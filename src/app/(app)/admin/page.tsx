@@ -18,25 +18,30 @@ export default async function AdminPage() {
     admin.from('kf_workspace_members').select('workspace_id, user_id, role'),
   ])
 
-  const users = (authUsers?.users || []).map(u => {
-    const userWorkspaces = (members || [])
-      .filter(m => m.user_id === u.id)
-      .map(m => {
-        const ws = (workspaces || []).find(w => w.id === m.workspace_id)
-        return ws ? { id: ws.id, name: ws.name as string, plan: ws.plan as string, role: m.role as string } : null
-      })
-      .filter(Boolean) as { id: string; name: string; plan: string; role: string }[]
+  // Only KreaFlow users — must have at least one kf_workspace_members record
+  const kfUserIds = new Set((members || []).map(m => m.user_id))
 
-    return {
-      id: u.id,
-      email: u.email || '',
-      nama: (u.user_metadata?.nama as string) || '',
-      created_at: u.created_at,
-      last_sign_in: u.last_sign_in_at || '',
-      workspaces: userWorkspaces,
-      plan: userWorkspaces[0]?.plan || 'free',
-    }
-  }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const users = (authUsers?.users || [])
+    .filter(u => kfUserIds.has(u.id))
+    .map(u => {
+      const userWorkspaces = (members || [])
+        .filter(m => m.user_id === u.id)
+        .map(m => {
+          const ws = (workspaces || []).find(w => w.id === m.workspace_id)
+          return ws ? { id: ws.id, name: ws.name as string, plan: ws.plan as string, role: m.role as string } : null
+        })
+        .filter(Boolean) as { id: string; name: string; plan: string; role: string }[]
+
+      return {
+        id: u.id,
+        email: u.email || '',
+        nama: (u.user_metadata?.nama as string) || '',
+        created_at: u.created_at,
+        last_sign_in: u.last_sign_in_at || '',
+        workspaces: userWorkspaces,
+        plan: userWorkspaces[0]?.plan || 'free',
+      }
+    }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   const now = new Date()
   const today = now.toISOString().slice(0, 10)
