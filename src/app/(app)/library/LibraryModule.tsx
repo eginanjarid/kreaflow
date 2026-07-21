@@ -70,7 +70,11 @@ function extractGdriveId(url: string): string | null {
 }
 
 function getThumbnail(idea: ContentIdea): string | null {
-  if (idea.preview_url) return idea.preview_url
+  if (idea.preview_url) {
+    const gdriveId = extractGdriveId(idea.preview_url)
+    if (gdriveId) return `https://drive.google.com/thumbnail?id=${gdriveId}&sz=w400`
+    return idea.preview_url
+  }
   if (idea.gdrive_url) {
     const id = extractGdriveId(idea.gdrive_url)
     if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w400`
@@ -763,13 +767,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                     const isCanva = modal.idea.preview_url?.includes('canva') || modal.idea.preview_url?.includes('canva.link')
                     if (isCanva) return (
                       <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>
-                        Link Canva tidak bisa dijadikan thumbnail. Paste URL gambar langsung (contoh: dari imgbb.com, imgur.com, atau Google Drive).
+                        Link Canva tidak bisa dijadikan thumbnail. Paste URL gambar langsung atau link Google Drive.
                       </div>
                     )
-                    return (
-                      <img src={modal.idea.preview_url} alt="preview" style={{ marginTop: 10, width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
-                        onError={e => { (e.target as HTMLImageElement).outerHTML = '<div style="margin-top:10px;font-size:0.72rem;color:#ef4444">Gagal load gambar — pastikan URL adalah link gambar langsung</div>' }} />
-                    )
+                    const thumb = getThumbnail({ ...modal.idea, gdrive_url: '' })
+                    return thumb ? (
+                      <img src={thumb} alt="preview" style={{ marginTop: 10, width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
+                        onError={e => { (e.target as HTMLImageElement).outerHTML = '<div style="margin-top:10px;font-size:0.72rem;color:#ef4444">Gagal load gambar — pastikan URL adalah link gambar langsung atau link Google Drive yang sudah di-share publik</div>' }} />
+                    ) : null
                   })()}
                 </div>
 
