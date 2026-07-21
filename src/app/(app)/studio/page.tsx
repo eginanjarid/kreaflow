@@ -19,7 +19,7 @@ export default async function StudioPage() {
 
   const wsId = member.workspace_id
 
-  const [{ data: contents }, { data: products }, { data: notifications }] = await Promise.all([
+  const [{ data: contents }, { data: products }, { data: notifications }, { data: workspace }] = await Promise.all([
     supabase
       .from('kf_content_ideas')
       .select('*')
@@ -37,6 +37,11 @@ export default async function StudioPage() {
       .eq('workspace_id', wsId)
       .eq('is_read', false)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('kf_workspaces')
+      .select('name')
+      .eq('id', wsId)
+      .single(),
   ])
 
   return (
@@ -45,6 +50,7 @@ export default async function StudioPage() {
       products={products || []}
       initialNotifications={notifications || []}
       workspaceId={wsId}
+      workspaceName={(workspace as { name: string } | null)?.name || 'studio'}
     />
   )
 }
