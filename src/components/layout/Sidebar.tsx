@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+const SUPER_ADMINS = ['eginanjarism@gmail.com']
+
 const NAV = [
   { href: '/brand', label: 'Brand', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> },
   { href: '/catalog', label: 'Catalog', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> },
@@ -72,6 +74,21 @@ export default function Sidebar({ user, workspace }: Props) {
             </Link>
           )
         })}
+        {SUPER_ADMINS.includes(user.email) && (
+          <>
+            <div style={{ height: 1, background: '#1f1f1f', margin: '8px 4px' }} />
+            <Link href="/admin" style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 8,
+              color: pathname.startsWith('/admin') ? '#f87171' : '#64748b',
+              background: pathname.startsWith('/admin') ? 'rgba(248,113,113,0.08)' : 'transparent',
+              fontWeight: pathname.startsWith('/admin') ? 600 : 400, fontSize: '0.875rem', textDecoration: 'none',
+              border: pathname.startsWith('/admin') ? '1px solid rgba(248,113,113,0.2)' : '1px solid transparent',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Super Admin
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* User */}

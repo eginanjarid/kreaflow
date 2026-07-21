@@ -12,11 +12,16 @@ export default async function AdminPage() {
 
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-  const [{ data: authUsers }, { data: workspaces }, { data: members }] = await Promise.all([
+  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 500 }),
     admin.from('kf_workspaces').select('id, name, plan, owner_id, created_at, modes'),
-    admin.from('kf_workspace_members').select('workspace_id, user_id, role'),
+    admin.from('kf_workspace_members').select('workspace_id, user_id, role, created_at'),
+    admin.from('kf_invites').select('workspace_id, email, role, created_at, accepted_at, expires_at'),
   ])
+
+  const userMap = Object.fromEntries(
+    (authUsers?.users || []).map(u => [u.id, { email: u.email || '', nama: (u.user_metadata?.nama as string) || '', created_at: u.created_at, last_sign_in: u.last_sign_in_at || '' }])
+  )
 
   // Only KreaFlow users — must have at least one kf_workspace_members record
   const kfUserIds = new Set((members || []).map(m => m.user_id))
@@ -43,6 +48,31 @@ export default async function AdminPage() {
       }
     }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
+  const workspaceList = (workspaces || []).map(ws => {
+    const wsMembers = (members || [])
+      .filter(m => m.workspace_id === ws.id)
+      .map(m => ({
+        user_id: m.user_id,
+        role: m.role as string,
+        joined_at: m.created_at as string,
+        email: userMap[m.user_id]?.email || '',
+        nama: userMap[m.user_id]?.nama || '',
+      }))
+    const wsInvites = (invites || []).filter(i => i.workspace_id === ws.id && !i.accepted_at)
+    const owner = wsMembers.find(m => m.role === 'owner')
+    return {
+      id: ws.id,
+      name: ws.name as string,
+      plan: ws.plan as string,
+      created_at: ws.created_at as string,
+      modes: (ws.modes as string[]) || [],
+      owner_email: owner?.email || '',
+      member_count: wsMembers.length,
+      members: wsMembers,
+      pending_invites: wsInvites.length,
+    }
+  }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
   const now = new Date()
   const today = now.toISOString().slice(0, 10)
   const weekAgo = new Date(now.getTime() - 7 * 86400000).toISOString()
@@ -59,8 +89,8 @@ export default async function AdminPage() {
       pro: users.filter(u => u.plan === 'pro').length,
       team: users.filter(u => u.plan === 'team').length,
     },
-    totalWorkspaces: (workspaces || []).length,
+    totalWorkspaces: workspaceList.length,
   }
 
-  return <AdminModule users={users} stats={stats} />
+  return <AdminModule users={users} workspaces={workspaceList} stats={stats} />
 }
