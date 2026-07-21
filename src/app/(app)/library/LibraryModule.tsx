@@ -715,12 +715,15 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                 {/* Canva */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-                    Link Canva
+                    Link Canva <span style={{ color: '#475569', fontWeight: 400 }}>(hanya shortcut buka desain)</span>
                   </label>
-                  <input style={fieldStyle()} value={modal.idea.canva_url || ''} onChange={e => setField('canva_url', e.target.value)} placeholder="https://www.canva.com/design/..." />
+                  <input style={fieldStyle()} value={modal.idea.canva_url || ''} onChange={e => setField('canva_url', e.target.value)} placeholder="https://www.canva.com/design/... atau canva.link/..." />
+                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.5 }}>
+                    ⚠️ Canva tidak mendukung thumbnail publik — link ini hanya untuk shortcut buka desain. Gunakan GDrive di bawah untuk thumbnail.
+                  </div>
                   {modal.idea.canva_url && (
                     <a href={modal.idea.canva_url} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-block', marginTop: 6, fontSize: '0.75rem', color: '#A78BFA', textDecoration: 'underline' }}>
+                      style={{ display: 'inline-block', marginTop: 4, fontSize: '0.75rem', color: '#A78BFA', textDecoration: 'underline' }}>
                       Buka di Canva ↗
                     </a>
                   )}
@@ -729,22 +732,23 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                 {/* Google Drive */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-                    Link Google Drive
+                    Link Google Drive <span style={{ color: '#86efac', fontWeight: 400 }}>← thumbnail otomatis dari sini</span>
                   </label>
                   <input style={fieldStyle()} value={modal.idea.gdrive_url || ''} onChange={e => setField('gdrive_url', e.target.value)} placeholder="https://drive.google.com/file/d/..." />
+                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.5 }}>
+                    Export desain Canva ke Google Drive → klik kanan file → "Bagikan" → "Siapapun yang punya link" → paste link-nya di sini.
+                  </div>
                   {modal.idea.gdrive_url && (() => {
-                    const thumb = (() => {
-                      const id = extractGdriveId(modal.idea.gdrive_url || '')
-                      return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : null
-                    })()
+                    const id = extractGdriveId(modal.idea.gdrive_url || '')
+                    const thumb = id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : null
                     return thumb ? (
                       <div style={{ marginTop: 10 }}>
                         <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 6 }}>Preview thumbnail:</div>
                         <img src={thumb} alt="preview" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
-                          onError={e => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="font-size:0.72rem;color:#ef4444;padding:4px 0">Gagal load thumbnail — pastikan link sudah di-share publik</div>' }} />
+                          onError={e => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="font-size:0.72rem;color:#ef4444;margin-top:4px">Gagal load — pastikan file sudah di-share publik di Google Drive</div>' }} />
                       </div>
                     ) : (
-                      <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>Format link tidak dikenali</div>
+                      <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>Format link tidak dikenali. Gunakan link dari drive.google.com/file/d/...</div>
                     )
                   })()}
                 </div>
@@ -752,13 +756,21 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                 {/* Manual preview URL */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-                    URL Thumbnail Manual <span style={{ color: '#475569', fontWeight: 400 }}>(opsional, override)</span>
+                    URL Gambar Thumbnail <span style={{ color: '#475569', fontWeight: 400 }}>(opsional — harus link gambar langsung)</span>
                   </label>
-                  <input style={fieldStyle()} value={modal.idea.preview_url || ''} onChange={e => setField('preview_url', e.target.value)} placeholder="https://..." />
-                  {modal.idea.preview_url && (
-                    <img src={modal.idea.preview_url} alt="preview" style={{ marginTop: 10, width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
-                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                  )}
+                  <input style={fieldStyle()} value={modal.idea.preview_url || ''} onChange={e => setField('preview_url', e.target.value)} placeholder="https://i.imgur.com/... atau link .jpg/.png langsung" />
+                  {modal.idea.preview_url && (() => {
+                    const isCanva = modal.idea.preview_url?.includes('canva') || modal.idea.preview_url?.includes('canva.link')
+                    if (isCanva) return (
+                      <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>
+                        Link Canva tidak bisa dijadikan thumbnail. Paste URL gambar langsung (contoh: dari imgbb.com, imgur.com, atau Google Drive).
+                      </div>
+                    )
+                    return (
+                      <img src={modal.idea.preview_url} alt="preview" style={{ marginTop: 10, width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
+                        onError={e => { (e.target as HTMLImageElement).outerHTML = '<div style="margin-top:10px;font-size:0.72rem;color:#ef4444">Gagal load gambar — pastikan URL adalah link gambar langsung</div>' }} />
+                    )
+                  })()}
                 </div>
 
                 {/* Current thumbnail preview */}
