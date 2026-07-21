@@ -540,7 +540,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
     { id: 'basic', label: 'Info Dasar' },
     { id: 'content', label: 'Konten' },
     { id: 'script', label: 'Script' },
-    { id: 'media', label: '🖼 Media' },
   ]
 
   return (
@@ -855,79 +854,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 </div>
               </>}
 
-              {/* Tab: Media */}
-              {modal.tab === 'media' && <>
-                <div style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.18)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.6 }}>
-                  Paste link share dari Canva atau Google Drive. Thumbnail otomatis muncul di Grid View.
-                </div>
-
-                {/* Canva */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-                    Link Canva <span style={{ color: '#475569', fontWeight: 400 }}>(hanya shortcut buka desain)</span>
-                  </label>
-                  <input style={fieldStyle()} value={modal.idea.canva_url || ''} onChange={e => setField('canva_url', e.target.value)} placeholder="https://www.canva.com/design/... atau canva.link/..." />
-                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.5 }}>
-                    ⚠️ Canva tidak mendukung thumbnail publik — link ini hanya untuk shortcut buka desain. Gunakan GDrive di bawah untuk thumbnail.
-                  </div>
-                  {modal.idea.canva_url && (
-                    <a href={modal.idea.canva_url} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-block', marginTop: 4, fontSize: '0.75rem', color: '#A78BFA', textDecoration: 'underline' }}>
-                      Buka di Canva ↗
-                    </a>
-                  )}
-                </div>
-
-                {/* Google Drive */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-                    Link Google Drive <span style={{ color: '#86efac', fontWeight: 400 }}>← thumbnail otomatis dari sini</span>
-                  </label>
-                  <input style={fieldStyle()} value={modal.idea.gdrive_url || ''} onChange={e => setField('gdrive_url', e.target.value)} placeholder="https://drive.google.com/file/d/..." />
-                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.5 }}>
-                    Export desain Canva ke Google Drive → klik kanan file → "Bagikan" → "Siapapun yang punya link" → paste link-nya di sini.
-                  </div>
-                  {modal.idea.gdrive_url && (() => {
-                    const id = extractGdriveId(modal.idea.gdrive_url || '')
-                    const thumb = id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : null
-                    return thumb ? (
-                      <div style={{ marginTop: 10 }}>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 6 }}>Preview thumbnail:</div>
-                        <img src={thumb} alt="preview" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
-                          onError={e => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="font-size:0.72rem;color:#ef4444;margin-top:4px">Gagal load — pastikan file sudah di-share publik di Google Drive</div>' }} />
-                      </div>
-                    ) : (
-                      <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>Format link tidak dikenali. Gunakan link dari drive.google.com/file/d/...</div>
-                    )
-                  })()}
-                </div>
-
-                {/* Manual preview URL */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-                    URL Gambar Thumbnail <span style={{ color: '#475569', fontWeight: 400 }}>(opsional — harus link gambar langsung)</span>
-                  </label>
-                  <input style={fieldStyle()} value={modal.idea.preview_url || ''} onChange={e => setField('preview_url', e.target.value)} placeholder="https://i.imgur.com/... atau link .jpg/.png langsung" />
-                  {modal.idea.preview_url && (() => {
-                    const isCanva = modal.idea.preview_url?.includes('canva') || modal.idea.preview_url?.includes('canva.link')
-                    if (isCanva) return (
-                      <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>
-                        Link Canva tidak bisa dijadikan thumbnail. Paste URL gambar langsung atau link Google Drive.
-                      </div>
-                    )
-                    const thumb = getThumbnail({ ...modal.idea, gdrive_url: '' })
-                    return thumb ? (
-                      <img src={thumb} alt="preview" style={{ marginTop: 10, width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
-                        onError={e => { (e.target as HTMLImageElement).outerHTML = '<div style="margin-top:10px;font-size:0.72rem;color:#ef4444">Gagal load gambar — pastikan URL adalah link gambar langsung atau link Google Drive yang sudah di-share publik</div>' }} />
-                    ) : null
-                  })()}
-                </div>
-
-                {/* Preview selector */}
-                {(modal.idea.canva_url || modal.idea.gdrive_url || modal.idea.preview_url) && (
-                  <MediaPreview idea={modal.idea} />
-                )}
-              </>}
 
               {/* Footer */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4, borderTop: '1px solid #1f1f1f', marginTop: 4 }}>
