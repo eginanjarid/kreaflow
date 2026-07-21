@@ -35,13 +35,25 @@ type IGTab = 'grid' | 'reels' | 'tagged'
 
 const FORMATS = ['Video Pendek', 'Reels', 'Story', 'Carousel', 'Single Post', 'Thread', 'Live', 'Podcast', 'Blog']
 const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before-After', 'Story Telling', 'Tutorial']
-const STATUSES = ['Draft', 'Ready', 'Scheduled', 'Posted']
+const STATUSES = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUS_COLOR: Record<string, string> = {
-  Draft: '#475569', Ready: '#166534', Scheduled: '#1e40af', Posted: '#6b21a8'
+  Draft: '#475569',
+  'Naskah Siap': '#f59e0b',
+  Produksi: '#3b82f6',
+  'Siap Tayang': '#22c55e',
+  Terjadwal: '#a855f7',
+  Tayang: '#6b21a8',
+  Ready: '#166534', Scheduled: '#1e40af', Posted: '#6b21a8',
 }
 const STATUS_BG: Record<string, string> = {
-  Draft: '#1a1a1a', Ready: 'rgba(22,101,52,0.15)', Scheduled: 'rgba(30,64,175,0.15)', Posted: 'rgba(107,33,168,0.15)'
+  Draft: '#1a1a1a',
+  'Naskah Siap': 'rgba(245,158,11,0.12)',
+  Produksi: 'rgba(59,130,246,0.12)',
+  'Siap Tayang': 'rgba(34,197,94,0.12)',
+  Terjadwal: 'rgba(168,85,247,0.12)',
+  Tayang: 'rgba(107,33,168,0.15)',
+  Ready: 'rgba(22,101,52,0.15)', Scheduled: 'rgba(30,64,175,0.15)', Posted: 'rgba(107,33,168,0.15)',
 }
 
 function emptyIdea(workspaceId: string): ContentIdea {

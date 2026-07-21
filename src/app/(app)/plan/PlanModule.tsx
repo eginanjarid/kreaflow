@@ -431,16 +431,24 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setAffSavedToLibrary(false)
     const supabase = createClient()
     const selectedProduct = products.find(p => p.id === affForm.product_id)
-    const { error: err } = await supabase.from('kf_content_ideas').insert({
+    const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
+    const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
-      judul: `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`,
+      judul,
       platform: [affForm.platform],
       format: affForm.tipe_konten,
       script: affNaskah,
-      status: 'Draft',
+      status: 'Naskah Siap',
       product_id: affForm.product_id || null,
-    })
-    if (!err) {
+    }).select('id').single()
+    if (!err && inserted) {
+      await supabase.from('kf_notifications').insert({
+        workspace_id: workspaceId,
+        type: 'produksi',
+        title: `Mulai Produksi — ${judul}`,
+        message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
+        content_idea_id: inserted.id,
+      })
       setAffSavedToLibrary(true)
       setTimeout(() => setAffSavedToLibrary(false), 3000)
       if (selectedProduct) {
@@ -451,7 +459,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         )
         if (naskahTask && naskahTask.percent_complete < 100) {
           await supabase.from('kf_tasks').update({ percent_complete: 100 }).eq('id', naskahTask.id)
-          await supabase.from('kf_calendar_entries').update({ status: 'Posted' }).eq('task_id', naskahTask.id)
         }
       }
     }
@@ -461,16 +468,24 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (!generatedNaskah.trim()) return
     setSavedToLibrary(false)
     const supabase = createClient()
-    const { error: err } = await supabase.from('kf_content_ideas').insert({
+    const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
+    const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
-      judul: `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`,
+      judul,
       platform: [naskahForm.platform],
       format: naskahForm.tipe_konten,
       script: generatedNaskah,
-      status: 'Draft',
+      status: 'Naskah Siap',
       product_id: naskahForm.product_id || null,
-    })
-    if (!err) {
+    }).select('id').single()
+    if (!err && inserted) {
+      await supabase.from('kf_notifications').insert({
+        workspace_id: workspaceId,
+        type: 'produksi',
+        title: `Mulai Produksi — ${judul}`,
+        message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
+        content_idea_id: inserted.id,
+      })
       setSavedToLibrary(true)
       setTimeout(() => setSavedToLibrary(false), 3000)
       if (naskahForm.product_id) {
@@ -483,7 +498,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           )
           if (naskahTask && naskahTask.percent_complete < 100) {
             await supabase.from('kf_tasks').update({ percent_complete: 100 }).eq('id', naskahTask.id)
-            await supabase.from('kf_calendar_entries').update({ status: 'Posted' }).eq('task_id', naskahTask.id)
           }
         }
       }

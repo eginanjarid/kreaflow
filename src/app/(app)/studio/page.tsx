@@ -1,0 +1,50 @@
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import StudioModule from './StudioModule'
+
+export default async function StudioPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: member } = await supabase
+    .from('kf_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .single()
+
+  if (!member) redirect('/login')
+
+  const wsId = member.workspace_id
+
+  const [{ data: contents }, { data: products }, { data: notifications }] = await Promise.all([
+    supabase
+      .from('kf_content_ideas')
+      .select('*')
+      .eq('workspace_id', wsId)
+      .in('status', ['Naskah Siap', 'Produksi', 'Siap Tayang'])
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('kf_products')
+      .select('id, nama')
+      .eq('workspace_id', wsId)
+      .eq('is_active', true),
+    supabase
+      .from('kf_notifications')
+      .select('*')
+      .eq('workspace_id', wsId)
+      .eq('is_read', false)
+      .order('created_at', { ascending: false }),
+  ])
+
+  return (
+    <StudioModule
+      initialContents={contents || []}
+      products={products || []}
+      initialNotifications={notifications || []}
+      workspaceId={wsId}
+    />
+  )
+}

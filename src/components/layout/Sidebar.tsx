@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const SUPER_ADMINS = ['eginanjarism@gmail.com']
 
@@ -12,6 +13,7 @@ const NAV = [
   { href: '/catalog', label: 'Catalog', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> },
   { href: '/plan', label: 'Plan', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
   { href: '/library', label: 'Library', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> },
+  { href: '/studio', label: 'Studio', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5M2 7h5M17 7h5M2 17h5M17 17h5"/></svg> },
   { href: '/calendar', label: 'Calendar', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> },
   { href: '/tracker', label: 'Tracker', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> },
   { href: '/insights', label: 'Insights', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
@@ -28,6 +30,23 @@ type Props = {
 export default function Sidebar({ user, workspace }: Props) {
   const pathname = usePathname()
   const router = useRouter()
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [studioCount, setStudioCount] = useState(0)
+
+  useEffect(() => {
+    const supabase = createClient()
+    async function fetchCounts() {
+      const [{ count: notifCount }, { count: studioReady }] = await Promise.all([
+        supabase.from('kf_notifications').select('*', { count: 'exact', head: true }).eq('is_read', false),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Naskah Siap'),
+      ])
+      setUnreadCount(notifCount || 0)
+      setStudioCount(studioReady || 0)
+    }
+    fetchCounts()
+    const interval = setInterval(fetchCounts, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -61,16 +80,22 @@ export default function Sidebar({ user, workspace }: Props) {
       <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
         {NAV.map(item => {
           const active = pathname.startsWith(item.href)
+          const isStudio = item.href === '/studio'
           return (
             <Link key={item.href} href={item.href} style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 8, marginBottom: 2,
               color: active ? '#A78BFA' : '#94a3b8',
               background: active ? 'rgba(124,58,237,0.12)' : 'transparent',
               fontWeight: active ? 600 : 400, fontSize: '0.875rem', textDecoration: 'none',
-              transition: 'all 0.15s',
+              transition: 'all 0.15s', position: 'relative',
             }}>
               {item.icon}
               {item.label}
+              {isStudio && studioCount > 0 && (
+                <span style={{ marginLeft: 'auto', minWidth: 18, height: 18, background: '#f59e0b', borderRadius: 10, fontSize: '0.62rem', fontWeight: 700, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px' }}>
+                  {studioCount}
+                </span>
+              )}
             </Link>
           )
         })}
