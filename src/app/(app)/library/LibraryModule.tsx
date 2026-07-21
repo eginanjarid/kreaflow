@@ -24,12 +24,14 @@ type ContentIdea = {
   canva_url?: string
   gdrive_url?: string
   preview_url?: string
+  show_in_feed?: boolean
 }
 
 type Product = { id: string; nama: string }
 type Pillar = { id: string; nama: string }
 type TaskSnap = { id: string; nama: string; due_date: string; percent_complete: number; priority: string }
 type ViewMode = 'list' | 'ig' | 'tiktok'
+type IGTab = 'grid' | 'reels' | 'tagged'
 
 const FORMATS = ['Video Pendek', 'Reels', 'Story', 'Carousel', 'Single Post', 'Thread', 'Live', 'Podcast', 'Blog']
 const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before-After', 'Story Telling', 'Tutorial']
@@ -47,7 +49,7 @@ function emptyIdea(workspaceId: string): ContentIdea {
     workspace_id: workspaceId, pillar_id: '', product_id: '', judul: '',
     format: '', formula: '', usp: [], hook: '', body: '', cta: '',
     hashtags: [], prompt_script: '', script: '', status: 'Draft', platform: [],
-    scheduled_date: '', canva_url: '', gdrive_url: '', preview_url: '',
+    scheduled_date: '', canva_url: '', gdrive_url: '', preview_url: '', show_in_feed: true,
   }
 }
 
@@ -310,6 +312,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [previewPost, setPreviewPost] = useState<ContentIdea | null>(null)
+  const [igTab, setIgTab] = useState<IGTab>('grid')
 
   function openSchedule(c: ContentIdea) {
     setScheduleModal({ idea: c })
@@ -349,7 +352,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
     setError('')
   }
   function closeModal() { setModal(m => ({ ...m, open: false })) }
-  function setField(key: keyof ContentIdea, value: string | string[]) {
+  function setField(key: keyof ContentIdea, value: string | string[] | boolean) {
     setModal(m => ({ ...m, idea: { ...m.idea, [key]: value } }))
   }
   function toggleArr(key: 'platform' | 'usp' | 'hashtags', val: string) {
@@ -632,20 +635,37 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
 
             {/* Tab bar */}
             <div style={{ display: 'flex', borderTop: '1px solid #1a1a1a' }}>
-              {[
-                { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="#f1f5f9"><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg>, active: true },
-                { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>, active: false },
-                { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>, active: false },
-              ].map((t, i) => (
-                <div key={i} style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '10px 0', borderBottom: t.active ? '1px solid #f1f5f9' : 'none' }}>
+              {([
+                { key: 'grid' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill={igTab==='grid'?'#f1f5f9':'none'} stroke={igTab==='grid'?'none':'#555'} strokeWidth="1.5"><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg> },
+                { key: 'reels' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={igTab==='reels'?'#f1f5f9':'#555'} strokeWidth="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> },
+                { key: 'tagged' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={igTab==='tagged'?'#f1f5f9':'#555'} strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
+              ] as { key: IGTab; icon: React.ReactNode }[]).map(t => (
+                <button key={t.key} onClick={() => setIgTab(t.key)}
+                  style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '10px 0', background: 'transparent', border: 'none', borderBottom: igTab === t.key ? '1px solid #f1f5f9' : '1px solid transparent', cursor: 'pointer' }}>
                   {t.icon}
-                </div>
+                </button>
               ))}
             </div>
 
-            {/* Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#1a1a1a' }}>
-              {filtered.map(c => {
+            {/* Grid / Reels / Tagged content */}
+            {(() => {
+              const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
+              const igFiltered = igTab === 'reels'
+                ? filtered.filter(c => VIDEO_FORMATS.includes(c.format))
+                : igTab === 'tagged'
+                ? []
+                : filtered.filter(c => !VIDEO_FORMATS.includes(c.format) || c.show_in_feed !== false)
+
+              if (igTab === 'tagged') return (
+                <div style={{ padding: '32px 16px', textAlign: 'center', color: '#475569', fontSize: '0.8rem' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: 8 }}>🏷️</div>
+                  Konten yang di-tag akan muncul di sini
+                </div>
+              )
+
+              return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#1a1a1a' }}>
+              {igFiltered.map(c => {
                 const thumb = getThumbnail(c)
                 const isHovered = hoveredId === c.id
                 return (
@@ -674,12 +694,21 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 )
               })}
               {/* Empty placeholder slots */}
-              {Array.from({ length: Math.max(0, 9 - filtered.length) }).map((_, i) => (
-                <div key={`empty-${i}`} style={{ aspectRatio: '1 / 1', background: '#0d0d0d', border: '1px dashed #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} onClick={openAdd}>
-                  {i === 0 && filtered.length === 0 && <span style={{ fontSize: '1.2rem', color: '#2a2a2a' }}>+</span>}
+              {Array.from({ length: Math.max(0, 9 - igFiltered.length) }).map((_, i) => (
+                <div key={`empty-${i}`} style={{ aspectRatio: '1 / 1', background: '#0d0d0d', border: '1px dashed #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  onClick={igTab === 'grid' ? openAdd : undefined}>
+                  {i === 0 && igFiltered.length === 0 && igTab === 'reels' && (
+                    <div style={{ textAlign: 'center', padding: 8 }}>
+                      <div style={{ fontSize: '1.5rem', marginBottom: 4 }}>🎬</div>
+                      <div style={{ fontSize: '0.62rem', color: '#475569', lineHeight: 1.4 }}>Tambah konten format Reels atau Video Pendek</div>
+                    </div>
+                  )}
+                  {i === 0 && igFiltered.length === 0 && igTab === 'grid' && <span style={{ fontSize: '1.2rem', color: '#2a2a2a' }}>+</span>}
                 </div>
               ))}
             </div>
+              )
+            })()}
           </div>
           <div style={{ marginTop: 8, fontSize: '0.72rem', color: '#475569' }}>
             {filtered.length} konten · Klik thumbnail untuk preview post · Hover + Edit untuk edit
@@ -887,6 +916,19 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     <input type="date" style={fieldStyle()} value={modal.idea.scheduled_date} onChange={e => setField('scheduled_date', e.target.value)} />
                   </div>
                 </div>
+                {['Reels', 'Video Pendek', 'Live'].includes(modal.idea.format) && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 14px' }}>
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#e2e8f0' }}>Tampil di Feed</div>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: 2 }}>Seperti opsi "Bagikan ke Feed" di Instagram Reels</div>
+                    </div>
+                    <button type="button"
+                      onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
+                      style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? 'linear-gradient(135deg,#7C3AED,#A78BFA)' : '#2a2a2a', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: modal.idea.show_in_feed !== false ? 23 : 3, transition: 'left 0.2s' }} />
+                    </button>
+                  </div>
+                )}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>Platform</label>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
