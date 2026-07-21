@@ -82,6 +82,126 @@ function getThumbnail(idea: ContentIdea): string | null {
   return null
 }
 
+function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
+  idea: ContentIdea; workspaceName: string; onEdit: () => void; onClose: () => void
+}) {
+  const thumb = getThumbnail(idea)
+  const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
+  const initial = workspaceName.charAt(0).toUpperCase()
+  const caption = [idea.hook, idea.body, idea.cta].filter(Boolean).join('\n\n') || idea.judul
+  const hashtags = (idea.hashtags || []).join(' ')
+  const fakeLikes = Math.floor(Math.random() * 900) + 100
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+      onClick={onClose}>
+      <div onClick={e => e.stopPropagation()}
+        style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 16, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
+
+        {/* IG Post Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#fff', flexShrink: 0 }}>
+            {initial}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', lineHeight: 1 }}>{handle}</div>
+            <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: 2 }}>Original audio</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
+            <span style={{ color: '#64748b', fontSize: '1.1rem', cursor: 'pointer', lineHeight: 1 }}>···</span>
+          </div>
+        </div>
+
+        {/* Image */}
+        <div style={{ width: '100%', aspectRatio: '4 / 5', background: '#111', position: 'relative', overflow: 'hidden' }}>
+          {thumb
+            ? <img src={thumb} alt={idea.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            : <ThumbnailPlaceholder idea={idea} />
+          }
+          {/* dot indicator */}
+          <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
+          </div>
+        </div>
+
+        {/* Action bar */}
+        <div style={{ padding: '10px 14px 6px', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
+            <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          <div style={{ flex: 1 }} />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
+        </div>
+
+        {/* Likes */}
+        <div style={{ paddingInline: 14, fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>
+          {fakeLikes.toLocaleString()} suka
+        </div>
+
+        {/* Caption */}
+        {caption && (
+          <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#e2e8f0', lineHeight: 1.5, marginBottom: 4 }}>
+            <span style={{ fontWeight: 700, marginRight: 6 }}>{handle}</span>
+            <span style={{ whiteSpace: 'pre-wrap' }}>{caption.length > 150 ? caption.slice(0, 150) + '...' : caption}</span>
+          </div>
+        )}
+
+        {/* Hashtags */}
+        {hashtags && (
+          <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#3b82f6', marginBottom: 4, lineHeight: 1.5 }}>
+            {hashtags}
+          </div>
+        )}
+
+        {/* Status badge */}
+        <div style={{ paddingInline: 14, marginBottom: 6 }}>
+          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>
+            {idea.status}
+          </span>
+          {idea.format && <span style={{ marginLeft: 6, fontSize: '0.68rem', color: '#475569' }}>{idea.format}</span>}
+        </div>
+
+        <div style={{ fontSize: '0.7rem', color: '#475569', paddingInline: 14, marginBottom: 10 }}>
+          {idea.scheduled_date ? `Dijadwalkan: ${idea.scheduled_date}` : 'Belum dijadwalkan'}
+        </div>
+
+        {/* Footer actions */}
+        <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #1a1a1a' }}>
+          <button onClick={onEdit}
+            style={{ flex: 1, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '9px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+            Edit Konten
+          </button>
+          {idea.canva_url && (
+            <a href={idea.canva_url} target="_blank" rel="noopener noreferrer"
+              style={{ flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px', color: '#A78BFA', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+              Buka Canva ↗
+            </a>
+          )}
+          {idea.gdrive_url && (
+            <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer"
+              style={{ flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px', color: '#38bdf8', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+              Drive ↗
+            </a>
+          )}
+          <button onClick={onClose}
+            style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 12px', color: '#64748b', fontSize: '0.82rem', cursor: 'pointer' }}>
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const PREVIEW_RATIOS = [
   { key: '1:1',     label: '1:1',      sub: 'IG Grid',    w: 160, h: 160 },
   { key: '4:5',     label: '4:5',      sub: 'IG / TikTok', w: 128, h: 160 },
@@ -165,9 +285,10 @@ function ThumbnailPlaceholder({ idea }: { idea: ContentIdea }) {
   )
 }
 
-export default function LibraryModule({ initialIdeas, workspaceId, products, pillars, tasks = [] }: {
+export default function LibraryModule({ initialIdeas, workspaceId, workspaceName = 'workspace', products, pillars, tasks = [] }: {
   initialIdeas: ContentIdea[]
   workspaceId: string
+  workspaceName?: string
   products: Product[]
   pillars: Pillar[]
   tasks?: TaskSnap[]
@@ -188,6 +309,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
   const [schedDone, setSchedDone] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [previewPost, setPreviewPost] = useState<ContentIdea | null>(null)
 
   function openSchedule(c: ContentIdea) {
     setScheduleModal({ idea: c })
@@ -445,7 +567,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                   style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
                   onMouseEnter={() => setHoveredId(c.id!)}
                   onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => openEdit(c)}>
+                  onClick={() => setPreviewPost(c)}>
                   {thumb ? (
                     <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
@@ -455,29 +577,19 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                   {/* Hover overlay */}
                   <div style={{
                     position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8, gap: 5,
                     opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s',
                   }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#f1f5f9', textAlign: 'center', lineHeight: 1.3, marginBottom: 4 }}>
-                      {c.judul || '(Tanpa judul)'}
+                    <div style={{ fontSize: '0.65rem', fontWeight: 600, color: '#f1f5f9', textAlign: 'center', lineHeight: 1.3 }}>
+                      {(c.judul || '(Tanpa judul)').length > 30 ? (c.judul || '').slice(0, 30) + '…' : (c.judul || '(Tanpa judul)')}
                     </div>
-                    <span style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: 3, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600, border: `1px solid ${STATUS_COLOR[c.status]}40` }}>
+                    <span style={{ fontSize: '0.58rem', padding: '1px 6px', borderRadius: 3, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>
                       {c.status}
                     </span>
-                    {c.canva_url && (
-                      <a href={c.canva_url} target="_blank" rel="noopener noreferrer"
-                        onClick={e => e.stopPropagation()}
-                        style={{ marginTop: 6, fontSize: '0.6rem', color: '#A78BFA', textDecoration: 'underline' }}>
-                        Buka Canva
-                      </a>
-                    )}
-                    {c.gdrive_url && (
-                      <a href={c.gdrive_url} target="_blank" rel="noopener noreferrer"
-                        onClick={e => e.stopPropagation()}
-                        style={{ marginTop: 4, fontSize: '0.6rem', color: '#38bdf8', textDecoration: 'underline' }}>
-                        Buka Drive
-                      </a>
-                    )}
+                    <button onClick={e => { e.stopPropagation(); openEdit(c) }}
+                      style={{ background: 'rgba(124,58,237,0.85)', border: 'none', borderRadius: 5, padding: '3px 10px', color: '#fff', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer', marginTop: 2 }}>
+                      Edit
+                    </button>
                   </div>
                   {/* Status dot */}
                   {!isHovered && (
@@ -507,7 +619,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                   style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
                   onMouseEnter={() => setHoveredId(c.id!)}
                   onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => openEdit(c)}>
+                  onClick={() => setPreviewPost(c)}>
                   {thumb ? (
                     <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
@@ -558,6 +670,16 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
             {filtered.length} konten · Klik untuk edit · Hover untuk detail
           </div>
         </div>
+      )}
+
+      {/* IG Post Preview Modal */}
+      {previewPost && (
+        <IGPostPreview
+          idea={previewPost}
+          workspaceName={workspaceName}
+          onEdit={() => { setPreviewPost(null); openEdit(previewPost) }}
+          onClose={() => setPreviewPost(null)}
+        />
       )}
 
       {/* Quick Schedule Modal */}
