@@ -600,7 +600,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             })}
           </div>
           <div style={{ marginTop: 10, fontSize: '0.72rem', color: '#475569' }}>
-            {filtered.length} konten · Klik untuk edit · Hover untuk detail
+            {filtered.length} konten · Klik untuk preview · Hover lalu Edit untuk edit
           </div>
         </div>
       ) : (
@@ -667,7 +667,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             })}
           </div>
           <div style={{ marginTop: 10, fontSize: '0.72rem', color: '#475569' }}>
-            {filtered.length} konten · Klik untuk edit · Hover untuk detail
+            {filtered.length} konten · Klik untuk preview · Hover lalu Edit untuk edit
           </div>
         </div>
       )}
