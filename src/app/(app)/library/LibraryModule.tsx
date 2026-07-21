@@ -668,6 +668,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               {igFiltered.map(c => {
                 const thumb = getThumbnail(c)
                 const isHovered = hoveredId === c.id
+                const isVideo = ['Reels', 'Video Pendek', 'Live'].includes(c.format)
                 return (
                   <div key={c.id}
                     style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
@@ -678,6 +679,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                       ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                       : <ThumbnailPlaceholder idea={c} />
                     }
+                    {/* Format badge — always visible */}
+                    {c.format && (
+                      <div style={{ position: 'absolute', bottom: 4, left: 4, fontSize: '0.55rem', fontWeight: 600, color: '#fff', background: isVideo ? 'rgba(220,39,39,0.85)' : 'rgba(30,64,175,0.85)', padding: '2px 5px', borderRadius: 3, backdropFilter: 'blur(2px)' }}>
+                        {c.format}
+                      </div>
+                    )}
                     {/* Status dot */}
                     <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status], boxShadow: '0 0 4px rgba(0,0,0,0.7)' }} />
                     {/* Hover */}
