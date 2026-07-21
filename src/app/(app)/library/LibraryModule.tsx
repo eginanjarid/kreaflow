@@ -21,11 +21,15 @@ type ContentIdea = {
   status: string
   platform: string[]
   scheduled_date: string
+  canva_url?: string
+  gdrive_url?: string
+  preview_url?: string
 }
 
 type Product = { id: string; nama: string }
 type Pillar = { id: string; nama: string }
 type TaskSnap = { id: string; nama: string; due_date: string; percent_complete: number; priority: string }
+type ViewMode = 'list' | 'ig' | 'tiktok'
 
 const FORMATS = ['Video Pendek', 'Reels', 'Story', 'Carousel', 'Single Post', 'Thread', 'Live', 'Podcast', 'Blog']
 const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before-After', 'Story Telling', 'Tutorial']
@@ -43,7 +47,7 @@ function emptyIdea(workspaceId: string): ContentIdea {
     workspace_id: workspaceId, pillar_id: '', product_id: '', judul: '',
     format: '', formula: '', usp: [], hook: '', body: '', cta: '',
     hashtags: [], prompt_script: '', script: '', status: 'Draft', platform: [],
-    scheduled_date: '',
+    scheduled_date: '', canva_url: '', gdrive_url: '', preview_url: '',
   }
 }
 
@@ -57,6 +61,21 @@ function fieldStyle(extra?: object) {
 }
 function selectStyle() {
   return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }
+}
+
+function extractGdriveId(url: string): string | null {
+  if (!url) return null
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+  return m ? m[1] : null
+}
+
+function getThumbnail(idea: ContentIdea): string | null {
+  if (idea.preview_url) return idea.preview_url
+  if (idea.gdrive_url) {
+    const id = extractGdriveId(idea.gdrive_url)
+    if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w400`
+  }
+  return null
 }
 
 function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName: string }) {
@@ -89,6 +108,22 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
   )
 }
 
+function ThumbnailPlaceholder({ idea }: { idea: ContentIdea }) {
+  const letter = (idea.judul || '?').charAt(0).toUpperCase()
+  const gradients: Record<string, string> = {
+    Draft: 'linear-gradient(135deg, #1e293b, #334155)',
+    Ready: 'linear-gradient(135deg, #14532d, #166534)',
+    Scheduled: 'linear-gradient(135deg, #1e3a8a, #1d4ed8)',
+    Posted: 'linear-gradient(135deg, #3b0764, #6b21a8)',
+  }
+  return (
+    <div style={{ width: '100%', height: '100%', background: gradients[idea.status] || gradients.Draft, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+      <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', fontFamily: 'sans-serif' }}>{letter}</span>
+      {idea.canva_url && <span style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: 4 }}>Canva</span>}
+    </div>
+  )
+}
+
 export default function LibraryModule({ initialIdeas, workspaceId, products, pillars, tasks = [] }: {
   initialIdeas: ContentIdea[]
   workspaceId: string
@@ -110,6 +145,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
   const [schedEntry, setSchedEntry] = useState({ platform: '', scheduled_at: '', status: 'Planned' })
   const [schedSaving, setSchedSaving] = useState(false)
   const [schedDone, setSchedDone] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   function openSchedule(c: ContentIdea) {
     setScheduleModal({ idea: c })
@@ -217,6 +254,13 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
     { id: 'basic', label: 'Info Dasar' },
     { id: 'content', label: 'Konten' },
     { id: 'script', label: 'Script' },
+    { id: 'media', label: '🖼 Media' },
+  ]
+
+  const VIEW_BTNS: { mode: ViewMode; label: string; title: string }[] = [
+    { mode: 'list', label: '☰', title: 'List View' },
+    { mode: 'ig', label: '⊞', title: 'IG Grid (3 kolom)' },
+    { mode: 'tiktok', label: '▬▬', title: 'TikTok Feed (2 kolom)' },
   ]
 
   return (
@@ -242,26 +286,34 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
         ))}
       </div>
 
-      {/* Filters */}
+      {/* Filters + View Toggle */}
       {ideas.length > 0 && (
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           {['', ...STATUSES].map(s => (
             <button key={s} onClick={() => setFilterStatus(s)}
               style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #7C3AED' : '1px solid #2a2a2a', background: filterStatus === s ? 'rgba(124,58,237,0.15)' : '#1a1a1a', color: filterStatus === s ? '#A78BFA' : '#64748b', cursor: 'pointer' }}>
               {s || 'Semua'}
             </button>
           ))}
-          <div style={{ width: 1, background: '#2a2a2a', margin: '0 4px' }} />
+          <div style={{ width: 1, background: '#2a2a2a', margin: '0 4px', alignSelf: 'stretch' }} />
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
               style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #7C3AED' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(124,58,237,0.15)' : '#1a1a1a', color: filterPlatform === p ? '#A78BFA' : '#64748b', cursor: 'pointer' }}>
               {p || 'Semua Platform'}
             </button>
           ))}
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+            {VIEW_BTNS.map(v => (
+              <button key={v.mode} onClick={() => setViewMode(v.mode)} title={v.title}
+                style={{ padding: '6px 12px', borderRadius: 8, fontSize: '0.85rem', border: viewMode === v.mode ? '1px solid #7C3AED' : '1px solid #2a2a2a', background: viewMode === v.mode ? 'rgba(124,58,237,0.15)' : '#1a1a1a', color: viewMode === v.mode ? '#A78BFA' : '#64748b', cursor: 'pointer', fontWeight: 600 }}>
+                {v.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Content List */}
+      {/* Content */}
       {filtered.length === 0 ? (
         <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, padding: 48, textAlign: 'center', color: '#64748b' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📚</div>
@@ -273,11 +325,21 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
             </button>
           )}
         </div>
-      ) : (
+      ) : viewMode === 'list' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {filtered.map(c => (
             <div key={c.id} style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                {/* Thumbnail mini di list view */}
+                {getThumbnail(c) ? (
+                  <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: '1px solid #2a2a2a', cursor: 'pointer' }} onClick={() => openEdit(c)}>
+                    <img src={getThumbnail(c)!} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                  </div>
+                ) : (c.canva_url || c.gdrive_url) ? (
+                  <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: '1px solid #2a2a2a', cursor: 'pointer' }} onClick={() => openEdit(c)}>
+                    <ThumbnailPlaceholder idea={c} />
+                  </div>
+                ) : null}
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
@@ -325,6 +387,143 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
               </div>
             </div>
           ))}
+        </div>
+      ) : viewMode === 'ig' ? (
+        /* IG Grid: 3-col square */
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E4405F', display: 'inline-block' }} />
+            Instagram Grid Preview
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, maxWidth: 540, background: '#0a0a0a', padding: 2, borderRadius: 4 }}>
+            {filtered.map(c => {
+              const thumb = getThumbnail(c)
+              const isHovered = hoveredId === c.id
+              return (
+                <div key={c.id}
+                  style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
+                  onMouseEnter={() => setHoveredId(c.id!)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  onClick={() => openEdit(c)}>
+                  {thumb ? (
+                    <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                  ) : (
+                    <ThumbnailPlaceholder idea={c} />
+                  )}
+                  {/* Hover overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8,
+                    opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s',
+                  }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#f1f5f9', textAlign: 'center', lineHeight: 1.3, marginBottom: 4 }}>
+                      {c.judul || '(Tanpa judul)'}
+                    </div>
+                    <span style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: 3, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600, border: `1px solid ${STATUS_COLOR[c.status]}40` }}>
+                      {c.status}
+                    </span>
+                    {c.canva_url && (
+                      <a href={c.canva_url} target="_blank" rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        style={{ marginTop: 6, fontSize: '0.6rem', color: '#A78BFA', textDecoration: 'underline' }}>
+                        Buka Canva
+                      </a>
+                    )}
+                    {c.gdrive_url && (
+                      <a href={c.gdrive_url} target="_blank" rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        style={{ marginTop: 4, fontSize: '0.6rem', color: '#38bdf8', textDecoration: 'underline' }}>
+                        Buka Drive
+                      </a>
+                    )}
+                  </div>
+                  {/* Status dot */}
+                  {!isHovered && (
+                    <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status], boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          <div style={{ marginTop: 10, fontSize: '0.72rem', color: '#475569' }}>
+            {filtered.length} konten · Klik untuk edit · Hover untuk detail
+          </div>
+        </div>
+      ) : (
+        /* TikTok Feed: 2-col 9:16 */
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#69C9D0', display: 'inline-block' }} />
+            TikTok Feed Preview
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, maxWidth: 400 }}>
+            {filtered.map(c => {
+              const thumb = getThumbnail(c)
+              const isHovered = hoveredId === c.id
+              return (
+                <div key={c.id}
+                  style={{ position: 'relative', aspectRatio: '9 / 16', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d', borderRadius: 8, border: '1px solid #1f1f1f' }}
+                  onMouseEnter={() => setHoveredId(c.id!)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  onClick={() => openEdit(c)}>
+                  {thumb ? (
+                    <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                  ) : (
+                    <ThumbnailPlaceholder idea={c} />
+                  )}
+                  {/* Bottom caption — always visible */}
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
+                    padding: '20px 8px 8px',
+                  }}>
+                    <div style={{ fontSize: '0.68rem', fontWeight: 600, color: '#f1f5f9', lineHeight: 1.3, marginBottom: 3 }}>
+                      {(c.judul || '(Tanpa judul)').length > 40 ? (c.judul || '').slice(0, 40) + '…' : (c.judul || '(Tanpa judul)')}
+                    </div>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {c.platform.slice(0, 2).map(p => (
+                        <span key={p} style={{ fontSize: '0.55rem', padding: '1px 5px', borderRadius: 3, color: '#69C9D0', background: 'rgba(105,201,208,0.12)', border: '1px solid rgba(105,201,208,0.25)' }}>{p}</span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Hover overlay with actions */}
+                  <div style={{
+                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 8,
+                    opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s',
+                  }}>
+                    <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>
+                      {c.status}
+                    </span>
+                    <button
+                      onClick={e => { e.stopPropagation(); openEdit(c) }}
+                      style={{ background: 'rgba(124,58,237,0.8)', border: 'none', borderRadius: 6, padding: '5px 12px', color: '#fff', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}>
+                      Edit
+                    </button>
+                    {c.canva_url && (
+                      <a href={c.canva_url} target="_blank" rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        style={{ fontSize: '0.62rem', color: '#A78BFA', textDecoration: 'underline' }}>
+                        Canva ↗
+                      </a>
+                    )}
+                    {c.gdrive_url && (
+                      <a href={c.gdrive_url} target="_blank" rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        style={{ fontSize: '0.62rem', color: '#38bdf8', textDecoration: 'underline' }}>
+                        Drive ↗
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div style={{ marginTop: 10, fontSize: '0.72rem', color: '#475569' }}>
+            {filtered.length} konten · Klik untuk edit · Hover untuk detail
+          </div>
         </div>
       )}
 
@@ -505,6 +704,91 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                   </div>
                   <textarea style={fieldStyle({ height: 240, resize: 'vertical', lineHeight: '1.6', fontFamily: 'monospace' })} value={modal.idea.script} onChange={e => setField('script', e.target.value)} placeholder="Script lengkap konten akan muncul di sini..." />
                 </div>
+              </>}
+
+              {/* Tab: Media */}
+              {modal.tab === 'media' && <>
+                <div style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.18)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.6 }}>
+                  Paste link share dari Canva atau Google Drive. Thumbnail otomatis muncul di Grid View.
+                </div>
+
+                {/* Canva */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
+                    Link Canva
+                  </label>
+                  <input style={fieldStyle()} value={modal.idea.canva_url || ''} onChange={e => setField('canva_url', e.target.value)} placeholder="https://www.canva.com/design/..." />
+                  {modal.idea.canva_url && (
+                    <a href={modal.idea.canva_url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-block', marginTop: 6, fontSize: '0.75rem', color: '#A78BFA', textDecoration: 'underline' }}>
+                      Buka di Canva ↗
+                    </a>
+                  )}
+                </div>
+
+                {/* Google Drive */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
+                    Link Google Drive
+                  </label>
+                  <input style={fieldStyle()} value={modal.idea.gdrive_url || ''} onChange={e => setField('gdrive_url', e.target.value)} placeholder="https://drive.google.com/file/d/..." />
+                  {modal.idea.gdrive_url && (() => {
+                    const thumb = (() => {
+                      const id = extractGdriveId(modal.idea.gdrive_url || '')
+                      return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : null
+                    })()
+                    return thumb ? (
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 6 }}>Preview thumbnail:</div>
+                        <img src={thumb} alt="preview" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
+                          onError={e => { (e.target as HTMLImageElement).parentElement!.innerHTML = '<div style="font-size:0.72rem;color:#ef4444;padding:4px 0">Gagal load thumbnail — pastikan link sudah di-share publik</div>' }} />
+                      </div>
+                    ) : (
+                      <div style={{ marginTop: 6, fontSize: '0.72rem', color: '#ef4444' }}>Format link tidak dikenali</div>
+                    )
+                  })()}
+                </div>
+
+                {/* Manual preview URL */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
+                    URL Thumbnail Manual <span style={{ color: '#475569', fontWeight: 400 }}>(opsional, override)</span>
+                  </label>
+                  <input style={fieldStyle()} value={modal.idea.preview_url || ''} onChange={e => setField('preview_url', e.target.value)} placeholder="https://..." />
+                  {modal.idea.preview_url && (
+                    <img src={modal.idea.preview_url} alt="preview" style={{ marginTop: 10, width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #2a2a2a', display: 'block' }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                  )}
+                </div>
+
+                {/* Current thumbnail preview */}
+                {(modal.idea.canva_url || modal.idea.gdrive_url || modal.idea.preview_url) && (
+                  <div style={{ marginTop: 4 }}>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 8 }}>Tampilan di Grid View:</div>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      {/* IG square preview */}
+                      <div>
+                        <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: 4 }}>IG</div>
+                        <div style={{ width: 80, height: 80, borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
+                          {(() => {
+                            const t = getThumbnail(modal.idea)
+                            return t ? <img src={t} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder idea={modal.idea} />
+                          })()}
+                        </div>
+                      </div>
+                      {/* TikTok 9:16 preview */}
+                      <div>
+                        <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: 4 }}>TikTok</div>
+                        <div style={{ width: 45, height: 80, borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
+                          {(() => {
+                            const t = getThumbnail(modal.idea)
+                            return t ? <img src={t} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder idea={modal.idea} />
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>}
 
               {/* Footer */}
