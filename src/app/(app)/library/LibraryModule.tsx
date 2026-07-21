@@ -455,19 +455,19 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
           </div>
         </div>
       ) : (
-        /* TikTok Feed: 2-col 9:16 */
+        /* TikTok / Feed: 2-col square */
         <div>
           <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#69C9D0', display: 'inline-block' }} />
-            TikTok Feed Preview
+            Feed Preview (2 kolom)
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, maxWidth: 400 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, maxWidth: 540, background: '#0a0a0a', padding: 3, borderRadius: 4 }}>
             {filtered.map(c => {
               const thumb = getThumbnail(c)
               const isHovered = hoveredId === c.id
               return (
                 <div key={c.id}
-                  style={{ position: 'relative', aspectRatio: '9 / 16', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d', borderRadius: 8, border: '1px solid #1f1f1f' }}
+                  style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
                   onMouseEnter={() => setHoveredId(c.id!)}
                   onMouseLeave={() => setHoveredId(null)}
                   onClick={() => openEdit(c)}>
@@ -477,35 +477,23 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                   ) : (
                     <ThumbnailPlaceholder idea={c} />
                   )}
-                  {/* Bottom caption — always visible */}
+                  {/* Hover overlay */}
                   <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
-                    padding: '20px 8px 8px',
-                  }}>
-                    <div style={{ fontSize: '0.68rem', fontWeight: 600, color: '#f1f5f9', lineHeight: 1.3, marginBottom: 3 }}>
-                      {(c.judul || '(Tanpa judul)').length > 40 ? (c.judul || '').slice(0, 40) + '…' : (c.judul || '(Tanpa judul)')}
-                    </div>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {c.platform.slice(0, 2).map(p => (
-                        <span key={p} style={{ fontSize: '0.55rem', padding: '1px 5px', borderRadius: 3, color: '#69C9D0', background: 'rgba(105,201,208,0.12)', border: '1px solid rgba(105,201,208,0.25)' }}>{p}</span>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Hover overlay with actions */}
-                  <div style={{
-                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 8,
+                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, gap: 6,
                     opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s',
                   }}>
-                    <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#f1f5f9', textAlign: 'center', lineHeight: 1.3, marginBottom: 2 }}>
+                      {(c.judul || '(Tanpa judul)').length > 40 ? (c.judul || '').slice(0, 40) + '…' : (c.judul || '(Tanpa judul)')}
+                    </div>
+                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>
                       {c.status}
                     </span>
-                    <button
-                      onClick={e => { e.stopPropagation(); openEdit(c) }}
-                      style={{ background: 'rgba(124,58,237,0.8)', border: 'none', borderRadius: 6, padding: '5px 12px', color: '#fff', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}>
-                      Edit
-                    </button>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {c.platform.slice(0, 2).map(p => (
+                        <span key={p} style={{ fontSize: '0.55rem', padding: '1px 5px', borderRadius: 3, color: '#69C9D0', background: 'rgba(105,201,208,0.12)', border: '1px solid rgba(105,201,208,0.3)' }}>{p}</span>
+                      ))}
+                    </div>
                     {c.canva_url && (
                       <a href={c.canva_url} target="_blank" rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
@@ -521,6 +509,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                       </a>
                     )}
                   </div>
+                  {/* Status dot */}
+                  {!isHovered && (
+                    <div style={{ position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status], boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />
+                  )}
                 </div>
               )
             })}
@@ -793,10 +785,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                           })()}
                         </div>
                       </div>
-                      {/* TikTok 9:16 preview */}
+                      {/* Feed 2-col preview */}
                       <div>
-                        <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: 4 }}>TikTok</div>
-                        <div style={{ width: 45, height: 80, borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
+                        <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: 4 }}>Feed</div>
+                        <div style={{ width: 80, height: 80, borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
                           {(() => {
                             const t = getThumbnail(modal.idea)
                             return t ? <img src={t} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder idea={modal.idea} />
