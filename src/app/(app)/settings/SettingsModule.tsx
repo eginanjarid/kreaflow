@@ -3,6 +3,22 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+type Member = {
+  id: string
+  user_id: string
+  role: string
+  created_at: string
+  email: string
+  nama: string
+}
+
+type PendingInvite = {
+  id: string
+  email: string
+  role: string
+  expires_at: string
+}
+
 type Props = {
   workspaceId: string
   workspaceName: string
@@ -10,6 +26,10 @@ type Props = {
   userName: string
   plan: string
   modes: string[]
+  myRole: string
+  members: Member[]
+  pendingInvites: PendingInvite[]
+  appUrl: string
 }
 
 const MODE_OPTIONS = [
@@ -21,13 +41,59 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, modes: initialModes }: Props) {
+export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, modes: initialModes, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
   const [tab, setTab] = useState('workspace')
   const [wsName, setWsName] = useState(workspaceName)
   const [activeModes, setActiveModes] = useState<string[]>(initialModes?.length ? initialModes : ['creator'])
   const [displayName, setDisplayName] = useState(userName === userEmail ? '' : userName)
   const [wsSaving, setWsSaving] = useState(false)
   const [wsMsg, setWsMsg] = useState('')
+
+  const [members, setMembers] = useState<Member[]>(initialMembers)
+  const [pending, setPending] = useState<PendingInvite[]>(initialPending)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState('member')
+  const [inviting, setInviting] = useState(false)
+  const [inviteLink, setInviteLink] = useState('')
+  const [inviteError, setInviteError] = useState('')
+  const [teamMsg, setTeamMsg] = useState('')
+
+  async function sendInvite(e: React.FormEvent) {
+    e.preventDefault()
+    setInviting(true); setInviteError(''); setInviteLink('')
+    const res = await fetch('/api/team', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspaceId, email: inviteEmail, role: inviteRole }),
+    })
+    const data = await res.json()
+    setInviting(false)
+    if (!res.ok) { setInviteError(data.error || 'Gagal'); return }
+    setInviteLink(data.url)
+    setPending(prev => [...prev, { id: data.token, email: inviteEmail, role: inviteRole, expires_at: new Date(Date.now() + 7 * 86400000).toISOString() }])
+    setInviteEmail('')
+  }
+
+  async function removeMember(memberId: string) {
+    if (!confirm('Hapus member ini dari workspace?')) return
+    const res = await fetch('/api/team', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspaceId, memberId }),
+    })
+    if (res.ok) { setMembers(prev => prev.filter(m => m.id !== memberId)); setTeamMsg('Member dihapus.'); setTimeout(() => setTeamMsg(''), 3000) }
+  }
+
+  async function changeRole(memberId: string, role: string) {
+    const res = await fetch('/api/team', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspaceId, memberId, role }),
+    })
+    if (res.ok) { setMembers(prev => prev.map(m => m.id === memberId ? { ...m, role } : m)); setTeamMsg('Role diperbarui.'); setTimeout(() => setTeamMsg(''), 3000) }
+  }
+
+  const canManageTeam = myRole === 'owner' || myRole === 'admin'
 
   const [curPwd, setCurPwd] = useState('')
   const [newPwd, setNewPwd] = useState('')
@@ -88,7 +154,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #1f1f1f' }}>
-        {[{ id: 'workspace', label: 'Workspace' }, { id: 'akun', label: 'Akun' }].map(t => (
+        {[{ id: 'workspace', label: 'Workspace' }, { id: 'tim', label: 'Tim' }, { id: 'akun', label: 'Akun' }].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #7C3AED' : '2px solid transparent', color: tab === t.id ? '#A78BFA' : '#64748b', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
             {t.label}
@@ -161,6 +227,110 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Tim Tab */}
+      {tab === 'tim' && (
+        <div style={{ maxWidth: 560 }}>
+          {teamMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#86efac', fontSize: '0.85rem', marginBottom: 16 }}>{teamMsg}</div>}
+
+          {/* Members list */}
+          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, marginBottom: 20, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>Member Aktif</div>
+              <div style={{ fontSize: '0.75rem', color: '#475569' }}>{members.length} member</div>
+            </div>
+            {members.map(m => (
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #1a1a1a' }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: m.role === 'owner' ? 'linear-gradient(135deg,#7C3AED,#A78BFA)' : '#1a1a1a', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0', flexShrink: 0 }}>
+                  {(m.nama || m.email).charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 500, color: '#e2e8f0', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nama || m.email}</div>
+                  {m.nama && <div style={{ fontSize: '0.72rem', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>}
+                </div>
+                {canManageTeam && m.role !== 'owner' ? (
+                  <select
+                    value={m.role}
+                    onChange={e => changeRole(m.id, e.target.value)}
+                    style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', outline: 'none' }}
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="member">Member</option>
+                  </select>
+                ) : (
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: m.role === 'owner' ? 'rgba(124,58,237,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#A78BFA' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
+                )}
+                {canManageTeam && m.role !== 'owner' && m.email !== userEmail && (
+                  <button onClick={() => removeMember(m.id)} style={{ background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '4px' }} title="Remove">🗑</button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Pending invites */}
+          {pending.length > 0 && (
+            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, marginBottom: 20, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid #1f1f1f' }}>
+                <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>Undangan Tertunda</div>
+              </div>
+              {pending.map(inv => (
+                <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #1a1a1a' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.85rem', color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.email}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#475569' }}>Expires {new Date(inv.expires_at).toLocaleDateString('id-ID')}</div>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(254,188,46,0.1)', color: '#febc2e', fontWeight: 600, textTransform: 'capitalize' }}>{inv.role}</span>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(71,85,105,0.2)', color: '#64748b' }}>Pending</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Invite form */}
+          {canManageTeam && (
+            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, padding: '20px' }}>
+              <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem', marginBottom: 14 }}>Undang Member Baru</div>
+              <form onSubmit={sendInvite} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
+                  <input
+                    type="email"
+                    placeholder="email@contoh.com"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    required
+                    style={fieldStyle()}
+                  />
+                  <select
+                    value={inviteRole}
+                    onChange={e => setInviteRole(e.target.value)}
+                    style={{ ...fieldStyle(), width: 'auto', cursor: 'pointer' }}
+                  >
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                {inviteError && <div style={{ color: '#f87171', fontSize: '0.82rem' }}>{inviteError}</div>}
+                <button type="submit" disabled={inviting} style={{ background: inviting ? '#5B21B6' : 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 9, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: inviting ? 'not-allowed' : 'pointer', alignSelf: 'flex-start' }}>
+                  {inviting ? 'Membuat link...' : '+ Generate Link Undangan'}
+                </button>
+              </form>
+
+              {inviteLink && (
+                <div style={{ marginTop: 16, background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.25)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#A78BFA', fontWeight: 600, marginBottom: 8 }}>Link Undangan (valid 7 hari)</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <code style={{ flex: 1, fontSize: '0.72rem', color: '#94a3b8', wordBreak: 'break-all', background: '#0d0d0d', borderRadius: 6, padding: '8px 10px', border: '1px solid #2a2a2a' }}>{inviteLink}</code>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
+                      style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 12px', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
+                    >Salin</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
