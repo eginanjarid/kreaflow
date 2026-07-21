@@ -752,9 +752,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Status</label>
-                    <select style={selectStyle()} value={modal.idea.status ?? 'Draft'} onChange={e => setField('status', e.target.value)}>
-                      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#475569', background: STATUS_BG[modal.idea.status] || '#1a1a1a', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#2a2a2a'}33` }}>
+                        {modal.idea.status || 'Draft'}
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: '#334155' }}>Diatur otomatis oleh workflow</span>
+                    </div>
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Produk</label>
