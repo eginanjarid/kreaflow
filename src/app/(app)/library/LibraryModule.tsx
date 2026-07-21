@@ -601,16 +601,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
           {filtered.map(c => (
             <div key={c.id} style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                {/* Thumbnail mini di list view */}
-                {getThumbnail(c) ? (
-                  <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: '1px solid #2a2a2a', cursor: 'pointer' }} onClick={() => openEdit(c)}>
-                    <img src={getThumbnail(c)!} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                  </div>
-                ) : (c.canva_url || c.gdrive_url) ? (
-                  <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: '1px solid #2a2a2a', cursor: 'pointer' }} onClick={() => openEdit(c)}>
-                    <ThumbnailPlaceholder idea={c} />
-                  </div>
-                ) : null}
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
