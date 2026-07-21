@@ -671,7 +671,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 const isVideo = ['Reels', 'Video Pendek', 'Live'].includes(c.format)
                 return (
                   <div key={c.id}
-                    style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
+                    style={{ position: 'relative', aspectRatio: igTab === 'reels' ? '9 / 16' : '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
                     onMouseEnter={() => setHoveredId(c.id!)}
                     onMouseLeave={() => setHoveredId(null)}
                     onClick={() => setPreviewPost(c)}>
@@ -702,7 +702,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               })}
               {/* Empty placeholder slots */}
               {Array.from({ length: Math.max(0, 9 - igFiltered.length) }).map((_, i) => (
-                <div key={`empty-${i}`} style={{ aspectRatio: '1 / 1', background: '#0d0d0d', border: '1px dashed #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9 / 16' : '1 / 1', background: '#0d0d0d', border: '1px dashed #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                   onClick={igTab === 'grid' ? openAdd : undefined}>
                   {i === 0 && igFiltered.length === 0 && igTab === 'reels' && (
                     <div style={{ textAlign: 'center', padding: 8 }}>
