@@ -204,6 +204,119 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
   )
 }
 
+function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
+  idea: ContentIdea; workspaceName: string; onEdit: () => void; onClose: () => void
+}) {
+  const thumb = getThumbnail(idea)
+  const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
+  const initial = workspaceName.charAt(0).toUpperCase()
+  const caption = [idea.hook, idea.body, idea.cta].filter(Boolean).join(' ') || idea.judul
+  const hashtags = (idea.hashtags || []).join(' ')
+  const fakeLikes = Math.floor(Math.random() * 9000) + 1000
+  const fakeComments = Math.floor(Math.random() * 500) + 50
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, flexDirection: 'column', gap: 12 }}
+      onClick={onClose}>
+      {/* Reel container */}
+      <div onClick={e => e.stopPropagation()}
+        style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid #333', flexShrink: 0 }}>
+
+        {/* Background thumbnail */}
+        {thumb
+          ? <img src={thumb} alt={idea.judul} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          : <div style={{ position: 'absolute', inset: 0 }}><ThumbnailPlaceholder idea={idea} /></div>
+        }
+
+        {/* Gradient overlays */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.35) 100%)' }} />
+
+        {/* Top bar */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', padding: '14px 14px 0' }}>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <span style={{ flex: 1, textAlign: 'center', color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>Reels</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ cursor: 'pointer' }}><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+
+        {/* Play button */}
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+
+        {/* Right sidebar */}
+        <div style={{ position: 'absolute', right: 10, bottom: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span style={{ color: '#fff', fontSize: '0.68rem', fontWeight: 600 }}>{fakeLikes.toLocaleString()}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span style={{ color: '#fff', fontSize: '0.68rem', fontWeight: 600 }}>{fakeComments}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span style={{ color: '#fff', fontSize: '0.68rem', fontWeight: 600 }}>Kirim</span>
+          </div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+
+        {/* Bottom info */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 48, padding: '0 14px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem', color: '#fff', flexShrink: 0 }}>
+              {initial}
+            </div>
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>{handle}</span>
+            <span style={{ color: '#fff', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.6)', borderRadius: 6, padding: '2px 10px', cursor: 'pointer' }}>Ikuti</span>
+          </div>
+          {caption && (
+            <div style={{ color: '#fff', fontSize: '0.78rem', lineHeight: 1.4, marginBottom: 6 }}>
+              {caption.length > 100 ? caption.slice(0, 100) + '…' : caption}
+            </div>
+          )}
+          {hashtags && (
+            <div style={{ color: '#93c5fd', fontSize: '0.73rem', marginBottom: 8 }}>
+              {hashtags.length > 60 ? hashtags.slice(0, 60) + '…' : hashtags}
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <span style={{ color: '#e2e8f0', fontSize: '0.7rem' }}>Audio original · {handle}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Action buttons below */}
+      <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div style={{ background: 'rgba(30,30,30,0.9)', borderRadius: 8, padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: '0.68rem', color: STATUS_COLOR[idea.status], fontWeight: 600 }}>{idea.status}</span>
+          {idea.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>· {idea.scheduled_date}</span>}
+        </div>
+        <button onClick={onEdit} style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
+          Edit Konten
+        </button>
+        {idea.canva_url && (
+          <a href={idea.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px 14px', color: '#A78BFA', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+            Canva ↗
+          </a>
+        )}
+        {idea.gdrive_url && (
+          <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px 14px', color: '#38bdf8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+            Drive ↗
+          </a>
+        )}
+        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #333', borderRadius: 8, padding: '6px 12px', color: '#94a3b8', fontSize: '0.78rem', cursor: 'pointer' }}>
+          ✕
+        </button>
+      </div>
+    </div>
+  )
+}
+
 const PREVIEW_RATIOS = [
   { key: '1:1',     label: '1:1',      sub: 'IG Grid',    w: 160, h: 160 },
   { key: '4:5',     label: '4:5',      sub: 'IG / TikTok', w: 128, h: 160 },
@@ -312,6 +425,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [previewPost, setPreviewPost] = useState<ContentIdea | null>(null)
+  const [previewReels, setPreviewReels] = useState<ContentIdea | null>(null)
   const [igTab, setIgTab] = useState<IGTab>('grid')
 
   function openSchedule(c: ContentIdea) {
@@ -674,7 +788,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     style={{ position: 'relative', aspectRatio: igTab === 'reels' ? '9 / 16' : '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
                     onMouseEnter={() => setHoveredId(c.id!)}
                     onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => setPreviewPost(c)}>
+                    onClick={() => igTab === 'reels' ? setPreviewReels(c) : setPreviewPost(c)}>
                     {thumb
                       ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                       : <ThumbnailPlaceholder idea={c} />
@@ -797,6 +911,16 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
           workspaceName={workspaceName}
           onEdit={() => { setPreviewPost(null); openEdit(previewPost) }}
           onClose={() => setPreviewPost(null)}
+        />
+      )}
+
+      {/* IG Reels Preview Modal */}
+      {previewReels && (
+        <IGReelsPreview
+          idea={previewReels}
+          workspaceName={workspaceName}
+          onEdit={() => { setPreviewReels(null); openEdit(previewReels) }}
+          onClose={() => setPreviewReels(null)}
         />
       )}
 
