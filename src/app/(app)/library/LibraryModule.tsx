@@ -82,6 +82,43 @@ function getThumbnail(idea: ContentIdea): string | null {
   return null
 }
 
+const PREVIEW_RATIOS = [
+  { key: '1:1',     label: '1:1',      sub: 'IG Grid',    w: 160, h: 160 },
+  { key: '4:5',     label: '4:5',      sub: 'IG / TikTok', w: 128, h: 160 },
+  { key: '16:9',    label: '16:9',     sub: 'YouTube',    w: 200, h: 113 },
+  { key: '1.91:1',  label: '1.91:1',   sub: 'Landscape',  w: 200, h: 105 },
+]
+
+function MediaPreview({ idea }: { idea: ContentIdea }) {
+  const [ratio, setRatio] = useState('1:1')
+  const thumb = getThumbnail(idea)
+  const r = PREVIEW_RATIOS.find(x => x.key === ratio) || PREVIEW_RATIOS[0]
+
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 8 }}>Preview tampilan:</div>
+      {/* Ratio toggle */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+        {PREVIEW_RATIOS.map(rx => (
+          <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #7C3AED' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(124,58,237,0.15)' : '#1a1a1a', cursor: 'pointer', gap: 1 }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#A78BFA' : '#94a3b8' }}>{rx.label}</span>
+            <span style={{ fontSize: '0.6rem', color: ratio === rx.key ? '#7C3AED' : '#475569' }}>{rx.sub}</span>
+          </button>
+        ))}
+      </div>
+      {/* Preview box */}
+      <div style={{ width: r.w, height: r.h, borderRadius: 8, overflow: 'hidden', border: '1px solid #2a2a2a', background: '#0d0d0d', transition: 'all 0.2s' }}>
+        {thumb
+          ? <img src={thumb} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          : <ThumbnailPlaceholder idea={idea} />
+        }
+      </div>
+      <div style={{ marginTop: 5, fontSize: '0.68rem', color: '#475569' }}>{r.w}×{r.h}px · {r.label} · {r.sub}</div>
+    </div>
+  )
+}
+
 function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName: string }) {
   const sprintTasks = tasks
     .filter(t => t.nama.includes(' — ') && t.nama.endsWith('— ' + productName))
@@ -263,8 +300,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
 
   const VIEW_BTNS: { mode: ViewMode; label: string; title: string }[] = [
     { mode: 'list', label: '☰', title: 'List View' },
-    { mode: 'ig', label: '⊞', title: 'IG Grid (3 kolom)' },
-    { mode: 'tiktok', label: '▬▬', title: 'TikTok Feed (2 kolom)' },
+    { mode: 'ig', label: '⊞', title: 'IG Grid 1:1 (3 kolom)' },
+    { mode: 'tiktok', label: '▭▭', title: 'Feed 4:5 Portrait (2 kolom)' },
   ]
 
   return (
@@ -455,19 +492,19 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
           </div>
         </div>
       ) : (
-        /* TikTok / Feed: 2-col square */
+        /* Feed 4:5 portrait: 2-col */
         <div>
           <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#69C9D0', display: 'inline-block' }} />
-            Feed Preview (2 kolom)
+            Feed Preview 4:5 (2 kolom) — IG portrait, TikTok foto
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, maxWidth: 540, background: '#0a0a0a', padding: 3, borderRadius: 4 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, maxWidth: 440, background: '#0a0a0a', padding: 3, borderRadius: 4 }}>
             {filtered.map(c => {
               const thumb = getThumbnail(c)
               const isHovered = hoveredId === c.id
               return (
                 <div key={c.id}
-                  style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
+                  style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
                   onMouseEnter={() => setHoveredId(c.id!)}
                   onMouseLeave={() => setHoveredId(null)}
                   onClick={() => openEdit(c)}>
@@ -770,33 +807,9 @@ export default function LibraryModule({ initialIdeas, workspaceId, products, pil
                   })()}
                 </div>
 
-                {/* Current thumbnail preview */}
+                {/* Preview selector */}
                 {(modal.idea.canva_url || modal.idea.gdrive_url || modal.idea.preview_url) && (
-                  <div style={{ marginTop: 4 }}>
-                    <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 8 }}>Tampilan di Grid View:</div>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                      {/* IG square preview */}
-                      <div>
-                        <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: 4 }}>IG</div>
-                        <div style={{ width: 80, height: 80, borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
-                          {(() => {
-                            const t = getThumbnail(modal.idea)
-                            return t ? <img src={t} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder idea={modal.idea} />
-                          })()}
-                        </div>
-                      </div>
-                      {/* Feed 2-col preview */}
-                      <div>
-                        <div style={{ fontSize: '0.65rem', color: '#475569', marginBottom: 4 }}>Feed</div>
-                        <div style={{ width: 80, height: 80, borderRadius: 4, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
-                          {(() => {
-                            const t = getThumbnail(modal.idea)
-                            return t ? <img src={t} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder idea={modal.idea} />
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <MediaPreview idea={modal.idea} />
                 )}
               </>}
 
