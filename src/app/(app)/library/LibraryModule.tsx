@@ -552,55 +552,137 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
           ))}
         </div>
       ) : viewMode === 'ig' ? (
-        /* IG Grid: 3-col square */
-        <div>
-          <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E4405F', display: 'inline-block' }} />
-            Instagram Grid Preview
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, maxWidth: 540, background: '#0a0a0a', padding: 2, borderRadius: 4 }}>
-            {filtered.map(c => {
-              const thumb = getThumbnail(c)
-              const isHovered = hoveredId === c.id
-              return (
-                <div key={c.id}
-                  style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
-                  onMouseEnter={() => setHoveredId(c.id!)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => setPreviewPost(c)}>
-                  {thumb ? (
-                    <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                  ) : (
-                    <ThumbnailPlaceholder idea={c} />
-                  )}
-                  {/* Hover overlay */}
-                  <div style={{
-                    position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 8, gap: 5,
-                    opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s',
-                  }}>
-                    <div style={{ fontSize: '0.65rem', fontWeight: 600, color: '#f1f5f9', textAlign: 'center', lineHeight: 1.3 }}>
-                      {(c.judul || '(Tanpa judul)').length > 30 ? (c.judul || '').slice(0, 30) + '…' : (c.judul || '(Tanpa judul)')}
+        /* IG Profile Mockup */
+        <div style={{ maxWidth: 480 }}>
+          {/* Phone-style card */}
+          <div style={{ background: '#000', borderRadius: 16, border: '1px solid #333', overflow: 'hidden' }}>
+
+            {/* IG top bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #1a1a1a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f1f5f9' }}>{workspaceName.toLowerCase().replace(/\s+/g, '')}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div style={{ display: 'flex', gap: 14 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              </div>
+            </div>
+
+            {/* Profile header */}
+            <div style={{ padding: '16px 16px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 14 }}>
+                {/* Avatar with IG gradient ring */}
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', padding: 2.5 }}>
+                    <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>
+                      {workspaceName.charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontSize: '0.58rem', padding: '1px 6px', borderRadius: 3, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>
-                      {c.status}
-                    </span>
-                    <button onClick={e => { e.stopPropagation(); openEdit(c) }}
-                      style={{ background: 'rgba(124,58,237,0.85)', border: 'none', borderRadius: 5, padding: '3px 10px', color: '#fff', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer', marginTop: 2 }}>
-                      Edit
-                    </button>
                   </div>
-                  {/* Status dot */}
-                  {!isHovered && (
-                    <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status], boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />
-                  )}
                 </div>
-              )
-            })}
+                {/* Stats */}
+                <div style={{ display: 'flex', gap: 20, flex: 1 }}>
+                  {[
+                    { val: ideas.length, label: 'Postingan' },
+                    { val: '—', label: 'Pengikut' },
+                    { val: '—', label: 'Mengikuti' },
+                  ].map(s => (
+                    <div key={s.label} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9' }}>{s.val}</div>
+                      <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9' }}>{workspaceName}</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>Content preview — KreaFlow</div>
+              </div>
+
+              {/* Buttons */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                <button style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333', borderRadius: 8, padding: '7px 0', color: '#f1f5f9', fontSize: '0.8rem', fontWeight: 600, cursor: 'default' }}>Edit profil</button>
+                <button style={{ flex: 1, background: '#1a1a1a', border: '1px solid #333', borderRadius: 8, padding: '7px 0', color: '#f1f5f9', fontSize: '0.8rem', fontWeight: 600, cursor: 'default' }}>Bagikan profil</button>
+                <button style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: 8, padding: '7px 10px', color: '#f1f5f9', cursor: 'default' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </button>
+              </div>
+
+              {/* Highlights */}
+              <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '50%', border: '1px dashed #444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: '1.4rem', color: '#555' }}>+</span>
+                  </div>
+                  <span style={{ fontSize: '0.62rem', color: '#64748b' }}>Baru</span>
+                </div>
+                {['Tips', 'Promo', 'Behind'].map(h => (
+                  <div key={h} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                    <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#1a1a1a', border: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '1.2rem' }}>📌</span>
+                    </div>
+                    <span style={{ fontSize: '0.62rem', color: '#94a3b8' }}>{h}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tab bar */}
+            <div style={{ display: 'flex', borderTop: '1px solid #1a1a1a' }}>
+              {[
+                { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="#f1f5f9"><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg>, active: true },
+                { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>, active: false },
+                { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>, active: false },
+              ].map((t, i) => (
+                <div key={i} style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '10px 0', borderBottom: t.active ? '1px solid #f1f5f9' : 'none' }}>
+                  {t.icon}
+                </div>
+              ))}
+            </div>
+
+            {/* Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#1a1a1a' }}>
+              {filtered.map(c => {
+                const thumb = getThumbnail(c)
+                const isHovered = hoveredId === c.id
+                return (
+                  <div key={c.id}
+                    style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', cursor: 'pointer', background: '#0d0d0d' }}
+                    onMouseEnter={() => setHoveredId(c.id!)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    onClick={() => setPreviewPost(c)}>
+                    {thumb
+                      ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                      : <ThumbnailPlaceholder idea={c} />
+                    }
+                    {/* Status dot */}
+                    <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status], boxShadow: '0 0 4px rgba(0,0,0,0.7)' }} />
+                    {/* Hover */}
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: isHovered ? 1 : 0, transition: 'opacity 0.15s' }}>
+                      <span style={{ fontSize: '0.62rem', fontWeight: 600, color: '#fff', textAlign: 'center', padding: '0 6px', lineHeight: 1.3 }}>
+                        {(c.judul || '').slice(0, 25)}{(c.judul || '').length > 25 ? '…' : ''}
+                      </span>
+                      <button onClick={e => { e.stopPropagation(); openEdit(c) }}
+                        style={{ background: 'rgba(124,58,237,0.9)', border: 'none', borderRadius: 4, padding: '3px 8px', color: '#fff', fontSize: '0.6rem', fontWeight: 600, cursor: 'pointer' }}>
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+              {/* Empty placeholder slots */}
+              {Array.from({ length: Math.max(0, 9 - filtered.length) }).map((_, i) => (
+                <div key={`empty-${i}`} style={{ aspectRatio: '1 / 1', background: '#0d0d0d', border: '1px dashed #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} onClick={openAdd}>
+                  {i === 0 && filtered.length === 0 && <span style={{ fontSize: '1.2rem', color: '#2a2a2a' }}>+</span>}
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ marginTop: 10, fontSize: '0.72rem', color: '#475569' }}>
-            {filtered.length} konten · Klik untuk preview · Hover lalu Edit untuk edit
+          <div style={{ marginTop: 8, fontSize: '0.72rem', color: '#475569' }}>
+            {filtered.length} konten · Klik thumbnail untuk preview post · Hover + Edit untuk edit
           </div>
         </div>
       ) : (
