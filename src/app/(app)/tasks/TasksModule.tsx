@@ -13,6 +13,7 @@ type Task = {
   due_date: string
   percent_complete: number
   notes: string
+  stage?: string
 }
 
 type SprintStep = {
@@ -30,6 +31,14 @@ const PRIORITIES = ['High', 'Medium', 'Low']
 const PLATFORMS = ['', 'TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Umum']
 const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf24', Low: '#86efac' }
 const PRIORITY_BG: Record<string, string> = { High: 'rgba(248,113,113,0.1)', Medium: 'rgba(251,191,36,0.1)', Low: 'rgba(134,239,172,0.1)' }
+
+const STAGE_MAP: Record<string, string> = {
+  riset: 'riset', naskah: 'naskah',
+  take_video: 'produksi', broll_vo: 'produksi', editing: 'produksi',
+  shooting: 'produksi', broll: 'produksi', caption: 'produksi',
+  topik: 'produksi', persiapan: 'produksi', promo: 'produksi', live: 'produksi', clip: 'produksi',
+  schedule: 'schedule',
+}
 
 const SPRINT_TEMPLATES: Record<string, { label: string; color: string; steps: SprintStep[] }> = {
   affiliate: {
@@ -110,6 +119,8 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
   const [sprintPillar, setSprintPillar] = useState('')
   const [sprintPlatform, setSprintPlatform] = useState('')
   const [sprintStart, setSprintStart] = useState('')
+  const [sprintNamaKonten, setSprintNamaKonten] = useState('')
+  const [sprintTanggalTayang, setSprintTanggalTayang] = useState('')
   const [sprintSteps, setSprintSteps] = useState<SprintStep[]>(SPRINT_TEMPLATES.affiliate.steps.map(s => ({ ...s })))
   const [savingSprint, setSavingSprint] = useState(false)
   const [sprintError, setSprintError] = useState('')
@@ -132,6 +143,8 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
     setSprintPillar('')
     setSprintPlatform('')
     setSprintStart(today)
+    setSprintNamaKonten('')
+    setSprintTanggalTayang('')
     setSprintSteps(stepsWithDates('affiliate', today))
     setSprintError('')
     setSprintModal(true)
@@ -204,15 +217,18 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
     setSprintError('')
     const supabase = createClient()
 
+    const contentLabel = sprintNamaKonten.trim() || sprintLabel
+
     const newTasks: Task[] = enabledSteps.map(step => ({
       workspace_id: workspaceId,
-      nama: `${step.icon} ${step.nama}${sprintLabel ? ' — ' + sprintLabel : ''}`,
+      nama: `${step.icon} ${step.nama}${contentLabel ? ' — ' + contentLabel : ''}`,
       platform: sprintPlatform,
       priority: step.priority,
       start_date: sprintStart,
       due_date: step.due_date || sprintStart,
       percent_complete: 0,
       notes: step.is_optional ? '(Opsional)' : '',
+      stage: STAGE_MAP[step.id] || 'produksi',
     }))
 
     const { data, error: err } = await supabase
@@ -226,18 +242,38 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       .map((step, i) => ({ step, taskId: data[i].id }))
       .filter(({ step }) => step.id === 'schedule' || step.id.startsWith('schedule') || step.icon === '📅')
     if (scheduleSteps.length > 0) {
+      const tanggalTayang = sprintTanggalTayang || null
       const calEntries = scheduleSteps.map(({ step, taskId }) => ({
         workspace_id: workspaceId,
         task_id: taskId,
-        label: sprintLabel,
+        label: contentLabel,
         platform: sprintPlatform || null,
-        scheduled_at: `${step.due_date || sprintStart}T09:00:00`,
+        scheduled_at: `${tanggalTayang || step.due_date || sprintStart}T09:00:00`,
         posted_at: null,
         posted_url: null,
         status: 'Planned',
         content_id: null,
       }))
       await supabase.from('kf_calendar_entries').insert(calEntries)
+    }
+
+    // Notification chain: insert first notif based on first enabled step
+    const firstStep = enabledSteps[0]
+    const firstTaskId = data[0].id
+    const firstStage = STAGE_MAP[firstStep.id] || 'produksi'
+    const notifTypeMap: Record<string, { type: string; title: string; message: string }> = {
+      riset: { type: 'riset', title: `Mulai Riset — ${contentLabel}`, message: 'Sprint baru dibuat. Mulai riset untuk konten ini.' },
+      naskah: { type: 'naskah', title: `Mulai Naskah — ${contentLabel}`, message: 'Sprint baru dibuat. Langsung ke Plan untuk buat naskah.' },
+      produksi: { type: 'produksi', title: `Mulai Produksi — ${contentLabel}`, message: 'Sprint baru dibuat. Buka Studio untuk mulai produksi.' },
+      schedule: { type: 'schedule', title: `Siap Schedule — ${contentLabel}`, message: 'Sprint baru dibuat. Jadwalkan konten ini.' },
+    }
+    const firstNotif = notifTypeMap[firstStage]
+    if (firstNotif) {
+      await supabase.from('kf_notifications').insert({
+        workspace_id: workspaceId,
+        ...firstNotif,
+        task_id: firstTaskId,
+      })
     }
 
     setTasks(prev => [...created, ...prev])
@@ -274,9 +310,24 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
   async function updateProgress(id: string, pct: number) {
     const supabase = createClient()
     await supabase.from('kf_tasks').update({ percent_complete: pct }).eq('id', id)
-    // Sync calendar entry status if this task is linked
     const calStatus = pct === 100 ? 'Posted' : pct > 0 ? 'Ready' : 'Planned'
     await supabase.from('kf_calendar_entries').update({ status: calStatus }).eq('task_id', id)
+
+    // Notification chain
+    if (pct === 100) {
+      const task = tasks.find(t => t.id === id)
+      if (task?.stage === 'riset') {
+        const label = getTaskContext(task.nama)
+        await supabase.from('kf_notifications').insert({
+          workspace_id: workspaceId,
+          type: 'naskah',
+          title: `Mulai Naskah — ${label || task.nama}`,
+          message: 'Riset selesai. Buka Plan untuk mulai buat naskah konten.',
+          task_id: id,
+        })
+      }
+    }
+
     setTasks(prev => prev.map(x => x.id === id ? { ...x, percent_complete: pct } : x))
   }
 
@@ -591,8 +642,10 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       const chipBorder = overdue ? 'rgba(248,113,113,0.3)' : col === 'done' ? 'rgba(134,239,172,0.25)' : col === 'in_progress' ? 'rgba(251,191,36,0.25)' : '#2a2a2a'
                       const icon = col === 'done' ? '✓' : col === 'in_progress' ? '◷' : '○'
                       return (
-                        <div key={t.id} title={t.due_date ? `Due: ${new Date(t.due_date).toLocaleDateString('id-ID')} · ${t.priority}` : t.priority}
-                          style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 20, background: chipBg, border: `1px solid ${chipBorder}`, color: chipColor, fontSize: '0.73rem', fontWeight: 600, cursor: 'default', transition: 'opacity 0.15s' }}>
+                        <div key={t.id}
+                          title={`${t.due_date ? 'Due: ' + new Date(t.due_date).toLocaleDateString('id-ID') + ' · ' : ''}${t.priority} — klik untuk toggle selesai`}
+                          onClick={() => updateProgress(t.id!, t.percent_complete === 100 ? 0 : 100)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 20, background: chipBg, border: `1px solid ${chipBorder}`, color: chipColor, fontSize: '0.73rem', fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.15s, transform 0.1s' }}>
                           <span style={{ fontSize: '0.7rem' }}>{icon}</span>
                           {stepName}
                           {t.due_date && (
@@ -738,6 +791,13 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   </div>
                 )}
 
+                {/* Nama Konten */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nama Konten / Judul</label>
+                  <input style={fieldStyle({ fontSize: '0.875rem' })} value={sprintNamaKonten} onChange={e => setSprintNamaKonten(e.target.value)} placeholder="cth: Review Serum Vit C Erha, Tutorial Skincare Pagi, 3 Tips Diet Sehat..." />
+                  <div style={{ fontSize: '0.7rem', color: '#334155', marginTop: 4 }}>Nama ini dipakai di semua notifikasi dan task label</div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Platform</label>
@@ -748,6 +808,11 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Mulai *</label>
                     <input type="date" style={fieldStyle()} value={sprintStart} onChange={e => handleSprintStartChange(e.target.value)} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Tayang (Rencana)</label>
+                    <input type="date" style={fieldStyle()} value={sprintTanggalTayang} onChange={e => setSprintTanggalTayang(e.target.value)} min={sprintStart} />
+                    <div style={{ fontSize: '0.7rem', color: '#334155', marginTop: 4 }}>Muncul di Calendar. Jika kosong, pakai tanggal deadline step Schedule.</div>
                   </div>
                 </div>
               </div>
@@ -812,9 +877,12 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               </div>
 
               {/* Preview summary */}
-              {sprintStart && (sprintProductId || sprintPillar.trim() || sprintCustomLabel.trim()) && (
+              {sprintStart && (sprintProductId || sprintPillar.trim() || sprintCustomLabel.trim() || sprintNamaKonten.trim()) && (
                 <div style={{ background: '#0d1117', border: '1px solid #1f1f1f', borderRadius: 10, padding: '12px 16px', fontSize: '0.78rem', color: '#475569', lineHeight: 1.9 }}>
                   <div style={{ color: '#334155', fontWeight: 600, marginBottom: 4 }}>SPRINT PREVIEW</div>
+                  {sprintNamaKonten.trim() && (
+                    <div>Nama Konten: <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{sprintNamaKonten.trim()}</span></div>
+                  )}
                   {sprintType === 'affiliate' && sprintProductId && (
                     <div>Produk: <span style={{ color: '#64748b' }}>{products.find(p => p.id === sprintProductId)?.nama}</span></div>
                   )}
@@ -825,9 +893,12 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                     <div>Konten: <span style={{ color: '#64748b' }}>{sprintCustomLabel}</span></div>
                   )}
                   <div>Mulai: <span style={{ color: '#64748b' }}>{sprintStart}</span> · {sprintSteps.filter(s => s.enabled).length} tasks akan dibuat</div>
+                  {sprintTanggalTayang && (
+                    <div>Tayang: <span style={{ color: '#34d399', fontWeight: 600 }}>{sprintTanggalTayang}</span></div>
+                  )}
                   {sprintSteps.filter(s => s.enabled && s.due_date).length > 0 && (
                     <div>
-                      Selesai target: <span style={{ color: '#64748b' }}>
+                      Target selesai: <span style={{ color: '#64748b' }}>
                         {sprintSteps.filter(s => s.enabled && s.due_date).map(s => s.due_date).sort().at(-1)}
                       </span>
                     </div>
