@@ -17,7 +17,7 @@ type Entry = {
 }
 
 type ContentIdea = { id: string; judul: string; format: string; platform: string[] }
-type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string }
+type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string; stage?: string | null }
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUSES = ['Planned', 'Ready', 'Posted', 'Cancelled']
@@ -66,9 +66,9 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   function tasksForDay(day: number) {
     if (!showTasks) return []
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    // Only show sprint tasks (nama contains ' — ') and skip already-linked ones
+    // Only show schedule-stage tasks (tanggal tayang) not already linked to calendar entries
     const linkedTaskIds = new Set(entries.filter(e => e.task_id).map(e => e.task_id))
-    return tasks.filter(t => t.due_date === dateStr && !linkedTaskIds.has(t.id) && t.nama.includes(' — '))
+    return tasks.filter(t => t.due_date === dateStr && !linkedTaskIds.has(t.id) && t.stage === 'schedule')
   }
 
   function prevMonth() {
@@ -130,7 +130,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const monthTasks = showTasks ? tasks.filter(t => {
     if (!t.due_date) return false
     if (linkedTaskIds.has(t.id)) return false
-    if (!t.nama.includes(' — ')) return false  // sprint tasks only
+    if (t.stage !== 'schedule') return false  // only tanggal tayang tasks
     const d = new Date(t.due_date)
     return d.getFullYear() === viewYear && d.getMonth() === viewMonth
   }).sort((a, b) => a.due_date.localeCompare(b.due_date)) : []

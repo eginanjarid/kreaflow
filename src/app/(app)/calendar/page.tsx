@@ -17,7 +17,7 @@ export default async function CalendarPage() {
   const [{ data: entries }, { data: ideas }, { data: tasks }] = await Promise.all([
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),
     supabase.from('kf_content_ideas').select('id, judul, format, platform').eq('workspace_id', wsId),
-    supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
+    supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority,stage').eq('workspace_id', wsId).not('due_date', 'is', null),
   ])
 
   return (
