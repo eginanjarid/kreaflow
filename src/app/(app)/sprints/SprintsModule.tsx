@@ -97,25 +97,29 @@ const MASTER_STEPS: StepDef[] = [
   { id: 'live',      nama: 'Live',        icon: '🔴', doneAt: 'Terjadwal',   href: '/studio' },
 ]
 
+function parseTemplateType(template_type: string): { key: string; stepIds: string[] | null } {
+  if (!template_type) return { key: 'affiliate', stepIds: null }
+  const colonIdx = template_type.indexOf(':')
+  if (colonIdx === -1) return { key: template_type, stepIds: null }
+  return { key: template_type.slice(0, colonIdx), stepIds: template_type.slice(colonIdx + 1).split(',').filter(Boolean) }
+}
+
 function getTemplateSteps(template_type: string): StepDef[] {
-  if (!template_type) return TEMPLATES.affiliate.steps
-  if (template_type.startsWith('custom:')) {
-    const ids = template_type.replace('custom:', '').split(',').filter(Boolean)
-    return ids.map(id => MASTER_STEPS.find(s => s.id === id)).filter(Boolean) as StepDef[]
-  }
-  return TEMPLATES[template_type]?.steps || TEMPLATES.affiliate.steps
+  const { key, stepIds } = parseTemplateType(template_type)
+  if (stepIds) return stepIds.map(id => MASTER_STEPS.find(s => s.id === id)).filter(Boolean) as StepDef[]
+  return TEMPLATES[key]?.steps || TEMPLATES.affiliate.steps
 }
 
 function getTemplateLabel(template_type: string): string {
-  if (!template_type) return 'Konten Affiliate'
-  if (template_type.startsWith('custom:')) return 'Custom'
-  return TEMPLATES[template_type]?.label || 'Konten Affiliate'
+  const { key } = parseTemplateType(template_type)
+  if (key === 'custom') return 'Custom'
+  return TEMPLATES[key]?.label || 'Konten Affiliate'
 }
 
 function getTemplateColor(template_type: string): string {
-  if (!template_type) return TEMPLATES.affiliate.color
-  if (template_type.startsWith('custom:')) return '#94a3b8'
-  return TEMPLATES[template_type]?.color || TEMPLATES.affiliate.color
+  const { key } = parseTemplateType(template_type)
+  if (key === 'custom') return '#94a3b8'
+  return TEMPLATES[key]?.color || TEMPLATES.affiliate.color
 }
 
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
@@ -204,9 +208,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // Sprint create modal
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
-  const [customSteps, setCustomSteps] = useState<string[]>(['naskah', 'editing', 'schedule'])
+  // sprintSteps: ordered list of steps + who's assigned (replaces customSteps + stepAssign)
+  const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string }[]>([])
+  const [addStepOpen, setAddStepOpen] = useState(false)
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number }[]>([{ product_id: '', jumlah: 7 }])
-  const [stepAssign, setStepAssign] = useState<Record<string, string>>({})
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -243,24 +248,31 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const totalDone = sprintContents.filter(c => c.status === 'Tayang').length
   const totalPct = sprintContents.length > 0 ? Math.round((totalDone / sprintContents.length) * 100) : 0
 
+  function initStepsFromTemplate(tpl: string) {
+    const base = tpl === 'custom' ? [] : (TEMPLATES[tpl]?.steps || TEMPLATES.affiliate.steps)
+    setSprintSteps(base.map(s => ({ step: s, memberId: '' })))
+  }
+
   // ── Sprint create ─────────────────────────────────────────────────────────
   function openSprintModal() {
     const { start, end } = getWeekDates()
-    setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', template_type: 'affiliate' })
-    setCustomSteps(['naskah', 'editing', 'schedule'])
+    const tpl = 'affiliate'
+    setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', template_type: tpl })
+    initStepsFromTemplate(tpl)
+    setAddStepOpen(false)
     setSprintProducts(products.length > 0
       ? products.map(p => ({ product_id: p.id, jumlah: 7 }))
       : [{ product_id: '', jumlah: 7 }]
     )
-    setStepAssign({})
     setSprintModal(true)
   }
 
   async function createSprint() {
     if (!sprintForm.nama.trim() || !sprintForm.start_date) return
     setSavingSprint(true)
-    const tplType = sprintForm.template_type === 'custom'
-      ? (customSteps.length > 0 ? `custom:${customSteps.join(',')}` : 'custom:naskah,schedule')
+    const stepIds = sprintSteps.map(s => s.step.id)
+    const tplType = stepIds.length > 0
+      ? `${sprintForm.template_type === 'custom' ? 'custom' : sprintForm.template_type}:${stepIds.join(',')}`
       : sprintForm.template_type
 
     const totalFromProducts = sprintProducts.filter(r => r.product_id).reduce((s, r) => s + r.jumlah, 0)
@@ -281,8 +293,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
       if (rows.length > 0) {
         // Build per-step assign lookup: step.id → member display name
         const assignByCol: Record<string, string> = {}
-        Object.entries(stepAssign).forEach(([stepId, memberId]) => {
-          const col = STEP_ASSIGN_COL[stepId]
+        sprintSteps.forEach(({ step, memberId }) => {
+          const col = STEP_ASSIGN_COL[step.id]
           if (col && memberId) {
             const m = workspaceMembers.find(x => x.id === memberId)
             if (m) assignByCol[col] = m.nama || m.email
@@ -673,67 +685,89 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
               {/* Template selector */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Jenis Konten & Workflow</label>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Jenis Konten</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {(Object.entries(TEMPLATES) as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
-                    <button key={key} type="button" onClick={() => setSprintForm(f => ({ ...f, template_type: key }))}
+                    <button key={key} type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: key })); initStepsFromTemplate(key) }}
                       style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#2a2a2a'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#1a1a1a', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
                     </button>
                   ))}
-                  <button type="button" onClick={() => setSprintForm(f => ({ ...f, template_type: 'custom' }))}
+                  <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
                     style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#2a2a2a'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#1a1a1a', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     ✏️ Custom
                   </button>
                 </div>
-
-                {/* Step preview for presets */}
-                {sprintForm.template_type !== 'custom' && TEMPLATES[sprintForm.template_type] && (
-                  <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    {TEMPLATES[sprintForm.template_type].steps.map((s, i) => (
-                      <span key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', color: '#475569' }}>
-                        <span style={{ fontSize: '0.85rem' }}>{s.icon}</span>{s.nama}
-                        {i < TEMPLATES[sprintForm.template_type].steps.length - 1 && <span style={{ color: '#1f2937', marginLeft: 3 }}>→</span>}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Custom step picker */}
-                {sprintForm.template_type === 'custom' && (
-                  <div style={{ marginTop: 10, background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px' }}>
-                    <div style={{ fontSize: '0.68rem', color: '#64748b', marginBottom: 8, fontWeight: 600 }}>Pilih steps yang dipakai:</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {MASTER_STEPS.map(step => {
-                        const checked = customSteps.includes(step.id)
-                        return (
-                          <label key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                            <input type="checkbox" checked={checked}
-                              onChange={e => setCustomSteps(prev => e.target.checked ? [...prev, step.id] : prev.filter(x => x !== step.id))}
-                              style={{ width: 14, height: 14, accentColor: '#7C3AED', cursor: 'pointer' }} />
-                            <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
-                            <span style={{ fontSize: '0.78rem', color: checked ? '#e2e8f0' : '#475569', fontWeight: checked ? 500 : 400 }}>{step.nama}</span>
-                            <span style={{ fontSize: '0.6rem', color: '#1f2937', marginLeft: 'auto' }}>selesai saat: {step.doneAt}</span>
-                          </label>
-                        )
-                      })}
-                    </div>
-                    {customSteps.length > 0 && (
-                      <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #1f1f1f', display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                        {customSteps.map((id, i) => {
-                          const s = MASTER_STEPS.find(x => x.id === id)
-                          if (!s) return null
-                          return (
-                            <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: '0.65rem', color: '#A78BFA' }}>
-                              {s.icon} {s.nama}{i < customSteps.length - 1 ? ' →' : ''}
-                            </span>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
+
+              {/* ── Step Editor (unified: add/remove steps + assign) ── */}
+              <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>Steps Pekerjaan</div>
+                    <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Hapus step yg gak diperlukan, tambah yg kurang, assign ke anggota tim</div>
+                  </div>
+                  <span style={{ fontSize: '0.65rem', color: '#475569' }}>{sprintSteps.length} step</span>
+                </div>
+
+                {/* Step rows */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {sprintSteps.map(({ step, memberId }, idx) => (
+                    <div key={`${step.id}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto 28px', gap: 6, alignItems: 'center', background: '#111', border: '1px solid #1f1f1f', borderRadius: 8, padding: '7px 8px' }}>
+                      {/* Drag handle / number */}
+                      <span style={{ fontSize: '0.7rem', color: '#1f2937', textAlign: 'center', fontWeight: 700 }}>{idx + 1}</span>
+                      {/* Step name */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
+                        <span style={{ fontSize: '0.78rem', color: '#e2e8f0', fontWeight: 500 }}>{step.nama}</span>
+                      </div>
+                      {/* Assign dropdown */}
+                      {workspaceMembers.length > 0 ? (
+                        <select
+                          value={memberId}
+                          onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
+                          style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: memberId ? '#A78BFA' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', minWidth: 130 }}>
+                          <option value="">— Assign —</option>
+                          {workspaceMembers.map(m => (
+                            <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
+                          ))}
+                        </select>
+                      ) : <div />}
+                      {/* Delete */}
+                      <button type="button" onClick={() => setSprintSteps(prev => prev.filter((_, i) => i !== idx))}
+                        style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, width: 26, height: 26, color: '#475569', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  {sprintSteps.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '12px', color: '#1f2937', fontSize: '0.72rem', border: '1px dashed #1f1f1f', borderRadius: 8 }}>Belum ada step — tambah dari daftar di bawah</div>
+                  )}
+                </div>
+
+                {/* Add step */}
+                <div style={{ marginTop: 8, position: 'relative' }}>
+                  <button type="button" onClick={() => setAddStepOpen(v => !v)}
+                    style={{ width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                    <span>+</span> Tambah Step
+                  </button>
+                  {addStepOpen && (
+                    <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#111', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).map(ms => (
+                        <button key={ms.id} type="button"
+                          onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '' }]); setAddStepOpen(false) }}
+                          style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
+                          <span style={{ fontSize: '0.9rem' }}>{ms.icon}</span> {ms.nama}
+                        </button>
+                      ))}
+                      {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).length === 0 && (
+                        <div style={{ padding: '6px 10px', color: '#334155', fontSize: '0.72rem' }}>Semua step sudah ditambah</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Sprint *</label>
                 <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint 20-26 Jul" />
@@ -755,42 +789,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   </select>
                 </div>
               </div>
-
-              {/* ── Assign Tim per Step ── */}
-              {workspaceMembers.length > 0 && (() => {
-                const currentSteps = sprintForm.template_type === 'custom'
-                  ? customSteps.map(id => MASTER_STEPS.find(s => s.id === id)).filter(Boolean) as StepDef[]
-                  : (TEMPLATES[sprintForm.template_type]?.steps || [])
-                const uniqueSteps = currentSteps.filter((s, i, arr) => arr.findIndex(x => STEP_ASSIGN_COL[x.id] === STEP_ASSIGN_COL[s.id]) === i)
-                if (uniqueSteps.length === 0) return null
-                return (
-                  <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: 3 }}>Assign Tim per Step</div>
-                    <div style={{ fontSize: '0.65rem', color: '#334155', marginBottom: 10 }}>Siapa mengerjakan apa — berlaku untuk semua konten di sprint ini</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                      {uniqueSteps.map(step => (
-                        <div key={step.id} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 8, alignItems: 'center' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                            <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
-                            <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>{step.nama}</span>
-                          </div>
-                          <select
-                            value={stepAssign[step.id] || ''}
-                            onChange={e => setStepAssign(prev => ({ ...prev, [step.id]: e.target.value }))}
-                            style={{ ...fieldStyle({ padding: '6px 10px', fontSize: '0.78rem' }), cursor: 'pointer' }}>
-                            <option value="">— Belum assign —</option>
-                            {workspaceMembers.map(m => (
-                              <option key={m.id} value={m.id}>
-                                {m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })()}
 
               {/* ── Produk & Jumlah Konten ── */}
               <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
