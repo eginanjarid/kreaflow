@@ -24,7 +24,7 @@ export default async function SettingsPage() {
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const [{ data: membersRaw }, { data: pendingInvites }] = await Promise.all([
-    admin.from('kf_workspace_members').select('id, role, created_at, user_id').eq('workspace_id', wsId),
+    admin.from('kf_workspace_members').select('id, role, jabatan, created_at, user_id').eq('workspace_id', wsId),
     admin.from('kf_invites').select('id, email, role, created_at, expires_at').eq('workspace_id', wsId).is('accepted_at', null).gt('expires_at', new Date().toISOString()),
   ])
 
@@ -35,6 +35,7 @@ export default async function SettingsPage() {
     id: m.id,
     user_id: m.user_id,
     role: m.role as string,
+    jabatan: (m.jabatan as string | null) || '',
     created_at: m.created_at as string,
     email: userMap[m.user_id]?.email || '',
     nama: userMap[m.user_id]?.nama || '',

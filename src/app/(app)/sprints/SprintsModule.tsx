@@ -158,12 +158,31 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, memberCount, initialTasks }: {
+type WorkspaceMember = { id: string; user_id: string; role: string; jabatan: string; email: string; nama: string }
+
+// Map step id → assigned_* column name
+const STEP_ASSIGN_COL: Record<string, string> = {
+  naskah:    'assigned_naskah',
+  rundown:   'assigned_naskah',
+  caption:   'assigned_naskah',
+  take_vid:  'assigned_produksi',
+  shooting:  'assigned_produksi',
+  editing:   'assigned_produksi',
+  thumbnail: 'assigned_produksi',
+  review:    'assigned_produksi',
+  schedule:  'assigned_schedule',
+  live:      'assigned_schedule',
+  persiapan: 'assigned_produksi',
+}
+
+const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 'Art Director', 'Owner', 'Content Creator']
+
+export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks }: {
   initialSprints: Sprint[]
   initialContents: ContentItem[]
   products: Product[]
   workspaceId: string
-  memberCount: number
+  workspaceMembers: WorkspaceMember[]
   initialTasks: ManualTask[]
 }) {
   const supabase = createClient()
@@ -187,6 +206,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
   const [customSteps, setCustomSteps] = useState<string[]>(['naskah', 'editing', 'schedule'])
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number }[]>([{ product_id: '', jumlah: 7 }])
+  const [stepAssign, setStepAssign] = useState<Record<string, string>>({})
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -232,6 +252,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       ? products.map(p => ({ product_id: p.id, jumlah: 7 }))
       : [{ product_id: '', jumlah: 7 }]
     )
+    setStepAssign({})
     setSprintModal(true)
   }
 
@@ -258,6 +279,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
       // Auto-generate content items from product rows
       const rows = sprintProducts.filter(r => r.product_id && r.jumlah > 0)
       if (rows.length > 0) {
+        // Build per-step assign lookup: step.id → member display name
+        const assignByCol: Record<string, string> = {}
+        Object.entries(stepAssign).forEach(([stepId, memberId]) => {
+          const col = STEP_ASSIGN_COL[stepId]
+          if (col && memberId) {
+            const m = workspaceMembers.find(x => x.id === memberId)
+            if (m) assignByCol[col] = m.nama || m.email
+          }
+        })
+
         const items = rows.flatMap(row => {
           const produk = products.find(p => p.id === row.product_id)
           return Array.from({ length: row.jumlah }, (_, i) => ({
@@ -267,6 +298,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             status: 'Draft',
             product_id: row.product_id,
             platform: sprintForm.platform ? [sprintForm.platform] : [],
+            ...assignByCol,
           }))
         })
         const { data: inserted } = await supabase.from('kf_content_ideas').insert(items).select('*')
@@ -724,6 +756,42 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
               </div>
 
+              {/* ── Assign Tim per Step ── */}
+              {workspaceMembers.length > 0 && (() => {
+                const currentSteps = sprintForm.template_type === 'custom'
+                  ? customSteps.map(id => MASTER_STEPS.find(s => s.id === id)).filter(Boolean) as StepDef[]
+                  : (TEMPLATES[sprintForm.template_type]?.steps || [])
+                const uniqueSteps = currentSteps.filter((s, i, arr) => arr.findIndex(x => STEP_ASSIGN_COL[x.id] === STEP_ASSIGN_COL[s.id]) === i)
+                if (uniqueSteps.length === 0) return null
+                return (
+                  <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: 3 }}>Assign Tim per Step</div>
+                    <div style={{ fontSize: '0.65rem', color: '#334155', marginBottom: 10 }}>Siapa mengerjakan apa — berlaku untuk semua konten di sprint ini</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                      {uniqueSteps.map(step => (
+                        <div key={step.id} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 8, alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
+                            <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>{step.nama}</span>
+                          </div>
+                          <select
+                            value={stepAssign[step.id] || ''}
+                            onChange={e => setStepAssign(prev => ({ ...prev, [step.id]: e.target.value }))}
+                            style={{ ...fieldStyle({ padding: '6px 10px', fontSize: '0.78rem' }), cursor: 'pointer' }}>
+                            <option value="">— Belum assign —</option>
+                            {workspaceMembers.map(m => (
+                              <option key={m.id} value={m.id}>
+                                {m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+
               {/* ── Produk & Jumlah Konten ── */}
               <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -825,7 +893,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <input type="date" style={fieldStyle()} value={addForm.tanggal_tayang} onChange={e => setAddForm(f => ({ ...f, tanggal_tayang: e.target.value }))} />
                 </div>
               </div>
-              {memberCount > 1 && (
+              {workspaceMembers.length > 1 && (
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Assign Tim (opsional)</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>

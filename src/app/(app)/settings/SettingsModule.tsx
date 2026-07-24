@@ -7,6 +7,7 @@ type Member = {
   id: string
   user_id: string
   role: string
+  jabatan: string
   created_at: string
   email: string
   nama: string
@@ -91,6 +92,15 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       body: JSON.stringify({ workspaceId, memberId, role }),
     })
     if (res.ok) { setMembers(prev => prev.map(m => m.id === memberId ? { ...m, role } : m)); setTeamMsg('Role diperbarui.'); setTimeout(() => setTeamMsg(''), 3000) }
+  }
+
+  async function changeJabatan(memberId: string, jabatan: string) {
+    const res = await fetch('/api/team', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspaceId, memberId, jabatan }),
+    })
+    if (res.ok) { setMembers(prev => prev.map(m => m.id === memberId ? { ...m, jabatan } : m)); setTeamMsg('Jabatan diperbarui.'); setTimeout(() => setTeamMsg(''), 3000) }
   }
 
   const canManageTeam = myRole === 'owner' || myRole === 'admin'
@@ -250,6 +260,17 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                   <div style={{ fontWeight: 500, color: '#e2e8f0', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nama || m.email}</div>
                   {m.nama && <div style={{ fontSize: '0.72rem', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>}
                 </div>
+                {/* Jabatan */}
+                <select
+                  value={m.jabatan || ''}
+                  onChange={e => changeJabatan(m.id, e.target.value)}
+                  style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: m.jabatan ? '#A78BFA' : '#334155', fontSize: '0.72rem', cursor: 'pointer', outline: 'none', minWidth: 110 }}
+                >
+                  <option value="">— Jabatan —</option>
+                  {['Copywriter','Videografer','Editor','Admin Sosmed','Art Director','Content Creator','Owner'].map(j => (
+                    <option key={j} value={j}>{j}</option>
+                  ))}
+                </select>
                 {canManageTeam && m.role !== 'owner' ? (
                   <select
                     value={m.role}

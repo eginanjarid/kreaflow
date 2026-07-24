@@ -70,17 +70,26 @@ export async function DELETE(req: NextRequest) {
   return NextResponse.json({ success: true })
 }
 
-// PATCH /api/team — change role
+// PATCH /api/team — change role or jabatan
 export async function PATCH(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { workspaceId, memberId, role } = await req.json()
+  const { workspaceId, memberId, role, jabatan } = await req.json()
   const callerRole = await getCallerRole(user.id, workspaceId)
-  if (callerRole !== 'owner') return NextResponse.json({ error: 'Hanya owner yang bisa ubah role' }, { status: 403 })
 
   const admin = adminClient()
+
+  // Jabatan can be changed by anyone with access (owner/admin)
+  if (jabatan !== undefined) {
+    if (!callerRole || callerRole === 'member') return NextResponse.json({ error: 'Tidak punya akses' }, { status: 403 })
+    await admin.from('kf_workspace_members').update({ jabatan }).eq('id', memberId).eq('workspace_id', workspaceId)
+    return NextResponse.json({ success: true })
+  }
+
+  // Role change: only owner
+  if (callerRole !== 'owner') return NextResponse.json({ error: 'Hanya owner yang bisa ubah role' }, { status: 403 })
   const { data: target } = await admin.from('kf_workspace_members').select('role').eq('id', memberId).single()
   if ((target as { role: string } | null)?.role === 'owner') return NextResponse.json({ error: 'Tidak bisa ubah role owner' }, { status: 400 })
 
