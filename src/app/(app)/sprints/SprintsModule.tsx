@@ -186,13 +186,16 @@ const STEP_ASSIGN_COL: Record<string, string> = {
 
 const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 'Art Director', 'Owner', 'Content Creator']
 
-export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks }: {
+type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
+
+export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [] }: {
   initialSprints: Sprint[]
   initialContents: ContentItem[]
   products: Product[]
   workspaceId: string
   workspaceMembers: WorkspaceMember[]
   initialTasks: ManualTask[]
+  accounts?: SosmedAkun[]
 }) {
   const supabase = createClient()
   const searchParams = useSearchParams()
@@ -881,8 +884,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Akun</label>
-                  <input style={fieldStyle()} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))} placeholder="@namaakun / Toko A" />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
+                  {accounts.length > 0 ? (
+                    <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))}>
+                      <option value="">Pilih akun</option>
+                      {accounts.map(a => <option key={a.id} value={`${a.nama} (@${a.handle})`}>{a.platform} · {a.nama} (@{a.handle})</option>)}
+                    </select>
+                  ) : (
+                    <div style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#475569' }}>
+                      Belum ada akun. <a href="/brand?tab=akun" style={{ color: '#A78BFA', textDecoration: 'none' }}>Daftarkan dulu di Brand → Akun Sosial →</a>
+                    </div>
+                  )}
                 </div>
               </div>
 

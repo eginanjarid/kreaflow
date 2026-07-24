@@ -82,8 +82,14 @@ const TABS_BASE = [
   { id: 'pillars', label: 'Content Pillars', affiliateOnly: false },
   { id: 'bio', label: 'Bio Studio', affiliateOnly: false },
   { id: 'visual', label: 'Brand Identity', affiliateOnly: false },
+  { id: 'akun', label: '📲 Akun Sosial', affiliateOnly: false },
   { id: 'affiliate', label: '🔗 Affiliator Brand', affiliateOnly: true },
 ]
+
+const PLATFORMS_SOSMED = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Twitter/X', 'LinkedIn']
+const MAX_AKUN = 10
+
+type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
 const FREQ_LEVELS = [
   { id: 1, name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#475569', glow: 'rgba(71,85,105,0.3)', icon: '👻' },
@@ -217,14 +223,20 @@ export default function BrandModule({
   initialProfile,
   workspaceId,
   modes = ['creator'],
+  initialAkun = [],
 }: {
   initialProfile: BrandProfile | null
   workspaceId: string
   modes?: string[]
+  initialAkun?: SosmedAkun[]
 }) {
   const isAffiliate = modes.includes('affiliate')
   const TABS = TABS_BASE.filter(t => !t.affiliateOnly || isAffiliate)
   const [tab, setTab] = useState('overview')
+  const [akunList, setAkunList] = useState<SosmedAkun[]>(initialAkun)
+  const [akunForm, setAkunForm] = useState({ platform: 'TikTok', handle: '', nama: '' })
+  const [savingAkun, setSavingAkun] = useState(false)
+  const [deletingAkun, setDeletingAkun] = useState<string | null>(null)
   const defaultProfile: BrandProfile = {
     workspace_id: workspaceId,
     nama_akun: '', platform_utama: '', gaya_konten: '', tipe_konten: '',
@@ -314,6 +326,33 @@ export default function BrandModule({
   function setField(key: keyof BrandProfile, value: string) {
     setProfile(p => ({ ...p, [key]: value }))
     setSaved(false)
+  }
+
+  async function addAkun() {
+    if (!akunForm.handle.trim() || !akunForm.nama.trim()) return
+    if (akunList.length >= MAX_AKUN) return
+    setSavingAkun(true)
+    const supabase = createClient()
+    const { data, error } = await supabase.from('kf_accounts').insert({
+      workspace_id: workspaceId,
+      platform: akunForm.platform,
+      handle: akunForm.handle.trim().replace(/^@/, ''),
+      nama: akunForm.nama.trim(),
+    }).select('id, platform, handle, nama').single()
+    if (!error && data) {
+      setAkunList(prev => [...prev, data as SosmedAkun])
+      setAkunForm(f => ({ ...f, handle: '', nama: '' }))
+    }
+    setSavingAkun(false)
+  }
+
+  async function deleteAkun(id: string) {
+    if (!confirm('Hapus akun ini?')) return
+    setDeletingAkun(id)
+    const supabase = createClient()
+    await supabase.from('kf_accounts').delete().eq('id', id)
+    setAkunList(prev => prev.filter(a => a.id !== id))
+    setDeletingAkun(null)
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -1932,6 +1971,84 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       {/* Content Pillars — own form, must be outside outer form */}
       {tab === 'pillars' && (
         <ContentPillarsTab workspaceId={workspaceId} profile={profile} />
+      )}
+
+      {/* ── Akun Sosial ── */}
+      {tab === 'akun' && (
+        <div style={{ maxWidth: 600 }}>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>📲 Akun Sosial Media</div>
+            <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Daftarkan akun-akun sosmed yang kamu kelola. Maksimal {MAX_AKUN} akun per workspace.</div>
+          </div>
+
+          {/* Registered accounts */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+            {akunList.length === 0 && (
+              <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '28px 20px', textAlign: 'center', color: '#334155', fontSize: '0.85rem' }}>
+                Belum ada akun terdaftar. Tambahkan akun pertama kamu.
+              </div>
+            )}
+            {akunList.map(a => (
+              <div key={a.id} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: 'rgba(124,58,237,0.12)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.2)', whiteSpace: 'nowrap' }}>{a.platform}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>{a.nama}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 1 }}>@{a.handle}</div>
+                </div>
+                <button
+                  onClick={() => deleteAkun(a.id)}
+                  disabled={deletingAkun === a.id}
+                  style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: '#475569', fontSize: '0.75rem', cursor: 'pointer' }}>
+                  {deletingAkun === a.id ? '...' : '🗑'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Add new account form */}
+          {akunList.length < MAX_AKUN ? (
+            <div style={{ background: '#0f0f0f', border: '1px solid #2a2a2a', borderRadius: 12, padding: '16px 18px' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', marginBottom: 12 }}>+ Tambah Akun ({akunList.length}/{MAX_AKUN})</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginBottom: 5 }}>Platform</label>
+                  <select
+                    value={akunForm.platform}
+                    onChange={e => setAkunForm(f => ({ ...f, platform: e.target.value }))}
+                    style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 10px', color: '#e2e8f0', fontSize: '0.82rem', outline: 'none', cursor: 'pointer' }}>
+                    {PLATFORMS_SOSMED.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginBottom: 5 }}>Username / Handle</label>
+                  <input
+                    value={akunForm.handle}
+                    onChange={e => setAkunForm(f => ({ ...f, handle: e.target.value }))}
+                    placeholder="namaakun (tanpa @)"
+                    style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 10px', color: '#e2e8f0', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginBottom: 5 }}>Nama Akun (label untuk kamu)</label>
+                  <input
+                    value={akunForm.nama}
+                    onChange={e => setAkunForm(f => ({ ...f, nama: e.target.value }))}
+                    placeholder="cth: Toko Utama, Akun Affiliate A"
+                    style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 10px', color: '#e2e8f0', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <button
+                onClick={addAkun}
+                disabled={savingAkun || !akunForm.handle.trim() || !akunForm.nama.trim()}
+                style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: savingAkun ? 'default' : 'pointer', opacity: (!akunForm.handle.trim() || !akunForm.nama.trim()) ? 0.5 : 1 }}>
+                {savingAkun ? 'Menyimpan...' : '+ Tambah Akun'}
+              </button>
+            </div>
+          ) : (
+            <div style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 10, padding: '12px 16px', fontSize: '0.82rem', color: '#f87171' }}>
+              Batas maksimal {MAX_AKUN} akun sudah tercapai. Hapus akun yang tidak aktif untuk menambah baru.
+            </div>
+          )}
+        </div>
       )}
 
       {/* Universal AI Picker Modal */}
