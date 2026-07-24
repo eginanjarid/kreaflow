@@ -374,6 +374,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSavingAdd(false)
   }
 
+  // ── Advance to a specific step's doneAt status (from card chip click) ───────
+  async function advanceToStep(item: ContentItem, step: StepDef) {
+    const targetStatus = step.doneAt
+    const currentIdx = STATUS_ORDER.indexOf(item.status)
+    const targetIdx = STATUS_ORDER.indexOf(targetStatus)
+    if (targetIdx <= currentIdx) return // already done or past
+    await advanceStatus(item, targetStatus)
+  }
+
   // ── Status update ─────────────────────────────────────────────────────────
   async function advanceStatus(item: ContentItem, newStatus: string) {
     setSavingAction(true)
@@ -663,7 +672,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <ContentCard key={item.id} item={item} steps={stepsWithMeta}
                             productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
                             productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
-                            onClick={() => setDetailItem(item)} />
+                            onClick={() => setDetailItem(item)}
+                            onStepClick={(step) => advanceToStep(item, step)} />
                         ))}
                         {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
                           <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(124,58,237,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
@@ -1039,40 +1049,77 @@ export default function SprintsModule({ initialSprints, initialContents, product
   )
 }
 
-function ContentCard({ item, steps, productName, productColor, onClick }: {
+function ContentCard({ item, steps, productName, productColor, onClick, onStepClick }: {
   item: ContentItem
   steps: (StepDef & { deadline?: string; memberName?: string })[]
   productName: string | null
   productColor: string
   onClick: () => void
+  onStepClick: (step: StepDef, currentStatus: string) => void
 }) {
+  // Find the next undone step (the current active one)
+  const nextStepIdx = steps.findIndex(s => !isStepDone(item.status, s.doneAt))
+
   return (
-    <div onClick={onClick}
-      style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
-      {productName && (
-        <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          ● {productName}
-        </div>
-      )}
-      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
-      {/* Step chips */}
+    <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
+      {/* Header: click opens detail */}
+      <div onClick={onClick}>
+        {productName && (
+          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            ● {productName}
+          </div>
+        )}
+        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
+      </div>
+
+      {/* Step chips — clickable to advance */}
       {steps.length > 0 && (
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-          {steps.map(step => {
+          {steps.map((step, idx) => {
             const done = isStepDone(item.status, step.doneAt)
+            const isNext = idx === nextStepIdx
             return (
-              <span key={step.id} style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: 4, background: done ? 'rgba(52,211,153,0.1)' : '#1a1a1a', border: `1px solid ${done ? 'rgba(52,211,153,0.3)' : '#2a2a2a'}`, color: done ? '#34d399' : '#334155', display: 'flex', alignItems: 'center', gap: 2 }}>
-                {done ? '✓' : '○'} {step.nama}
-              </span>
+              <button
+                key={step.id}
+                type="button"
+                title={done ? `${step.nama} selesai` : isNext ? `Klik untuk tandai ${step.nama} selesai` : step.nama}
+                onClick={e => { e.stopPropagation(); if (!done) onStepClick(step, item.status) }}
+                style={{
+                  fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, cursor: done ? 'default' : 'pointer',
+                  background: done ? 'rgba(52,211,153,0.12)' : isNext ? 'rgba(167,139,250,0.12)' : '#1a1a1a',
+                  border: `1px solid ${done ? 'rgba(52,211,153,0.35)' : isNext ? 'rgba(167,139,250,0.4)' : '#2a2a2a'}`,
+                  color: done ? '#34d399' : isNext ? '#A78BFA' : '#334155',
+                  display: 'flex', alignItems: 'center', gap: 2,
+                  fontWeight: isNext ? 700 : 400,
+                  transition: 'all 0.15s',
+                }}>
+                {done ? '✓' : isNext ? '▶' : '○'} {step.nama}
+              </button>
             )
           })}
         </div>
       )}
-      {item.tanggal_tayang && (
-        <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 5 }}>
-          📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-        </div>
-      )}
+
+      {/* Bottom: deadline of next step or tayang date */}
+      {(() => {
+        const nextStep = nextStepIdx >= 0 ? steps[nextStepIdx] : null
+        const dl = nextStep?.deadline
+        if (dl) {
+          const overdue = new Date(dl) < new Date()
+          return (
+            <div style={{ fontSize: '0.6rem', marginTop: 5, color: overdue ? '#f87171' : '#475569' }}>
+              {overdue ? '⚠️' : '📅'} Due {new Date(dl).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+              {overdue ? ' — terlambat' : ''}
+            </div>
+          )
+        }
+        if (item.tanggal_tayang) return (
+          <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 5 }}>
+            📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+          </div>
+        )
+        return null
+      })()}
     </div>
   )
 }
