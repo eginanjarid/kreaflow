@@ -719,7 +719,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
                             productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
                             onClick={() => setDetailItem(item)}
-                            onStepClick={(step) => advanceToStep(item, step)} />
+                            onStepDone={(step) => advanceToStep(item, step)} />
                         ))}
                         {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
                           <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(124,58,237,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
@@ -1095,20 +1095,18 @@ export default function SprintsModule({ initialSprints, initialContents, product
   )
 }
 
-function ContentCard({ item, steps, productName, productColor, onClick, onStepClick }: {
+function ContentCard({ item, steps, productName, productColor, onClick, onStepDone }: {
   item: ContentItem
   steps: (StepDef & { deadline?: string; memberName?: string })[]
   productName: string | null
   productColor: string
   onClick: () => void
-  onStepClick: (step: StepDef, currentStatus: string) => void
+  onStepDone: (step: StepDef) => void
 }) {
-  // Find the next undone step (the current active one)
   const nextStepIdx = steps.findIndex(s => !isStepDone(item.status, s.doneAt))
 
   return (
     <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
-      {/* Header: click opens detail */}
       <div onClick={onClick}>
         {productName && (
           <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -1118,29 +1116,49 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepCl
         <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
       </div>
 
-      {/* Step chips — clickable to advance */}
+      {/* Step chips */}
       {steps.length > 0 && (
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {steps.map((step, idx) => {
             const done = isStepDone(item.status, step.doneAt)
             const isNext = idx === nextStepIdx
+
+            if (done) {
+              return (
+                <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#34d399', display: 'flex', alignItems: 'center', gap: 2 }}>
+                  ✓ {step.nama}
+                </div>
+              )
+            }
+
+            if (isNext) {
+              return (
+                <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {/* Navigate to module */}
+                  <a
+                    href={step.href}
+                    onClick={e => e.stopPropagation()}
+                    title={`Buka ${step.nama}`}
+                    style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.4)', color: '#A78BFA', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
+                    ▶ {step.nama}
+                  </a>
+                  {/* Mark done — separate explicit button */}
+                  <button
+                    type="button"
+                    title={`Tandai ${step.nama} selesai`}
+                    onClick={e => { e.stopPropagation(); onStepDone(step) }}
+                    style={{ fontSize: '0.6rem', padding: '3px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.3)', color: '#34d399', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center' }}>
+                    ✓
+                  </button>
+                </div>
+              )
+            }
+
+            // Future step
             return (
-              <button
-                key={step.id}
-                type="button"
-                title={done ? `${step.nama} selesai` : isNext ? `Klik untuk tandai ${step.nama} selesai` : step.nama}
-                onClick={e => { e.stopPropagation(); if (!done) onStepClick(step, item.status) }}
-                style={{
-                  fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, cursor: done ? 'default' : 'pointer',
-                  background: done ? 'rgba(52,211,153,0.12)' : isNext ? 'rgba(167,139,250,0.12)' : '#1a1a1a',
-                  border: `1px solid ${done ? 'rgba(52,211,153,0.35)' : isNext ? 'rgba(167,139,250,0.4)' : '#2a2a2a'}`,
-                  color: done ? '#34d399' : isNext ? '#A78BFA' : '#334155',
-                  display: 'flex', alignItems: 'center', gap: 2,
-                  fontWeight: isNext ? 700 : 400,
-                  transition: 'all 0.15s',
-                }}>
-                {done ? '✓' : isNext ? '▶' : '○'} {step.nama}
-              </button>
+              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#334155', display: 'flex', alignItems: 'center', gap: 2 }}>
+                ○ {step.nama}
+              </div>
             )
           })}
         </div>
