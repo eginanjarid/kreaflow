@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type Sprint = {
@@ -42,6 +43,18 @@ type ContentItem = {
 }
 
 type Product = { id: string; nama: string; platform_affiliate: string | null }
+
+type ManualTask = {
+  id?: string
+  workspace_id: string
+  nama: string
+  platform: string
+  priority: string
+  start_date: string
+  due_date: string
+  percent_complete: number
+  notes: string
+}
 
 const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
@@ -86,17 +99,31 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, memberCount }: {
+export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, memberCount, initialTasks }: {
   initialSprints: Sprint[]
   initialContents: ContentItem[]
   products: Product[]
   workspaceId: string
   memberCount: number
+  initialTasks: ManualTask[]
 }) {
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const [activeTab, setActiveTab] = useState<'board' | 'tasks'>(
+    searchParams.get('tab') === 'tasks' ? 'tasks' : 'board'
+  )
+  useEffect(() => {
+    if (searchParams.get('tab') === 'tasks') setActiveTab('tasks')
+  }, [searchParams])
+
   const [sprints, setSprints] = useState<Sprint[]>(initialSprints)
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [selectedSprintId, setSelectedSprintId] = useState<string | null>(initialSprints[0]?.id || null)
+
+  // Manual tasks state
+  const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
+  const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask } | null>(null)
+  const [savingTask, setSavingTask] = useState(false)
   const [filterProduct, setFilterProduct] = useState('')
   const [search, setSearch] = useState('')
 
@@ -271,8 +298,174 @@ export default function SprintsModule({ initialSprints, initialContents, product
     return STAGE_COLS.find(col => col.statuses.includes(item.status))?.id || 'riset'
   }
 
+  function emptyTask(): ManualTask {
+    return { workspace_id: workspaceId, nama: '', platform: '', priority: 'Medium', start_date: '', due_date: '', percent_complete: 0, notes: '' }
+  }
+
+  async function saveTask() {
+    if (!taskModal || !taskModal.task.nama.trim()) return
+    setSavingTask(true)
+    const t = { ...taskModal.task, workspace_id: workspaceId }
+    if (t.id) {
+      await supabase.from('kf_tasks').update(t).eq('id', t.id)
+      setTasks(prev => prev.map(x => x.id === t.id ? t : x))
+    } else {
+      const { data } = await supabase.from('kf_tasks').insert(t).select('id').single()
+      if (data) setTasks(prev => [{ ...t, id: data.id }, ...prev])
+    }
+    setSavingTask(false)
+    setTaskModal(null)
+  }
+
+  async function toggleTask(id: string, current: number) {
+    const pct = current === 100 ? 0 : 100
+    await supabase.from('kf_tasks').update({ percent_complete: pct }).eq('id', id)
+    setTasks(prev => prev.map(x => x.id === id ? { ...x, percent_complete: pct } : x))
+  }
+
+  async function deleteTask(id: string) {
+    if (!confirm('Hapus task ini?')) return
+    await supabase.from('kf_tasks').delete().eq('id', id)
+    setTasks(prev => prev.filter(x => x.id !== id))
+  }
+
+  const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf24', Low: '#86efac' }
+  const tasksTodo = tasks.filter(t => t.percent_complete < 100)
+  const tasksDone = tasks.filter(t => t.percent_complete === 100)
+
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 80px)', gap: 0, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
+      {/* Tab bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0, borderBottom: '1px solid #1f1f1f', background: '#0d0d0d', flexShrink: 0, paddingLeft: 16 }}>
+        {[
+          { key: 'board', label: '⚡ Sprint Board', desc: 'Kelola konten mingguan' },
+          { key: 'tasks', label: '✅ Tasks', desc: 'Checklist manual & ad-hoc' },
+        ].map(tab => (
+          <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
+            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#7C3AED' : 'transparent'}`, color: activeTab === tab.key ? '#A78BFA' : '#475569', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+            {tab.label}
+            {tab.key === 'tasks' && tasks.filter(t => t.percent_complete < 100).length > 0 && (
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#1f1f1f', color: '#64748b', borderRadius: 8, padding: '1px 6px' }}>
+                {tasks.filter(t => t.percent_complete < 100).length}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+    {activeTab === 'tasks' ? (
+      /* ── TASKS TAB ── */
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', maxWidth: 720 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.1rem' }}>Tasks</div>
+            <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: 2 }}>Checklist manual — beli alat, meeting, non-konten, dll</div>
+          </div>
+          <button onClick={() => setTaskModal({ open: true, task: emptyTask() })}
+            style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            + Task
+          </button>
+        </div>
+
+        {tasks.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
+            <div style={{ fontSize: '2rem', marginBottom: 10 }}>✅</div>
+            <div style={{ fontWeight: 600, color: '#475569', marginBottom: 4 }}>Belum ada task</div>
+            <div style={{ fontSize: '0.8rem' }}>Catat todo non-konten di sini — beli tripod, perpanjang domain, meeting, dll.</div>
+          </div>
+        )}
+
+        {tasksTodo.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+              Belum Selesai ({tasksTodo.length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {tasksTodo.map(t => (
+                <div key={t.id} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)}
+                    style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #2a2a2a', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>{t.nama}</div>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                      {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
+                      {t.platform && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: '#475569', background: '#1a1a1a' }}>{t.platform}</span>}
+                      {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#475569' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
+                      {t.notes && <span style={{ fontSize: '0.65rem', color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{t.notes}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <button onClick={() => setTaskModal({ open: true, task: { ...t } })} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 10px', color: '#64748b', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
+                    <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: '#334155', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tasksDone.length > 0 && (
+          <div style={{ opacity: 0.5 }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+              Selesai ({tasksDone.length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {tasksDone.map(t => (
+                <div key={t.id} style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)}
+                    style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #7C3AED', background: '#7C3AED', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </button>
+                  <span style={{ flex: 1, color: '#334155', fontSize: '0.875rem', textDecoration: 'line-through' }}>{t.nama}</span>
+                  <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: 'none', color: '#1f2937', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Task Modal */}
+        {taskModal?.open && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
+            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 14, width: '100%', maxWidth: 440 }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontWeight: 700, color: '#f1f5f9' }}>{taskModal.task.id ? 'Edit Task' : '+ Task Baru'}</div>
+                <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+              </div>
+              <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Task *</label>
+                  <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder="cth: Beli tripod, Perpanjang domain, Meeting brief..." />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Priority</label>
+                    <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={taskModal.task.priority} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, priority: e.target.value } } : m)}>
+                      {['High', 'Medium', 'Low'].map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Deadline</label>
+                    <input type="date" style={fieldStyle()} value={taskModal.task.due_date} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, due_date: e.target.value } } : m)} />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Catatan</label>
+                  <input style={fieldStyle()} value={taskModal.task.notes} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, notes: e.target.value } } : m)} placeholder="Detail tambahan..." />
+                </div>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                  <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 16px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                  <button onClick={saveTask} disabled={savingTask} style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+                    {savingTask ? 'Menyimpan...' : taskModal.task.id ? 'Update' : 'Simpan'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : (
+    <div style={{ display: 'flex', flex: 1, gap: 0, overflow: 'hidden' }}>
 
       {/* Left: Sprint List */}
       <div style={{ width: 240, flexShrink: 0, background: '#0d0d0d', borderRight: '1px solid #1f1f1f', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -617,6 +810,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
       )}
     </div>
+    )}
+  </div>
   )
 }
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import SprintsModule from './SprintsModule'
 
 export default async function SprintsPage() {
@@ -18,20 +19,24 @@ export default async function SprintsPage() {
 
   const wsId = member.workspace_id
 
-  const [{ data: sprints }, { data: contents }, { data: products }, { data: members }] = await Promise.all([
+  const [{ data: sprints }, { data: contents }, { data: products }, { data: members }, { data: tasks }] = await Promise.all([
     supabase.from('kf_sprints').select('*').eq('workspace_id', wsId).order('start_date', { ascending: false }),
     supabase.from('kf_content_ideas').select('*').eq('workspace_id', wsId).not('sprint_id', 'is', null).order('created_at', { ascending: false }),
     supabase.from('kf_products').select('id, nama, platform_affiliate').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_workspace_members').select('user_id, role').eq('workspace_id', wsId),
+    supabase.from('kf_tasks').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
   ])
 
   return (
+    <Suspense>
     <SprintsModule
       initialSprints={sprints || []}
       initialContents={contents || []}
       products={products || []}
       workspaceId={wsId}
       memberCount={(members || []).length}
+      initialTasks={tasks || []}
     />
+    </Suspense>
   )
 }
