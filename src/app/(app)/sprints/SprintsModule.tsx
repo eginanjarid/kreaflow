@@ -5,6 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
+type StepConfig = { id: string; deadline: string; memberName: string }
+
 type Sprint = {
   id: string
   workspace_id: string
@@ -15,6 +17,7 @@ type Sprint = {
   platform: string
   status: string
   template_type: string
+  step_config: StepConfig[] | null
   created_at: string
 }
 
@@ -208,8 +211,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // Sprint create modal
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
-  // sprintSteps: ordered list of steps + who's assigned (replaces customSteps + stepAssign)
-  const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string }[]>([])
+  // sprintSteps: ordered list of steps + assign + deadline
+  const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; deadline: string }[]>([])
   const [addStepOpen, setAddStepOpen] = useState(false)
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number }[]>([{ product_id: '', jumlah: 7 }])
   const [savingSprint, setSavingSprint] = useState(false)
@@ -231,6 +234,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
   const steps = selectedSprint ? getTemplateSteps(selectedSprint.template_type) : []
+  // Merge step_config (deadline + memberName) into steps for display
+  type StepWithMeta = StepDef & { deadline?: string; memberName?: string }
+  const stepsWithMeta: StepWithMeta[] = steps.map(s => {
+    const cfg = selectedSprint?.step_config?.find(c => c.id === s.id)
+    return { ...s, deadline: cfg?.deadline || '', memberName: cfg?.memberName || '' }
+  })
 
   const productColorMap = useMemo(() => {
     const m: Record<string, string> = {}
@@ -250,7 +259,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   function initStepsFromTemplate(tpl: string) {
     const base = tpl === 'custom' ? [] : (TEMPLATES[tpl]?.steps || TEMPLATES.affiliate.steps)
-    setSprintSteps(base.map(s => ({ step: s, memberId: '' })))
+    setSprintSteps(base.map(s => ({ step: s, memberId: '', deadline: '' })))
   }
 
   // ── Sprint create ─────────────────────────────────────────────────────────
@@ -276,6 +285,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
       : sprintForm.template_type
 
     const totalFromProducts = sprintProducts.filter(r => r.product_id).reduce((s, r) => s + r.jumlah, 0)
+    const stepConfigData: StepConfig[] = sprintSteps.map(({ step, memberId, deadline }) => {
+      const m = workspaceMembers.find(x => x.id === memberId)
+      return { id: step.id, deadline, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
+    })
+
     const { data: sprint, error } = await supabase.from('kf_sprints').insert({
       workspace_id: workspaceId,
       nama: sprintForm.nama.trim(),
@@ -284,6 +298,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       target_konten: totalFromProducts > 0 ? totalFromProducts : sprintForm.target_konten,
       platform: sprintForm.platform || null,
       template_type: tplType,
+      step_config: stepConfigData,
       status: 'active',
     }).select('*').single()
 
@@ -645,7 +660,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Cards */}
                       <div style={{ flex: 1, overflowY: 'auto', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {items.map(item => (
-                          <ContentCard key={item.id} item={item} steps={steps}
+                          <ContentCard key={item.id} item={item} steps={stepsWithMeta}
                             productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
                             productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
                             onClick={() => setDetailItem(item)} />
@@ -712,32 +727,41 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
                 {/* Step rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {sprintSteps.map(({ step, memberId }, idx) => (
-                    <div key={`${step.id}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '28px 1fr auto 28px', gap: 6, alignItems: 'center', background: '#111', border: '1px solid #1f1f1f', borderRadius: 8, padding: '7px 8px' }}>
-                      {/* Drag handle / number */}
-                      <span style={{ fontSize: '0.7rem', color: '#1f2937', textAlign: 'center', fontWeight: 700 }}>{idx + 1}</span>
-                      {/* Step name */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  {sprintSteps.map(({ step, memberId, deadline }, idx) => (
+                    <div key={`${step.id}-${idx}`} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 8, padding: '8px 10px' }}>
+                      {/* Row 1: number + name + delete */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.65rem', color: '#334155', fontWeight: 700, background: '#1a1a1a', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
                         <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
-                        <span style={{ fontSize: '0.78rem', color: '#e2e8f0', fontWeight: 500 }}>{step.nama}</span>
+                        <span style={{ fontSize: '0.82rem', color: '#e2e8f0', fontWeight: 600, flex: 1 }}>{step.nama}</span>
+                        <button type="button" onClick={() => setSprintSteps(prev => prev.filter((_, i) => i !== idx))}
+                          style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 5, width: 22, height: 22, color: '#475569', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          ✕
+                        </button>
                       </div>
-                      {/* Assign dropdown */}
-                      {workspaceMembers.length > 0 ? (
-                        <select
-                          value={memberId}
-                          onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
-                          style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: memberId ? '#A78BFA' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', minWidth: 130 }}>
-                          <option value="">— Assign —</option>
-                          {workspaceMembers.map(m => (
-                            <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
-                          ))}
-                        </select>
-                      ) : <div />}
-                      {/* Delete */}
-                      <button type="button" onClick={() => setSprintSteps(prev => prev.filter((_, i) => i !== idx))}
-                        style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, width: 26, height: 26, color: '#475569', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        ✕
-                      </button>
+                      {/* Row 2: assign + deadline */}
+                      <div style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr 130px' : '1fr', gap: 6 }}>
+                        {workspaceMembers.length > 0 && (
+                          <select
+                            value={memberId}
+                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
+                            style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '5px 8px', color: memberId ? '#A78BFA' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                            <option value="">— Assign ke —</option>
+                            {workspaceMembers.map(m => (
+                              <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
+                            ))}
+                          </select>
+                        )}
+                        <div style={{ position: 'relative' }}>
+                          <input type="date"
+                            value={deadline}
+                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, deadline: e.target.value } : x))}
+                            style={{ ...fieldStyle({ padding: '5px 8px', fontSize: '0.72rem', color: deadline ? '#fbbf24' : '#334155' }) }}
+                            placeholder="Deadline"
+                          />
+                          {!deadline && <span style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', fontSize: '0.68rem', color: '#334155', pointerEvents: 'none' }}>📅 Deadline</span>}
+                        </div>
+                      </div>
                     </div>
                   ))}
                   {sprintSteps.length === 0 && (
@@ -755,7 +779,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#111', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).map(ms => (
                         <button key={ms.id} type="button"
-                          onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '' }]); setAddStepOpen(false) }}
+                          onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '', deadline: '' }]); setAddStepOpen(false) }}
                           style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
                           <span style={{ fontSize: '0.9rem' }}>{ms.icon}</span> {ms.nama}
                         </button>
@@ -948,22 +972,37 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ padding: '14px 20px', borderBottom: '1px solid #1f1f1f' }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Checklist</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {steps.map(step => {
+                {stepsWithMeta.map(step => {
                   const done = isStepDone(detailItem.status, step.doneAt)
+                  const isOverdue = step.deadline && !done && new Date(step.deadline) < new Date()
                   return (
-                    <div key={step.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.06)' : '#1a1a1a', border: `1px solid ${done ? 'rgba(52,211,153,0.2)' : '#2a2a2a'}` }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#2a2a2a'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                    <div key={step.id} style={{ padding: '8px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.06)' : '#1a1a1a', border: `1px solid ${isOverdue ? 'rgba(248,113,113,0.3)' : done ? 'rgba(52,211,153,0.2)' : '#2a2a2a'}` }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#2a2a2a'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                          </div>
+                          <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
+                          <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#e2e8f0', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
                         </div>
-                        <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
-                        <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#e2e8f0', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
+                        {!done && (
+                          <Link href={step.href} onClick={() => setDetailItem(null)}
+                            style={{ fontSize: '0.68rem', color: '#A78BFA', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)' }}>
+                            Buka →
+                          </Link>
+                        )}
                       </div>
-                      {!done && (
-                        <Link href={step.href} onClick={() => setDetailItem(null)}
-                          style={{ fontSize: '0.68rem', color: '#A78BFA', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)' }}>
-                          Buka →
-                        </Link>
+                      {/* Meta: assignee + deadline */}
+                      {(step.memberName || step.deadline) && (
+                        <div style={{ display: 'flex', gap: 10, marginTop: 5, paddingLeft: 26 }}>
+                          {step.memberName && <span style={{ fontSize: '0.65rem', color: '#64748b' }}>👤 {step.memberName}</span>}
+                          {step.deadline && (
+                            <span style={{ fontSize: '0.65rem', color: isOverdue ? '#f87171' : done ? '#334155' : '#fbbf24', fontWeight: isOverdue ? 700 : 400 }}>
+                              {isOverdue ? '⚠️ ' : '📅 '}{new Date(step.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                              {isOverdue && !done ? ' (terlambat)' : ''}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                   )
@@ -1002,7 +1041,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
 function ContentCard({ item, steps, productName, productColor, onClick }: {
   item: ContentItem
-  steps: StepDef[]
+  steps: (StepDef & { deadline?: string; memberName?: string })[]
   productName: string | null
   productColor: string
   onClick: () => void
