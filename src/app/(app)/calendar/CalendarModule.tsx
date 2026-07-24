@@ -16,7 +16,14 @@ type Entry = {
   status: string
 }
 
-type ContentIdea = { id: string; judul: string; format: string; platform: string[] }
+type ContentIdea = {
+  id: string; judul: string; format: string; platform: string[]
+  product_id: string | null; product_nama: string | null
+}
+type ReadyItem = {
+  id: string; judul: string; format: string | null; platform: string[] | null
+  product_id: string | null; product_nama: string | null; sprint_id: string
+}
 type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string; stage?: string | null }
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
@@ -32,11 +39,12 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [] }: {
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [] }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
   tasks?: TaskSnap[]
+  readyQueue?: ReadyItem[]
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -47,6 +55,12 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [error, setError] = useState('')
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
   const [showTasks, setShowTasks] = useState(true)
+  const [queueOpen, setQueueOpen] = useState(true)
+  const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
+  const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platform: string } | null>(null)
+  const [schedSaving, setSchedSaving] = useState(false)
+
+  const todayDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
   // Calendar grid
   const calDays = useMemo(() => {
@@ -66,7 +80,6 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   function tasksForDay(day: number) {
     if (!showTasks) return []
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    // Only show schedule-stage tasks (tanggal tayang) not already linked to calendar entries
     const linkedTaskIds = new Set(entries.filter(e => e.task_id).map(e => e.task_id))
     return tasks.filter(t => t.due_date === dateStr && !linkedTaskIds.has(t.id) && t.stage === 'schedule')
   }
@@ -120,6 +133,42 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
     setEntries(prev => prev.filter(x => x.id !== id))
   }
 
+  function openSchedModal(item: ReadyItem) {
+    const defaultPlatform = (item.platform && item.platform.length === 1) ? item.platform[0] : ''
+    setSchedModal({ item, date: todayDateStr, time: '09:00', platform: defaultPlatform })
+  }
+
+  async function confirmSchedule() {
+    if (!schedModal) return
+    setSchedSaving(true)
+    const supabase = createClient()
+    const { item, date, time, platform } = schedModal
+    const scheduled_at = `${date}T${time}`
+    const { data: entry } = await supabase.from('kf_calendar_entries').insert({
+      workspace_id: workspaceId,
+      content_id: item.id,
+      platform,
+      scheduled_at,
+      status: 'Planned',
+      posted_at: null,
+      posted_url: null,
+    }).select('id').single()
+    await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date }).eq('id', item.id)
+    await supabase.from('kf_notifications').insert({
+      workspace_id: workspaceId,
+      type: 'schedule',
+      title: `📅 Terjadwal — ${item.judul}`,
+      message: `Konten dijadwalkan posting ${date} pukul ${time}${platform ? ' di ' + platform : ''}. Sprint progress bertambah!`,
+      content_idea_id: item.id,
+    })
+    if (entry) {
+      setEntries(prev => [...prev, { id: entry.id, workspace_id: workspaceId, content_id: item.id, platform, scheduled_at, posted_at: null, posted_url: null, status: 'Planned' }])
+    }
+    setReadyItems(prev => prev.filter(r => r.id !== item.id))
+    setSchedModal(null)
+    setSchedSaving(false)
+  }
+
   const ideaMap = Object.fromEntries(ideas.map(i => [i.id, i]))
   const monthEntries = entries.filter(e => {
     const d = new Date(e.scheduled_at)
@@ -130,12 +179,12 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const monthTasks = showTasks ? tasks.filter(t => {
     if (!t.due_date) return false
     if (linkedTaskIds.has(t.id)) return false
-    if (t.stage !== 'schedule') return false  // only tanggal tayang tasks
+    if (t.stage !== 'schedule') return false
     const d = new Date(t.due_date)
     return d.getFullYear() === viewYear && d.getMonth() === viewMonth
   }).sort((a, b) => a.due_date.localeCompare(b.due_date)) : []
 
-  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  const todayStr = todayDateStr
 
   return (
     <div>
@@ -165,6 +214,52 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
           </button>
         </div>
       </div>
+
+      {/* ── Antrian Posting ── */}
+      {readyItems.length > 0 && (
+        <div style={{ background: '#0f1a14', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 12, marginBottom: 20, overflow: 'hidden' }}>
+          <button
+            onClick={() => setQueueOpen(o => !o)}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399' }}>⏰ Siap Dijadwalkan</span>
+              <span style={{ background: 'rgba(52,211,153,0.15)', color: '#34d399', fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10 }}>{readyItems.length} konten</span>
+            </div>
+            <span style={{ color: '#475569', fontSize: '0.8rem' }}>{queueOpen ? '▲' : '▼'}</span>
+          </button>
+          {queueOpen && (
+            <div style={{ borderTop: '1px solid rgba(52,211,153,0.1)', padding: '8px 12px 12px' }}>
+              {readyItems.map(item => (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 6px', borderBottom: '1px solid #1a2a1f' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                      {item.product_nama && (
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', borderRadius: 3, background: 'rgba(167,139,250,0.12)', color: '#A78BFA', whiteSpace: 'nowrap' }}>
+                          📦 {item.product_nama}
+                        </span>
+                      )}
+                      {item.format && (
+                        <span style={{ fontSize: '0.62rem', padding: '1px 5px', borderRadius: 3, background: '#1a1a1a', color: '#475569', border: '1px solid #2a2a2a' }}>{item.format}</span>
+                      )}
+                      {item.platform && item.platform.length > 0 && item.platform.map(p => (
+                        <span key={p} style={{ fontSize: '0.62rem', padding: '1px 5px', borderRadius: 3, background: '#1a1a1a', color: '#64748b', border: '1px solid #2a2a2a' }}>{p}</span>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: '0.82rem', color: '#e2e8f0', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.judul}</div>
+                  </div>
+                  <button
+                    onClick={() => openSchedModal(item)}
+                    style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, color: '#34d399', fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                  >
+                    + Jadwalkan
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Month Nav */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
@@ -203,28 +298,28 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                       <div style={{ fontSize: '0.78rem', fontWeight: isToday ? 700 : 400, color: isToday ? '#fff' : '#64748b', width: 22, height: 22, borderRadius: '50%', background: isToday ? '#7C3AED' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
                         {day}
                       </div>
-                      {/* Calendar entries (posting schedule) */}
                       {dayEntries.slice(0, MAX_SHOW).map(e => {
-                        const isSprint = !!e.task_id
-                        const displayName = e.label || (e.content_id ? ideaMap[e.content_id]?.judul : null) || '(konten)'
+                        const idea = e.content_id ? ideaMap[e.content_id] : null
+                        const displayName = e.label || idea?.judul || '(konten)'
+                        const productLabel = idea?.product_nama ? `📦${idea.product_nama.split(' ')[0]} · ` : ''
+                        const timeStr = e.scheduled_at ? new Date(e.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
                         return (
                           <div key={e.id} onClick={ev => { ev.stopPropagation(); openEdit(e) }}
-                            style={{ fontSize: '0.63rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: isSprint ? 'rgba(52,211,153,0.1)' : 'rgba(124,58,237,0.15)', border: `1px solid ${STATUS_COLOR[e.status] || '#2a2a2a'}`, color: STATUS_COLOR[e.status] || '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}>
-                            {isSprint ? '⚡' : '📅'} {e.platform ? `${e.platform} · ` : ''}{displayName}
+                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'rgba(124,58,237,0.15)', border: `1px solid ${STATUS_COLOR[e.status] || '#2a2a2a'}`, color: STATUS_COLOR[e.status] || '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
+                            title={`${idea?.product_nama ? idea.product_nama + ' · ' : ''}${displayName} · ${timeStr}`}>
+                            {timeStr && <span style={{ opacity: 0.7 }}>{timeStr} </span>}{productLabel}{displayName}
                           </div>
                         )
                       })}
-                      {/* Task deadlines (sprint only) */}
                       {dayTasks.slice(0, Math.max(0, MAX_SHOW - dayEntries.length)).map(t => {
                         const pct = t.percent_complete
                         const taskColor = pct === 100 ? '#86efac' : pct > 0 ? '#fbbf24' : '#94a3b8'
-                        // Strip leading emoji from step name (format: "emoji Nama — Context")
                         const rawStep = t.nama.split(' —')[0].trim()
                         const stepName = rawStep.replace(/^\p{Emoji}\s*/u, '')
                         const ctx = t.nama.match(/—\s*(.+)$/)?.[1]?.trim()
                         const dot = pct === 100 ? '●' : pct > 0 ? '◑' : '○'
                         return (
-                          <div key={t.id} onClick={e => e.stopPropagation()}
+                          <div key={t.id} onClick={ev => ev.stopPropagation()}
                             style={{ fontSize: '0.63rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: pct === 100 ? 'rgba(134,239,172,0.06)' : pct > 0 ? 'rgba(251,191,36,0.06)' : 'rgba(148,163,184,0.06)', border: `1px solid ${taskColor}40`, color: taskColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
                             title={`${t.nama} · ${pct}%`}>
                             {dot} {ctx ? ctx + ' · ' : ''}{stepName}
@@ -256,24 +351,30 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
             const displayName = e.label || idea?.judul || '(konten tidak terhubung)'
             return (
               <div key={e.id} style={{ background: '#111', border: `1px solid ${isSprint ? 'rgba(52,211,153,0.15)' : '#2a2a2a'}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                {/* Date block */}
                 <div style={{ width: 48, textAlign: 'center', flexShrink: 0 }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f1f5f9' }}>{d.getDate()}</div>
                   <div style={{ fontSize: '0.68rem', color: '#475569' }}>{MONTHS[d.getMonth()].slice(0, 3)}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
-                <div style={{ width: 1, height: 36, background: STATUS_COLOR[e.status] || '#2a2a2a', flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                <div style={{ width: 1, height: 44, background: STATUS_COLOR[e.status] || '#2a2a2a', flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Product + sprint badges */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
+                    {idea?.product_nama && (
+                      <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(167,139,250,0.12)', color: '#A78BFA', border: '1px solid rgba(167,139,250,0.2)' }}>
+                        📦 {idea.product_nama}
+                      </span>
+                    )}
                     {isSprint && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399', fontWeight: 600 }}>⚡ Sprint</span>}
-                    <span style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>{displayName}</span>
                   </div>
+                  <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{displayName}</div>
                   <div style={{ fontSize: '0.72rem', color: '#475569' }}>
-                    {e.platform && `${e.platform} · `}{d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                    {idea?.format && ` · ${idea.format}`}
-                    {isSprint && <span style={{ marginLeft: 6, color: '#334155' }}>· Dari sprint</span>}
+                    {e.platform && `${e.platform}`}{idea?.format && ` · ${idea.format}`}
                   </div>
                 </div>
-                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[e.status], background: `${STATUS_COLOR[e.status]}18`, fontWeight: 600 }}>{e.status}</span>
-                <div style={{ display: 'flex', gap: 6 }}>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[e.status], background: `${STATUS_COLOR[e.status]}18`, fontWeight: 600, flexShrink: 0 }}>{e.status}</span>
+                <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                   {!isSprint && <button onClick={() => openEdit(e)} style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid #7C3AED', borderRadius: 7, padding: '5px 10px', color: '#A78BFA', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>}
                   {!isSprint && <button onClick={() => deleteEntry(e.id!)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 7, padding: '5px 8px', color: '#64748b', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>}
                   {isSprint && <span style={{ fontSize: '0.7rem', color: '#334155', padding: '5px 0' }}>auto-sync</span>}
@@ -284,7 +385,56 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         </div>
       )}
 
-      {/* Modal */}
+      {/* ── Jadwalkan Modal (from queue) ── */}
+      {schedModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 420 }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>📅 Jadwalkan Posting</div>
+              <button onClick={() => setSchedModal(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Content info */}
+              <div style={{ background: '#1a1a1a', borderRadius: 10, padding: '12px 14px' }}>
+                {schedModal.item.product_nama && (
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#A78BFA', marginBottom: 4 }}>📦 {schedModal.item.product_nama}</div>
+                )}
+                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>{schedModal.item.judul}</div>
+                {schedModal.item.format && <div style={{ fontSize: '0.7rem', color: '#475569' }}>{schedModal.item.format}</div>}
+              </div>
+              {/* Date */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Tanggal Posting</label>
+                <input type="date" style={fieldStyle()} value={schedModal.date} onChange={e => setSchedModal(s => s ? { ...s, date: e.target.value } : s)} />
+              </div>
+              {/* Time */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Jam Posting</label>
+                <input type="time" style={fieldStyle()} value={schedModal.time} onChange={e => setSchedModal(s => s ? { ...s, time: e.target.value } : s)} />
+              </div>
+              {/* Platform */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
+                <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={schedModal.platform} onChange={e => setSchedModal(s => s ? { ...s, platform: e.target.value } : s)} required>
+                  <option value="">Pilih platform</option>
+                  {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
+                <button onClick={() => setSchedModal(null)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button
+                  onClick={confirmSchedule}
+                  disabled={schedSaving || !schedModal.platform || !schedModal.date}
+                  style={{ background: schedSaving ? '#15803d' : 'linear-gradient(135deg, #16a34a, #34d399)', border: 'none', borderRadius: 10, padding: '10px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: (schedSaving || !schedModal.platform) ? 'not-allowed' : 'pointer', opacity: (!schedModal.platform || !schedModal.date) ? 0.5 : 1 }}>
+                  {schedSaving ? 'Menjadwalkan...' : '✓ Jadwalkan'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit/Add Modal ── */}
       {modal?.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
           <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 480 }}>
@@ -298,8 +448,15 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Konten dari Library</label>
                 <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.entry.content_id ?? ''} onChange={e => setField('content_id', e.target.value)}>
                   <option value="">Pilih konten (opsional)</option>
-                  {ideas.map(i => <option key={i.id} value={i.id}>{i.judul} {i.format ? `· ${i.format}` : ''}</option>)}
+                  {ideas.map(i => (
+                    <option key={i.id} value={i.id}>
+                      {i.product_nama ? `[${i.product_nama}] ` : ''}{i.judul}{i.format ? ` · ${i.format}` : ''}
+                    </option>
+                  ))}
                 </select>
+                {modal.entry.content_id && ideaMap[modal.entry.content_id]?.product_nama && (
+                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#A78BFA' }}>📦 {ideaMap[modal.entry.content_id].product_nama}</div>
+                )}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
