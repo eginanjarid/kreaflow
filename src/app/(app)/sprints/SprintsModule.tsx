@@ -442,6 +442,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setDetailItem(null)
   }
 
+  async function deleteSprint(sprintId: string, sprintName: string) {
+    if (!confirm(`Hapus sprint "${sprintName}" beserta semua kontennya? Aksi ini tidak bisa dibatalkan.`)) return
+    await supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
+    await supabase.from('kf_sprints').delete().eq('id', sprintId)
+    setSprints(prev => prev.filter(s => s.id !== sprintId))
+    setContents(prev => prev.filter(c => c.sprint_id !== sprintId))
+    if (selectedSprintId === sprintId) setSelectedSprintId(null)
+  }
+
   // ── Manual tasks ──────────────────────────────────────────────────────────
   function emptyTask(): ManualTask {
     return { workspace_id: workspaceId, nama: '', platform: '', priority: 'Medium', start_date: '', due_date: '', percent_complete: 0, notes: '' }
@@ -620,10 +629,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const tplColor = getTemplateColor(s.template_type)
               return (
                 <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
-                  style={{ padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(124,58,237,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(124,58,237,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
+                  style={{ position: 'relative', padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(124,58,237,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(124,58,237,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
                     {isCurrent && <span style={{ fontSize: '0.5rem', background: '#34d399', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
                     <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
+                    <button
+                      onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }}
+                      title="Hapus sprint"
+                      style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#475569', fontSize: '0.75rem', cursor: 'pointer', padding: '1px 4px', borderRadius: 4, lineHeight: 1 }}
+                    >✕</button>
                   </div>
                   <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#A78BFA' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
                   <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
