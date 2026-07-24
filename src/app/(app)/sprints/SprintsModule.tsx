@@ -35,6 +35,7 @@ type ContentItem = {
   assigned_naskah: string | null
   assigned_produksi: string | null
   assigned_schedule: string | null
+  step_log: Record<string, string> | null
 }
 
 type Product = { id: string; nama: string; platform_affiliate: string | null }
@@ -230,6 +231,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
   const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask } | null>(null)
   const [savingTask, setSavingTask] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
@@ -379,7 +381,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const targetStatus = step.doneAt
     const currentIdx = STATUS_ORDER.indexOf(item.status)
     const targetIdx = STATUS_ORDER.indexOf(targetStatus)
-    if (targetIdx <= currentIdx) return // already done or past
+    if (targetIdx <= currentIdx) return
+    const newStepLog = { ...(item.step_log || {}), [`${step.id}_done_at`]: new Date().toISOString() }
+    await supabase.from('kf_content_ideas').update({ step_log: newStepLog }).eq('id', item.id)
+    setContents(prev => prev.map(c => c.id === item.id ? { ...c, step_log: newStepLog } : c))
     await advanceStatus(item, targetStatus)
   }
 
@@ -691,6 +696,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </select>
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari..."
                   style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.72rem', outline: 'none', width: 120 }} />
+                <button onClick={() => setReportOpen(true)}
+                  style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 7, padding: '6px 12px', color: '#fbbf24', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  📊 Laporan Tim
+                </button>
               </div>
 
               {/* 3-Column Kanban */}
@@ -1091,6 +1100,123 @@ export default function SprintsModule({ initialSprints, initialContents, product
           </div>
         </div>
       )}
+
+      {/* ── Laporan Tim Modal ───────────────────────────────────────────────── */}
+      {reportOpen && selectedSprint && (() => {
+        const reportSteps = getTemplateSteps(selectedSprint.template_type)
+        const stepCfgMap = Object.fromEntries((selectedSprint.step_config || []).map(c => [c.id, c]))
+        const now = new Date()
+
+        type StepReport = {
+          step: StepDef
+          memberName: string
+          deadline: string
+          total: number
+          done: number
+          onTime: number
+          late: number
+          pending: number
+          overdue: number
+        }
+
+        const report: StepReport[] = reportSteps.map(step => {
+          const cfg = stepCfgMap[step.id]
+          const deadline = cfg?.deadline || ''
+          const memberName = cfg?.memberName || '—'
+          const dlDate = deadline ? new Date(deadline) : null
+
+          let done = 0, onTime = 0, late = 0, pending = 0, overdue = 0
+          sprintContents.forEach(item => {
+            const stepDone = isStepDone(item.status, step.doneAt)
+            if (stepDone) {
+              done++
+              const doneAt = item.step_log?.[`${step.id}_done_at`]
+              if (dlDate && doneAt) {
+                if (new Date(doneAt) <= dlDate) onTime++
+                else late++
+              } else {
+                onTime++ // done but no deadline set → count as ok
+              }
+            } else {
+              pending++
+              if (dlDate && now > dlDate) overdue++
+            }
+          })
+          return { step, memberName, deadline, total: sprintContents.length, done, onTime, late, pending, overdue }
+        })
+
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
+            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 600, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>📊 Laporan Tim — {selectedSprint.nama}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 2 }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)} · {sprintContents.length} konten</div>
+                </div>
+                <button onClick={() => setReportOpen(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+              </div>
+              <div style={{ overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {report.map(r => {
+                  const pct = r.total > 0 ? Math.round(r.done / r.total * 100) : 0
+                  const hasDeadline = !!r.deadline
+                  const dlOverdue = hasDeadline && now > new Date(r.deadline) && r.done < r.total
+                  return (
+                    <div key={r.step.id} style={{ background: '#0f0f0f', border: `1px solid ${dlOverdue ? 'rgba(248,113,113,0.3)' : '#1f1f1f'}`, borderRadius: 10, padding: '14px 16px' }}>
+                      {/* Step header */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: '1rem' }}>{r.step.icon}</span>
+                          <div>
+                            <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.85rem' }}>{r.step.nama}</div>
+                            <div style={{ fontSize: '0.68rem', color: '#475569', marginTop: 1 }}>
+                              {r.memberName}
+                              {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#f87171' : '#334155' }}>
+                                · Deadline: {new Date(r.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                {dlOverdue && ' ⚠ Overdue'}
+                              </span>}
+                            </div>
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: pct === 100 ? '#86efac' : '#A78BFA' }}>{pct}%</span>
+                      </div>
+                      {/* Progress bar */}
+                      <div style={{ height: 5, background: '#1a1a1a', borderRadius: 3, marginBottom: 10 }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? '#34d399' : 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 3, transition: 'width 0.3s' }} />
+                      </div>
+                      {/* Stats row */}
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(134,239,172,0.1)', color: '#86efac' }}>
+                          ✓ {r.done} selesai
+                        </span>
+                        {hasDeadline && r.done > 0 && (
+                          <>
+                            <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(52,211,153,0.08)', color: '#34d399' }}>
+                              🎯 {r.onTime} tepat waktu
+                            </span>
+                            {r.late > 0 && (
+                              <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(248,113,113,0.08)', color: '#f87171' }}>
+                                ⚠ {r.late} terlambat
+                              </span>
+                            )}
+                          </>
+                        )}
+                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#1a1a1a', color: r.overdue > 0 ? '#f87171' : '#475569' }}>
+                          ○ {r.pending} belum{r.overdue > 0 ? ` (${r.overdue} overdue)` : ''}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+                {report.length === 0 && (
+                  <div style={{ textAlign: 'center', color: '#334155', padding: 32 }}>
+                    Belum ada step yang dikonfigurasi untuk sprint ini
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
