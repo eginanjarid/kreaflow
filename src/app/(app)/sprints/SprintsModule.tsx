@@ -84,6 +84,40 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
   },
 }
 
+const MASTER_STEPS: StepDef[] = [
+  { id: 'naskah',    nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
+  { id: 'take_vid',  nama: 'Take Video',  icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
+  { id: 'shooting',  nama: 'Shooting',    icon: '📷', doneAt: 'Produksi',    href: '/studio' },
+  { id: 'editing',   nama: 'Editing',     icon: '✂️', doneAt: 'Siap Tayang', href: '/studio' },
+  { id: 'caption',   nama: 'Caption',     icon: '✍️', doneAt: 'Siap Tayang', href: '/plan' },
+  { id: 'thumbnail', nama: 'Thumbnail',   icon: '🖼️', doneAt: 'Siap Tayang', href: '/studio' },
+  { id: 'review',    nama: 'Review',      icon: '👀', doneAt: 'Siap Tayang', href: '/studio' },
+  { id: 'rundown',   nama: 'Rundown',     icon: '📋', doneAt: 'Naskah Siap', href: '/plan' },
+  { id: 'schedule',  nama: 'Schedule',    icon: '📅', doneAt: 'Terjadwal',   href: '/calendar' },
+  { id: 'live',      nama: 'Live',        icon: '🔴', doneAt: 'Terjadwal',   href: '/studio' },
+]
+
+function getTemplateSteps(template_type: string): StepDef[] {
+  if (!template_type) return TEMPLATES.affiliate.steps
+  if (template_type.startsWith('custom:')) {
+    const ids = template_type.replace('custom:', '').split(',').filter(Boolean)
+    return ids.map(id => MASTER_STEPS.find(s => s.id === id)).filter(Boolean) as StepDef[]
+  }
+  return TEMPLATES[template_type]?.steps || TEMPLATES.affiliate.steps
+}
+
+function getTemplateLabel(template_type: string): string {
+  if (!template_type) return 'Konten Affiliate'
+  if (template_type.startsWith('custom:')) return 'Custom'
+  return TEMPLATES[template_type]?.label || 'Konten Affiliate'
+}
+
+function getTemplateColor(template_type: string): string {
+  if (!template_type) return TEMPLATES.affiliate.color
+  if (template_type.startsWith('custom:')) return '#94a3b8'
+  return TEMPLATES[template_type]?.color || TEMPLATES.affiliate.color
+}
+
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
@@ -151,6 +185,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // Sprint create modal
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
+  const [customSteps, setCustomSteps] = useState<string[]>(['naskah', 'editing', 'schedule'])
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -169,7 +204,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
-  const steps = selectedSprint ? (TEMPLATES[selectedSprint.template_type]?.steps || TEMPLATES.affiliate.steps) : []
+  const steps = selectedSprint ? getTemplateSteps(selectedSprint.template_type) : []
 
   const productColorMap = useMemo(() => {
     const m: Record<string, string> = {}
@@ -191,12 +226,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
   function openSprintModal() {
     const { start, end } = getWeekDates()
     setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', template_type: 'affiliate' })
+    setCustomSteps(['naskah', 'editing', 'schedule'])
     setSprintModal(true)
   }
 
   async function createSprint() {
     if (!sprintForm.nama.trim() || !sprintForm.start_date) return
     setSavingSprint(true)
+    const tplType = sprintForm.template_type === 'custom'
+      ? (customSteps.length > 0 ? `custom:${customSteps.join(',')}` : 'custom:naskah,schedule')
+      : sprintForm.template_type
     const { data, error } = await supabase.from('kf_sprints').insert({
       workspace_id: workspaceId,
       nama: sprintForm.nama.trim(),
@@ -204,7 +243,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       end_date: sprintForm.end_date,
       target_konten: sprintForm.target_konten,
       platform: sprintForm.platform || null,
-      template_type: sprintForm.template_type,
+      template_type: tplType,
       status: 'active',
     }).select('*').single()
     if (!error && data) { setSprints(prev => [data, ...prev]); setSelectedSprintId(data.id) }
@@ -449,13 +488,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const active = s.id === selectedSprintId
               const today = new Date().toISOString().split('T')[0]
               const isCurrent = s.start_date <= today && s.end_date >= today
-              const tpl = TEMPLATES[s.template_type] || TEMPLATES.affiliate
+              const tplLabel = getTemplateLabel(s.template_type)
+              const tplColor = getTemplateColor(s.template_type)
               return (
                 <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
                   style={{ padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(124,58,237,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(124,58,237,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
                     {isCurrent && <span style={{ fontSize: '0.5rem', background: '#34d399', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
-                    <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tpl.color + '18', color: tpl.color }}>{tpl.label}</span>
+                    <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
                   </div>
                   <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#A78BFA' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
                   <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
@@ -538,7 +578,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
                             onClick={() => setDetailItem(item)} />
                         ))}
-                        {items.length === 0 && (
+                        {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
+                          <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(124,58,237,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                            <div style={{ fontSize: '1.5rem' }}>📋</div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Sprint siap!</div>
+                            <div style={{ fontSize: '0.68rem', color: '#334155' }}>Tambah konten yang mau dikerjakan minggu ini</div>
+                            <button onClick={openAddModal} style={{ marginTop: 4, background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 7, padding: '7px 16px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                              + Tambah Konten
+                            </button>
+                          </div>
+                        )}
+                        {items.length === 0 && !(col.id === 'todo' && sprintContents.length === 0) && (
                           <div style={{ textAlign: 'center', padding: '32px 12px', color: '#1f2937', fontSize: '0.72rem', border: '1px dashed #1f1f1f', borderRadius: 8 }}>Kosong</div>
                         )}
                       </div>
@@ -564,23 +614,65 @@ export default function SprintsModule({ initialSprints, initialContents, product
               {/* Template selector */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Jenis Konten & Workflow</label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {Object.entries(TEMPLATES).map(([key, tpl]) => (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {(Object.entries(TEMPLATES) as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => setSprintForm(f => ({ ...f, template_type: key }))}
-                      style={{ flex: 1, minWidth: 100, padding: '10px 8px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#2a2a2a'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#1a1a1a', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.78rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#2a2a2a'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#1a1a1a', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
                     </button>
                   ))}
+                  <button type="button" onClick={() => setSprintForm(f => ({ ...f, template_type: 'custom' }))}
+                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#2a2a2a'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#1a1a1a', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    ✏️ Custom
+                  </button>
                 </div>
-                {/* Step preview */}
-                <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  {(TEMPLATES[sprintForm.template_type]?.steps || []).map((s, i) => (
-                    <span key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', color: '#475569' }}>
-                      <span style={{ fontSize: '0.85rem' }}>{s.icon}</span>{s.nama}
-                      {i < TEMPLATES[sprintForm.template_type].steps.length - 1 && <span style={{ color: '#1f2937', marginLeft: 3 }}>→</span>}
-                    </span>
-                  ))}
-                </div>
+
+                {/* Step preview for presets */}
+                {sprintForm.template_type !== 'custom' && TEMPLATES[sprintForm.template_type] && (
+                  <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                    {TEMPLATES[sprintForm.template_type].steps.map((s, i) => (
+                      <span key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', color: '#475569' }}>
+                        <span style={{ fontSize: '0.85rem' }}>{s.icon}</span>{s.nama}
+                        {i < TEMPLATES[sprintForm.template_type].steps.length - 1 && <span style={{ color: '#1f2937', marginLeft: 3 }}>→</span>}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Custom step picker */}
+                {sprintForm.template_type === 'custom' && (
+                  <div style={{ marginTop: 10, background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#64748b', marginBottom: 8, fontWeight: 600 }}>Pilih steps yang dipakai:</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {MASTER_STEPS.map(step => {
+                        const checked = customSteps.includes(step.id)
+                        return (
+                          <label key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                            <input type="checkbox" checked={checked}
+                              onChange={e => setCustomSteps(prev => e.target.checked ? [...prev, step.id] : prev.filter(x => x !== step.id))}
+                              style={{ width: 14, height: 14, accentColor: '#7C3AED', cursor: 'pointer' }} />
+                            <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
+                            <span style={{ fontSize: '0.78rem', color: checked ? '#e2e8f0' : '#475569', fontWeight: checked ? 500 : 400 }}>{step.nama}</span>
+                            <span style={{ fontSize: '0.6rem', color: '#1f2937', marginLeft: 'auto' }}>selesai saat: {step.doneAt}</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                    {customSteps.length > 0 && (
+                      <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #1f1f1f', display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {customSteps.map((id, i) => {
+                          const s = MASTER_STEPS.find(x => x.id === id)
+                          if (!s) return null
+                          return (
+                            <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: '0.65rem', color: '#A78BFA' }}>
+                              {s.icon} {s.nama}{i < customSteps.length - 1 ? ' →' : ''}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Sprint *</label>
