@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 type Sprint = {
   id: string
@@ -13,6 +14,7 @@ type Sprint = {
   target_konten: number
   platform: string
   status: string
+  template_type: string
   created_at: string
 }
 
@@ -26,20 +28,10 @@ type ContentItem = {
   status: string
   product_id: string | null
   tanggal_tayang: string | null
-  riset_done_at: string | null
-  terjadwal_at: string | null
-  tayang_at: string | null
   assigned_riset: string | null
   assigned_naskah: string | null
   assigned_produksi: string | null
   assigned_schedule: string | null
-  hook: string | null
-  body: string | null
-  cta: string | null
-  script: string | null
-  canva_url: string | null
-  drive_url: string | null
-  studio_done_at: string | null
 }
 
 type Product = { id: string; nama: string; platform_affiliate: string | null }
@@ -56,43 +48,76 @@ type ManualTask = {
   notes: string
 }
 
-const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
-const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
+// ── Sprint templates ──────────────────────────────────────────────────────────
+type StepDef = { id: string; nama: string; icon: string; doneAt: string; href: string }
 
-const STAGE_COLS = [
-  { id: 'riset', label: 'Riset', color: '#60a5fa', bg: 'rgba(96,165,250,0.08)', statuses: ['Draft'] },
-  { id: 'naskah', label: 'Naskah', color: '#fbbf24', bg: 'rgba(251,191,36,0.08)', statuses: ['Naskah Siap'] },
-  { id: 'produksi', label: 'Produksi', color: '#f97316', bg: 'rgba(249,115,22,0.08)', statuses: ['Produksi'] },
-  { id: 'siap', label: 'Siap Tayang', color: '#34d399', bg: 'rgba(52,211,153,0.08)', statuses: ['Siap Tayang'] },
-  { id: 'terjadwal', label: 'Terjadwal', color: '#a78bfa', bg: 'rgba(167,139,250,0.08)', statuses: ['Terjadwal'] },
-  { id: 'tayang', label: 'Tayang', color: '#86efac', bg: 'rgba(134,239,172,0.08)', statuses: ['Tayang'] },
+const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[] }> = {
+  affiliate: {
+    label: 'Konten Affiliate',
+    color: '#34d399',
+    steps: [
+      { id: 'naskah',   nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'take_vid', nama: 'Take Video',  icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
+      { id: 'editing',  nama: 'Editing',     icon: '✂️', doneAt: 'Siap Tayang', href: '/studio' },
+      { id: 'schedule', nama: 'Schedule',    icon: '📅', doneAt: 'Terjadwal',   href: '/calendar' },
+    ],
+  },
+  creator: {
+    label: 'Konten Creator',
+    color: '#A78BFA',
+    steps: [
+      { id: 'naskah',   nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'shooting', nama: 'Shooting',    icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
+      { id: 'editing',  nama: 'Editing',     icon: '✂️', doneAt: 'Siap Tayang', href: '/studio' },
+      { id: 'caption',  nama: 'Caption',     icon: '✍️', doneAt: 'Siap Tayang', href: '/plan' },
+      { id: 'schedule', nama: 'Schedule',    icon: '📅', doneAt: 'Terjadwal',   href: '/calendar' },
+    ],
+  },
+  live: {
+    label: 'Live Streaming',
+    color: '#f87171',
+    steps: [
+      { id: 'rundown',   nama: 'Rundown',    icon: '📋', doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'persiapan', nama: 'Persiapan',  icon: '🎙️', doneAt: 'Produksi',    href: '/studio' },
+      { id: 'live',      nama: 'Live',       icon: '🔴', doneAt: 'Terjadwal',   href: '/studio' },
+    ],
+  },
+}
+
+const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
+const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
+const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
+const PRIORITIES = ['High', 'Medium', 'Low']
+const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf24', Low: '#86efac' }
+const PRODUCT_COLORS = ['#7C3AED','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
+
+const BOARD_COLS = [
+  { id: 'todo',  label: 'Todo',       count_color: '#475569', border: '#2a2a2a', bg: '#0d0d0d' },
+  { id: 'doing', label: 'Dikerjakan', count_color: '#fbbf24', border: 'rgba(251,191,36,0.25)', bg: 'rgba(251,191,36,0.03)' },
+  { id: 'done',  label: 'Done ✓',    count_color: '#86efac', border: 'rgba(134,239,172,0.25)', bg: 'rgba(134,239,172,0.03)' },
 ]
 
-const PRODUCT_COLORS = ['#7C3AED','#059669','#dc2626','#d97706','#0284c7','#be185d','#7c3aed','#047857']
+function getColFromStatus(status: string): 'todo' | 'doing' | 'done' {
+  if (status === 'Tayang') return 'done'
+  if (status === 'Draft') return 'todo'
+  return 'doing'
+}
+
+function isStepDone(status: string, doneAt: string): boolean {
+  return STATUS_ORDER.indexOf(status) >= STATUS_ORDER.indexOf(doneAt)
+}
 
 function getWeekDates() {
   const now = new Date()
   const day = now.getDay()
-  const mon = new Date(now)
-  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1))
-  const sun = new Date(mon)
-  sun.setDate(mon.getDate() + 6)
+  const mon = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1))
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
   const fmt = (d: Date) => d.toISOString().split('T')[0]
   return { start: fmt(mon), end: fmt(sun) }
 }
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-}
-
-function relativeTime(ts: string) {
-  const diff = Date.now() - new Date(ts).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 1) return 'baru saja'
-  if (m < 60) return `${m}m lalu`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h}j lalu`
-  return `${Math.floor(h / 24)}h lalu`
 }
 
 function fieldStyle(extra?: object) {
@@ -109,6 +134,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 }) {
   const supabase = createClient()
   const searchParams = useSearchParams()
+
   const [activeTab, setActiveTab] = useState<'board' | 'tasks'>(
     searchParams.get('tab') === 'tasks' ? 'tasks' : 'board'
   )
@@ -119,52 +145,52 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprints, setSprints] = useState<Sprint[]>(initialSprints)
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [selectedSprintId, setSelectedSprintId] = useState<string | null>(initialSprints[0]?.id || null)
-
-  // Manual tasks state
-  const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
-  const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask } | null>(null)
-  const [savingTask, setSavingTask] = useState(false)
-  const [filterProduct, setFilterProduct] = useState('')
   const [search, setSearch] = useState('')
+  const [filterProduct, setFilterProduct] = useState('')
 
   // Sprint create modal
   const [sprintModal, setSprintModal] = useState(false)
-  const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 5, platform: '' })
+  const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
-  const [contentModal, setContentModal] = useState<{ open: boolean; item: Partial<ContentItem> & { _sprintId: string } } | null>(null)
-  const [savingContent, setSavingContent] = useState(false)
+  const [addModal, setAddModal] = useState(false)
+  const [addForm, setAddForm] = useState({ judul: '', product_id: '', format: '', platform: '', tanggal_tayang: '', assigned_naskah: '', assigned_produksi: '', assigned_schedule: '' })
+  const [savingAdd, setSavingAdd] = useState(false)
 
-  // Card detail modal
-  const [detailModal, setDetailModal] = useState<ContentItem | null>(null)
+  // Detail modal
+  const [detailItem, setDetailItem] = useState<ContentItem | null>(null)
   const [savingAction, setSavingAction] = useState(false)
+
+  // Manual tasks
+  const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
+  const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask } | null>(null)
+  const [savingTask, setSavingTask] = useState(false)
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
+  const steps = selectedSprint ? (TEMPLATES[selectedSprint.template_type]?.steps || TEMPLATES.affiliate.steps) : []
 
   const productColorMap = useMemo(() => {
-    const map: Record<string, string> = {}
-    products.forEach((p, i) => { map[p.id] = PRODUCT_COLORS[i % PRODUCT_COLORS.length] })
-    return map
+    const m: Record<string, string> = {}
+    products.forEach((p, i) => { m[p.id] = PRODUCT_COLORS[i % PRODUCT_COLORS.length] })
+    return m
   }, [products])
 
-  const filteredContents = sprintContents.filter(c => {
+  const filtered = sprintContents.filter(c => {
     if (filterProduct && c.product_id !== filterProduct) return false
     if (search && !c.judul.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
-  const colItems = (statuses: string[]) => filteredContents.filter(c => statuses.includes(c.status))
-
+  const colItems = (colId: string) => filtered.filter(c => getColFromStatus(c.status) === colId)
   const totalDone = sprintContents.filter(c => c.status === 'Tayang').length
   const totalPct = sprintContents.length > 0 ? Math.round((totalDone / sprintContents.length) * 100) : 0
 
+  // ── Sprint create ─────────────────────────────────────────────────────────
   function openSprintModal() {
     const { start, end } = getWeekDates()
-    const startFmt = new Date(start).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-    const endFmt = new Date(end).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-    setSprintForm({ nama: `Sprint ${startFmt} – ${endFmt}`, start_date: start, end_date: end, target_konten: 35, platform: '' })
+    setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', template_type: 'affiliate' })
     setSprintModal(true)
   }
 
@@ -178,130 +204,81 @@ export default function SprintsModule({ initialSprints, initialContents, product
       end_date: sprintForm.end_date,
       target_konten: sprintForm.target_konten,
       platform: sprintForm.platform || null,
+      template_type: sprintForm.template_type,
       status: 'active',
     }).select('*').single()
-    if (!error && data) {
-      setSprints(prev => [data, ...prev])
-      setSelectedSprintId(data.id)
-      setSprintModal(false)
-    }
+    if (!error && data) { setSprints(prev => [data, ...prev]); setSelectedSprintId(data.id) }
     setSavingSprint(false)
+    setSprintModal(false)
   }
 
-  function openAddContent(sprintId: string) {
-    setContentModal({
-      open: true,
-      item: {
-        _sprintId: sprintId,
-        sprint_id: sprintId,
-        workspace_id: workspaceId,
-        status: 'Draft',
-        judul: '',
-        format: '',
-        platform: [],
-        product_id: '',
-        tanggal_tayang: null,
-        assigned_riset: '',
-        assigned_naskah: '',
-        assigned_produksi: '',
-        assigned_schedule: '',
-      }
-    })
-    setSavingContent(false)
+  // ── Add content ───────────────────────────────────────────────────────────
+  function openAddModal() {
+    setAddForm({ judul: '', product_id: '', format: '', platform: '', tanggal_tayang: '', assigned_naskah: '', assigned_produksi: '', assigned_schedule: '' })
+    setAddModal(true)
   }
 
   async function saveContent() {
-    if (!contentModal) return
-    const item = contentModal.item
-    if (!item.judul?.trim()) return
-    setSavingContent(true)
-    const payload = {
+    if (!addForm.judul.trim() || !selectedSprintId) return
+    setSavingAdd(true)
+    const { data, error } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
-      sprint_id: item._sprintId,
-      judul: item.judul!.trim(),
-      format: item.format || null,
-      platform: item.platform || [],
+      sprint_id: selectedSprintId,
+      judul: addForm.judul.trim(),
+      format: addForm.format || null,
+      platform: addForm.platform ? [addForm.platform] : [],
       status: 'Draft',
-      product_id: item.product_id || null,
-      tanggal_tayang: item.tanggal_tayang || null,
-      assigned_riset: item.assigned_riset || null,
-      assigned_naskah: item.assigned_naskah || null,
-      assigned_produksi: item.assigned_produksi || null,
-      assigned_schedule: item.assigned_schedule || null,
-    }
-    const { data, error } = await supabase.from('kf_content_ideas').insert(payload).select('*').single()
+      product_id: addForm.product_id || null,
+      tanggal_tayang: addForm.tanggal_tayang || null,
+      assigned_naskah: addForm.assigned_naskah || null,
+      assigned_produksi: addForm.assigned_produksi || null,
+      assigned_schedule: addForm.assigned_schedule || null,
+    }).select('*').single()
     if (!error && data) {
       setContents(prev => [data, ...prev])
-      // Insert riset notification
       await supabase.from('kf_notifications').insert({
         workspace_id: workspaceId,
-        type: 'riset',
-        title: `Mulai Riset — ${data.judul}`,
-        message: `Konten baru ditambahkan ke sprint. ${item.assigned_riset ? 'Assignee: ' + item.assigned_riset : 'Mulai riset sekarang.'}`,
+        type: 'naskah',
+        title: `Mulai Naskah — ${data.judul}`,
+        message: `Konten baru di sprint. ${addForm.assigned_naskah ? 'Assign: ' + addForm.assigned_naskah + '.' : 'Buka Plan untuk buat naskah.'}`,
         content_idea_id: data.id,
       })
-      setContentModal(null)
+      setAddModal(false)
     }
-    setSavingContent(false)
+    setSavingAdd(false)
   }
 
-  async function markRisetDone(item: ContentItem) {
-    setSavingAction(true)
-    const now = new Date().toISOString()
-    await supabase.from('kf_content_ideas').update({ riset_done_at: now }).eq('id', item.id)
-    await supabase.from('kf_notifications').insert({
-      workspace_id: workspaceId,
-      type: 'naskah',
-      title: `Mulai Naskah — ${item.judul}`,
-      message: `Riset selesai. ${item.assigned_naskah ? item.assigned_naskah + ', buka' : 'Buka'} Plan untuk buat naskah.`,
-      content_idea_id: item.id,
-    })
-    setContents(prev => prev.map(c => c.id === item.id ? { ...c, riset_done_at: now } : c))
-    if (detailModal?.id === item.id) setDetailModal(prev => prev ? { ...prev, riset_done_at: now } : prev)
-    setSavingAction(false)
-  }
-
-  async function updateStatus(item: ContentItem, newStatus: string) {
+  // ── Status update ─────────────────────────────────────────────────────────
+  async function advanceStatus(item: ContentItem, newStatus: string) {
     setSavingAction(true)
     const update: Record<string, string> = { status: newStatus }
     if (newStatus === 'Terjadwal') update.terjadwal_at = new Date().toISOString()
     if (newStatus === 'Tayang') update.tayang_at = new Date().toISOString()
     await supabase.from('kf_content_ideas').update(update).eq('id', item.id)
-
     if (newStatus === 'Terjadwal') {
       await supabase.from('kf_notifications').insert({
-        workspace_id: workspaceId,
-        type: 'schedule',
+        workspace_id: workspaceId, type: 'schedule',
         title: `Terjadwal — ${item.judul}`,
-        message: `Konten sudah dijadwalkan.${item.tanggal_tayang ? ' Tayang: ' + fmtDate(item.tanggal_tayang) : ''}`,
+        message: item.tanggal_tayang ? `Tayang: ${fmtDate(item.tanggal_tayang)}` : 'Konten sudah dijadwalkan.',
         content_idea_id: item.id,
       })
     }
     setContents(prev => prev.map(c => c.id === item.id ? { ...c, ...update } : c))
-    if (detailModal?.id === item.id) setDetailModal(prev => prev ? { ...prev, ...update } : prev)
+    if (detailItem?.id === item.id) setDetailItem(prev => prev ? { ...prev, ...update } : prev)
     setSavingAction(false)
   }
 
-  async function deleteContent(id: string) {
+  async function removeFromSprint(id: string) {
     if (!confirm('Hapus konten ini dari sprint?')) return
     await supabase.from('kf_content_ideas').update({ sprint_id: null }).eq('id', id)
     setContents(prev => prev.filter(c => c.id !== id))
-    setDetailModal(null)
+    setDetailItem(null)
   }
 
-  function getProductName(id: string | null) {
-    if (!id) return null
-    return products.find(p => p.id === id)?.nama || null
-  }
-
-  function getStageOf(item: ContentItem) {
-    return STAGE_COLS.find(col => col.statuses.includes(item.status))?.id || 'riset'
-  }
-
+  // ── Manual tasks ──────────────────────────────────────────────────────────
   function emptyTask(): ManualTask {
     return { workspace_id: workspaceId, nama: '', platform: '', priority: 'Medium', start_date: '', due_date: '', percent_complete: 0, notes: '' }
   }
-
   async function saveTask() {
     if (!taskModal || !taskModal.task.nama.trim()) return
     setSavingTask(true)
@@ -313,53 +290,49 @@ export default function SprintsModule({ initialSprints, initialContents, product
       const { data } = await supabase.from('kf_tasks').insert(t).select('id').single()
       if (data) setTasks(prev => [{ ...t, id: data.id }, ...prev])
     }
-    setSavingTask(false)
-    setTaskModal(null)
+    setSavingTask(false); setTaskModal(null)
   }
-
   async function toggleTask(id: string, current: number) {
     const pct = current === 100 ? 0 : 100
     await supabase.from('kf_tasks').update({ percent_complete: pct }).eq('id', id)
     setTasks(prev => prev.map(x => x.id === id ? { ...x, percent_complete: pct } : x))
   }
-
   async function deleteTask(id: string) {
     if (!confirm('Hapus task ini?')) return
     await supabase.from('kf_tasks').delete().eq('id', id)
     setTasks(prev => prev.filter(x => x.id !== id))
   }
 
-  const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf24', Low: '#86efac' }
   const tasksTodo = tasks.filter(t => t.percent_complete < 100)
   const tasksDone = tasks.filter(t => t.percent_complete === 100)
 
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
+
       {/* Tab bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 0, borderBottom: '1px solid #1f1f1f', background: '#0d0d0d', flexShrink: 0, paddingLeft: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #1f1f1f', background: '#0d0d0d', flexShrink: 0, paddingLeft: 16 }}>
         {[
-          { key: 'board', label: '⚡ Sprint Board', desc: 'Kelola konten mingguan' },
-          { key: 'tasks', label: '✅ Tasks', desc: 'Checklist manual & ad-hoc' },
+          { key: 'board', label: '⚡ Sprint Board' },
+          { key: 'tasks', label: '✅ Tasks' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
             style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#7C3AED' : 'transparent'}`, color: activeTab === tab.key ? '#A78BFA' : '#475569', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
-            {tab.key === 'tasks' && tasks.filter(t => t.percent_complete < 100).length > 0 && (
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#1f1f1f', color: '#64748b', borderRadius: 8, padding: '1px 6px' }}>
-                {tasks.filter(t => t.percent_complete < 100).length}
-              </span>
+            {tab.key === 'tasks' && tasksTodo.length > 0 && (
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#1f1f1f', color: '#64748b', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
             )}
           </button>
         ))}
       </div>
 
     {activeTab === 'tasks' ? (
-      /* ── TASKS TAB ── */
+      // ── TASKS TAB ──────────────────────────────────────────────────────────
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', maxWidth: 720 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
             <div style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.1rem' }}>Tasks</div>
-            <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: 2 }}>Checklist manual — beli alat, meeting, non-konten, dll</div>
+            <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: 2 }}>Checklist manual — non-konten (beli alat, meeting, dll)</div>
           </div>
           <button onClick={() => setTaskModal({ open: true, task: emptyTask() })}
             style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
@@ -370,31 +343,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
         {tasks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
             <div style={{ fontSize: '2rem', marginBottom: 10 }}>✅</div>
-            <div style={{ fontWeight: 600, color: '#475569', marginBottom: 4 }}>Belum ada task</div>
-            <div style={{ fontSize: '0.8rem' }}>Catat todo non-konten di sini — beli tripod, perpanjang domain, meeting, dll.</div>
+            <div style={{ fontWeight: 600, color: '#475569' }}>Belum ada task manual</div>
           </div>
         )}
-
         {tasksTodo.length > 0 && (
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
-              Belum Selesai ({tasksTodo.length})
-            </div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Belum Selesai ({tasksTodo.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksTodo.map(t => (
                 <div key={t.id} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)}
-                    style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #2a2a2a', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #2a2a2a', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                       {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
-                      {t.platform && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: '#475569', background: '#1a1a1a' }}>{t.platform}</span>}
                       {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#475569' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
-                      {t.notes && <span style={{ fontSize: '0.65rem', color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>{t.notes}</span>}
+                      {t.notes && <span style={{ fontSize: '0.65rem', color: '#334155' }}>{t.notes}</span>}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: 6 }}>
                     <button onClick={() => setTaskModal({ open: true, task: { ...t } })} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 10px', color: '#64748b', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
                     <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: '#334155', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
                   </div>
@@ -403,17 +370,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
             </div>
           </div>
         )}
-
         {tasksDone.length > 0 && (
-          <div style={{ opacity: 0.5 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
-              Selesai ({tasksDone.length})
-            </div>
+          <div style={{ opacity: 0.45 }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Selesai ({tasksDone.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksDone.map(t => (
                 <div key={t.id} style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)}
-                    style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #7C3AED', background: '#7C3AED', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #7C3AED', background: '#7C3AED', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </button>
                   <span style={{ flex: 1, color: '#334155', fontSize: '0.875rem', textDecoration: 'line-through' }}>{t.nama}</span>
@@ -424,7 +387,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
           </div>
         )}
 
-        {/* Task Modal */}
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
             <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 14, width: '100%', maxWidth: 440 }}>
@@ -435,13 +397,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Task *</label>
-                  <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder="cth: Beli tripod, Perpanjang domain, Meeting brief..." />
+                  <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder="cth: Beli tripod, Perpanjang domain..." />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Priority</label>
                     <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={taskModal.task.priority} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, priority: e.target.value } } : m)}>
-                      {['High', 'Medium', 'Low'].map(p => <option key={p} value={p}>{p}</option>)}
+                      {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                   </div>
                   <div>
@@ -451,7 +413,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Catatan</label>
-                  <input style={fieldStyle()} value={taskModal.task.notes} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, notes: e.target.value } } : m)} placeholder="Detail tambahan..." />
+                  <input style={fieldStyle()} value={taskModal.task.notes} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, notes: e.target.value } } : m)} placeholder="Detail..." />
                 </div>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                   <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 16px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
@@ -464,158 +426,186 @@ export default function SprintsModule({ initialSprints, initialContents, product
           </div>
         )}
       </div>
+
     ) : (
-    <div style={{ display: 'flex', flex: 1, gap: 0, overflow: 'hidden' }}>
 
-      {/* Left: Sprint List */}
-      <div style={{ width: 240, flexShrink: 0, background: '#0d0d0d', borderRight: '1px solid #1f1f1f', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 14px 12px', borderBottom: '1px solid #1f1f1f' }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Sprint</div>
-          <button onClick={openSprintModal}
-            style={{ width: '100%', background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '9px 0', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
-            + Buat Sprint
-          </button>
-        </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }}>
-          {sprints.length === 0 && (
-            <div style={{ fontSize: '0.75rem', color: '#334155', padding: '16px 8px', textAlign: 'center' }}>Belum ada sprint</div>
-          )}
-          {sprints.map(s => {
-            const sc = contents.filter(c => c.sprint_id === s.id)
-            const done = sc.filter(c => c.status === 'Tayang').length
-            const active = s.id === selectedSprintId
-            const isThisWeek = s.start_date <= new Date().toISOString().split('T')[0] && s.end_date >= new Date().toISOString().split('T')[0]
-            return (
-              <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
-                style={{ padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(124,58,237,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(124,58,237,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                  {isThisWeek && <span style={{ fontSize: '0.55rem', background: '#34d399', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
-                  <span style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#A78BFA' : '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</span>
-                </div>
-                <div style={{ fontSize: '0.65rem', color: '#475569' }}>
-                  {fmtDate(s.start_date)} – {fmtDate(s.end_date)}
-                </div>
-                <div style={{ marginTop: 5, height: 3, background: '#1f1f1f', borderRadius: 2 }}>
-                  <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 2, transition: 'width 0.3s' }} />
-                </div>
-                <div style={{ fontSize: '0.62rem', color: '#334155', marginTop: 3 }}>{done}/{sc.length} tayang</div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      // ── SPRINT BOARD TAB ───────────────────────────────────────────────────
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
-      {/* Main: Sprint Board */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {!selectedSprint ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, color: '#334155' }}>
-            <div style={{ fontSize: '2.5rem' }}>⚡</div>
-            <div style={{ fontWeight: 700, color: '#475569' }}>Pilih atau buat sprint</div>
-            <button onClick={openSprintModal} style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
-              + Buat Sprint Pertama
+        {/* Left: Sprint List */}
+        <div style={{ width: 230, flexShrink: 0, background: '#0d0d0d', borderRight: '1px solid #1f1f1f', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '14px 12px 10px', borderBottom: '1px solid #1f1f1f' }}>
+            <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Sprint Mingguan</div>
+            <button onClick={openSprintModal}
+              style={{ width: '100%', background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 0', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+              + Buat Sprint
             </button>
           </div>
-        ) : (
-          <>
-            {/* Sprint Header */}
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1rem' }}>{selectedSprint.nama}</span>
-                  {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{selectedSprint.platform}</span>}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-                  <span style={{ fontSize: '0.72rem', color: '#475569' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
-                  <span style={{ fontSize: '0.72rem', color: '#475569' }}>·</span>
-                  <span style={{ fontSize: '0.72rem', color: '#475569' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
-                  <span style={{ fontSize: '0.72rem', color: totalPct === 100 ? '#86efac' : '#A78BFA', fontWeight: 700 }}>{totalPct}% done</span>
-                </div>
-              </div>
-              {/* Progress bar */}
-              <div style={{ width: 140, height: 6, background: '#1a1a1a', borderRadius: 3, flexShrink: 0 }}>
-                <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 3, transition: 'width 0.3s' }} />
-              </div>
-              {/* Filters */}
-              <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#A78BFA' : '#475569', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
-                <option value="">Semua Produk</option>
-                {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-              </select>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
-                style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.75rem', outline: 'none', width: 140 }} />
-            </div>
-
-            {/* Kanban Board */}
-            <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
-              {STAGE_COLS.map(col => {
-                const items = colItems(col.statuses)
-                return (
-                  <div key={col.id} style={{ width: 220, flexShrink: 0, display: 'flex', flexDirection: 'column', background: '#0d0d0d', border: `1px solid ${col.color}25`, borderRadius: 12, overflow: 'hidden' }}>
-                    {/* Column Header */}
-                    <div style={{ padding: '10px 12px', borderBottom: `1px solid ${col.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: col.bg }}>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: col.color }}>{col.label}</span>
-                      <span style={{ fontSize: '0.65rem', fontWeight: 700, color: col.color, background: `${col.color}20`, border: `1px solid ${col.color}40`, borderRadius: 8, padding: '1px 7px' }}>{items.length}</span>
-                    </div>
-                    {/* Cards */}
-                    <div style={{ flex: 1, overflowY: 'auto', padding: 8, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                      {items.map(item => (
-                        <ContentCard key={item.id} item={item} col={col}
-                          productName={getProductName(item.product_id)}
-                          productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
-                          onClick={() => setDetailModal(item)} />
-                      ))}
-                      {/* Add button in Riset column */}
-                      {col.id === 'riset' && (
-                        <button onClick={() => openAddContent(selectedSprint.id)}
-                          style={{ width: '100%', padding: '8px', background: 'transparent', border: `1px dashed ${col.color}40`, borderRadius: 8, color: col.color, fontSize: '0.72rem', cursor: 'pointer', marginTop: 2 }}>
-                          + Tambah Konten
-                        </button>
-                      )}
-                    </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '6px 8px' }}>
+            {sprints.length === 0 && <div style={{ fontSize: '0.75rem', color: '#1f2937', padding: '20px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
+            {sprints.map(s => {
+              const sc = contents.filter(c => c.sprint_id === s.id)
+              const done = sc.filter(c => c.status === 'Tayang').length
+              const active = s.id === selectedSprintId
+              const today = new Date().toISOString().split('T')[0]
+              const isCurrent = s.start_date <= today && s.end_date >= today
+              const tpl = TEMPLATES[s.template_type] || TEMPLATES.affiliate
+              return (
+                <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
+                  style={{ padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(124,58,237,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(124,58,237,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                    {isCurrent && <span style={{ fontSize: '0.5rem', background: '#34d399', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
+                    <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tpl.color + '18', color: tpl.color }}>{tpl.label}</span>
                   </div>
-                )
-              })}
-            </div>
-          </>
-        )}
-      </div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#A78BFA' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
+                  <div style={{ marginTop: 5, height: 3, background: '#1a1a1a', borderRadius: 2 }}>
+                    <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 2 }} />
+                  </div>
+                  <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 2 }}>{done}/{sc.length} done</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
 
-      {/* Create Sprint Modal */}
+        {/* Main: Board */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {!selectedSprint ? (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, color: '#334155' }}>
+              <div style={{ fontSize: '2.5rem' }}>⚡</div>
+              <div style={{ fontWeight: 700, color: '#475569' }}>Pilih atau buat sprint mingguan</div>
+              <button onClick={openSprintModal} style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+                + Buat Sprint Pertama
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Sprint header */}
+              <div style={{ padding: '12px 18px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '0.95rem' }}>{selectedSprint.nama}</span>
+                    {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{selectedSprint.platform}</span>}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+                    <span style={{ fontSize: '0.7rem', color: '#334155' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
+                    <span style={{ fontSize: '0.7rem', color: '#334155' }}>·</span>
+                    <span style={{ fontSize: '0.7rem', color: '#334155' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#A78BFA' }}>{totalPct}% done</span>
+                    {/* Step legend */}
+                    <span style={{ fontSize: '0.65rem', color: '#334155', marginLeft: 4 }}>
+                      Steps: {steps.map(s => s.icon).join(' ')}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ width: 120, height: 5, background: '#1a1a1a', borderRadius: 3, flexShrink: 0 }}>
+                  <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 3, transition: 'width 0.3s' }} />
+                </div>
+                <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
+                  style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#A78BFA' : '#475569', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">Semua Produk</option>
+                  {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                </select>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari..."
+                  style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.72rem', outline: 'none', width: 120 }} />
+              </div>
+
+              {/* 3-Column Kanban */}
+              <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '14px', gap: 12 }}>
+                {BOARD_COLS.map(col => {
+                  const items = colItems(col.id)
+                  return (
+                    <div key={col.id} style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', background: col.bg, border: `1px solid ${col.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                      {/* Column header */}
+                      <div style={{ padding: '10px 14px', borderBottom: `1px solid ${col.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: col.count_color }}>{col.label}</span>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: col.count_color, background: `${col.count_color}15`, border: `1px solid ${col.count_color}30`, borderRadius: 8, padding: '1px 7px' }}>{items.length}</span>
+                          {col.id === 'todo' && (
+                            <button onClick={openAddModal}
+                              style={{ background: 'transparent', border: `1px dashed ${col.count_color}40`, borderRadius: 6, padding: '2px 8px', color: col.count_color, fontSize: '0.68rem', cursor: 'pointer' }}>
+                              + Konten
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {/* Cards */}
+                      <div style={{ flex: 1, overflowY: 'auto', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {items.map(item => (
+                          <ContentCard key={item.id} item={item} steps={steps}
+                            productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
+                            productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
+                            onClick={() => setDetailItem(item)} />
+                        ))}
+                        {items.length === 0 && (
+                          <div style={{ textAlign: 'center', padding: '32px 12px', color: '#1f2937', fontSize: '0.72rem', border: '1px dashed #1f1f1f', borderRadius: 8 }}>Kosong</div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )}
+
+      {/* ── Sprint Create Modal ─────────────────────────────────────────────── */}
       {sprintModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 440 }}>
+          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 460 }}>
             <div style={{ padding: '18px 22px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>⚡ Buat Sprint Baru</div>
               <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Template selector */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Nama Sprint *</label>
-                <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint 23-29 Juni" />
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Jenis Konten & Workflow</label>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {Object.entries(TEMPLATES).map(([key, tpl]) => (
+                    <button key={key} type="button" onClick={() => setSprintForm(f => ({ ...f, template_type: key }))}
+                      style={{ flex: 1, minWidth: 100, padding: '10px 8px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#2a2a2a'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#1a1a1a', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.78rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      {tpl.label}
+                    </button>
+                  ))}
+                </div>
+                {/* Step preview */}
+                <div style={{ marginTop: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {(TEMPLATES[sprintForm.template_type]?.steps || []).map((s, i) => (
+                    <span key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', color: '#475569' }}>
+                      <span style={{ fontSize: '0.85rem' }}>{s.icon}</span>{s.nama}
+                      {i < TEMPLATES[sprintForm.template_type].steps.length - 1 && <span style={{ color: '#1f2937', marginLeft: 3 }}>→</span>}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Sprint *</label>
+                <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint 20-26 Jul" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Mulai *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Mulai</label>
                   <input type="date" style={fieldStyle()} value={sprintForm.start_date} onChange={e => setSprintForm(f => ({ ...f, start_date: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Selesai *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
                   <input type="date" style={fieldStyle()} value={sprintForm.end_date} onChange={e => setSprintForm(f => ({ ...f, end_date: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Target Konten</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Target Konten</label>
                   <input type="number" min={1} style={fieldStyle()} value={sprintForm.target_konten} onChange={e => setSprintForm(f => ({ ...f, target_konten: Number(e.target.value) }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
                     <option value="">Semua</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
-              </div>
-              <div style={{ background: '#0d1117', border: '1px solid #1f1f1f', borderRadius: 8, padding: '10px 14px', fontSize: '0.75rem', color: '#475569' }}>
-                💡 Setelah sprint dibuat, tambah konten satu per satu di kolom <strong style={{ color: '#60a5fa' }}>Riset</strong>. Setiap konten bisa di-assign ke anggota tim berbeda.
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
@@ -629,44 +619,44 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
       )}
 
-      {/* Add Content Modal */}
-      {contentModal?.open && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20, overflowY: 'auto' }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 500, marginTop: 20, marginBottom: 20 }}>
-            <div style={{ padding: '18px 22px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>+ Tambah Konten ke Sprint</div>
-              <button onClick={() => setContentModal(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+      {/* ── Add Content Modal ───────────────────────────────────────────────── */}
+      {addModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
+          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 460 }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontWeight: 700, color: '#f1f5f9' }}>+ Tambah Konten ke Sprint</div>
+              <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
-            <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+            <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Konten *</label>
-                <input style={fieldStyle()} value={contentModal.item.judul || ''} onChange={e => setContentModal(m => m ? { ...m, item: { ...m.item, judul: e.target.value } } : m)} placeholder="cth: Review Serum Vit C – Drama Version" />
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama / Judul Konten *</label>
+                <input style={fieldStyle()} value={addForm.judul} onChange={e => setAddForm(f => ({ ...f, judul: e.target.value }))} placeholder="cth: Review Serum Vit C — Drama Version" />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Produk</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={contentModal.item.product_id || ''} onChange={e => setContentModal(m => m ? { ...m, item: { ...m.item, product_id: e.target.value } } : m)}>
+                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.product_id} onChange={e => setAddForm(f => ({ ...f, product_id: e.target.value }))}>
                     <option value="">— Pilih produk —</option>
                     {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Format</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={contentModal.item.format || ''} onChange={e => setContentModal(m => m ? { ...m, item: { ...m.item, format: e.target.value } } : m)}>
+                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.format} onChange={e => setAddForm(f => ({ ...f, format: e.target.value }))}>
                     <option value="">— Format —</option>
                     {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Platform</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={Array.isArray(contentModal.item.platform) ? contentModal.item.platform[0] || '' : ''} onChange={e => setContentModal(m => m ? { ...m, item: { ...m.item, platform: [e.target.value] } } : m)}>
+                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.platform} onChange={e => setAddForm(f => ({ ...f, platform: e.target.value }))}>
                     <option value="">— Platform —</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang</label>
-                  <input type="date" style={fieldStyle()} value={contentModal.item.tanggal_tayang || ''} onChange={e => setContentModal(m => m ? { ...m, item: { ...m.item, tanggal_tayang: e.target.value } } : m)} />
+                  <input type="date" style={fieldStyle()} value={addForm.tanggal_tayang} onChange={e => setAddForm(f => ({ ...f, tanggal_tayang: e.target.value }))} />
                 </div>
               </div>
               {memberCount > 1 && (
@@ -674,16 +664,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Assign Tim (opsional)</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                     {[
-                      { key: 'assigned_riset', label: '🔍 Riset' },
-                      { key: 'assigned_naskah', label: '✍️ Naskah' },
-                      { key: 'assigned_produksi', label: '🎨 Produksi' },
+                      { key: 'assigned_naskah', label: '📝 Naskah' },
+                      { key: 'assigned_produksi', label: '🎬 Produksi' },
                       { key: 'assigned_schedule', label: '📅 Schedule' },
                     ].map(({ key, label }) => (
                       <div key={key}>
                         <div style={{ fontSize: '0.68rem', color: '#475569', marginBottom: 3 }}>{label}</div>
                         <input style={fieldStyle({ fontSize: '0.8rem', padding: '7px 10px' })}
-                          value={(contentModal.item as Record<string, string>)[key] || ''}
-                          onChange={e => setContentModal(m => m ? { ...m, item: { ...m.item, [key]: e.target.value } } : m)}
+                          value={(addForm as Record<string, string>)[key] || ''}
+                          onChange={e => setAddForm(f => ({ ...f, [key]: e.target.value }))}
                           placeholder="Nama anggota..." />
                       </div>
                     ))}
@@ -691,10 +680,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
               )}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button onClick={() => setContentModal(null)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
-                <button onClick={saveContent} disabled={savingContent}
-                  style={{ background: 'linear-gradient(135deg,#059669,#34d399)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingContent ? 'not-allowed' : 'pointer' }}>
-                  {savingContent ? 'Menyimpan...' : 'Tambah ke Sprint'}
+                <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button onClick={saveContent} disabled={savingAdd}
+                  style={{ background: 'linear-gradient(135deg,#059669,#34d399)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingAdd ? 'not-allowed' : 'pointer' }}>
+                  {savingAdd ? 'Menyimpan...' : 'Tambah'}
                 </button>
               </div>
             </div>
@@ -702,107 +691,73 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
       )}
 
-      {/* Detail / Action Modal */}
-      {detailModal && (
+      {/* ── Detail Modal ────────────────────────────────────────────────────── */}
+      {detailItem && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 480 }}>
+          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 440 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                {detailModal.product_id && (
-                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: productColorMap[detailModal.product_id], marginBottom: 4 }}>
-                    {getProductName(detailModal.product_id)}
+                {detailItem.product_id && (
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: productColorMap[detailItem.product_id], marginBottom: 4 }}>
+                    {products.find(p => p.id === detailItem.product_id)?.nama}
                   </div>
                 )}
-                <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.95rem' }}>{detailModal.judul}</div>
-                <div style={{ display: 'flex', gap: 6, marginTop: 5, flexWrap: 'wrap' }}>
-                  {detailModal.format && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailModal.format}</span>}
-                  {Array.isArray(detailModal.platform) && detailModal.platform[0] && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailModal.platform[0]}</span>}
-                  {detailModal.tanggal_tayang && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>📅 {fmtDate(detailModal.tanggal_tayang)}</span>}
+                <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.95rem' }}>{detailItem.judul}</div>
+                <div style={{ display: 'flex', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>
+                  {detailItem.format && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailItem.format}</span>}
+                  {Array.isArray(detailItem.platform) && detailItem.platform[0] && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailItem.platform[0]}</span>}
+                  {detailItem.tanggal_tayang && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>📅 {fmtDate(detailItem.tanggal_tayang)}</span>}
                 </div>
               </div>
-              <button onClick={() => setDetailModal(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+              <button onClick={() => setDetailItem(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
 
-            {/* Stage progress */}
+            {/* Step checklist */}
             <div style={{ padding: '14px 20px', borderBottom: '1px solid #1f1f1f' }}>
-              <div style={{ display: 'flex', gap: 0 }}>
-                {STAGE_COLS.map((col, i) => {
-                  const isCurrent = col.statuses.includes(detailModal.status)
-                  const isPast = STAGE_COLS.findIndex(c => c.statuses.includes(detailModal.status)) > i
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Checklist</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {steps.map(step => {
+                  const done = isStepDone(detailItem.status, step.doneAt)
                   return (
-                    <div key={col.id} style={{ flex: 1, textAlign: 'center', position: 'relative' }}>
-                      <div style={{ width: 20, height: 20, borderRadius: '50%', background: isCurrent ? col.color : isPast ? '#334155' : '#1a1a1a', border: `2px solid ${isCurrent ? col.color : isPast ? '#334155' : '#2a2a2a'}`, margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {isPast && <svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>}
+                    <div key={step.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.06)' : '#1a1a1a', border: `1px solid ${done ? 'rgba(52,211,153,0.2)' : '#2a2a2a'}` }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#2a2a2a'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                        </div>
+                        <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
+                        <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#e2e8f0', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
                       </div>
-                      <div style={{ fontSize: '0.55rem', color: isCurrent ? col.color : '#334155', fontWeight: isCurrent ? 700 : 400 }}>{col.label}</div>
-                      {i < STAGE_COLS.length - 1 && <div style={{ position: 'absolute', top: 9, left: '60%', right: '-40%', height: 2, background: isPast ? '#334155' : '#1a1a1a' }} />}
+                      {!done && (
+                        <Link href={step.href} onClick={() => setDetailItem(null)}
+                          style={{ fontSize: '0.68rem', color: '#A78BFA', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)' }}>
+                          Buka →
+                        </Link>
+                      )}
                     </div>
                   )
                 })}
               </div>
             </div>
 
-            {/* Assignments */}
-            {(detailModal.assigned_riset || detailModal.assigned_naskah || detailModal.assigned_produksi || detailModal.assigned_schedule) && (
-              <div style={{ padding: '12px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                {[
-                  { key: 'assigned_riset', label: '🔍', val: detailModal.assigned_riset },
-                  { key: 'assigned_naskah', label: '✍️', val: detailModal.assigned_naskah },
-                  { key: 'assigned_produksi', label: '🎨', val: detailModal.assigned_produksi },
-                  { key: 'assigned_schedule', label: '📅', val: detailModal.assigned_schedule },
-                ].filter(a => a.val).map(a => (
-                  <span key={a.key} style={{ fontSize: '0.72rem', color: '#64748b' }}>{a.label} <span style={{ color: '#94a3b8' }}>{a.val}</span></span>
-                ))}
-              </div>
-            )}
-
-            {/* Actions */}
-            <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {detailModal.status === 'Draft' && !detailModal.riset_done_at && (
-                <button onClick={() => markRisetDone(detailModal)} disabled={savingAction}
-                  style={{ width: '100%', background: 'rgba(96,165,250,0.1)', border: '1px solid rgba(96,165,250,0.3)', borderRadius: 8, padding: '10px', color: '#60a5fa', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                  🔍 Tandai Riset Selesai → Notif Naskah
-                </button>
-              )}
-              {detailModal.status === 'Draft' && detailModal.riset_done_at && (
-                <div style={{ background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: 8, padding: '10px', fontSize: '0.8rem', color: '#60a5fa', textAlign: 'center' }}>
-                  ✓ Riset selesai {relativeTime(detailModal.riset_done_at)} — menunggu naskah di Plan
-                </div>
-              )}
-              {(detailModal.status === 'Draft' || detailModal.status === 'Naskah Siap') && (
-                <a href="/plan" style={{ display: 'block', width: '100%', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 8, padding: '10px', color: '#fbbf24', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
-                  ✍️ Buka Plan → Buat Naskah
-                </a>
-              )}
-              {detailModal.status === 'Naskah Siap' && (
-                <a href="/studio" style={{ display: 'block', width: '100%', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: 8, padding: '10px', color: '#f97316', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
-                  🎨 Buka Studio → Produksi
-                </a>
-              )}
-              {detailModal.status === 'Produksi' && (
-                <a href="/studio" style={{ display: 'block', width: '100%', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: 8, padding: '10px', color: '#f97316', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
-                  🎨 Lanjut di Studio
-                </a>
-              )}
-              {detailModal.status === 'Siap Tayang' && (
-                <button onClick={() => updateStatus(detailModal, 'Terjadwal')} disabled={savingAction}
-                  style={{ width: '100%', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 8, padding: '10px', color: '#a78bfa', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+            {/* Manual status advance */}
+            <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {detailItem.status !== 'Terjadwal' && detailItem.status !== 'Tayang' && (
+                <button onClick={() => advanceStatus(detailItem, 'Terjadwal')} disabled={savingAction}
+                  style={{ width: '100%', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 8, padding: '9px', color: '#a78bfa', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
                   📅 Tandai Terjadwal
                 </button>
               )}
-              {detailModal.status === 'Terjadwal' && (
-                <button onClick={() => updateStatus(detailModal, 'Tayang')} disabled={savingAction}
-                  style={{ width: '100%', background: 'rgba(134,239,172,0.1)', border: '1px solid rgba(134,239,172,0.3)', borderRadius: 8, padding: '10px', color: '#86efac', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                  🚀 Tandai Tayang
+              {detailItem.status === 'Terjadwal' && (
+                <button onClick={() => advanceStatus(detailItem, 'Tayang')} disabled={savingAction}
+                  style={{ width: '100%', background: 'rgba(134,239,172,0.1)', border: '1px solid rgba(134,239,172,0.3)', borderRadius: 8, padding: '9px', color: '#86efac', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                  🚀 Tandai Tayang → Done
                 </button>
               )}
-              {detailModal.status === 'Tayang' && (
-                <div style={{ background: 'rgba(134,239,172,0.06)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px', fontSize: '0.8rem', color: '#86efac', textAlign: 'center' }}>
-                  ✓ Sudah Tayang {detailModal.tayang_at ? relativeTime(detailModal.tayang_at) : ''}
-                </div>
+              {detailItem.status === 'Tayang' && (
+                <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#86efac' }}>✓ Sudah Tayang — Done</div>
               )}
-              <button onClick={() => deleteContent(detailModal.id)}
-                style={{ width: '100%', background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px', color: '#475569', fontSize: '0.78rem', cursor: 'pointer' }}>
+              <button onClick={() => removeFromSprint(detailItem.id)}
+                style={{ width: '100%', background: 'transparent', border: '1px solid #1f1f1f', borderRadius: 8, padding: '8px', color: '#334155', fontSize: '0.75rem', cursor: 'pointer' }}>
                 Hapus dari Sprint
               </button>
             </div>
@@ -810,39 +765,41 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
       )}
     </div>
-    )}
-  </div>
   )
 }
 
-function ContentCard({ item, col, productName, productColor, onClick }: {
+function ContentCard({ item, steps, productName, productColor, onClick }: {
   item: ContentItem
-  col: typeof STAGE_COLS[0]
+  steps: StepDef[]
   productName: string | null
   productColor: string
   onClick: () => void
 }) {
-  const platform = Array.isArray(item.platform) ? item.platform[0] : item.platform
   return (
     <div onClick={onClick}
-      style={{ background: '#111', border: `1px solid ${col.color}20`, borderRadius: 8, padding: '10px 10px', cursor: 'pointer', transition: 'border-color 0.15s, transform 0.1s' }}>
+      style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
       {productName && (
-        <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           ● {productName}
         </div>
       )}
-      <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 6 }}>{item.judul}</div>
-      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: item.tanggal_tayang || item.assigned_riset ? 5 : 0 }}>
-        {item.format && <span style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 3, background: '#1a1a1a', color: '#475569' }}>{item.format}</span>}
-        {platform && <span style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 3, background: '#1a1a1a', color: '#475569' }}>{platform}</span>}
-        {item.riset_done_at && item.status === 'Draft' && <span style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 3, background: 'rgba(96,165,250,0.1)', color: '#60a5fa' }}>riset ✓</span>}
-      </div>
-      {item.tanggal_tayang && (
-        <div style={{ fontSize: '0.62rem', color: '#334155' }}>📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</div>
+      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
+      {/* Step chips */}
+      {steps.length > 0 && (
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {steps.map(step => {
+            const done = isStepDone(item.status, step.doneAt)
+            return (
+              <span key={step.id} style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: 4, background: done ? 'rgba(52,211,153,0.1)' : '#1a1a1a', border: `1px solid ${done ? 'rgba(52,211,153,0.3)' : '#2a2a2a'}`, color: done ? '#34d399' : '#334155', display: 'flex', alignItems: 'center', gap: 2 }}>
+                {done ? '✓' : '○'} {step.nama}
+              </span>
+            )
+          })}
+        </div>
       )}
-      {(item.assigned_riset || item.assigned_naskah || item.assigned_produksi || item.assigned_schedule) && (
-        <div style={{ fontSize: '0.6rem', color: '#334155', marginTop: 3 }}>
-          👤 {item.assigned_riset || item.assigned_naskah || item.assigned_produksi || item.assigned_schedule}
+      {item.tanggal_tayang && (
+        <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 5 }}>
+          📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
         </div>
       )}
     </div>
