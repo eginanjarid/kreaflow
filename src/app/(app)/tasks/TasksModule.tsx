@@ -407,6 +407,18 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
         </div>
       </div>
 
+      {/* Sprint Board banner — always visible */}
+      <div style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ fontSize: '1.4rem', flexShrink: 0 }}>⚡</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, color: '#A78BFA', marginBottom: 2, fontSize: '0.875rem' }}>Mau plan banyak konten dalam 1 minggu?</div>
+          <div style={{ fontSize: '0.78rem', color: '#475569' }}>Gunakan <strong style={{ color: '#A78BFA' }}>Sprint Board</strong> — 1 sprint = 1 minggu = banyak konten sekaligus dalam kanban. Task di sini untuk 1 konten = 1 checklist.</div>
+        </div>
+        <a href="/sprints" style={{ flexShrink: 0, background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          Buka Sprint Board →
+        </a>
+      </div>
+
       {/* Sprint template info card (only show when no tasks) */}
       {tasks.length === 0 && (
         <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)', borderRadius: 12, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
@@ -703,8 +715,8 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
             {/* Header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1.1rem' }}>⚡ Buat Sprint</div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>Auto-generate checklist task dari template — bisa dikustomisasi</div>
+                <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1.1rem' }}>⚡ Buat Sprint — 1 Konten</div>
+                <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>Checklist per konten. Untuk banyak konten 1 minggu → <a href="/sprints" style={{ color: '#A78BFA', fontWeight: 600 }}>Sprint Board</a></div>
               </div>
               <button onClick={() => setSprintModal(false)} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
             </div>
