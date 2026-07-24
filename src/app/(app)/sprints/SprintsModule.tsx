@@ -236,6 +236,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask } | null>(null)
   const [savingTask, setSavingTask] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
+  const [deleteUndo, setDeleteUndo] = useState<{
+    sprintId: string; sprintName: string; sprint: Sprint; contents: ContentItem[]; timeoutId: ReturnType<typeof setTimeout>
+  } | null>(null)
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
@@ -452,13 +455,37 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setDetailItem(null)
   }
 
-  async function deleteSprint(sprintId: string, sprintName: string) {
-    if (!confirm(`Hapus sprint "${sprintName}" beserta semua kontennya? Aksi ini tidak bisa dibatalkan.`)) return
-    await supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
-    await supabase.from('kf_sprints').delete().eq('id', sprintId)
+  function deleteSprint(sprintId: string, sprintName: string) {
+    const sprint = sprints.find(s => s.id === sprintId)
+    const sprintContentsToDelete = contents.filter(c => c.sprint_id === sprintId)
+    if (!sprint) return
+
+    if (deleteUndo) {
+      clearTimeout(deleteUndo.timeoutId)
+      supabase.from('kf_content_ideas').delete().eq('sprint_id', deleteUndo.sprintId)
+      supabase.from('kf_sprints').delete().eq('id', deleteUndo.sprintId)
+    }
+
     setSprints(prev => prev.filter(s => s.id !== sprintId))
     setContents(prev => prev.filter(c => c.sprint_id !== sprintId))
-    if (selectedSprintId === sprintId) setSelectedSprintId(null)
+    if (selectedSprintId === sprintId) setSelectedSprintId(sprints.find(s => s.id !== sprintId)?.id || null)
+
+    const timeoutId = setTimeout(() => {
+      supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
+      supabase.from('kf_sprints').delete().eq('id', sprintId)
+      setDeleteUndo(null)
+    }, 5000)
+
+    setDeleteUndo({ sprintId, sprintName, sprint, contents: sprintContentsToDelete, timeoutId })
+  }
+
+  function cancelDelete() {
+    if (!deleteUndo) return
+    clearTimeout(deleteUndo.timeoutId)
+    setSprints(prev => [...prev, deleteUndo.sprint].sort((a, b) => b.start_date.localeCompare(a.start_date)))
+    setContents(prev => [...prev, ...deleteUndo.contents])
+    setSelectedSprintId(deleteUndo.sprintId)
+    setDeleteUndo(null)
   }
 
   // ── Manual tasks ──────────────────────────────────────────────────────────
@@ -1236,6 +1263,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
           </div>
         )
       })()}
+
+      {deleteUndo && (
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 500, background: '#1a1a1a', border: '1px solid #3a3a3a', borderRadius: 12, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 320 }}>
+          <span style={{ fontSize: '0.88rem', color: '#e2e8f0' }}>
+            Sprint <strong>"{deleteUndo.sprintName}"</strong> dihapus
+          </span>
+          <button onClick={cancelDelete} style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+            Batalkan
+          </button>
+        </div>
+      )}
     </div>
   )
 }

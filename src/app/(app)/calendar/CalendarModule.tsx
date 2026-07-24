@@ -22,7 +22,7 @@ type ContentIdea = {
 }
 type ReadyItem = {
   id: string; judul: string; format: string | null; platform: string[] | null
-  product_id: string | null; product_nama: string | null; sprint_id: string
+  product_id: string | null; product_nama: string | null; sprint_id: string | null
 }
 type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string; stage?: string | null }
 
@@ -59,6 +59,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
   const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platform: string } | null>(null)
   const [schedSaving, setSchedSaving] = useState(false)
+  const [schedError, setSchedError] = useState('')
 
   const todayDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
@@ -140,10 +141,15 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
 
   async function confirmSchedule() {
     if (!schedModal) return
-    setSchedSaving(true)
-    const supabase = createClient()
     const { item, date, time, platform } = schedModal
     const scheduled_at = `${date}T${time}`
+    if (new Date(scheduled_at) < new Date()) {
+      setSchedError('Jadwal tidak boleh di masa lalu. Pilih tanggal dan waktu yang akan datang.')
+      return
+    }
+    setSchedSaving(true)
+    setSchedError('')
+    const supabase = createClient()
     const { data: entry } = await supabase.from('kf_calendar_entries').insert({
       workspace_id: workspaceId,
       content_id: item.id,
@@ -154,13 +160,15 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       posted_url: null,
     }).select('id').single()
     await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date }).eq('id', item.id)
-    await supabase.from('kf_notifications').insert({
-      workspace_id: workspaceId,
-      type: 'schedule',
-      title: `📅 Terjadwal — ${item.judul}`,
-      message: `Konten dijadwalkan posting ${date} pukul ${time}${platform ? ' di ' + platform : ''}. Sprint progress bertambah!`,
-      content_idea_id: item.id,
-    })
+    if (item.sprint_id) {
+      await supabase.from('kf_notifications').insert({
+        workspace_id: workspaceId,
+        type: 'schedule',
+        title: `📅 Terjadwal — ${item.judul}`,
+        message: `Konten dijadwalkan posting ${date} pukul ${time}${platform ? ' di ' + platform : ''}. Sprint progress bertambah!`,
+        content_idea_id: item.id,
+      })
+    }
     if (entry) {
       setEntries(prev => [...prev, { id: entry.id, workspace_id: workspaceId, content_id: item.id, platform, scheduled_at, posted_at: null, posted_url: null, status: 'Planned' }])
     }
@@ -420,8 +428,13 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                   {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
+              {schedError && (
+                <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: '0.8rem', color: '#f87171' }}>
+                  {schedError}
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
-                <button onClick={() => setSchedModal(null)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button onClick={() => { setSchedModal(null); setSchedError('') }} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button
                   onClick={confirmSchedule}
                   disabled={schedSaving || !schedModal.platform || !schedModal.date}

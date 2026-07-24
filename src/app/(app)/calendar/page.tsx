@@ -19,7 +19,7 @@ export default async function CalendarPage() {
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id').eq('workspace_id', wsId),
     supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority,stage').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_products').select('id, nama').eq('workspace_id', wsId).eq('is_active', true),
-    supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id').eq('workspace_id', wsId).eq('status', 'Siap Tayang').not('sprint_id', 'is', null),
+    supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id').eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
   ])
 
   const productMap = Object.fromEntries((products || []).map(p => [p.id as string, p.nama as string]))
@@ -40,7 +40,7 @@ export default async function CalendarPage() {
     platform: (r.platform as string[] | null) || null,
     product_id: (r.product_id as string | null) || null,
     product_nama: r.product_id ? (productMap[r.product_id as string] || null) : null,
-    sprint_id: r.sprint_id as string,
+    sprint_id: (r.sprint_id as string | null) || null,
   }))
 
   return (

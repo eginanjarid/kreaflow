@@ -10,6 +10,7 @@ type ContentItem = {
   cta: string; hashtags: string[]; script: string; prompt_script: string
   status: string; scheduled_date: string; canva_url?: string; gdrive_url?: string
   preview_url?: string; studio_notes?: string; studio_done_at?: string; show_in_feed?: boolean
+  sprint_id?: string | null; step_log?: Record<string, string> | null
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
@@ -182,7 +183,11 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
 
   async function handleSelesai() {
     setMarking(true)
-    await supabase.from('kf_content_ideas').update({ canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: new Date().toISOString() }).eq('id', item.id)
+    const now = new Date().toISOString()
+    const stepLogUpdate = item.sprint_id
+      ? { step_log: { ...(item.step_log || {}), editing_done_at: now } }
+      : {}
+    await supabase.from('kf_content_ideas').update({ canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, ...stepLogUpdate }).eq('id', item.id)
     await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
     setMarking(false)

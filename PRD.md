@@ -57,7 +57,7 @@ Database produk affiliate.
 
 **Sprint Board:**
 - Kanban 3 kolom: **Todo** (Draft) | **Dikerjakan** (Naskah Siap s.d. Terjadwal) | **Done** (Tayang)
-- Sidebar list sprint dengan tombol ✕ hapus
+- Sidebar list sprint dengan tombol ✕ hapus + **undo toast 5 detik** (hapus optimistis, batalkan sebelum DB delete)
 - **Buat Sprint modal:**
   - Pilih template: Affiliate / Creator / Live / Custom (bisa add/remove/reorder step)
   - Pilih **Akun Posting** (dropdown dari `kf_accounts`, kalau kosong → link ke Brand)
@@ -104,8 +104,9 @@ Copywriter buat naskah dengan AI.
 - `kf_content_ideas`
 
 #### 5. Library
-Arsip naskah — READ ONLY.
-- Status badge otomatis. Tabs: Info Dasar | Konten | Script
+Arsip & editor semua konten (sprint maupun standalone).
+- Edit modal: tab Info Dasar | Konten (hook/body/cta/hashtag) | Script (script lengkap)
+- Status badge auto dari workflow — tidak bisa diubah manual dari Library
 - Status flow: `Draft → Naskah Siap → Produksi → Siap Tayang → Terjadwal → Tayang`
 
 #### 6. Studio
@@ -113,16 +114,18 @@ Production workspace untuk desainer/editor.
 - Antrian / Dikerjakan / Selesai tabs
 - Input Canva URL, Google Drive URL, preview thumbnail
 - "Simpan Progress" → status: Produksi
-- "Tandai Selesai" → status: Siap Tayang + notif ke Calendar
+- "Tandai Selesai" → status: Siap Tayang + notif ke Calendar + update `step_log.editing_done_at` (jika ada sprint_id)
 - IG Profile mockup: Grid / Reels / Tagged tabs
 - `studio_notes`, `studio_done_at` di kf_content_ideas
 
 #### 7. Calendar
 Jadwal posting konten.
-- **[BARU] Panel "⏰ Siap Dijadwalkan"**: konten Sprint status Siap Tayang yang belum dijadwalkan
+- **Panel "⏰ Siap Dijadwalkan"**: SEMUA konten status Siap Tayang (sprint maupun standalone)
   - Tampil per item: nama produk (ungu), judul konten, format, platform
   - Tombol "+ Jadwalkan" → modal pilih tanggal + jam + platform
-  - On confirm: buat `kf_calendar_entries` + update konten status "Terjadwal" + notif
+  - Validasi: tolak jadwal di masa lalu (error inline)
+  - On confirm: buat `kf_calendar_entries` + update konten status "Terjadwal"
+  - Notif sprint hanya dikirim jika konten punya sprint_id
 - Calendar chip & list view: tampil jam posting + nama produk
 - List view: badge produk ungu + waktu posting prominent
 - Edit/hapus jadwal manual
@@ -250,6 +253,20 @@ src/
 
 ---
 
+## Keputusan Bisnis (In Progress)
+
+| Item | Status | Catatan |
+|---|---|---|
+| Payment gateway | Menimbang | Midtrans langsung vs Scalev |
+| Model pricing | Menimbang | Berlangganan bulanan vs sekali beli |
+| Plan limits enforcement | Belum | Tunggu keputusan harga final |
+| Onboarding wizard | Roadmap | Setelah fitur utama beres |
+| Feature gating (Brand+Catalog wajib diisi dulu) | Roadmap | Block akses Sprint/Plan jika Brand kosong |
+| Tutorial in-app | Roadmap | Panduan langkah demi langkah per modul |
+| Mobile responsiveness | Roadmap | Setelah tema & warna final |
+| AI bring-your-own-API | Roadmap (low priority) | User bawa API key sendiri |
+| Landing page update | Roadmap | Update setelah fitur beres |
+
 ## Backlog Prioritas
 
 ### 🟡 PRIORITAS 1 — Notification Center
@@ -260,6 +277,9 @@ Analytics konten per platform. Input manual: views, likes, comments, shares. Sum
 
 ### 🟡 PRIORITAS 3 — Budget
 Tracking biaya produksi per konten/sprint. ROI estimasi (affiliate revenue vs cost).
+
+### 🟡 PRIORITAS 4 — Feature Gating
+Cek apakah Brand sudah diisi sebelum akses Sprint/Plan/Studio/Calendar. Redirect ke Brand jika belum. Bisa dikombinasi dengan onboarding wizard.
 
 ---
 
