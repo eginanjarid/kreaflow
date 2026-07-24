@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import TasksModule from './TasksModule'
 
 export default async function TasksPage() {
@@ -26,11 +27,13 @@ export default async function TasksPage() {
   ])
 
   return (
-    <TasksModule
-      initialTasks={tasks || []}
-      workspaceId={wsId}
-      products={products || []}
-      contentPillars={brand?.affiliate_content_pillars || ''}
-    />
+    <Suspense>
+      <TasksModule
+        initialTasks={tasks || []}
+        workspaceId={wsId}
+        products={products || []}
+        contentPillars={brand?.affiliate_content_pillars || ''}
+      />
+    </Suspense>
   )
 }

@@ -24,10 +24,10 @@ const NAV = [
 ]
 
 const NOTIF_TYPE: Record<string, { icon: string; color: string; labelNew: string; labelOld: string }> = {
-  riset:    { icon: '🔍', color: '#60a5fa', labelNew: '/sprints', labelOld: '/tasks' },
-  naskah:   { icon: '✍️', color: '#fbbf24', labelNew: '/plan',    labelOld: '/plan' },
-  produksi: { icon: '🎨', color: '#f97316', labelNew: '/studio',  labelOld: '/studio' },
-  schedule: { icon: '📅', color: '#a78bfa', labelNew: '/calendar',labelOld: '/calendar' },
+  riset:    { icon: '🔍', color: '#60a5fa', labelNew: '/sprints',       labelOld: '/tasks?view=sprint' },
+  naskah:   { icon: '✍️', color: '#fbbf24', labelNew: '/plan',          labelOld: '/plan' },
+  produksi: { icon: '🎨', color: '#f97316', labelNew: '/studio',        labelOld: '/studio' },
+  schedule: { icon: '📅', color: '#a78bfa', labelNew: '/calendar',      labelOld: '/calendar' },
 }
 
 type NotifItem = {

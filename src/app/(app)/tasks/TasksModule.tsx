@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type Task = {
@@ -100,12 +101,19 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
   products?: ProductSnap[]
   contentPillars?: string
 }) {
+  const searchParams = useSearchParams()
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [modal, setModal] = useState<{ open: boolean; task: Task }>({ open: false, task: emptyTask(workspaceId) })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [filterPriority, setFilterPriority] = useState('')
-  const [view, setView] = useState<'kanban' | 'list' | 'sprint'>('kanban')
+  const [view, setView] = useState<'kanban' | 'list' | 'sprint'>(
+    searchParams.get('view') === 'sprint' ? 'sprint' : 'kanban'
+  )
+
+  useEffect(() => {
+    if (searchParams.get('view') === 'sprint') setView('sprint')
+  }, [searchParams])
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragOverCol, setDragOverCol] = useState<string | null>(null)
   const [filterContext, setFilterContext] = useState('')
