@@ -15,6 +15,7 @@ type Sprint = {
   end_date: string
   target_konten: number
   platform: string
+  akun: string | null
   status: string
   template_type: string
   step_config: StepConfig[] | null
@@ -211,7 +212,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // Sprint create modal
   const [sprintModal, setSprintModal] = useState(false)
-  const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
+  const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: 'affiliate' })
   // sprintSteps: ordered list of steps + assign + deadline
   const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; deadline: string }[]>([])
   const [addStepOpen, setAddStepOpen] = useState(false)
@@ -268,7 +269,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   function openSprintModal() {
     const { start, end } = getWeekDates()
     const tpl = 'affiliate'
-    setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', template_type: tpl })
+    setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', akun: '', template_type: tpl })
     initStepsFromTemplate(tpl)
     setAddStepOpen(false)
     setSprintProducts(products.length > 0
@@ -299,6 +300,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       end_date: sprintForm.end_date,
       target_konten: totalFromProducts > 0 ? totalFromProducts : sprintForm.target_konten,
       platform: sprintForm.platform || null,
+      akun: sprintForm.akun.trim() || null,
       template_type: tplType,
       step_config: stepConfigData,
       status: 'active',
@@ -645,7 +647,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     >✕</button>
                   </div>
                   <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#A78BFA' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
-                  <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}{s.akun ? ` · @${s.akun.replace(/^@/, '')}` : ''}</div>
                   <div style={{ marginTop: 5, height: 3, background: '#1a1a1a', borderRadius: 2 }}>
                     <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 2 }} />
                   </div>
@@ -674,6 +676,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '0.95rem' }}>{selectedSprint.nama}</span>
                     {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{selectedSprint.platform}</span>}
+                    {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.25)', color: '#A78BFA', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
                     <span style={{ fontSize: '0.7rem', color: '#334155' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
@@ -876,6 +879,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <option value="">Semua Platform</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Akun</label>
+                  <input style={fieldStyle()} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))} placeholder="@namaakun / Toko A" />
                 </div>
               </div>
 
