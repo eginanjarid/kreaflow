@@ -186,6 +186,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', template_type: 'affiliate' })
   const [customSteps, setCustomSteps] = useState<string[]>(['naskah', 'editing', 'schedule'])
+  const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number }[]>([{ product_id: '', jumlah: 7 }])
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -227,6 +228,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const { start, end } = getWeekDates()
     setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', template_type: 'affiliate' })
     setCustomSteps(['naskah', 'editing', 'schedule'])
+    setSprintProducts(products.length > 0
+      ? products.map(p => ({ product_id: p.id, jumlah: 7 }))
+      : [{ product_id: '', jumlah: 7 }]
+    )
     setSprintModal(true)
   }
 
@@ -236,17 +241,40 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const tplType = sprintForm.template_type === 'custom'
       ? (customSteps.length > 0 ? `custom:${customSteps.join(',')}` : 'custom:naskah,schedule')
       : sprintForm.template_type
-    const { data, error } = await supabase.from('kf_sprints').insert({
+
+    const totalFromProducts = sprintProducts.filter(r => r.product_id).reduce((s, r) => s + r.jumlah, 0)
+    const { data: sprint, error } = await supabase.from('kf_sprints').insert({
       workspace_id: workspaceId,
       nama: sprintForm.nama.trim(),
       start_date: sprintForm.start_date,
       end_date: sprintForm.end_date,
-      target_konten: sprintForm.target_konten,
+      target_konten: totalFromProducts > 0 ? totalFromProducts : sprintForm.target_konten,
       platform: sprintForm.platform || null,
       template_type: tplType,
       status: 'active',
     }).select('*').single()
-    if (!error && data) { setSprints(prev => [data, ...prev]); setSelectedSprintId(data.id) }
+
+    if (!error && sprint) {
+      // Auto-generate content items from product rows
+      const rows = sprintProducts.filter(r => r.product_id && r.jumlah > 0)
+      if (rows.length > 0) {
+        const items = rows.flatMap(row => {
+          const produk = products.find(p => p.id === row.product_id)
+          return Array.from({ length: row.jumlah }, (_, i) => ({
+            workspace_id: workspaceId,
+            sprint_id: sprint.id,
+            judul: `${produk?.nama || 'Konten'} — Konten ${i + 1}`,
+            status: 'Draft',
+            product_id: row.product_id,
+            platform: sprintForm.platform ? [sprintForm.platform] : [],
+          }))
+        })
+        const { data: inserted } = await supabase.from('kf_content_ideas').insert(items).select('*')
+        if (inserted) setContents(prev => [...inserted, ...prev])
+      }
+      setSprints(prev => [sprint, ...prev])
+      setSelectedSprintId(sprint.id)
+    }
     setSavingSprint(false)
     setSprintModal(false)
   }
@@ -604,13 +632,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
       {/* ── Sprint Create Modal ─────────────────────────────────────────────── */}
       {sprintModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 460 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20, overflowY: 'auto' }}>
+          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 500, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '18px 22px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>⚡ Buat Sprint Baru</div>
               <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
-            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
               {/* Template selector */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Jenis Konten & Workflow</label>
@@ -688,22 +716,68 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <input type="date" style={fieldStyle()} value={sprintForm.end_date} onChange={e => setSprintForm(f => ({ ...f, end_date: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Target Konten</label>
-                  <input type="number" min={1} style={fieldStyle()} value={sprintForm.target_konten} onChange={e => setSprintForm(f => ({ ...f, target_konten: Number(e.target.value) }))} />
-                </div>
-                <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
-                    <option value="">Semua</option>
+                    <option value="">Semua Platform</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
               </div>
+
+              {/* ── Produk & Jumlah Konten ── */}
+              <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>Produk & Jumlah Konten</div>
+                    <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Sistem akan auto-buat slot konten untuk setiap produk</div>
+                  </div>
+                  {(() => {
+                    const total = sprintProducts.filter(r => r.product_id).reduce((s, r) => s + r.jumlah, 0)
+                    return total > 0 && (
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#A78BFA', background: 'rgba(124,58,237,0.1)', padding: '3px 8px', borderRadius: 5 }}>
+                        Total: {total} konten
+                      </span>
+                    )
+                  })()}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  {sprintProducts.map((row, idx) => (
+                    <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 68px 28px', gap: 6, alignItems: 'center' }}>
+                      <select
+                        value={row.product_id}
+                        onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
+                        style={{ ...fieldStyle({ padding: '7px 10px', fontSize: '0.8rem' }), cursor: 'pointer' }}>
+                        <option value="">— Pilih Produk —</option>
+                        {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                      </select>
+                      <input
+                        type="number" min={1} max={99}
+                        value={row.jumlah}
+                        onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
+                        style={{ ...fieldStyle({ padding: '7px 8px', fontSize: '0.8rem', textAlign: 'center' as const }), textAlign: 'center' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
+                        style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, width: 28, height: 32, color: '#334155', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7 }])}
+                  style={{ marginTop: 8, width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer' }}>
+                  + Tambah Produk Lain
+                </button>
+              </div>
+
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={createSprint} disabled={savingSprint}
                   style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
-                  {savingSprint ? 'Membuat...' : 'Buat Sprint'}
+                  {savingSprint ? 'Membuat Sprint...' : `Buat Sprint${sprintProducts.filter(r=>r.product_id).length > 0 ? ` (${sprintProducts.filter(r=>r.product_id).reduce((s,r)=>s+r.jumlah,0)} konten)` : ''}`}
                 </button>
               </div>
             </div>
