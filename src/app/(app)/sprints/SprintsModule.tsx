@@ -390,14 +390,46 @@ export default function SprintsModule({ initialSprints, initialContents, product
     if (newStatus === 'Terjadwal') update.terjadwal_at = new Date().toISOString()
     if (newStatus === 'Tayang') update.tayang_at = new Date().toISOString()
     await supabase.from('kf_content_ideas').update(update).eq('id', item.id)
-    if (newStatus === 'Terjadwal') {
-      await supabase.from('kf_notifications').insert({
-        workspace_id: workspaceId, type: 'schedule',
-        title: `Terjadwal — ${item.judul}`,
+
+    // Notification chain: setiap step selesai → notif ke step/modul berikutnya
+    const CHAIN: Record<string, { type: string; title: string; message: string }> = {
+      'Naskah Siap': {
+        type: 'produksi',
+        title: `📝 Naskah Siap — ${item.judul}`,
+        message: 'Naskah selesai dibuat. Lanjut ke Take Video / Produksi di Studio.',
+      },
+      'Produksi': {
+        type: 'produksi',
+        title: `🎬 Take Video Selesai — ${item.judul}`,
+        message: 'Take video selesai. Lanjut ke Editing di Studio.',
+      },
+      'Siap Tayang': {
+        type: 'produksi',
+        title: `✂️ Editing Selesai — ${item.judul}`,
+        message: 'Editing selesai. Konten siap dijadwalkan — buka Calendar.',
+      },
+      'Terjadwal': {
+        type: 'schedule',
+        title: `📅 Terjadwal — ${item.judul}`,
         message: item.tanggal_tayang ? `Tayang: ${fmtDate(item.tanggal_tayang)}` : 'Konten sudah dijadwalkan.',
+      },
+      'Tayang': {
+        type: 'schedule',
+        title: `🚀 Tayang! — ${item.judul}`,
+        message: 'Konten sudah live. Sprint progress bertambah!',
+      },
+    }
+    const notif = CHAIN[newStatus]
+    if (notif) {
+      await supabase.from('kf_notifications').insert({
+        workspace_id: workspaceId,
+        type: notif.type,
+        title: notif.title,
+        message: notif.message,
         content_idea_id: item.id,
       })
     }
+
     setContents(prev => prev.map(c => c.id === item.id ? { ...c, ...update } : c))
     if (detailItem?.id === item.id) setDetailItem(prev => prev ? { ...prev, ...update } : prev)
     setSavingAction(false)

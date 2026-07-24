@@ -128,7 +128,9 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
   )
 }
 
-export default function PlanModule({ initialPlatforms, initialCampaigns, workspaceId, brandProfile, products, modes, tasks = [] }: {
+type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
+
+export default function PlanModule({ initialPlatforms, initialCampaigns, workspaceId, brandProfile, products, modes, tasks = [], sprintDrafts = [] }: {
   initialPlatforms: PlatformPlan[]
   initialCampaigns: Campaign[]
   workspaceId: string
@@ -136,6 +138,7 @@ export default function PlanModule({ initialPlatforms, initialCampaigns, workspa
   products: Product[]
   modes: string[]
   tasks?: TaskSnap[]
+  sprintDrafts?: SprintDraft[]
 }) {
   const isAffiliate = modes.includes('affiliate')
   const TABS = TABS_BASE
@@ -187,6 +190,12 @@ export default function PlanModule({ initialPlatforms, initialCampaigns, workspa
   const [affSavedToLibrary, setAffSavedToLibrary] = useState(false)
   const [affProdSteps, setAffProdSteps] = useState<Record<string, boolean>>({})
   function toggleProdStep(id: string) { setAffProdSteps(prev => ({ ...prev, [id]: !prev[id] })) }
+
+  const [sprintLinkModal, setSprintLinkModal] = useState<{
+    draft: SprintDraft; naskah: string; judul: string; productId: string
+    platform: string; tipe: string; mode: 'affiliate' | 'creator'
+  } | null>(null)
+  const [sprintLinkSaving, setSprintLinkSaving] = useState(false)
 
   function setNF(key: keyof NaskahForm, val: string) { setNaskahForm(f => ({ ...f, [key]: val })) }
   function setAFF(key: keyof AffNaskahForm, val: string) { setAffForm(f => ({ ...f, [key]: val })) }
@@ -426,20 +435,19 @@ Sebutkan varian mana yang paling potensial convert untuk target ${affForm.target
 Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan sales pitch. Gunakan bahasa sehari-hari Indonesia yang relate untuk ${affForm.target_audiens}.`
   }
 
-  async function saveAffToLibrary() {
-    if (!affNaskah.trim()) return
-    setAffSavedToLibrary(false)
+  async function _doInsertNaskah(
+    naskah: string, judul: string, productId: string | null,
+    platform: string, tipe: string, mode: 'affiliate' | 'creator'
+  ) {
     const supabase = createClient()
-    const selectedProduct = products.find(p => p.id === affForm.product_id)
-    const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
     const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
       judul,
-      platform: [affForm.platform],
-      format: affForm.tipe_konten,
-      script: affNaskah,
+      platform: [platform],
+      format: tipe,
+      script: naskah,
       status: 'Naskah Siap',
-      product_id: affForm.product_id || null,
+      product_id: productId || null,
     }).select('id').single()
     if (!err && inserted) {
       await supabase.from('kf_notifications').insert({
@@ -449,52 +457,18 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
         content_idea_id: inserted.id,
       })
-      setAffSavedToLibrary(true)
-      setTimeout(() => setAffSavedToLibrary(false), 3000)
-      if (selectedProduct) {
-        const naskahTask = tasks.find(t =>
-          t.nama.includes(' — ') &&
-          t.nama.endsWith('— ' + selectedProduct.nama) &&
-          t.nama.toLowerCase().includes('naskah')
-        )
-        if (naskahTask && naskahTask.percent_complete < 100) {
-          await supabase.from('kf_tasks').update({ percent_complete: 100 }).eq('id', naskahTask.id)
-        }
+      if (mode === 'affiliate') {
+        setAffSavedToLibrary(true)
+        setTimeout(() => setAffSavedToLibrary(false), 3000)
+      } else {
+        setSavedToLibrary(true)
+        setTimeout(() => setSavedToLibrary(false), 3000)
       }
-    }
-  }
-
-  async function saveToLibrary() {
-    if (!generatedNaskah.trim()) return
-    setSavedToLibrary(false)
-    const supabase = createClient()
-    const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
-    const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
-      workspace_id: workspaceId,
-      judul,
-      platform: [naskahForm.platform],
-      format: naskahForm.tipe_konten,
-      script: generatedNaskah,
-      status: 'Naskah Siap',
-      product_id: naskahForm.product_id || null,
-    }).select('id').single()
-    if (!err && inserted) {
-      await supabase.from('kf_notifications').insert({
-        workspace_id: workspaceId,
-        type: 'produksi',
-        title: `Mulai Produksi — ${judul}`,
-        message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
-        content_idea_id: inserted.id,
-      })
-      setSavedToLibrary(true)
-      setTimeout(() => setSavedToLibrary(false), 3000)
-      if (naskahForm.product_id) {
-        const selectedProduct = products.find(p => p.id === naskahForm.product_id)
+      if (productId) {
+        const selectedProduct = products.find(p => p.id === productId)
         if (selectedProduct) {
           const naskahTask = tasks.find(t =>
-            t.nama.includes(' — ') &&
-            t.nama.endsWith('— ' + selectedProduct.nama) &&
-            t.nama.toLowerCase().includes('naskah')
+            t.nama.includes(' — ') && t.nama.endsWith('— ' + selectedProduct.nama) && t.nama.toLowerCase().includes('naskah')
           )
           if (naskahTask && naskahTask.percent_complete < 100) {
             await supabase.from('kf_tasks').update({ percent_complete: 100 }).eq('id', naskahTask.id)
@@ -502,6 +476,59 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         }
       }
     }
+  }
+
+  async function saveAffToLibrary() {
+    if (!affNaskah.trim()) return
+    setAffSavedToLibrary(false)
+    const selectedProduct = products.find(p => p.id === affForm.product_id)
+    const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
+    const matchingDraft = affForm.product_id ? sprintDrafts.find(d => d.product_id === affForm.product_id) : null
+    if (matchingDraft) {
+      setSprintLinkModal({ draft: matchingDraft, naskah: affNaskah, judul, productId: affForm.product_id, platform: affForm.platform, tipe: affForm.tipe_konten, mode: 'affiliate' })
+      return
+    }
+    await _doInsertNaskah(affNaskah, judul, affForm.product_id, affForm.platform, affForm.tipe_konten, 'affiliate')
+  }
+
+  async function saveToLibrary() {
+    if (!generatedNaskah.trim()) return
+    setSavedToLibrary(false)
+    const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
+    const matchingDraft = naskahForm.product_id ? sprintDrafts.find(d => d.product_id === naskahForm.product_id) : null
+    if (matchingDraft) {
+      setSprintLinkModal({ draft: matchingDraft, naskah: generatedNaskah, judul, productId: naskahForm.product_id, platform: naskahForm.platform, tipe: naskahForm.tipe_konten, mode: 'creator' })
+      return
+    }
+    await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator')
+  }
+
+  async function confirmSprintUpdate() {
+    if (!sprintLinkModal) return
+    setSprintLinkSaving(true)
+    const { draft, naskah, mode } = sprintLinkModal
+    const supabase = createClient()
+    await supabase.from('kf_content_ideas').update({ script: naskah, status: 'Naskah Siap', judul: sprintLinkModal.judul }).eq('id', draft.id)
+    await supabase.from('kf_notifications').insert({
+      workspace_id: workspaceId,
+      type: 'produksi',
+      title: `📝 Naskah Siap — ${sprintLinkModal.judul}`,
+      message: `Naskah selesai dibuat. Lanjut ke Take Video / Produksi di Studio.`,
+      content_idea_id: draft.id,
+    })
+    setSprintLinkSaving(false)
+    setSprintLinkModal(null)
+    if (mode === 'affiliate') { setAffSavedToLibrary(true); setTimeout(() => setAffSavedToLibrary(false), 3000) }
+    else { setSavedToLibrary(true); setTimeout(() => setSavedToLibrary(false), 3000) }
+  }
+
+  async function confirmSaveNew() {
+    if (!sprintLinkModal) return
+    setSprintLinkSaving(true)
+    const { naskah, judul, productId, platform, tipe, mode } = sprintLinkModal
+    setSprintLinkModal(null)
+    setSprintLinkSaving(false)
+    await _doInsertNaskah(naskah, judul, productId, platform, tipe, mode)
   }
 
   function copyPrompt(prompt: string) {
@@ -1338,6 +1365,45 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#475569', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
               {promptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Sprint Link Modal ── */}
+      {sprintLinkModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ background: '#141414', border: '1px solid #2a2a2a', borderRadius: 16, padding: 28, maxWidth: 420, width: '100%' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>🔗 Slot Sprint Tersedia</div>
+            <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: 16, lineHeight: 1.5 }}>
+              Ada slot konten di Sprint aktif untuk produk ini:
+              <br />
+              <span style={{ color: '#A78BFA', fontWeight: 600 }}>&ldquo;{sprintLinkModal.draft.judul}&rdquo;</span>
+              <br /><br />
+              Mau update slot sprint itu dengan naskah ini, atau simpan sebagai konten baru terpisah?
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                onClick={confirmSprintUpdate}
+                disabled={sprintLinkSaving}
+                style={{ background: '#7C3AED', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '12px 0', cursor: sprintLinkSaving ? 'default' : 'pointer', opacity: sprintLinkSaving ? 0.6 : 1 }}
+              >
+                {sprintLinkSaving ? 'Menyimpan...' : '✓ Update Slot Sprint'}
+              </button>
+              <button
+                onClick={confirmSaveNew}
+                disabled={sprintLinkSaving}
+                style={{ background: '#1e1e1e', border: '1px solid #333', borderRadius: 10, color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', padding: '12px 0', cursor: sprintLinkSaving ? 'default' : 'pointer' }}
+              >
+                Simpan Sebagai Konten Baru
+              </button>
+              <button
+                onClick={() => setSprintLinkModal(null)}
+                disabled={sprintLinkSaving}
+                style={{ background: 'transparent', border: 'none', color: '#475569', fontSize: '0.8rem', cursor: 'pointer', padding: '6px 0' }}
+              >
+                Batal
+              </button>
+            </div>
           </div>
         </div>
       )}
