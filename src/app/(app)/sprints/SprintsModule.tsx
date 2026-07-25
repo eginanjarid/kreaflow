@@ -296,7 +296,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       ? `${sprintForm.template_type === 'custom' ? 'custom' : sprintForm.template_type}:${stepIds.join(',')}`
       : sprintForm.template_type
 
-    const totalFromProducts = sprintProducts.filter(r => r.product_id).reduce((s, r) => s + r.jumlah, 0)
+    const totalFromProducts = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
     const stepConfigData: StepConfig[] = sprintSteps.map(({ step, memberId, deadline }) => {
       const m = workspaceMembers.find(x => x.id === memberId)
       return { id: step.id, deadline, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
@@ -316,8 +316,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
     }).select('*').single()
 
     if (!error && sprint) {
-      // Auto-generate content items from product rows
-      const rows = sprintProducts.filter(r => r.product_id && r.jumlah > 0)
+      // Auto-generate content items from all rows (product optional)
+      const rows = sprintProducts.filter(r => r.jumlah > 0)
       if (rows.length > 0) {
         // Build per-step assign lookup: step.id → member display name
         const assignByCol: Record<string, string> = {}
@@ -342,9 +342,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
             return {
               workspace_id: workspaceId,
               sprint_id: sprint.id,
-              judul: `${produk?.nama || 'Konten'} — Konten ${i + 1}`,
+              judul: produk ? `${produk.nama} — Konten ${i + 1}` : `Konten ${i + 1}`,
               status: 'Draft',
-              product_id: row.product_id,
+              product_id: row.product_id || null,
               platform: sprintForm.platform ? [sprintForm.platform] : [],
               tanggal_tayang,
               jam_tayang: row.jam || null,
@@ -962,11 +962,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>Produk & Jumlah Konten</div>
-                    <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Sistem akan auto-buat slot konten untuk setiap produk</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>Slot Konten</div>
+                    <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Produk opsional — bisa dikosongkan untuk konten kreator</div>
                   </div>
                   {(() => {
-                    const total = sprintProducts.filter(r => r.product_id).reduce((s, r) => s + r.jumlah, 0)
+                    const total = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
                     return total > 0 && (
                       <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#A78BFA', background: 'rgba(124,58,237,0.1)', padding: '3px 8px', borderRadius: 5 }}>
                         Total: {total} konten
@@ -983,7 +983,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           value={row.product_id}
                           onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
                           style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: '#e2e8f0', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
-                          <option value="">— Pilih Produk —</option>
+                          <option value="">— Tanpa Produk —</option>
                           {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                         </select>
                         <input
@@ -1033,7 +1033,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </div>
                       </div>
                       {/* Preview jadwal */}
-                      {row.product_id && row.mulai && (
+                      {row.mulai && (
                         <div style={{ fontSize: '0.62rem', color: '#475569', background: '#0a0a0a', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
                           {(() => {
                             const dates = Array.from({ length: Math.min(row.jumlah, 4) }, (_, i) => {
@@ -1052,7 +1052,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   type="button"
                   onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
                   style={{ marginTop: 8, width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer' }}>
-                  + Tambah Produk Lain
+                  + Tambah Baris
                 </button>
               </div>
 
@@ -1060,7 +1060,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={createSprint} disabled={savingSprint}
                   style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
-                  {savingSprint ? 'Membuat Sprint...' : `Buat Sprint${sprintProducts.filter(r=>r.product_id).length > 0 ? ` (${sprintProducts.filter(r=>r.product_id).reduce((s,r)=>s+r.jumlah,0)} konten)` : ''}`}
+                  {savingSprint ? 'Membuat Sprint...' : `Buat Sprint (${sprintProducts.filter(r=>r.jumlah>0).reduce((s,r)=>s+r.jumlah,0)} konten)`}
                 </button>
               </div>
             </div>
