@@ -23,6 +23,11 @@ type ContentIdea = {
 type ReadyItem = {
   id: string; judul: string; format: string | null; platform: string[] | null
   product_id: string | null; product_nama: string | null; sprint_id: string | null
+  tanggal_tayang: string | null; jam_tayang: string | null
+}
+type PlannedItem = {
+  id: string; judul: string; product_id: string | null; product_nama: string | null
+  tanggal_tayang: string; jam_tayang: string | null
 }
 type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string; stage?: string | null }
 
@@ -39,12 +44,13 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [] }: {
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], plannedItems = [] }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
   tasks?: TaskSnap[]
   readyQueue?: ReadyItem[]
+  plannedItems?: PlannedItem[]
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -83,6 +89,11 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
     const linkedTaskIds = new Set(entries.filter(e => e.task_id).map(e => e.task_id))
     return tasks.filter(t => t.due_date === dateStr && !linkedTaskIds.has(t.id) && t.stage === 'schedule')
+  }
+
+  function plannedForDay(day: number) {
+    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    return plannedItems.filter(p => p.tanggal_tayang === dateStr)
   }
 
   function prevMonth() {
@@ -136,7 +147,10 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
 
   function openSchedModal(item: ReadyItem) {
     const defaultPlatform = (item.platform && item.platform.length === 1) ? item.platform[0] : ''
-    setSchedModal({ item, date: todayDateStr, time: '09:00', platform: defaultPlatform })
+    const defaultDate = item.tanggal_tayang || todayDateStr
+    const defaultTime = item.jam_tayang || '09:00'
+    setSchedModal({ item, date: defaultDate, time: defaultTime, platform: defaultPlatform })
+    setSchedError('')
   }
 
   async function confirmSchedule() {
@@ -255,6 +269,11 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                       ))}
                     </div>
                     <div style={{ fontSize: '0.82rem', color: '#e2e8f0', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.judul}</div>
+                    {item.tanggal_tayang && (
+                      <div style={{ fontSize: '0.65rem', color: '#475569', marginTop: 2 }}>
+                        📅 Rencana: {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` pukul ${item.jam_tayang}` : ''}
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => openSchedModal(item)}
@@ -274,7 +293,11 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <button onClick={prevMonth} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px 12px', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem' }}>‹</button>
         <span style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1.1rem', minWidth: 160, textAlign: 'center' }}>{MONTHS[viewMonth]} {viewYear}</span>
         <button onClick={nextMonth} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px 12px', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem' }}>›</button>
-        <span style={{ fontSize: '0.8rem', color: '#475569', marginLeft: 8 }}>{monthEntries.length} jadwal{monthTasks.length > 0 ? ` · ${monthTasks.length} deadline task` : ''}</span>
+        <span style={{ fontSize: '0.8rem', color: '#475569', marginLeft: 8 }}>
+          {monthEntries.length} jadwal
+          {monthTasks.length > 0 ? ` · ${monthTasks.length} deadline task` : ''}
+          {(() => { const mp = plannedItems.filter(p => { const d = new Date(p.tanggal_tayang); return d.getFullYear() === viewYear && d.getMonth() === viewMonth }).length; return mp > 0 ? ` · ${mp} rencana` : '' })()}
+        </span>
       </div>
 
       {view === 'calendar' ? (
@@ -290,10 +313,12 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
             {calDays.map((day, idx) => {
               const dayEntries = day ? entriesForDay(day) : []
               const dayTasks = day ? tasksForDay(day) : []
+              const dayPlanned = day ? plannedForDay(day) : []
               const dateStr = day ? `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : ''
               const isToday = dateStr === todayStr
-              const totalItems = dayEntries.length + dayTasks.length
+              const totalItems = dayEntries.length + dayTasks.length + dayPlanned.length
               const MAX_SHOW = 3
+              let shown = 0
               return (
                 <div key={idx} onClick={() => day && openAdd(day)}
                   style={{
@@ -307,6 +332,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         {day}
                       </div>
                       {dayEntries.slice(0, MAX_SHOW).map(e => {
+                        shown++
                         const idea = e.content_id ? ideaMap[e.content_id] : null
                         const displayName = e.label || idea?.judul || '(konten)'
                         const productLabel = idea?.product_nama ? `📦${idea.product_nama.split(' ')[0]} · ` : ''
@@ -319,7 +345,8 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                           </div>
                         )
                       })}
-                      {dayTasks.slice(0, Math.max(0, MAX_SHOW - dayEntries.length)).map(t => {
+                      {dayTasks.slice(0, Math.max(0, MAX_SHOW - shown)).map(t => {
+                        shown++
                         const pct = t.percent_complete
                         const taskColor = pct === 100 ? '#86efac' : pct > 0 ? '#fbbf24' : '#94a3b8'
                         const rawStep = t.nama.split(' —')[0].trim()
@@ -331,6 +358,18 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                             style={{ fontSize: '0.63rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: pct === 100 ? 'rgba(134,239,172,0.06)' : pct > 0 ? 'rgba(251,191,36,0.06)' : 'rgba(148,163,184,0.06)', border: `1px solid ${taskColor}40`, color: taskColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
                             title={`${t.nama} · ${pct}%`}>
                             {dot} {ctx ? ctx + ' · ' : ''}{stepName}
+                          </div>
+                        )
+                      })}
+                      {dayPlanned.slice(0, Math.max(0, MAX_SHOW - shown)).map(p => {
+                        shown++
+                        return (
+                          <div key={p.id} onClick={ev => ev.stopPropagation()}
+                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #334155', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
+                            title={`📋 Rencana: ${p.judul}${p.jam_tayang ? ' · ' + p.jam_tayang : ''}`}>
+                            {p.jam_tayang && <span style={{ opacity: 0.6 }}>{p.jam_tayang} </span>}
+                            {p.product_nama ? `${p.product_nama.split(' ')[0]} · ` : ''}
+                            {p.judul.replace(/^.*?—\s*/, '').slice(0, 18)}
                           </div>
                         )
                       })}
