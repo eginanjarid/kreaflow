@@ -281,10 +281,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', akun: '', template_type: tpl })
     initStepsFromTemplate(tpl)
     setAddStepOpen(false)
-    setSprintProducts(products.length > 0
-      ? products.map(p => ({ product_id: p.id, jumlah: 7, mulai: start, interval: 1, jam: '18:00' }))
-      : [{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }]
-    )
+    setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
     setSprintModal(true)
   }
 
@@ -1048,12 +1045,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </div>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
-                  style={{ marginTop: 8, width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer' }}>
-                  + Tambah Baris
-                </button>
+                <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
+                  <button
+                    type="button"
+                    onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
+                    style={{ flex: 1, background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer' }}>
+                    + Tambah Baris
+                  </button>
+                  {products.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSprintProducts(prev => [
+                        ...prev,
+                        ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }))
+                      ])}
+                      style={{ flex: 1, background: 'rgba(124,58,237,0.08)', border: '1px dashed rgba(124,58,237,0.3)', borderRadius: 7, padding: '6px', color: '#A78BFA', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
+                      + Tambahkan Semua Produk
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
