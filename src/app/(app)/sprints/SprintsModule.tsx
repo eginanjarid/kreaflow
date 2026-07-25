@@ -32,6 +32,7 @@ type ContentItem = {
   status: string
   product_id: string | null
   tanggal_tayang: string | null
+  jam_tayang: string | null
   assigned_riset: string | null
   assigned_naskah: string | null
   assigned_produksi: string | null
@@ -230,6 +231,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // Detail modal
   const [detailItem, setDetailItem] = useState<ContentItem | null>(null)
   const [savingAction, setSavingAction] = useState(false)
+  const [detailJadwal, setDetailJadwal] = useState<{ date: string; time: string }>({ date: '', time: '18:00' })
+  const [savingJadwal, setSavingJadwal] = useState(false)
 
   // Manual tasks
   const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
@@ -464,6 +467,22 @@ export default function SprintsModule({ initialSprints, initialContents, product
     await supabase.from('kf_content_ideas').update({ sprint_id: null }).eq('id', id)
     setContents(prev => prev.filter(c => c.id !== id))
     setDetailItem(null)
+  }
+
+  async function saveJadwal() {
+    if (!detailItem) return
+    setSavingJadwal(true)
+    const tanggal = detailJadwal.date || null
+    const jam = detailJadwal.time || null
+    const { error } = await supabase
+      .from('kf_content_ideas')
+      .update({ tanggal_tayang: tanggal, jam_tayang: jam })
+      .eq('id', detailItem.id)
+    if (!error) {
+      setContents(prev => prev.map(c => c.id === detailItem.id ? { ...c, tanggal_tayang: tanggal, jam_tayang: jam } : c))
+      setDetailItem(prev => prev ? { ...prev, tanggal_tayang: tanggal, jam_tayang: jam } : null)
+    }
+    setSavingJadwal(false)
   }
 
   function deleteSprint(sprintId: string, sprintName: string) {
@@ -771,7 +790,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <ContentCard key={item.id} item={item} steps={stepsWithMeta}
                             productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
                             productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
-                            onClick={() => setDetailItem(item)}
+                            onClick={() => {
+                              setDetailItem(item)
+                              setDetailJadwal({ date: item.tanggal_tayang || '', time: item.jam_tayang || '18:00' })
+                            }}
                             onStepDone={(step) => advanceToStep(item, step)} />
                         ))}
                         {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
@@ -1133,7 +1155,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>
                   {detailItem.format && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailItem.format}</span>}
                   {Array.isArray(detailItem.platform) && detailItem.platform[0] && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailItem.platform[0]}</span>}
-                  {detailItem.tanggal_tayang && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>📅 {fmtDate(detailItem.tanggal_tayang)}</span>}
+                  {detailItem.tanggal_tayang && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>📅 {fmtDate(detailItem.tanggal_tayang)}{detailItem.jam_tayang ? ` · ${detailItem.jam_tayang}` : ''}</span>}
                 </div>
               </div>
               <button onClick={() => setDetailItem(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -1179,6 +1201,29 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   )
                 })}
               </div>
+            </div>
+
+            {/* Jadwal Posting */}
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid #1f1f1f' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Jadwal Posting</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 110px', gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Tanggal</div>
+                  <input type="date" value={detailJadwal.date}
+                    onChange={e => setDetailJadwal(prev => ({ ...prev, date: e.target.value }))}
+                    style={{ width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '7px 10px', color: '#e2e8f0', fontSize: '0.8rem', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Jam</div>
+                  <input type="time" value={detailJadwal.time}
+                    onChange={e => setDetailJadwal(prev => ({ ...prev, time: e.target.value }))}
+                    style={{ width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '7px 10px', color: '#e2e8f0', fontSize: '0.8rem', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <button onClick={saveJadwal} disabled={savingJadwal}
+                style={{ marginTop: 8, width: '100%', background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 7, padding: '8px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: savingJadwal ? 'not-allowed' : 'pointer', opacity: savingJadwal ? 0.7 : 1 }}>
+                {savingJadwal ? 'Menyimpan...' : '💾 Simpan Jadwal'}
+              </button>
             </div>
 
             {/* Manual status advance */}
@@ -1421,8 +1466,8 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
           )
         }
         if (item.tanggal_tayang) return (
-          <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 5 }}>
-            📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+          <div style={{ fontSize: '0.6rem', color: '#475569', marginTop: 5 }}>
+            📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}
           </div>
         )
         return null
