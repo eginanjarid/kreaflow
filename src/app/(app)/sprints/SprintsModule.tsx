@@ -978,42 +978,48 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </button>
                       </div>
                       {/* Baris 2: jadwal posting */}
-                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.62rem', color: '#475569', flexShrink: 0 }}>📅 Mulai</span>
-                        <input
-                          type="date"
-                          value={row.mulai}
-                          onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
-                          style={{ flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 5, padding: '4px 6px', color: row.mulai ? '#e2e8f0' : '#475569', fontSize: '0.7rem', outline: 'none', minWidth: 0 }}
-                        />
-                        <span style={{ fontSize: '0.62rem', color: '#475569', flexShrink: 0 }}>jam</span>
-                        <input
-                          type="time"
-                          value={row.jam}
-                          onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
-                          style={{ width: 72, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 5, padding: '4px 6px', color: '#e2e8f0', fontSize: '0.7rem', outline: 'none', flexShrink: 0 }}
-                        />
-                        <span style={{ fontSize: '0.62rem', color: '#475569', flexShrink: 0 }}>tiap</span>
-                        <select
-                          value={row.interval}
-                          onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
-                          style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 5, padding: '4px 6px', color: '#e2e8f0', fontSize: '0.7rem', outline: 'none', cursor: 'pointer', flexShrink: 0 }}>
-                          <option value={1}>1 hari</option>
-                          <option value={2}>2 hari</option>
-                          <option value={3}>3 hari</option>
-                          <option value={7}>7 hari</option>
-                        </select>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
+                        <div>
+                          <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>📅 Mulai Posting</div>
+                          <input
+                            type="date"
+                            value={row.mulai}
+                            onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
+                            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#e2e8f0' : '#475569', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
+                          />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Jam</div>
+                          <input
+                            type="time"
+                            value={row.jam}
+                            onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
+                            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: '#e2e8f0', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
+                          />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Interval</div>
+                          <select
+                            value={row.interval}
+                            onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
+                            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: '#e2e8f0', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
+                            <option value={1}>Tiap 1 hari</option>
+                            <option value={2}>Tiap 2 hari</option>
+                            <option value={3}>Tiap 3 hari</option>
+                            <option value={7}>Tiap 7 hari</option>
+                          </select>
+                        </div>
                       </div>
                       {/* Preview jadwal */}
                       {row.product_id && row.mulai && (
-                        <div style={{ fontSize: '0.6rem', color: '#475569', paddingLeft: 2 }}>
+                        <div style={{ fontSize: '0.62rem', color: '#475569', background: '#0a0a0a', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
                           {(() => {
                             const dates = Array.from({ length: Math.min(row.jumlah, 4) }, (_, i) => {
                               const d = new Date(row.mulai + 'T00:00:00')
                               d.setDate(d.getDate() + i * (row.interval || 1))
                               return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
                             })
-                            return `${dates.join(', ')}${row.jumlah > 4 ? ` +${row.jumlah - 4} lagi` : ''} pukul ${row.jam}`
+                            return `${dates.join(' · ')}${row.jumlah > 4 ? ` · +${row.jumlah - 4} lagi` : ''} @ ${row.jam}`
                           })()}
                         </div>
                       )}
