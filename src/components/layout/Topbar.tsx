@@ -5,20 +5,20 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState, useRef } from 'react'
 
-const PAGE_TITLES: Record<string, string> = {
-  '/brand': 'Brand',
-  '/catalog': 'Catalog',
-  '/sprints': 'Sprints',
-  '/plan': 'Plan',
-  '/library': 'Library',
-  '/studio': 'Studio',
-  '/calendar': 'Calendar',
-  '/tracker': 'Tracker',
-  '/insights': 'Insights',
-  '/budget': 'Budget',
-  '/settings': 'Pengaturan',
-  '/notifications': 'Notifikasi',
-  '/admin': 'Super Admin',
+const PAGE_TITLES: Record<string, { title: string; sub: string }> = {
+  '/brand':         { title: 'Brand',        sub: 'Bangun identitas & strategi konten' },
+  '/catalog':       { title: 'Catalog',       sub: 'Database produk affiliate kamu' },
+  '/sprints':       { title: 'Sprints',       sub: 'Kelola produksi konten per sprint' },
+  '/plan':          { title: 'Plan',          sub: 'Buat naskah & skrip dengan AI' },
+  '/library':       { title: 'Library',       sub: 'Arsip semua konten kamu' },
+  '/studio':        { title: 'Studio',        sub: 'Produksi visual & editing' },
+  '/calendar':      { title: 'Calendar',      sub: 'Jadwal & antrian posting' },
+  '/tracker':       { title: 'Tracker',       sub: 'Pantau performa harian' },
+  '/insights':      { title: 'Insights',      sub: 'Analitik konten per platform' },
+  '/budget':        { title: 'Budget',        sub: 'Tracking biaya produksi' },
+  '/settings':      { title: 'Pengaturan',    sub: 'Kelola workspace & tim' },
+  '/notifications': { title: 'Notifikasi',    sub: 'Semua update aktivitas' },
+  '/admin':         { title: 'Super Admin',   sub: 'Panel manajemen internal' },
 }
 
 const NOTIF_TYPE: Record<string, { icon: string; color: string; href: string }> = {
@@ -64,7 +64,7 @@ export default function Topbar({ user }: Props) {
   const bellRef = useRef<HTMLDivElement>(null)
   const userRef = useRef<HTMLDivElement>(null)
 
-  const pageTitle = Object.entries(PAGE_TITLES).find(([key]) => pathname.startsWith(key))?.[1] ?? 'KreaFlow'
+  const page = Object.entries(PAGE_TITLES).find(([key]) => pathname.startsWith(key))?.[1] ?? { title: 'KreaFlow', sub: '' }
   const initials = user.nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
   useEffect(() => {
@@ -127,12 +127,12 @@ export default function Topbar({ user }: Props) {
 
   return (
     <header style={{
-      height: 64,
+      height: 70,
       background: '#fff',
       borderBottom: '1px solid #e5eaf2',
       display: 'flex',
       alignItems: 'center',
-      padding: '0 24px',
+      padding: '0 28px',
       flexShrink: 0,
       gap: 16,
       position: 'relative',
@@ -140,7 +140,8 @@ export default function Topbar({ user }: Props) {
     }}>
       {/* Page title */}
       <div style={{ flex: 1 }}>
-        <h1 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547', margin: 0 }}>{pageTitle}</h1>
+        <div style={{ fontSize: '0.72rem', color: '#9fa9ba', fontWeight: 500, marginBottom: 2 }}>{page.sub}</div>
+        <h1 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', margin: 0, lineHeight: 1 }}>{page.title}</h1>
       </div>
 
       {/* Right actions */}

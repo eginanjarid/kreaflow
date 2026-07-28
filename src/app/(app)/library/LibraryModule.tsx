@@ -108,7 +108,7 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
       onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
-        style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 16, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
+        style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 20, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
 
         {/* IG Post Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
@@ -586,7 +586,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
 
       {/* Content */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📚</div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>{ideas.length === 0 ? 'Library kosong' : 'Tidak ada konten'}</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>{ideas.length === 0 ? 'Mulai tambahkan ide konten kamu' : 'Coba filter lain'}</div>
@@ -599,7 +599,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {filtered.map(c => (
-            <div key={c.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: '16px 20px' }}>
+            <div key={c.id} style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
@@ -655,7 +655,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Quick Schedule Modal */}
       {scheduleModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 400 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#2a3547' }}>📅 Jadwalkan ke Calendar</h3>
               <button onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -707,7 +707,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
             {/* Modal Header */}
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>
@@ -786,7 +786,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     </div>
                     <button type="button"
                       onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
-                      style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#2a2a2a', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#2a2a2a', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: modal.idea.show_in_feed !== false ? 23 : 3, transition: 'left 0.2s' }} />
                     </button>
                   </div>

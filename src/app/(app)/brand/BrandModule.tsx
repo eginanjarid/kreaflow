@@ -892,7 +892,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
   }
 
   const sectionCard = (children: React.ReactNode) => (
-    <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
       {children}
     </div>
   )
@@ -949,7 +949,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {tab === 'overview' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {/* Left: Level Display */}
-            <div style={{ background: '#fff', border: `1px solid ${freqLevel.color}40`, borderRadius: 16, padding: 28, display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', border: `1px solid ${freqLevel.color}40`, borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', overflow: 'hidden' }}>
               {/* glow bg */}
               <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: freqLevel.glow, filter: 'blur(60px)', pointerEvents: 'none' }} />
 
@@ -1008,7 +1008,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             </div>
 
             {/* Right: Checklist */}
-            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
               <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Sinyal yang Perlu Dikuatkan</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
                 {FREQ_CHECKS.map((check, i) => {
@@ -1104,7 +1104,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             <span>✨</span> Generate dengan AI
           </button>
           {/* Niche Options CRUD */}
-          <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 20, padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opsi Niche dari AI</div>
@@ -1252,7 +1252,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           </button>
 
           {/* Premis CRUD */}
-          <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 20, padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Premis dari AI</div>
@@ -1402,7 +1402,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* CRUD section */}
-                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
+                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 20, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio {activePl.label}</div>
@@ -1499,7 +1499,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               {/* Preview */}
               <div
                 onClick={() => !logoUploading && logoFileRef.current?.click()}
-                style={{ width: 72, height: 72, borderRadius: 12, border: `2px dashed ${logoUploading ? '#1a73e8' : '#2a2a2a'}`, background: '#f8fafc', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'border-color 0.2s', position: 'relative' }}>
+                style={{ width: 72, height: 72, borderRadius: 20, border: `2px dashed ${logoUploading ? '#1a73e8' : '#2a2a2a'}`, background: '#f8fafc', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'border-color 0.2s', position: 'relative' }}>
                 {logoUploading ? (
                   <div style={{ fontSize: '0.7rem', color: '#42a5f5', textAlign: 'center', padding: 4 }}>uploading...</div>
                 ) : profile.logo_main_url ? (
@@ -1778,7 +1778,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* Nama akun CRUD */}
-                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
+                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 20, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rekomendasi Nama Akun</div>
@@ -1865,7 +1865,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* CTA ke Plan */}
-                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(26,115,232,0.3)', background: 'rgba(26,115,232,0.06)', textDecoration: 'none' }}>
+                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderRadius: 20, border: '1px solid rgba(26,115,232,0.3)', background: 'rgba(26,115,232,0.06)', textDecoration: 'none' }}>
                   <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>📝</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#42a5f5', fontSize: '0.9rem', marginBottom: 4 }}>Eksekusi di modul Plan</div>
@@ -1924,7 +1924,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* Bio CRUD */}
-                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
+                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 20, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Akun</div>
@@ -2007,7 +2007,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Add new account form */}
           {akunList.length < MAX_AKUN ? (
-            <div style={{ background: '#0f0f0f', border: '1px solid #e5eaf2', borderRadius: 12, padding: '16px 18px' }}>
+            <div style={{ background: '#0f0f0f', border: '1px solid #e5eaf2', borderRadius: 20, padding: '16px 18px' }}>
               <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#5a6a85', marginBottom: 12 }}>+ Tambah Akun ({akunList.length}/{MAX_AKUN})</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
@@ -2054,7 +2054,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       {/* Universal AI Picker Modal */}
       {aiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
@@ -2070,7 +2070,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 12, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', transition: 'all 0.15s', cursor: 'pointer' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', transition: 'all 0.15s', cursor: 'pointer' }}>
                   <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
@@ -2194,7 +2194,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
       </div>
     )}
     <form onSubmit={savePillars}>
-      <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Content Pillars</div>
@@ -2248,7 +2248,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
 
     {aiModal && (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <div>
               <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
@@ -2264,7 +2264,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
               { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
             ].map(ai => (
               <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 12, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', cursor: 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', cursor: 'pointer' }}>
                 <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>

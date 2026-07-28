@@ -651,7 +651,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           {naskahMode === 'creator' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               {/* Form kiri */}
-              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
                   <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 4 }}>Konfigurasi Naskah</div>
                   <div style={{ fontSize: '0.78rem', color: '#5a6a85' }}>Isi detail konten → Generate → paste hasil AI di kanan</div>
@@ -743,7 +743,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               </div>
 
               {/* Output kanan */}
-              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Hasil Naskah</div>
@@ -775,7 +775,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 760 }}>
 
               {/* STEP 01 — Data Produk */}
-              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, overflow: 'hidden' }}>
+              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #e5eaf2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 4, height: 22, borderRadius: 2, background: '#ec4899' }} />
@@ -823,7 +823,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Generate USP button */}
                   <button type="button" onClick={() => setAffAiModal({ prompt: buildUSPPrompt(), label: 'Analisis USP Produk' })}
-                    style={{ background: 'transparent', border: '1px solid #ec4899', borderRadius: 12, padding: '14px 20px', color: '#ec4899', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.15s' }}>
+                    style={{ background: 'transparent', border: '1px solid #ec4899', borderRadius: 20, padding: '14px 20px', color: '#ec4899', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.15s' }}>
                     <span style={{ fontSize: '1rem' }}>⚡</span> GENERATE USP (AI ANALYSIS)
                   </button>
 
@@ -841,7 +841,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               </div>
 
               {/* STEP 02 — Konfigurasi */}
-              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, overflow: 'hidden' }}>
+              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #e5eaf2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 4, height: 22, borderRadius: 2, background: '#38bdf8' }} />
@@ -1004,14 +1004,14 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Compile Scripts button */}
                   <button type="button" onClick={() => setAffAiModal({ prompt: buildAffNaskahPrompt(), label: 'Compile Scripts' })}
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none', borderRadius: 12, padding: '16px 20px', color: '#fff', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 4 }}>
+                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none', borderRadius: 20, padding: '16px 20px', color: '#fff', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 4 }}>
                     <span style={{ fontSize: '1.1rem' }}>⚗️</span> COMPILE SCRIPTS
                   </button>
                 </div>
               </div>
 
               {/* Output hasil naskah */}
-              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, padding: '22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 700, color: '#2a3547', marginBottom: 2 }}>Hasil Naskah</div>
@@ -1046,7 +1046,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   { id: 'schedule', label: 'Schedule Post', icon: '📅', desc: 'Jadwalkan posting di waktu terbaik' },
                 ]
                 return (
-                  <div style={{ background: '#fff', border: '1px solid #1e3a2f', borderRadius: 16, overflow: 'hidden' }}>
+                  <div style={{ background: '#fff', border: '1px solid #1e3a2f', borderRadius: 20, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #e5eaf2', background: 'rgba(52,211,153,0.03)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 4, height: 22, borderRadius: 2, background: '#34d399' }} />
@@ -1113,7 +1113,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {tab === 'platforms' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {platforms.map(p => (
-            <div key={p.platform} style={{ background: '#fff', border: `1px solid ${p.is_active ? 'rgba(26,115,232,0.3)' : '#2a2a2a'}`, borderRadius: 12, overflow: 'hidden' }}>
+            <div key={p.platform} style={{ background: '#fff', border: `1px solid ${p.is_active ? 'rgba(26,115,232,0.3)' : '#2a2a2a'}`, borderRadius: 20, overflow: 'hidden' }}>
               {/* Platform Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: p.is_active ? '1px solid #1f1f1f' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -1194,7 +1194,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             </button>
           </div>
           {campaigns.length === 0 ? (
-            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎯</div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada campaign</div>
               <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Rencanakan campaign promo, kolaborasi, atau event khusus</div>
@@ -1205,7 +1205,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {campaigns.map(c => (
-                <div key={c.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: '16px 20px' }}>
+                <div key={c.id} style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '16px 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
@@ -1235,7 +1235,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* Campaign Modal */}
       {modal?.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.campaign.id ? 'Edit Campaign' : 'Tambah Campaign'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
@@ -1298,7 +1298,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* AI Picker Modal — Affiliate */}
       {affAiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAffAiModal(null); setAffPromptCopied(false) } }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>{affAiModal.label || '⚗️ Compile Scripts'}</div>
@@ -1314,7 +1314,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 12, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
                   <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
@@ -1335,7 +1335,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* AI Picker Modal */}
       {aiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate Naskah</div>
@@ -1351,7 +1351,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 12, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
                   <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
@@ -1372,7 +1372,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* ── Sprint Link Modal ── */}
       {sprintLinkModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <div style={{ background: '#141414', border: '1px solid #e5eaf2', borderRadius: 16, padding: 28, maxWidth: 420, width: '100%' }}>
+          <div style={{ background: '#141414', border: '1px solid #e5eaf2', borderRadius: 20, padding: 28, maxWidth: 420, width: '100%' }}>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 8 }}>🔗 Slot Sprint Tersedia</div>
             <p style={{ color: '#5a6a85', fontSize: '0.875rem', marginBottom: 16, lineHeight: 1.5 }}>
               Ada slot konten di Sprint aktif untuk produk ini:

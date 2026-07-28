@@ -60,7 +60,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 16, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 20, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
           <div style={{ flex: 1 }}>
@@ -197,7 +197,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 820, maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 16, border: '1px solid #e5eaf2' }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 820, maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 4px 24px rgba(42,53,71,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #e5eaf2' }}>
           <div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>{item.judul}</div>
@@ -245,7 +245,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
   const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
 
   return (
-    <div onClick={onClick} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, overflow: 'hidden', cursor: 'pointer', transition: 'border-color 0.15s', display: 'flex', flexDirection: 'column' }}
+    <div onClick={onClick} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, overflow: 'hidden', cursor: 'pointer', transition: 'border-color 0.15s', display: 'flex', flexDirection: 'column' }}
       onMouseEnter={e => (e.currentTarget.style.borderColor = '#1a73e8')} onMouseLeave={e => (e.currentTarget.style.borderColor = '#1f1f1f')}>
       <div style={{ aspectRatio: '16/9', background: '#fff', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
         {thumb ? <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={item} />}
@@ -397,7 +397,7 @@ export default function StudioModule({ initialContents, products, initialNotific
         </div>
       ) : viewMode === 'ig' ? (
         /* IG Profile Mockup */
-        <div style={{ maxWidth: 480, margin: '0 auto', background: '#000', borderRadius: 16, border: '1px solid #1a1a1a', overflow: 'hidden' }}>
+        <div style={{ maxWidth: 480, margin: '0 auto', background: '#000', borderRadius: 20, border: '1px solid #1a1a1a', overflow: 'hidden' }}>
           {/* Top bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

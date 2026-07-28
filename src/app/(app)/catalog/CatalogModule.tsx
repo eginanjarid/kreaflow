@@ -184,7 +184,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📦</div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>{products.length === 0 ? 'Belum ada produk' : 'Tidak ditemukan'}</div>
           {products.length === 0 && <button onClick={openAdd} style={{ marginTop: 12, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>+ Tambah Produk Pertama</button>}
@@ -195,7 +195,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
             const tipe = TIPE_COLORS[p.tipe_produk] || TIPE_COLORS.Fisik
             const komisi = hitungKomisi(p)
             return (
-              <div key={p.id} style={{ background: '#fff', border: `1px solid ${p.is_active ? '#2a2a2a' : '#1a1a1a'}`, borderRadius: 12, overflow: 'hidden' }}>
+              <div key={p.id} style={{ background: '#fff', border: `1px solid ${p.is_active ? '#2a2a2a' : '#1a1a1a'}`, borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ height: 140, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                   {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ fontSize: '2.5rem' }}>{tipe.icon}</div>}
                   <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: tipe.color, background: tipe.bg, fontWeight: 600 }}>{p.tipe_produk}</div>
@@ -247,7 +247,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       {/* Modal */}
       {modal?.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 580, maxHeight: '92vh', overflowY: 'auto' }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 580, maxHeight: '92vh', overflowY: 'auto' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.product.id ? 'Edit Produk' : 'Tambah Produk'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>

@@ -97,7 +97,7 @@ export default async function InsightsPage() {
       {/* KPI Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
         {statCards.map(s => (
-          <div key={s.label} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: '18px 20px' }}>
+          <div key={s.label} style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '18px 20px' }}>
             <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{s.label}</div>
             <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>{s.value}</div>
             <div style={{ fontSize: '0.75rem', color: '#5a6a85' }}>{s.sub}</div>
@@ -107,7 +107,7 @@ export default async function InsightsPage() {
 
       {/* Affiliate Stats — hanya tampil jika mode affiliate aktif */}
       {isAffiliate && (
-        <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 14, padding: '20px', marginBottom: 24 }}>
+        <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 18, padding: '20px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
             <span style={{ fontSize: '1rem' }}>🔗</span>
             <div style={{ fontWeight: 600, color: '#34d399', fontSize: '0.9rem' }}>Affiliate Performance</div>
@@ -149,7 +149,7 @@ export default async function InsightsPage() {
 
       {/* Content Status + Finance */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: '20px' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '20px' }}>
           <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 16, fontSize: '0.9rem' }}>Status Konten di Library</div>
           {contentByStatus.map(({ status, count }) => {
             const total = (ideas || []).length || 1
@@ -169,7 +169,7 @@ export default async function InsightsPage() {
           })}
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: '20px' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '20px' }}>
           <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 16, fontSize: '0.9rem' }}>Ringkasan Keuangan</div>
           {[
             { label: 'Total Pemasukan', value: `Rp ${pemasukan.toLocaleString('id-ID')}`, color: '#86efac' },

@@ -408,7 +408,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       </div>
 
       {/* Sprint Board banner — always visible */}
-      <div style={{ background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 20, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
         <div style={{ fontSize: '1.4rem', flexShrink: 0 }}>⚡</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, color: '#42a5f5', marginBottom: 2, fontSize: '0.875rem' }}>Mau plan banyak konten dalam 1 minggu?</div>
@@ -421,7 +421,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
       {/* Sprint template info card (only show when no tasks) */}
       {tasks.length === 0 && (
-        <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)', borderRadius: 12, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+        <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)', borderRadius: 20, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
           <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: 2 }}>⚡</div>
           <div>
             <div style={{ fontWeight: 700, color: '#34d399', marginBottom: 4 }}>Sprint — Auto-generate checklist task sekaligus</div>
@@ -515,7 +515,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   style={{
                     background: isOver ? `${col.color}14` : '#0d0d0d',
                     border: `${isOver ? 2 : 1}px solid ${isOver ? col.color + 'cc' : '#1f1f1f'}`,
-                    borderRadius: 14,
+                    borderRadius: 18,
                     minHeight: 200,
                     transition: 'background 0.12s, border-color 0.12s',
                     overflow: 'hidden',
@@ -605,7 +605,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
         if (entries.length === 0 && soloTasks.length === 0) {
           return (
-            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
               <div style={{ fontSize: '2rem', marginBottom: 10 }}>📊</div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada sprint</div>
               <div style={{ fontSize: '0.82rem' }}>Buat sprint lewat tombol ⚡ Buat Sprint untuk mulai monitoring</div>
@@ -628,7 +628,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               const barColor = pct === 100 ? 'linear-gradient(90deg,#34d399,#86efac)' : hasOverdue ? 'linear-gradient(90deg,#f87171,#fca5a5)' : 'linear-gradient(90deg,#1a73e8,#42a5f5)'
 
               return (
-                <div key={ctx} style={{ background: '#fff', border: `1px solid ${hasOverdue && pct < 100 ? 'rgba(248,113,113,0.25)' : '#2a2a2a'}`, borderRadius: 14, overflow: 'hidden' }}>
+                <div key={ctx} style={{ background: '#fff', border: `1px solid ${hasOverdue && pct < 100 ? 'rgba(248,113,113,0.25)' : '#2a2a2a'}`, borderRadius: 18, overflow: 'hidden' }}>
                   {/* Header */}
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
@@ -693,7 +693,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       })()}
 
       {tasks.length === 0 && filtered.length === 0 && (
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>✅</div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada task</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Gunakan Sprint untuk bikin task produksi konten sekaligus</div>
@@ -711,7 +711,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* Sprint Modal */}
       {sprintModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 100, padding: '20px 20px', overflowY: 'auto' }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 580, marginTop: 20, marginBottom: 20 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 580, marginTop: 20, marginBottom: 20 }}>
             {/* Header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -942,7 +942,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* Task Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 500 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 500 }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.task.id ? 'Edit Task' : 'Tambah Task'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>

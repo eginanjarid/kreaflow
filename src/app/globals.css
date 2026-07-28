@@ -18,13 +18,27 @@
 
 body {
   font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
-  background: #f0f5f9;
+  background: #eef2f7;
   color: var(--text);
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #c8d1e0; border-radius: 4px; }
+
+/* Flexy-style card elevation */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(42, 53, 71, 0.08);
+  padding: 24px;
+}
+.card-sm {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 14px rgba(42, 53, 71, 0.06);
+  padding: 16px;
+}
 
 input, textarea, select {
   background: #fff;

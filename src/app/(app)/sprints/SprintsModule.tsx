@@ -629,7 +629,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 14, width: '100%', maxWidth: 440 }}>
+            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 18, width: '100%', maxWidth: 440 }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontWeight: 700, color: '#2a3547' }}>{taskModal.task.id ? 'Edit Task' : '+ Task Baru'}</div>
                 <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -767,7 +767,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {BOARD_COLS.map(col => {
                   const items = colItems(col.id)
                   return (
-                    <div key={col.id} style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', background: col.bg, border: `1px solid ${col.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                    <div key={col.id} style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', background: col.bg, border: `1px solid ${col.border}`, borderRadius: 20, overflow: 'hidden' }}>
                       {/* Column header */}
                       <div style={{ padding: '10px 14px', borderBottom: `1px solid ${col.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '0.82rem', fontWeight: 700, color: col.count_color }}>{col.label}</span>
@@ -820,7 +820,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       {/* ── Sprint Create Modal ─────────────────────────────────────────────── */}
       {sprintModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20, overflowY: 'auto' }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 500, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 500, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '18px 22px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>⚡ Buat Sprint Baru</div>
               <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -1081,7 +1081,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       {/* ── Add Content Modal ───────────────────────────────────────────────── */}
       {addModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 460 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 460 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 700, color: '#2a3547' }}>+ Tambah Konten ke Sprint</div>
               <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -1153,7 +1153,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       {/* ── Detail Modal ────────────────────────────────────────────────────── */}
       {detailItem && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 440 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 440 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 {detailItem.product_id && (
@@ -1308,7 +1308,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         return (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
-            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 600, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 600, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
                 <div>
                   <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>📊 Laporan Tim — {selectedSprint.nama}</div>
@@ -1380,7 +1380,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       })()}
 
       {deleteUndo && (
-        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 500, background: '#f8fafc', border: '1px solid #3a3a3a', borderRadius: 12, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 320 }}>
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 500, background: '#f8fafc', border: '1px solid #3a3a3a', borderRadius: 20, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 320 }}>
           <span style={{ fontSize: '0.88rem', color: '#2a3547' }}>
             Sprint <strong>"{deleteUndo.sprintName}"</strong> dihapus
           </span>

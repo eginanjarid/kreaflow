@@ -28,8 +28,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Topbar user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }} />
-        <main style={{ flex: 1, overflowY: 'auto', background: '#f0f5f9' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 24px' }}>
+        <main style={{ flex: 1, overflowY: 'auto', background: '#eef2f7' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 28px' }}>
             {children}
           </div>
         </main>

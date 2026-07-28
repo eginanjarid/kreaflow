@@ -169,7 +169,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
 
       {/* Users Tab */}
       {tab === 'users' && (
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', padding: '10px 16px', borderBottom: '1px solid #e5eaf2', fontSize: '0.68rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             <div>User</div><div>Workspace</div><div>Plan</div><div>Daftar</div><div>Aksi</div>
           </div>
@@ -198,9 +198,9 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
       {/* Workspaces Tab */}
       {tab === 'workspaces' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {filteredWs.length === 0 && <div style={{ padding: 28, textAlign: 'center', color: '#5a6a85', fontSize: '0.85rem', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12 }}>Tidak ada workspace</div>}
+          {filteredWs.length === 0 && <div style={{ padding: 28, textAlign: 'center', color: '#5a6a85', fontSize: '0.85rem', background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20 }}>Tidak ada workspace</div>}
           {filteredWs.map(ws => (
-            <div key={ws.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, overflow: 'hidden' }}>
+            <div key={ws.id} style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
@@ -245,7 +245,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
       {/* Action Modal */}
       {(actionUser || actionWs) && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 400, padding: '24px' }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 400, padding: '24px' }}>
             <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem', marginBottom: 4 }}>
               {actionType === 'password' ? 'Reset Password' : 'Ubah Plan'}
             </div>

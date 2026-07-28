@@ -239,7 +239,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
 
       {/* ── Antrian Posting ── */}
       {readyItems.length > 0 && (
-        <div style={{ background: '#0f1a14', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 12, marginBottom: 20, overflow: 'hidden' }}>
+        <div style={{ background: '#0f1a14', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
           <button
             onClick={() => setQueueOpen(o => !o)}
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', background: 'transparent', border: 'none', cursor: 'pointer' }}
@@ -301,7 +301,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       </div>
 
       {view === 'calendar' ? (
-        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
           {/* Day headers */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #e5eaf2' }}>
             {DAYS.map(d => (
@@ -384,7 +384,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {monthEntries.length === 0 ? (
-            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📅</div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada jadwal bulan ini</div>
               <button onClick={() => openAdd()} style={{ marginTop: 8, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -435,7 +435,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       {/* ── Jadwalkan Modal (from queue) ── */}
       {schedModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 420 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 420 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>📅 Jadwalkan Posting</div>
               <button onClick={() => setSchedModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -489,7 +489,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       {/* ── Edit/Add Modal ── */}
       {modal?.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 480 }}>
+          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480 }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.entry.id ? 'Edit Jadwal' : 'Jadwalkan Konten'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
