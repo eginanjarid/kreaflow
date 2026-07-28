@@ -916,7 +916,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
     <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Brand</h1>
+        <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Brand</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Bangun fondasi identitas brand dan konten kamu</p>
       </div>
 

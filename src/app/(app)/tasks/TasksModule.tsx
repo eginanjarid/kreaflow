@@ -376,7 +376,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Tasks</h1>
+          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Tasks</h1>
           <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Kelola tugas dan sprint produksi konten kamu</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>

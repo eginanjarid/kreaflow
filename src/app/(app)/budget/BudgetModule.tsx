@@ -77,7 +77,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Budget</h1>
+          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Budget</h1>
           <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Tracking pemasukan dan pengeluaran konten kamu</p>
         </div>
         <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>

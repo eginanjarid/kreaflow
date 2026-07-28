@@ -158,7 +158,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Settings</h1>
+        <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Settings</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Kelola workspace dan akun kamu</p>
       </div>
 

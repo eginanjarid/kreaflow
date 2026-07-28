@@ -109,7 +109,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 4 }}>Super Admin</h1>
+        <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 4 }}>Super Admin</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.85rem' }}>Platform management — hanya visible untuk kamu</p>
       </div>
 

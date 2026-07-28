@@ -138,8 +138,8 @@ export default function Topbar({ user }: Props) {
       position: 'relative',
       zIndex: 100,
     }}>
-      {/* Left: Hamburger + Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginRight: 28 }}>
+      {/* Left: Hamburger + Search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 20 }}>
         <button style={{
           width: 36, height: 36, borderRadius: 8,
           border: '1px solid #e5eaf2', background: '#fff',
@@ -150,10 +150,16 @@ export default function Topbar({ user }: Props) {
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <div>
-          <div style={{ fontSize: '0.68rem', color: '#9fa9ba', fontWeight: 500, marginBottom: 1 }}>{page.sub}</div>
-          <h1 style={{ fontSize: '1rem', fontWeight: 700, color: '#2a3547', margin: 0, lineHeight: 1 }}>{page.title}</h1>
-        </div>
+        <button style={{
+          width: 36, height: 36, borderRadius: 8,
+          border: '1px solid #e5eaf2', background: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', flexShrink: 0,
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5a6a85" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
       </div>
 
       {/* Middle: Quick Nav */}

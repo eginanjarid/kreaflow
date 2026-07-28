@@ -347,7 +347,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 4 }}>Studio</h1>
+          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 4 }}>Studio</h1>
           <p style={{ fontSize: '0.875rem', color: '#5a6a85' }}>Ruang kerja desainer & editor — lihat naskah, input hasil, preview visual</p>
         </div>
         <button onClick={() => setShowNotif(v => !v)}

@@ -64,7 +64,7 @@ export default async function InsightsPage() {
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Insights</h1>
+        <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Insights</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Overview performa brand dan konten kamu</p>
       </div>
 
@@ -99,7 +99,7 @@ export default async function InsightsPage() {
         {statCards.map(s => (
           <div key={s.label} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px' }}>
             <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{s.label}</div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2a3547', marginBottom: 4 }}>{s.value}</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.3px', marginBottom: 4 }}>{s.value}</div>
             <div style={{ fontSize: '0.75rem', color: '#5a6a85' }}>{s.sub}</div>
           </div>
         ))}
