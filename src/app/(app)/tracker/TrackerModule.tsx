@@ -96,7 +96,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
         <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: filterPlatform === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
               {p || 'Semua'}
             </button>
           ))}
@@ -167,7 +167,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Platform</label>

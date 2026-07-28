@@ -109,7 +109,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
           { key: 'schedule', label: '📅 Schedule' },
         ].map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
-            style={{ padding: '6px 14px', borderRadius: 20, border: `1px solid ${filter === f.key ? '#1a73e8' : '#2a2a2a'}`, background: filter === f.key ? 'rgba(26,115,232,0.15)' : 'transparent', color: filter === f.key ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: filter === f.key ? 700 : 400, transition: 'all 0.15s' }}>
+            style={{ padding: '6px 14px', borderRadius: 20, border: `1px solid ${filter === f.key ? '#1a73e8' : '#e5eaf2'}`, background: filter === f.key ? 'rgba(26,115,232,0.15)' : 'transparent', color: filter === f.key ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: filter === f.key ? 700 : 400, transition: 'all 0.15s' }}>
             {f.label}
           </button>
         ))}
@@ -133,7 +133,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
               const cfg = TYPE_CONFIG[n.type] || { color: '#5a6a85', bg: 'rgba(148,163,184,0.1)', label: n.type, icon: '📌', href: '/sprints' }
               return (
                 <div key={n.id}
-                  style={{ background: n.is_read ? '#0d0d0d' : '#111', border: `1px solid ${n.is_read ? '#1a1a1a' : cfg.color + '30'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start', transition: 'border-color 0.2s' }}>
+                  style={{ background: n.is_read ? '#0d0d0d' : '#f8fafc', border: `1px solid ${n.is_read ? '#f1f5f9' : cfg.color + '30'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start', transition: 'border-color 0.2s' }}>
                   {/* Icon */}
                   <div style={{ width: 36, height: 36, borderRadius: 10, background: cfg.bg, border: `1px solid ${cfg.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>
                     {cfg.icon}

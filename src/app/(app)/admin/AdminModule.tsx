@@ -159,7 +159,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
           <div style={{ display: 'flex', gap: 6 }}>
             {['', ...PLANS].map(p => (
               <button key={p} onClick={() => setFilterPlan(p)}
-                style={{ padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#f87171'}` : '1px solid #2a2a2a', background: filterPlan === p ? (PLAN_COLORS[p] || '#f87171') + '20' : '#1a1a1a', color: filterPlan === p ? (PLAN_COLORS[p] || '#f87171') : '#64748b', cursor: 'pointer', textTransform: 'uppercase' }}>
+                style={{ padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#f87171'}` : '1px solid #2a2a2a', background: filterPlan === p ? (PLAN_COLORS[p] || '#f87171') + '20' : '#f1f5f9', color: filterPlan === p ? (PLAN_COLORS[p] || '#f87171') : '#64748b', cursor: 'pointer', textTransform: 'uppercase' }}>
                 {p || 'All'}
               </button>
             ))}
@@ -224,7 +224,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
                   <div style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Anggota Tim</div>
                   {ws.members.map(m => (
                     <div key={m.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid #1a1a1a' }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: m.role === 'owner' ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700, color: '#2a3547', flexShrink: 0 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: m.role === 'owner' ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700, color: '#2a3547', flexShrink: 0 }}>
                         {(m.nama || m.email).charAt(0).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>

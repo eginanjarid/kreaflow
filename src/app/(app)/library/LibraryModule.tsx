@@ -45,7 +45,7 @@ const STATUS_COLOR: Record<string, string> = {
   Ready: '#166534', Scheduled: '#1e40af', Posted: '#6b21a8',
 }
 const STATUS_BG: Record<string, string> = {
-  Draft: '#1a1a1a',
+  Draft: '#f1f5f9',
   'Naskah Siap': 'rgba(245,158,11,0.12)',
   Produksi: 'rgba(59,130,246,0.12)',
   'Siap Tayang': 'rgba(34,197,94,0.12)',
@@ -346,7 +346,7 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
         {PREVIEW_RATIOS.map(rx => (
           <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(26,115,232,0.15)' : '#1a1a1a', cursor: 'pointer', gap: 1 }}>
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(26,115,232,0.15)' : '#f1f5f9', cursor: 'pointer', gap: 1 }}>
             <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#42a5f5' : '#94a3b8' }}>{rx.label}</span>
             <span style={{ fontSize: '0.6rem', color: ratio === rx.key ? '#1a73e8' : '#475569' }}>{rx.sub}</span>
           </button>
@@ -570,14 +570,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           {['', ...STATUSES].map(s => (
             <button key={s} onClick={() => setFilterStatus(s)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterStatus === s ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: filterStatus === s ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterStatus === s ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterStatus === s ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
               {s || 'Semua'}
             </button>
           ))}
-          <div style={{ width: 1, background: '#2a2a2a', margin: '0 4px', alignSelf: 'stretch' }} />
+          <div style={{ width: 1, background: '#e5eaf2', margin: '0 4px', alignSelf: 'stretch' }} />
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: filterPlatform === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
               {p || 'Semua Platform'}
             </button>
           ))}
@@ -727,7 +727,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             </div>
 
             <form onSubmit={handleSave} style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
 
               {/* Tab: Basic */}
               {modal.tab === 'basic' && <>
@@ -753,7 +753,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Status</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#475569', background: STATUS_BG[modal.idea.status] || '#1a1a1a', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#2a2a2a'}33` }}>
+                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#475569', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
                         {modal.idea.status || 'Draft'}
                       </span>
                       <span style={{ fontSize: '0.72rem', color: '#334155' }}>Diatur otomatis oleh workflow</span>
@@ -786,7 +786,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     </div>
                     <button type="button"
                       onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
-                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#2a2a2a', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: modal.idea.show_in_feed !== false ? 23 : 3, transition: 'left 0.2s' }} />
                     </button>
                   </div>
@@ -796,7 +796,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {PLATFORMS.map(p => (
                       <button key={p} type="button" onClick={() => toggleArr('platform', p)}
-                        style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.idea.platform.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.idea.platform.includes(p) ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: modal.idea.platform.includes(p) ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                        style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.idea.platform.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.idea.platform.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.idea.platform.includes(p) ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
                         {p}
                       </button>
                     ))}

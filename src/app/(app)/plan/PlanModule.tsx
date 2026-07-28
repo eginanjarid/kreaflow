@@ -104,7 +104,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
         <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', letterSpacing: '0.05em' }}>⚡ SPRINT AKTIF — {productName}</span>
         <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{done}/{total} selesai · {pct}%</span>
       </div>
-      <div style={{ height: 3, background: '#2a2a2a', borderRadius: 2, marginBottom: 8 }}>
+      <div style={{ height: 3, background: '#e5eaf2', borderRadius: 2, marginBottom: 8 }}>
         <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg, #1a73e8, #42a5f5)', borderRadius: 2, transition: 'width 0.3s' }} />
       </div>
       <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
@@ -662,7 +662,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'LinkedIn'].map(pl => (
                       <button key={pl} type="button" onClick={() => setNF('platform', pl)}
-                        style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${naskahForm.platform === pl ? '#1a73e8' : '#2a2a2a'}`, background: naskahForm.platform === pl ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: naskahForm.platform === pl ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: naskahForm.platform === pl ? 600 : 400 }}>
+                        style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${naskahForm.platform === pl ? '#1a73e8' : '#e5eaf2'}`, background: naskahForm.platform === pl ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: naskahForm.platform === pl ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: naskahForm.platform === pl ? 600 : 400 }}>
                         {pl}
                       </button>
                     ))}
@@ -684,7 +684,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         const label = line.replace(/^\d+\.\s*/, '').split('—')[0].trim()
                         return (
                           <button key={i} type="button" onClick={() => setNF('pillar', label)}
-                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', marginBottom: 4, borderRadius: 7, border: `1px solid ${naskahForm.pillar === label ? '#34d399' : '#2a2a2a'}`, background: naskahForm.pillar === label ? 'rgba(52,211,153,0.1)' : '#1a1a1a', color: naskahForm.pillar === label ? '#34d399' : '#64748b', fontSize: '0.78rem', cursor: 'pointer' }}>
+                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', marginBottom: 4, borderRadius: 7, border: `1px solid ${naskahForm.pillar === label ? '#34d399' : '#e5eaf2'}`, background: naskahForm.pillar === label ? 'rgba(52,211,153,0.1)' : '#f1f5f9', color: naskahForm.pillar === label ? '#34d399' : '#64748b', fontSize: '0.78rem', cursor: 'pointer' }}>
                             {line.replace(/^\d+\.\s*/, '')}
                           </button>
                         )
@@ -699,7 +699,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {['Shock/Surprised', 'Problem-first', 'Result-first', 'Story', 'Question', 'Warning', 'Comparison', 'Social proof'].map(h => (
                       <button key={h} type="button" onClick={() => setNF('hook_angle', naskahForm.hook_angle === h ? '' : h)}
-                        style={{ padding: '5px 10px', borderRadius: 6, border: `1px solid ${naskahForm.hook_angle === h ? '#1a73e8' : '#2a2a2a'}`, background: naskahForm.hook_angle === h ? 'rgba(26,115,232,0.12)' : '#1a1a1a', color: naskahForm.hook_angle === h ? '#42a5f5' : '#64748b', fontSize: '0.75rem', cursor: 'pointer' }}>
+                        style={{ padding: '5px 10px', borderRadius: 6, border: `1px solid ${naskahForm.hook_angle === h ? '#1a73e8' : '#e5eaf2'}`, background: naskahForm.hook_angle === h ? 'rgba(26,115,232,0.12)' : '#f1f5f9', color: naskahForm.hook_angle === h ? '#42a5f5' : '#64748b', fontSize: '0.75rem', cursor: 'pointer' }}>
                         {h}
                       </button>
                     ))}
@@ -728,7 +728,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 </div>
 
                 {brandProfile?.niche && (
-                  <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 14px', fontSize: '0.72rem', color: '#5a6a85', lineHeight: 1.7 }}>
+                  <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 14px', fontSize: '0.72rem', color: '#5a6a85', lineHeight: 1.7 }}>
                     <div style={{ color: '#334155', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>Brand context</div>
                     <div>Niche: <span style={{ color: '#5a6a85' }}>{brandProfile.niche}</span></div>
                     {brandProfile.tone_of_voice && <div>Tone: <span style={{ color: '#5a6a85' }}>{brandProfile.tone_of_voice}</span></div>}
@@ -831,7 +831,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hasil Analisis USP <span style={{ color: '#5a6a85', fontWeight: 400, textTransform: 'none' }}>(paste dari AI)</span></label>
                     <textarea
-                      style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.82rem', lineHeight: 1.7, border: `1px solid ${affForm.usp ? '#ec489940' : '#2a2a2a'}`, color: affForm.usp ? '#e2e8f0' : '#475569' })}
+                      style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.82rem', lineHeight: 1.7, border: `1px solid ${affForm.usp ? '#ec489940' : '#e5eaf2'}`, color: affForm.usp ? '#e2e8f0' : '#475569' })}
                       value={affForm.usp}
                       onChange={e => setAFF('usp', e.target.value)}
                       placeholder={'Paste hasil analisis USP dari AI di sini...\n\nHasil akan mencakup: USP, pain points, target segmen, angle promosi, objection handling, kata kunci emosional'}
@@ -1060,9 +1060,9 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         const done = step.autoCheck || !!affProdSteps[step.id]
                         return (
                           <div key={step.id} onClick={() => !step.autoCheck && toggleProdStep(step.id)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 10, background: done ? 'rgba(52,211,153,0.06)' : '#1a1a1a', border: `1px solid ${done ? '#34d39920' : '#2a2a2a'}`, cursor: step.autoCheck ? 'default' : 'pointer', transition: 'all 0.15s' }}>
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 10, background: done ? 'rgba(52,211,153,0.06)' : '#f1f5f9', border: `1px solid ${done ? '#34d39920' : '#e5eaf2'}`, cursor: step.autoCheck ? 'default' : 'pointer', transition: 'all 0.15s' }}>
                             {/* step number / check */}
-                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? '#34d399' : '#2a2a2a', transition: 'background 0.2s' }}>
+                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? '#34d399' : '#e5eaf2', transition: 'background 0.2s' }}>
                               {done ? (
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                               ) : (
@@ -1078,7 +1078,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                               <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>{step.desc}</div>
                             </div>
                             {i < PROD_STEPS.length - 1 && !step.autoCheck && (
-                              <div style={{ fontSize: '0.7rem', color: done ? '#34d39960' : '#2a2a2a', flexShrink: 0 }}>
+                              <div style={{ fontSize: '0.7rem', color: done ? '#34d39960' : '#e5eaf2', flexShrink: 0 }}>
                                 {done ? 'Done ✓' : 'Tap'}
                               </div>
                             )}
@@ -1113,19 +1113,19 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {tab === 'platforms' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {platforms.map(p => (
-            <div key={p.platform} style={{ background: '#fff', border: `1px solid ${p.is_active ? 'rgba(26,115,232,0.3)' : '#2a2a2a'}`, borderRadius: 20, overflow: 'hidden' }}>
+            <div key={p.platform} style={{ background: '#fff', border: `1px solid ${p.is_active ? 'rgba(26,115,232,0.3)' : '#e5eaf2'}`, borderRadius: 20, overflow: 'hidden' }}>
               {/* Platform Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: p.is_active ? '1px solid #1f1f1f' : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: p.is_active ? '1px solid #e5eaf2' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ fontWeight: 700, color: p.is_active ? '#e2e8f0' : '#475569', fontSize: '0.95rem' }}>{p.platform}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#86efac' : '#475569', background: p.is_active ? 'rgba(134,239,172,0.1)' : '#1a1a1a', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#86efac' : '#475569', background: p.is_active ? 'rgba(134,239,172,0.1)' : '#f1f5f9', fontWeight: 600 }}>
                     {p.is_active ? 'Aktif' : 'Tidak Aktif'}
                   </span>
                 </div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>{p.is_active ? 'Nonaktifkan' : 'Aktifkan'}</span>
                   <div onClick={() => setPlatformField(p.platform, 'is_active', !p.is_active)}
-                    style={{ width: 36, height: 20, borderRadius: 10, background: p.is_active ? '#1a73e8' : '#2a2a2a', position: 'relative', cursor: 'pointer', transition: 'background 0.2s' }}>
+                    style={{ width: 36, height: 20, borderRadius: 10, background: p.is_active ? '#1a73e8' : '#e5eaf2', position: 'relative', cursor: 'pointer', transition: 'background 0.2s' }}>
                     <div style={{ position: 'absolute', top: 3, left: p.is_active ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                   </div>
                 </label>
@@ -1166,7 +1166,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {WAKTU.map(t => (
                         <button key={t} type="button" onClick={() => toggleWaktu(p.platform, t)}
-                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: p.waktu_terbaik?.includes(t) ? '#42a5f5' : '#475569', cursor: 'pointer' }}>
+                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: p.waktu_terbaik?.includes(t) ? '#42a5f5' : '#475569', cursor: 'pointer' }}>
                           {t}
                         </button>
                       ))}
@@ -1241,7 +1241,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={saveCampaign} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Campaign *</label>
                 <input style={fieldStyle()} value={modal.campaign.nama} onChange={e => setCampField('nama', e.target.value)} placeholder="Harbolnas, Ramadan, Kolaborasi Brand..." required />
@@ -1278,7 +1278,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {PLATFORMS.map(p => (
                     <button key={p} type="button" onClick={() => togglePlatform(p)}
-                      style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.campaign.platforms.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.campaign.platforms.includes(p) ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: modal.campaign.platforms.includes(p) ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                      style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.campaign.platforms.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.campaign.platforms.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.campaign.platforms.includes(p) ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
                       {p}
                     </button>
                   ))}
@@ -1372,7 +1372,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* ── Sprint Link Modal ── */}
       {sprintLinkModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <div style={{ background: '#141414', border: '1px solid #e5eaf2', borderRadius: 20, padding: 28, maxWidth: 420, width: '100%' }}>
+          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, padding: 28, maxWidth: 420, width: '100%' }}>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 8 }}>🔗 Slot Sprint Tersedia</div>
             <p style={{ color: '#5a6a85', fontSize: '0.875rem', marginBottom: 16, lineHeight: 1.5 }}>
               Ada slot konten di Sprint aktif untuk produk ini:

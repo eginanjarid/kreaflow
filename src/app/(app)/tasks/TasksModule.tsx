@@ -455,7 +455,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
             <span style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Priority:</span>
             {['', ...PRIORITIES].map(p => (
               <button key={p} onClick={() => setFilterPriority(p)}
-                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterPriority === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPriority === p ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: filterPriority === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterPriority === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPriority === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPriority === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
                 {p || 'Semua'}
               </button>
             ))}
@@ -466,17 +466,17 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <span style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Sprint:</span>
               <button onClick={() => setFilterContext('')}
-                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === '' ? '1px solid #34d399' : '1px solid #2a2a2a', background: filterContext === '' ? 'rgba(52,211,153,0.12)' : '#1a1a1a', color: filterContext === '' ? '#34d399' : '#64748b', cursor: 'pointer' }}>
+                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === '' ? '1px solid #34d399' : '1px solid #2a2a2a', background: filterContext === '' ? 'rgba(52,211,153,0.12)' : '#f1f5f9', color: filterContext === '' ? '#34d399' : '#64748b', cursor: 'pointer' }}>
                 Semua
               </button>
               {allContexts.map(ctx => (
                 <button key={ctx} onClick={() => setFilterContext(ctx === filterContext ? '' : ctx)}
-                  style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === ctx ? '1px solid #34d399' : '1px solid #2a2a2a', background: filterContext === ctx ? 'rgba(52,211,153,0.12)' : '#1a1a1a', color: filterContext === ctx ? '#34d399' : '#64748b', cursor: 'pointer', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === ctx ? '1px solid #34d399' : '1px solid #2a2a2a', background: filterContext === ctx ? 'rgba(52,211,153,0.12)' : '#f1f5f9', color: filterContext === ctx ? '#34d399' : '#64748b', cursor: 'pointer', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {ctx}
                 </button>
               ))}
               <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
-                style={{ marginLeft: 'auto', background: '#f8fafc', border: `1px solid ${filterDate ? '#34d399' : '#2a2a2a'}`, borderRadius: 20, padding: '3px 12px', color: filterDate ? '#34d399' : '#475569', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }} />
+                style={{ marginLeft: 'auto', background: '#f8fafc', border: `1px solid ${filterDate ? '#34d399' : '#e5eaf2'}`, borderRadius: 20, padding: '3px 12px', color: filterDate ? '#34d399' : '#475569', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }} />
               {(filterContext || filterDate) && (
                 <button onClick={() => { setFilterContext(''); setFilterDate('') }}
                   style={{ padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', border: '1px solid #e5eaf2', background: 'transparent', color: '#5a6a85', cursor: 'pointer' }}>
@@ -514,7 +514,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   onDrop={async e => { e.preventDefault(); await dropToCol(col.id) }}
                   style={{
                     background: isOver ? `${col.color}14` : '#0d0d0d',
-                    border: `${isOver ? 2 : 1}px solid ${isOver ? col.color + 'cc' : '#1f1f1f'}`,
+                    border: `${isOver ? 2 : 1}px solid ${isOver ? col.color + 'cc' : '#e5eaf2'}`,
                     borderRadius: 18,
                     minHeight: 200,
                     transition: 'background 0.12s, border-color 0.12s',
@@ -522,17 +522,17 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                     boxShadow: isOver ? `0 0 18px ${col.color}22` : 'none',
                   }}>
                   {/* Column header */}
-                  <div style={{ padding: '13px 16px', borderBottom: `1px solid ${isOver ? col.color + '30' : '#1f1f1f'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'border-color 0.12s' }}>
+                  <div style={{ padding: '13px 16px', borderBottom: `1px solid ${isOver ? col.color + '30' : '#e5eaf2'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'border-color 0.12s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ fontSize: '1rem' }}>{col.icon}</span>
                       <span style={{ fontWeight: 700, color: col.color, fontSize: '0.875rem' }}>{col.label}</span>
                     </div>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#475569', background: isOver ? `${col.color}18` : '#1a1a1a', border: `1px solid ${isOver ? col.color + '50' : '#2a2a2a'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#475569', background: isOver ? `${col.color}18` : '#f1f5f9', border: `1px solid ${isOver ? col.color + '50' : '#e5eaf2'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
                   </div>
                   {/* Cards */}
                   <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 140 }}>
                     {colItems.length === 0 ? (
-                      <div style={{ textAlign: 'center', fontSize: '0.75rem', padding: '32px 12px', border: `2px dashed ${isOver ? col.color + '80' : '#1f1f1f'}`, borderRadius: 10, marginTop: 4, color: isOver ? col.color : '#2a2a2a', background: isOver ? `${col.color}08` : 'transparent', transition: 'all 0.12s' }}>
+                      <div style={{ textAlign: 'center', fontSize: '0.75rem', padding: '32px 12px', border: `2px dashed ${isOver ? col.color + '80' : '#e5eaf2'}`, borderRadius: 10, marginTop: 4, color: isOver ? col.color : '#e5eaf2', background: isOver ? `${col.color}08` : 'transparent', transition: 'all 0.12s' }}>
                         {isOver ? '⬇ Lepas di sini' : 'Kosong'}
                       </div>
                     ) : (
@@ -628,7 +628,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               const barColor = pct === 100 ? 'linear-gradient(90deg,#34d399,#86efac)' : hasOverdue ? 'linear-gradient(90deg,#f87171,#fca5a5)' : 'linear-gradient(90deg,#1a73e8,#42a5f5)'
 
               return (
-                <div key={ctx} style={{ background: '#fff', border: `1px solid ${hasOverdue && pct < 100 ? 'rgba(248,113,113,0.25)' : '#2a2a2a'}`, borderRadius: 18, overflow: 'hidden' }}>
+                <div key={ctx} style={{ background: '#fff', border: `1px solid ${hasOverdue && pct < 100 ? 'rgba(248,113,113,0.25)' : '#e5eaf2'}`, borderRadius: 18, overflow: 'hidden' }}>
                   {/* Header */}
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
@@ -658,8 +658,8 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       const col = getTaskCol(t.percent_complete)
                       const overdue = t.due_date && new Date(t.due_date) < new Date() && t.percent_complete < 100
                       const chipColor = overdue ? '#f87171' : col === 'done' ? '#86efac' : col === 'in_progress' ? '#fbbf24' : '#475569'
-                      const chipBg = overdue ? 'rgba(248,113,113,0.08)' : col === 'done' ? 'rgba(134,239,172,0.08)' : col === 'in_progress' ? 'rgba(251,191,36,0.08)' : '#1a1a1a'
-                      const chipBorder = overdue ? 'rgba(248,113,113,0.3)' : col === 'done' ? 'rgba(134,239,172,0.25)' : col === 'in_progress' ? 'rgba(251,191,36,0.25)' : '#2a2a2a'
+                      const chipBg = overdue ? 'rgba(248,113,113,0.08)' : col === 'done' ? 'rgba(134,239,172,0.08)' : col === 'in_progress' ? 'rgba(251,191,36,0.08)' : '#f1f5f9'
+                      const chipBorder = overdue ? 'rgba(248,113,113,0.3)' : col === 'done' ? 'rgba(134,239,172,0.25)' : col === 'in_progress' ? 'rgba(251,191,36,0.25)' : '#e5eaf2'
                       const icon = col === 'done' ? '✓' : col === 'in_progress' ? '◷' : '○'
                       return (
                         <div key={t.id}
@@ -722,7 +722,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
             </div>
 
             <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {sprintError && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{sprintError}</div>}
+              {sprintError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{sprintError}</div>}
 
               {/* Sprint type selector */}
               <div>
@@ -730,12 +730,12 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {(Object.entries(SPRINT_TEMPLATES) as [keyof typeof SPRINT_TEMPLATES, typeof SPRINT_TEMPLATES[keyof typeof SPRINT_TEMPLATES]][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => switchSprintType(key)}
-                      style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === key ? tpl.color + '60' : '#2a2a2a'}`, background: sprintType === key ? tpl.color + '12' : '#1a1a1a', color: sprintType === key ? tpl.color : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintType === key ? tpl.color + '12' : '#f1f5f9', color: sprintType === key ? tpl.color : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
                     </button>
                   ))}
                   <button type="button" onClick={() => switchSprintType('custom')}
-                    style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === 'custom' ? '#e879f960' : '#2a2a2a'}`, background: sprintType === 'custom' ? '#e879f912' : '#1a1a1a', color: sprintType === 'custom' ? '#e879f9' : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === 'custom' ? '#e879f960' : '#e5eaf2'}`, background: sprintType === 'custom' ? '#e879f912' : '#f1f5f9', color: sprintType === 'custom' ? '#e879f9' : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     ✏️ Custom
                   </button>
                 </div>
@@ -850,10 +850,10 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   {sprintSteps.map((step, i) => {
                     const isCustom = step.id.startsWith('custom_')
                     return (
-                      <div key={step.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: step.enabled ? '#1a1a1a' : '#0d0d0d', border: `1px solid ${step.enabled ? '#2a2a2a' : '#1a1a1a'}`, opacity: step.enabled ? 1 : 0.5, transition: 'all 0.15s' }}>
+                      <div key={step.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: step.enabled ? '#f1f5f9' : '#0d0d0d', border: `1px solid ${step.enabled ? '#e5eaf2' : '#f1f5f9'}`, opacity: step.enabled ? 1 : 0.5, transition: 'all 0.15s' }}>
                         {/* Toggle */}
                         <div onClick={() => toggleStep(step.id)}
-                          style={{ width: 36, height: 20, borderRadius: 10, background: step.enabled ? (SPRINT_TEMPLATES[sprintType as keyof typeof SPRINT_TEMPLATES]?.color ?? '#e879f9') : '#2a2a2a', position: 'relative', cursor: 'pointer', flexShrink: 0, marginTop: 2, transition: 'background 0.2s' }}>
+                          style={{ width: 36, height: 20, borderRadius: 10, background: step.enabled ? (SPRINT_TEMPLATES[sprintType as keyof typeof SPRINT_TEMPLATES]?.color ?? '#e879f9') : '#e5eaf2', position: 'relative', cursor: 'pointer', flexShrink: 0, marginTop: 2, transition: 'background 0.2s' }}>
                           <div style={{ position: 'absolute', top: 3, left: step.enabled ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                         </div>
 
@@ -898,7 +898,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
               {/* Preview summary */}
               {sprintStart && (sprintProductId || sprintPillar.trim() || sprintCustomLabel.trim() || sprintNamaKonten.trim()) && (
-                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px', fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.9 }}>
+                <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px', fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.9 }}>
                   <div style={{ color: '#334155', fontWeight: 600, marginBottom: 4 }}>SPRINT PREVIEW</div>
                   {sprintNamaKonten.trim() && (
                     <div>Nama Konten: <span style={{ color: '#2a3547', fontWeight: 600 }}>{sprintNamaKonten.trim()}</span></div>
@@ -948,7 +948,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Task *</label>
                 <input style={fieldStyle()} value={modal.task.nama} onChange={e => setField('nama', e.target.value)} placeholder="Apa yang perlu dikerjakan?" required />
@@ -1011,10 +1011,10 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
   return (
     <div draggable onDragStart={onDragStart} onDragEnd={onDragEnd}
       style={{
-        background: isDragging ? '#0d0d0d' : '#111',
+        background: isDragging ? '#0d0d0d' : '#f8fafc',
         border: isDragging
           ? `2px dashed ${colColor}60`
-          : `1px solid ${overdue ? 'rgba(248,113,113,0.25)' : '#2a2a2a'}`,
+          : `1px solid ${overdue ? 'rgba(248,113,113,0.25)' : '#e5eaf2'}`,
         borderRadius: 10,
         padding: '12px 14px',
         cursor: isDragging ? 'grabbing' : 'grab',
@@ -1064,10 +1064,10 @@ function TaskCard({ task, onEdit, onDelete, onProgress }: {
   const pct = task.percent_complete
   const overdue = task.due_date && new Date(task.due_date) < new Date() && pct < 100
   return (
-    <div style={{ background: '#fff', border: `1px solid ${overdue ? 'rgba(248,113,113,0.3)' : '#2a2a2a'}`, borderRadius: 10, padding: '14px 16px' }}>
+    <div style={{ background: '#fff', border: `1px solid ${overdue ? 'rgba(248,113,113,0.3)' : '#e5eaf2'}`, borderRadius: 10, padding: '14px 16px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
         <button onClick={() => onProgress(task.id!, pct === 100 ? 0 : 100)}
-          style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${pct === 100 ? '#1a73e8' : '#2a2a2a'}`, background: pct === 100 ? '#1a73e8' : 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${pct === 100 ? '#1a73e8' : '#e5eaf2'}`, background: pct === 100 ? '#1a73e8' : 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {pct === 100 && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
         </button>
         <div style={{ flex: 1 }}>

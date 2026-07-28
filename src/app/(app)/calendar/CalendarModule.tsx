@@ -219,7 +219,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {tasks.length > 0 && (
             <button onClick={() => setShowTasks(s => !s)}
-              style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#2a2a2a'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#1a1a1a', color: showTasks ? '#fbbf24' : '#475569', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
+              style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#e5eaf2'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#f1f5f9', color: showTasks ? '#fbbf24' : '#475569', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
               ⚡ {showTasks ? 'Tasks ON' : 'Tasks OFF'}
             </button>
           )}
@@ -239,7 +239,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
 
       {/* ── Antrian Posting ── */}
       {readyItems.length > 0 && (
-        <div style={{ background: '#0f1a14', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
+        <div style={{ background: '#f0fdf4', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
           <button
             onClick={() => setQueueOpen(o => !o)}
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', background: 'transparent', border: 'none', cursor: 'pointer' }}
@@ -339,7 +339,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         const timeStr = e.scheduled_at ? new Date(e.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
                         return (
                           <div key={e.id} onClick={ev => { ev.stopPropagation(); openEdit(e) }}
-                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'rgba(26,115,232,0.15)', border: `1px solid ${STATUS_COLOR[e.status] || '#2a2a2a'}`, color: STATUS_COLOR[e.status] || '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
+                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'rgba(26,115,232,0.15)', border: `1px solid ${STATUS_COLOR[e.status] || '#e5eaf2'}`, color: STATUS_COLOR[e.status] || '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
                             title={`${idea?.product_nama ? idea.product_nama + ' · ' : ''}${displayName} · ${timeStr}`}>
                             {timeStr && <span style={{ opacity: 0.7 }}>{timeStr} </span>}{productLabel}{displayName}
                           </div>
@@ -397,14 +397,14 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
             const isSprint = !!e.task_id
             const displayName = e.label || idea?.judul || '(konten tidak terhubung)'
             return (
-              <div key={e.id} style={{ background: '#fff', border: `1px solid ${isSprint ? 'rgba(52,211,153,0.15)' : '#2a2a2a'}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div key={e.id} style={{ background: '#fff', border: `1px solid ${isSprint ? 'rgba(52,211,153,0.15)' : '#e5eaf2'}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
                 {/* Date block */}
                 <div style={{ width: 48, textAlign: 'center', flexShrink: 0 }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#2a3547' }}>{d.getDate()}</div>
                   <div style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{MONTHS[d.getMonth()].slice(0, 3)}</div>
                   <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
-                <div style={{ width: 1, height: 44, background: STATUS_COLOR[e.status] || '#2a2a2a', flexShrink: 0 }} />
+                <div style={{ width: 1, height: 44, background: STATUS_COLOR[e.status] || '#e5eaf2', flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {/* Product + sprint badges */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
@@ -495,7 +495,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Konten dari Library</label>
                 <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.entry.content_id ?? ''} onChange={e => setField('content_id', e.target.value)}>

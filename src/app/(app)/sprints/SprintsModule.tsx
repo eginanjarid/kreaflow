@@ -136,7 +136,7 @@ const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
 
 const BOARD_COLS = [
-  { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#2a2a2a', bg: '#0d0d0d' },
+  { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#e5eaf2', bg: '#0d0d0d' },
   { id: 'doing', label: 'Dikerjakan', count_color: '#fbbf24', border: 'rgba(251,191,36,0.25)', bg: 'rgba(251,191,36,0.03)' },
   { id: 'done',  label: 'Done ✓',    count_color: '#86efac', border: 'rgba(134,239,172,0.25)', bg: 'rgba(134,239,172,0.03)' },
 ]
@@ -560,7 +560,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#42a5f5' : '#475569', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
             {tab.key === 'tasks' && tasksTodo.length > 0 && (
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#1f1f1f', color: '#5a6a85', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#f1f5f9', color: '#5a6a85', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
             )}
           </button>
         ))}
@@ -592,7 +592,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksTodo.map(t => (
                 <div key={t.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #2a2a2a', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #e5eaf2', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
@@ -832,12 +832,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {(Object.entries(TEMPLATES) as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: key })); initStepsFromTemplate(key) }}
-                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#2a2a2a'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#1a1a1a', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#f1f5f9', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
                     </button>
                   ))}
                   <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
-                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#2a2a2a'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#1a1a1a', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     ✏️ Custom
                   </button>
                 </div>
@@ -1179,10 +1179,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   const done = isStepDone(detailItem.status, step.doneAt)
                   const isOverdue = step.deadline && !done && new Date(step.deadline) < new Date()
                   return (
-                    <div key={step.id} style={{ padding: '8px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.06)' : '#1a1a1a', border: `1px solid ${isOverdue ? 'rgba(248,113,113,0.3)' : done ? 'rgba(52,211,153,0.2)' : '#2a2a2a'}` }}>
+                    <div key={step.id} style={{ padding: '8px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.06)' : '#f1f5f9', border: `1px solid ${isOverdue ? 'rgba(248,113,113,0.3)' : done ? '#d1fae5' : '#e5eaf2'}` }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#2a2a2a'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#e5eaf2'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                           </div>
                           <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
@@ -1322,7 +1322,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   const hasDeadline = !!r.deadline
                   const dlOverdue = hasDeadline && now > new Date(r.deadline) && r.done < r.total
                   return (
-                    <div key={r.step.id} style={{ background: '#0f0f0f', border: `1px solid ${dlOverdue ? 'rgba(248,113,113,0.3)' : '#1f1f1f'}`, borderRadius: 10, padding: '14px 16px' }}>
+                    <div key={r.step.id} style={{ background: '#fff', border: `1px solid ${dlOverdue ? 'rgba(248,113,113,0.3)' : '#e5eaf2'}`, borderRadius: 10, padding: '14px 16px' }}>
                       {/* Step header */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

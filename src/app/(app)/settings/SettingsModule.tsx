@@ -199,13 +199,13 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     if (active && activeModes.length === 1) return // minimal 1 mode aktif
                     setActiveModes(prev => active ? prev.filter(x => x !== m.id) : [...prev, m.id])
                   }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, border: `1px solid ${active ? m.color + '40' : '#2a2a2a'}`, background: active ? m.color + '08' : '#1a1a1a', cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, border: `1px solid ${active ? m.color + '40' : '#e5eaf2'}`, background: active ? m.color + '08' : '#f1f5f9', cursor: 'pointer', transition: 'all 0.15s' }}>
                     <span style={{ fontSize: '1.4rem' }}>{m.icon}</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 600, color: active ? m.color : '#94a3b8', fontSize: '0.875rem', marginBottom: 2 }}>{m.label}</div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>{m.desc}</div>
                     </div>
-                    <div style={{ width: 36, height: 20, borderRadius: 10, background: active ? m.color : '#2a2a2a', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                    <div style={{ width: 36, height: 20, borderRadius: 10, background: active ? m.color : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ position: 'absolute', top: 3, left: active ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                     </div>
                   </div>
@@ -253,7 +253,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
             </div>
             {members.map(m => (
               <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #1a1a1a' }}>
-                <div style={{ width: 34, height: 34, borderRadius: '50%', background: m.role === 'owner' ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#1a1a1a', border: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#2a3547', flexShrink: 0 }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: m.role === 'owner' ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#f1f5f9', border: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#2a3547', flexShrink: 0 }}>
                   {(m.nama || m.email).charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -381,7 +381,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Konfirmasi Password *</label>
               <input type="password" style={fieldStyle()} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="Ulangi password baru" required />
             </div>
-            {pwdError && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{pwdError}</div>}
+            {pwdError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{pwdError}</div>}
             {pwdMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#86efac', fontSize: '0.85rem' }}>{pwdMsg}</div>}
             <div>
               <button type="submit" disabled={pwdSaving} style={{ background: pwdSaving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: pwdSaving ? 'not-allowed' : 'pointer' }}>

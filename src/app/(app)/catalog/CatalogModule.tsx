@@ -174,7 +174,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
           <div style={{ display: 'flex', gap: 6 }}>
             {['', ...tipes].map(t => (
               <button key={t} onClick={() => setFilterTipe(t)}
-                style={{ padding: '8px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterTipe === t ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: filterTipe === t ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                style={{ padding: '8px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterTipe === t ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterTipe === t ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
                 {t || 'Semua'} {t && `(${products.filter(p => p.tipe_produk === t).length})`}
               </button>
             ))}
@@ -195,7 +195,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
             const tipe = TIPE_COLORS[p.tipe_produk] || TIPE_COLORS.Fisik
             const komisi = hitungKomisi(p)
             return (
-              <div key={p.id} style={{ background: '#fff', border: `1px solid ${p.is_active ? '#2a2a2a' : '#1a1a1a'}`, borderRadius: 20, overflow: 'hidden' }}>
+              <div key={p.id} style={{ background: '#fff', border: `1px solid ${p.is_active ? '#e5eaf2' : '#f1f5f9'}`, borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ height: 140, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                   {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ fontSize: '2.5rem' }}>{tipe.icon}</div>}
                   <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: tipe.color, background: tipe.bg, fontWeight: 600 }}>{p.tipe_produk}</div>
@@ -253,7 +253,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#1a0000', border: '1px solid #450a0a', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
 
               {/* Tipe Produk */}
               <div>
@@ -263,7 +263,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                     const tc = TIPE_COLORS[t]
                     return (
                       <button key={t} type="button" onClick={() => setField('tipe_produk', t)}
-                        style={{ flex: 1, padding: '10px 8px', borderRadius: 10, fontSize: '0.82rem', fontWeight: 600, border: `1px solid ${modal.product.tipe_produk === t ? tc.color : '#2a2a2a'}`, background: modal.product.tipe_produk === t ? tc.bg : '#1a1a1a', color: modal.product.tipe_produk === t ? tc.color : '#64748b', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        style={{ flex: 1, padding: '10px 8px', borderRadius: 10, fontSize: '0.82rem', fontWeight: 600, border: `1px solid ${modal.product.tipe_produk === t ? tc.color : '#e5eaf2'}`, background: modal.product.tipe_produk === t ? tc.bg : '#f1f5f9', color: modal.product.tipe_produk === t ? tc.color : '#64748b', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: '1.1rem' }}>{tc.icon}</span> {t}
                       </button>
                     )
