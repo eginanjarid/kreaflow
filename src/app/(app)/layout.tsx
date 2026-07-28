@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/layout/Sidebar'
+import Topbar from '@/components/layout/Topbar'
+
+const SUPER_ADMINS = ['eginanjarism@gmail.com']
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -15,17 +18,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .limit(1)
     .single()
 
+  const isSuperAdmin = SUPER_ADMINS.includes(user.email!)
+
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <Sidebar
-        user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
         workspace={(workspace?.kf_workspaces as unknown) as { id: string; name: string; plan: string } | null}
+        isSuperAdmin={isSuperAdmin}
       />
-      <main style={{ flex: 1, overflowY: 'auto', background: '#0a0a0a' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
-          {children}
-        </div>
-      </main>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Topbar user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }} />
+        <main style={{ flex: 1, overflowY: 'auto', background: '#f0f5f9' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 24px' }}>
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

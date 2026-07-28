@@ -1,31 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --brand: #7C3AED;
-  --brand-light: #A78BFA;
-  --brand-dark: #5B21B6;
-  --surface: #111111;
-  --surface-2: #1a1a1a;
-  --surface-3: #222222;
-  --border: #2a2a2a;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
+  --brand: #1a73e8;
+  --brand-light: #42a5f5;
+  --brand-dark: #1557b0;
+  --brand-bg: #e8f0fe;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-3: #f0f5f9;
+  --border: #e5eaf2;
+  --text: #2a3547;
+  --text-muted: #5a6a85;
+  --text-light: #9fa9ba;
 }
 
 * { box-sizing: border-box; }
 
 body {
   font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
-  background: #0a0a0a;
+  background: #f0f5f9;
   color: var(--text);
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #c8d1e0; border-radius: 4px; }
 
 input, textarea, select {
-  background: var(--surface-2);
+  background: #fff;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 14px;
@@ -36,6 +38,6 @@ input, textarea, select {
   outline: none;
   transition: border-color 0.15s;
 }
-input:focus, textarea:focus, select:focus { border-color: var(--brand-light); }
-input::placeholder, textarea::placeholder { color: var(--text-muted); }
-select option { background: #1a1a1a; }
+input:focus, textarea:focus, select:focus { border-color: var(--brand); }
+input::placeholder, textarea::placeholder { color: var(--text-light); }
+select option { background: #fff; color: var(--text); }
