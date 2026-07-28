@@ -127,43 +127,41 @@ export default function Topbar({ user }: Props) {
 
   return (
     <header style={{
-      height: 70,
+      height: 72,
       background: '#fff',
-      borderBottom: '1px solid #e5eaf2',
+      borderBottom: '1px solid #f1f5f9',
       display: 'flex',
       alignItems: 'center',
-      padding: '0 24px',
+      padding: '0 28px',
       flexShrink: 0,
       gap: 0,
       position: 'relative',
       zIndex: 100,
     }}>
       {/* Left: Hamburger + Search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginRight: 24 }}>
         <button style={{
-          width: 36, height: 36, borderRadius: 8,
-          border: '1px solid #e5eaf2', background: '#fff',
+          background: 'none', border: 'none', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', flexShrink: 0,
+          cursor: 'pointer', color: '#5a6a85',
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5a6a85" strokeWidth="2" strokeLinecap="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
         <button style={{
-          width: 36, height: 36, borderRadius: 8,
-          border: '1px solid #e5eaf2', background: '#fff',
+          background: 'none', border: 'none', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', flexShrink: 0,
+          cursor: 'pointer', color: '#5a6a85',
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5a6a85" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
         </button>
       </div>
 
       {/* Middle: Quick Nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 28, flex: 1 }}>
         {[
           { href: '/sprints', label: 'Sprints' },
           { href: '/plan', label: 'Plan' },
@@ -173,11 +171,9 @@ export default function Topbar({ user }: Props) {
           const active = pathname.startsWith(link.href)
           return (
             <Link key={link.href} href={link.href} style={{
-              padding: '6px 14px', borderRadius: 6,
-              fontSize: '0.82rem', fontWeight: active ? 600 : 400,
+              fontSize: '0.9375rem', fontWeight: active ? 600 : 500,
               color: active ? '#1a73e8' : '#5a6a85',
-              background: active ? '#e8f0fe' : 'transparent',
-              textDecoration: 'none', transition: 'all 0.15s',
+              textDecoration: 'none', transition: 'color 0.15s',
             }}>
               {link.label}
             </Link>
@@ -186,7 +182,7 @@ export default function Topbar({ user }: Props) {
       </div>
 
       {/* Right actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 
         {/* Bell */}
         <div ref={bellRef} style={{ position: 'relative' }}>
@@ -313,24 +309,25 @@ export default function Topbar({ user }: Props) {
           <button
             onClick={() => setUserOpen(v => !v)}
             style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px 5px 6px',
+              display: 'flex', alignItems: 'center', gap: 10, padding: '6px 10px 6px 6px',
               background: userOpen ? '#f5f7fb' : 'transparent',
-              border: `1px solid ${userOpen ? '#e5eaf2' : 'transparent'}`,
-              borderRadius: 20, cursor: 'pointer',
+              border: 'none',
+              borderRadius: 10, cursor: 'pointer',
             }}
           >
             <div style={{
-              width: 30, height: 30, borderRadius: '50%',
+              width: 36, height: 36, borderRadius: '50%',
               background: 'linear-gradient(135deg, #1a73e8, #42a5f5)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.72rem', fontWeight: 700, color: '#fff', flexShrink: 0,
+              fontSize: '0.75rem', fontWeight: 700, color: '#fff', flexShrink: 0,
+              border: '1px solid #f1f5f9',
             }}>
               {initials}
             </div>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#2a3547', whiteSpace: 'nowrap' }}>
-              {user.nama.split(' ')[0]}
+            <span style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#5a6a85', whiteSpace: 'nowrap' }}>
+              Hi, <strong style={{ fontWeight: 700, color: '#2a3547' }}>{user.nama.split(' ')[0]}</strong>
             </span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9fa9ba" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9fa9ba" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </button>
