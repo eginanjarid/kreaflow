@@ -1454,7 +1454,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
 
             // Future step
             return (
-              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', display: 'flex', alignItems: 'center', gap: 2 }}>
+              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f1f5f9', border: '1px solid #dde3ed', color: '#2a3547', display: 'flex', alignItems: 'center', gap: 2 }}>
                 ○ {step.nama}
               </div>
             )

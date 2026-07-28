@@ -172,7 +172,7 @@ export default function Topbar({ user }: Props) {
           return (
             <Link key={link.href} href={link.href} style={{
               fontSize: '0.9375rem', fontWeight: active ? 600 : 500,
-              color: active ? '#1a73e8' : '#5a6a85',
+              color: active ? '#1a73e8' : '#374151',
               textDecoration: 'none', transition: 'color 0.15s',
             }}>
               {link.label}

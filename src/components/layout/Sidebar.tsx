@@ -126,7 +126,7 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
       borderRadius: 8,
       marginBottom: 6,
       background: active ? '#1a73e8' : 'transparent',
-      color: active ? '#fff' : '#5a6a85',
+      color: active ? '#fff' : '#374151',
       fontWeight: active ? 600 : 500,
       fontSize: '0.9375rem',
       textDecoration: 'none' as const,
@@ -175,7 +175,7 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
         {NAV_GROUPS.map((group, gi) => (
           <div key={gi} style={{ marginBottom: 8 }}>
             <div style={{
-              fontSize: '0.6875rem', fontWeight: 700, color: '#9ca3af',
+              fontSize: '0.6875rem', fontWeight: 700, color: '#6b7280',
               letterSpacing: '0.08em', textTransform: 'uppercase',
               padding: '12px 10px 6px',
             }}>
