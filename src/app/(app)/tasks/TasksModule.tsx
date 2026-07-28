@@ -515,8 +515,8 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   }}
                   onDrop={async e => { e.preventDefault(); await dropToCol(col.id) }}
                   style={{
-                    background: isOver ? `${col.color}14` : '#0d0d0d',
-                    border: `${isOver ? 2 : 1}px solid ${isOver ? col.color + 'cc' : '#e5eaf2'}`,
+                    background: isOver ? `${col.color}10` : 'rgba(90,106,133,0.04)',
+                    border: `${isOver ? 2 : 1}px solid ${isOver ? col.color + 'cc' : '#eef1f6'}`,
                     borderRadius: 18,
                     minHeight: 200,
                     transition: 'background 0.12s, border-color 0.12s',
@@ -659,16 +659,20 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       const stepName = t.nama.split(' —')[0].trim()
                       const col = getTaskCol(t.percent_complete)
                       const overdue = t.due_date && new Date(t.due_date) < new Date() && t.percent_complete < 100
-                      const chipColor = overdue ? '#f87171' : col === 'done' ? '#86efac' : col === 'in_progress' ? '#fbbf24' : '#5a6a85'
-                      const chipBg = overdue ? 'rgba(248,113,113,0.08)' : col === 'done' ? 'rgba(134,239,172,0.08)' : col === 'in_progress' ? 'rgba(251,191,36,0.08)' : '#f1f5f9'
-                      const chipBorder = overdue ? 'rgba(248,113,113,0.3)' : col === 'done' ? 'rgba(134,239,172,0.25)' : col === 'in_progress' ? 'rgba(251,191,36,0.25)' : '#e5eaf2'
-                      const icon = col === 'done' ? '✓' : col === 'in_progress' ? '◷' : '○'
+                      const chipColor = overdue ? '#ef4444' : col === 'done' ? '#059669' : col === 'in_progress' ? '#d97706' : '#64748b'
+                      const chipBg = overdue ? 'rgba(239,68,68,0.08)' : col === 'done' ? 'rgba(5,150,105,0.08)' : col === 'in_progress' ? 'rgba(217,119,6,0.08)' : '#f1f5f9'
+                      const chipBorder = overdue ? 'rgba(239,68,68,0.25)' : col === 'done' ? 'rgba(5,150,105,0.25)' : col === 'in_progress' ? 'rgba(217,119,6,0.25)' : '#e5eaf2'
+                      const chipIcon = col === 'done'
+                        ? <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        : col === 'in_progress'
+                        ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/></svg>
                       return (
                         <div key={t.id}
                           title={`${t.due_date ? 'Due: ' + new Date(t.due_date).toLocaleDateString('id-ID') + ' · ' : ''}${t.priority} — klik untuk toggle selesai`}
                           onClick={() => updateProgress(t.id!, t.percent_complete === 100 ? 0 : 100)}
                           style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 20, background: chipBg, border: `1px solid ${chipBorder}`, color: chipColor, fontSize: '0.73rem', fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.15s, transform 0.1s' }}>
-                          <span style={{ fontSize: '0.7rem' }}>{icon}</span>
+                          <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{chipIcon}</span>
                           {stepName}
                           {t.due_date && (
                             <span style={{ fontSize: '0.65rem', opacity: 0.65, marginLeft: 2 }}>
@@ -852,7 +856,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   {sprintSteps.map((step, i) => {
                     const isCustom = step.id.startsWith('custom_')
                     return (
-                      <div key={step.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: step.enabled ? '#f1f5f9' : '#0d0d0d', border: `1px solid ${step.enabled ? '#e5eaf2' : '#f1f5f9'}`, opacity: step.enabled ? 1 : 0.5, transition: 'all 0.15s' }}>
+                      <div key={step.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: step.enabled ? '#f1f5f9' : '#f8fafc', border: `1px solid ${step.enabled ? '#e5eaf2' : '#f1f5f9'}`, opacity: step.enabled ? 1 : 0.45, transition: 'all 0.15s' }}>
                         {/* Toggle */}
                         <div onClick={() => toggleStep(step.id)}
                           style={{ width: 36, height: 20, borderRadius: 10, background: step.enabled ? (SPRINT_TEMPLATES[sprintType as keyof typeof SPRINT_TEMPLATES]?.color ?? '#e879f9') : '#e5eaf2', position: 'relative', cursor: 'pointer', flexShrink: 0, marginTop: 2, transition: 'background 0.2s' }}>
@@ -1013,7 +1017,7 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
   return (
     <div draggable onDragStart={onDragStart} onDragEnd={onDragEnd}
       style={{
-        background: isDragging ? '#0d0d0d' : '#f8fafc',
+        background: isDragging ? '#eef1f6' : '#f8fafc',
         border: isDragging
           ? `2px dashed ${colColor}60`
           : `1px solid ${overdue ? 'rgba(248,113,113,0.25)' : '#e5eaf2'}`,

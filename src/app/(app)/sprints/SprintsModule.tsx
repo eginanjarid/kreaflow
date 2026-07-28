@@ -743,8 +743,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#42a5f5' }}>{totalPct}% done</span>
                     {/* Step legend */}
-                    <span style={{ fontSize: '0.65rem', color: '#5a6a85', marginLeft: 4 }}>
-                      Steps: {steps.map(s => s.icon).join(' ')}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3, marginLeft: 4 }}>
+                      {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#9fa9ba', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
                     </span>
                   </div>
                 </div>
@@ -862,7 +862,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Row 1: number + name + delete */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                         <span style={{ fontSize: '0.65rem', color: '#5a6a85', fontWeight: 700, background: '#f8fafc', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
-                        <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
+                        <span style={{ color: '#5a6a85', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
                         <span style={{ fontSize: '0.82rem', color: '#2a3547', fontWeight: 600, flex: 1 }}>{step.nama}</span>
                         <button type="button" onClick={() => setSprintSteps(prev => prev.filter((_, i) => i !== idx))}
                           style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 5, width: 22, height: 22, color: '#5a6a85', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -911,7 +911,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         <button key={ms.id} type="button"
                           onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '', deadline: '' }]); setAddStepOpen(false) }}
                           style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#2a3547', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
-                          <span style={{ fontSize: '0.9rem' }}>{ms.icon}</span> {ms.nama}
+                          <span style={{ color: '#5a6a85', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[ms.id] || null}</span> {ms.nama}
                         </button>
                       ))}
                       {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).length === 0 && (
@@ -1187,7 +1187,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#e5eaf2'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                           </div>
-                          <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
+                          <span style={{ color: done ? '#34d399' : '#5a6a85', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
                           <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#2a3547', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
                         </div>
                         {!done && (
@@ -1328,7 +1328,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Step header */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: '1rem' }}>{r.step.icon}</span>
+                          <span style={{ color: '#5a6a85', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[r.step.id] || null}</span>
                           <div>
                             <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.85rem' }}>{r.step.nama}</div>
                             <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginTop: 1 }}>
@@ -1425,8 +1425,9 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
 
             if (done) {
               return (
-                <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#34d399', display: 'flex', alignItems: 'center', gap: 2 }}>
-                  ✓ {step.nama}
+                <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#34d399', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  {step.nama}
                 </div>
               )
             }
@@ -1434,21 +1435,20 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
             if (isNext) {
               return (
                 <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {/* Navigate to module */}
                   <a
                     href={step.href}
                     onClick={e => e.stopPropagation()}
                     title={`Buka ${step.nama}`}
-                    style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.12)', border: '1px solid rgba(66,165,245,0.4)', color: '#42a5f5', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
-                    ▶ {step.nama}
+                    style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.12)', border: '1px solid rgba(66,165,245,0.4)', color: '#42a5f5', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    {step.nama}
                   </a>
-                  {/* Mark done — separate explicit button */}
                   <button
                     type="button"
                     title={`Tandai ${step.nama} selesai`}
                     onClick={e => { e.stopPropagation(); onStepDone(step) }}
-                    style={{ fontSize: '0.6rem', padding: '3px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.3)', color: '#34d399', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center' }}>
-                    ✓
+                    style={{ fontSize: '0.6rem', padding: '3px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.3)', color: '#34d399', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 </div>
               )
@@ -1456,8 +1456,9 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
 
             // Future step
             return (
-              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f1f5f9', border: '1px solid #dde3ed', color: '#2a3547', display: 'flex', alignItems: 'center', gap: 2 }}>
-                ○ {step.nama}
+              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f1f5f9', border: '1px solid #dde3ed', color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
+                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                {step.nama}
               </div>
             )
           })}
