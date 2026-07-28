@@ -93,7 +93,7 @@ type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
 const FREQ_LEVELS = [
   { id: 1, icon: 'ghost', name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#5a6a85', glow: 'rgba(71,85,105,0.3)' },
-  { id: 2, icon: 'noise', name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)', icon: 'noise' },
+  { id: 2, icon: 'noise', name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)' },
   { id: 3, name: 'Signal', tagline: 'Frekuensimu mulai tertangkap.', desc: 'Kamu sudah punya arah dan niche yang jelas. Orang mulai bisa "membaca" kamu dan tahu kamu ahli di bidang apa.', color: '#38bdf8', glow: 'rgba(56,189,248,0.3)', icon: 'signal' },
   { id: 4, name: 'On Air', tagline: 'Siaran resmi dimulai.', desc: 'Brand kamu sudah live dan konsisten. Ada audiens yang actively menunggu kontenmu dan mempercayai kamu.', color: '#34d399', glow: 'rgba(52,211,153,0.3)', icon: 'on-air' },
   { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(66,165,245,0.3)', icon: 'broadcast' },
