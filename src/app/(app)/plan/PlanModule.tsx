@@ -183,7 +183,7 @@ export default function PlanModule({ initialPlatforms, initialCampaigns, workspa
     konteks: '',
   }
   const [affForm, setAffForm] = useState<AffNaskahForm>(emptyAffNaskah)
-  const [affStep, setAffStep] = useState<'produk' | 'usp' | 'config' | 'naskah'>('produk')
+  const [affLeftTab, setAffLeftTab] = useState<'produk' | 'config'>('produk')
   const [affAiModal, setAffAiModal] = useState<{ prompt: string; label?: string } | null>(null)
   const [affPromptCopied, setAffPromptCopied] = useState(false)
   const affNaskahRef = useRef<HTMLTextAreaElement>(null)
@@ -778,15 +778,25 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               {/* LEFT — Config */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-              {/* STEP 01 — Data Produk */}
+              {/* Tabbed config card */}
               <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #f3f4f6' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 4, height: 22, borderRadius: 2, background: '#ec4899' }} />
-                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '1.05rem' }}>Data Produk</span>
-                  </div>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#6b7280', background: '#f3f4f6', border: 'none', borderRadius: 5, padding: '3px 10px', letterSpacing: '0.08em' }}>STEP 01</span>
+
+                {/* Tab bar */}
+                <div style={{ display: 'flex', borderBottom: '1px solid #f3f4f6' }}>
+                  {([
+                    { id: 'produk', label: 'Data Produk', color: '#ec4899', step: '01' },
+                    { id: 'config', label: 'Konfigurasi', color: '#0284c7', step: '02' },
+                  ] as const).map(t => (
+                    <button key={t.id} type="button" onClick={() => setAffLeftTab(t.id)}
+                      style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '13px 16px', background: 'transparent', border: 'none', borderBottom: affLeftTab === t.id ? `2px solid ${t.color}` : '2px solid transparent', color: affLeftTab === t.id ? t.color : '#6b7280', fontSize: '0.875rem', fontWeight: affLeftTab === t.id ? 700 : 500, cursor: 'pointer', marginBottom: -1 }}>
+                      <span style={{ fontSize: '0.6rem', fontWeight: 700, background: affLeftTab === t.id ? t.color + '15' : '#f3f4f6', color: affLeftTab === t.id ? t.color : '#9ca3af', borderRadius: 4, padding: '1px 6px', letterSpacing: '0.05em' }}>{t.step}</span>
+                      {t.label}
+                    </button>
+                  ))}
                 </div>
+
+                {/* STEP 01 — Data Produk */}
+                {affLeftTab === 'produk' && (
                 <div style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {/* Pilih dari katalog */}
                   {products.length > 0 ? (
@@ -841,18 +851,16 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       placeholder={'Paste hasil analisis USP dari AI di sini...\n\nHasil akan mencakup: USP, pain points, target segmen, angle promosi, objection handling, kata kunci emosional'}
                     />
                   </div>
+                  <button type="button" onClick={() => setAffLeftTab('config')}
+                    style={{ background: '#0284c7', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    Lanjut ke Konfigurasi
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  </button>
                 </div>
-              </div>
+                )}
 
-              {/* STEP 02 — Konfigurasi */}
-              <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #f3f4f6' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 4, height: 22, borderRadius: 2, background: '#0284c7' }} />
-                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '1.05rem' }}>Konfigurasi</span>
-                  </div>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#6b7280', background: '#f3f4f6', border: 'none', borderRadius: 5, padding: '3px 10px', letterSpacing: '0.08em' }}>STEP 02</span>
-                </div>
+                {/* STEP 02 — Konfigurasi */}
+                {affLeftTab === 'config' && (
                 <div style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                   {/* Formula Copywriting */}
@@ -1008,11 +1016,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Compile Scripts button */}
                   <button type="button" onClick={() => setAffAiModal({ prompt: buildAffNaskahPrompt(), label: 'Compile Scripts' })}
-                    style={{ background: '#6366f1', border: 'none', borderRadius: 20, padding: '16px 20px', color: '#fff', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 4 }}>
+                    style={{ background: '#6366f1', border: 'none', borderRadius: 10, padding: '14px 20px', color: '#fff', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 4 }}>
                     <span style={{ fontSize: '1.1rem' }}></span> COMPILE SCRIPTS
                   </button>
                 </div>
-              </div>
+                )}
+
+              </div>{/* END tabbed card */}
 
               </div>{/* END LEFT column */}
 
