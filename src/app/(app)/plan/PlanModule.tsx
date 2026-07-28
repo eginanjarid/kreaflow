@@ -730,7 +730,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                 {brandProfile?.niche && (
                   <div style={{ background: '#f9fafb', border: 'none', borderRadius: 10, padding: '10px 14px', fontSize: '0.72rem', color: '#6b7280', lineHeight: 1.7 }}>
-                    <div style={{ color: '#6b7280', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>Brand context</div>
+                    <div style={{ color: '#9ca3af', fontWeight: 600, marginBottom: 4, fontSize: '0.65rem', letterSpacing: '0.04em' }}>Brand context</div>
                     <div>Niche: <span style={{ color: '#6b7280' }}>{brandProfile.niche}</span></div>
                     {brandProfile.tone_of_voice && <div>Tone: <span style={{ color: '#6b7280' }}>{brandProfile.tone_of_voice}</span></div>}
                     {brandProfile.target_audiens && <div>Audiens: <span style={{ color: '#6b7280' }}>{brandProfile.target_audiens}</span></div>}
@@ -801,7 +801,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {/* Pilih dari katalog */}
                   {products.length > 0 ? (
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pilih dari Katalog <span style={{ color: '#6b7280', fontWeight: 400, textTransform: 'none' }}>(auto-isi deskripsi)</span></label>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Pilih dari Katalog <span style={{ color: '#6b7280', fontWeight: 400 }}>(auto-isi deskripsi)</span></label>
                       <select style={fieldStyle({ fontSize: '0.85rem' })} value={affForm.product_id} onChange={e => {
                         const pid = e.target.value
                         const prod = products.find(p => p.id === pid)
@@ -826,7 +826,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Deskripsi produk */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deskripsi Produk (Input)</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Deskripsi Produk (Input)</label>
                     <textarea
                       style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.85rem', lineHeight: 1.7 })}
                       value={affForm.deskripsi_produk}
@@ -837,13 +837,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Generate USP button */}
                   <button type="button" onClick={() => setAffAiModal({ prompt: buildUSPPrompt(), label: 'Analisis USP Produk' })}
-                    style={{ background: 'transparent', border: '1px solid #ec4899', borderRadius: 20, padding: '14px 20px', color: '#ec4899', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.15s' }}>
+                    style={{ background: '#ec4899', border: 'none', borderRadius: 10, padding: '12px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     GENERATE USP (AI ANALYSIS)
                   </button>
 
                   {/* USP result paste area */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hasil Analisis USP <span style={{ color: '#6b7280', fontWeight: 400, textTransform: 'none' }}>(paste dari AI)</span></label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Hasil Analisis USP <span style={{ color: '#6b7280', fontWeight: 400 }}>(paste dari AI)</span></label>
                     <textarea
                       style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.82rem', lineHeight: 1.7, border: `1px solid ${affForm.usp ? '#ec489940' : 'transparent'}`, color: affForm.usp ? '#111827' : '#6b7280' })}
                       value={affForm.usp}
@@ -865,7 +865,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Formula Copywriting */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Formula Copywriting</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Formula Copywriting</label>
                     <select style={fieldStyle({ fontSize: '0.85rem' })} value={affForm.formula_copywriting} onChange={e => setAFF('formula_copywriting', e.target.value)}>
                       {[
                         'AIDA (Attention, Interest, Desire, Action)',
@@ -888,7 +888,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     const isCustomNiche = affForm.niche_produk !== '' && !NICHE_PRESETS.includes(affForm.niche_produk)
                     return (
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Niche Produk</label>
+                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Niche Produk</label>
                         <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustomNiche ? '' : affForm.niche_produk} onChange={e => setAFF('niche_produk', e.target.value)}>
                           <option value="">— Pilih dari daftar —</option>
                           {NICHE_PRESETS.map(n => <option key={n} value={n}>{n}</option>)}
@@ -905,7 +905,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         const AUDIENS_PRESETS = ['Gen Z (17-24)', 'Millennial (25-35)', 'Gen X (36-50)', 'Semua Usia', 'Remaja (< 17)', 'Senior (50+)', 'Ibu Rumah Tangga', 'Profesional Muda', 'Pelajar/Mahasiswa']
                         const isCustom = affForm.target_audiens !== '' && !AUDIENS_PRESETS.includes(affForm.target_audiens)
                         return <>
-                          <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Target Audiens</label>
+                          <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Audiens</label>
                           <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.target_audiens} onChange={e => setAFF('target_audiens', e.target.value)}>
                             {AUDIENS_PRESETS.map(a => <option key={a} value={a}>{a}</option>)}
                           </select>
@@ -914,7 +914,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       })()}
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Gender</label>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Gender</label>
                       <select style={fieldStyle({ fontSize: '0.85rem' })} value={affForm.gender} onChange={e => setAFF('gender', e.target.value)}>
                         {['Semua', 'Wanita', 'Pria'].map(g => <option key={g} value={g}>{g}</option>)}
                       </select>
@@ -923,7 +923,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Target Durasi */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Target Durasi</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Durasi</label>
                     <select style={fieldStyle({ fontSize: '0.85rem' })} value={affForm.target_durasi} onChange={e => setAFF('target_durasi', e.target.value)}>
                       {['15-20 detik (Quick Hook)', '30-40 detik (Optimal)', '45-60 detik (Standard)', '60-90 detik (Detail)', '90 detik+ (Deep Story)'].map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
@@ -935,7 +935,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     const isCustom = affForm.cta_style !== '' && !CTA_PRESETS.includes(affForm.cta_style)
                     return (
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Style Call to Action</label>
+                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Style CTA</label>
                         <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.cta_style} onChange={e => setAFF('cta_style', e.target.value)}>
                           <option value="">— Pilih dari daftar —</option>
                           {CTA_PRESETS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -951,7 +951,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     const isCustom = affForm.fokus_konversi !== '' && !KONVERSI_PRESETS.includes(affForm.fokus_konversi)
                     return (
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fokus Konversi (Trigger)</label>
+                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Fokus Konversi</label>
                         <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.fokus_konversi} onChange={e => setAFF('fokus_konversi', e.target.value)}>
                           <option value="">— Pilih dari daftar —</option>
                           {KONVERSI_PRESETS.map(f => <option key={f} value={f}>{f}</option>)}
@@ -967,7 +967,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     const isCustom = affForm.visual_hook !== '' && !VISUAL_PRESETS.includes(affForm.visual_hook)
                     return (
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Visual Hook Strategy</label>
+                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Visual Hook</label>
                         <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.visual_hook} onChange={e => setAFF('visual_hook', e.target.value)}>
                           <option value="">— Pilih dari daftar —</option>
                           {VISUAL_PRESETS.map(v => <option key={v} value={v}>{v}</option>)}
@@ -980,7 +980,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {/* Platform + Format */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Platform</label>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Platform</label>
                       <select style={fieldStyle({ fontSize: '0.85rem' })} value={affForm.platform} onChange={e => setAFF('platform', e.target.value)}>
                         {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee Video', 'LinkedIn'].map(p => <option key={p} value={p}>{p}</option>)}
                       </select>
@@ -990,7 +990,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         const FORMAT_PRESETS = ['Video Pendek', 'Reels', 'Story', 'Live Script', 'Thread/Caption', 'Carousel']
                         const isCustom = affForm.tipe_konten !== '' && !FORMAT_PRESETS.includes(affForm.tipe_konten)
                         return <>
-                          <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Format Konten</label>
+                          <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Format Konten</label>
                           <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.tipe_konten} onChange={e => setAFF('tipe_konten', e.target.value)}>
                             <option value="">— Pilih —</option>
                             {FORMAT_PRESETS.map(t => <option key={t} value={t}>{t}</option>)}
@@ -1003,13 +1003,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                   {/* Konteks tambahan */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Konteks Tambahan <span style={{ color: '#6b7280', fontWeight: 400, textTransform: 'none' }}>(opsional)</span></label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Konteks Tambahan <span style={{ color: '#6b7280', fontWeight: 400 }}>(opsional)</span></label>
                     <textarea style={fieldStyle({ height: 70, resize: 'none', fontSize: '0.82rem' })} value={affForm.konteks} onChange={e => setAFF('konteks', e.target.value)} placeholder="cth: momen harbolnas, buat campaign ramadan, target ibu-ibu yang suka masak..." />
                   </div>
 
                   {/* Jumlah Varian — free input */}
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Jumlah Varian Naskah</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jumlah Varian Naskah</label>
                     <input type="number" style={fieldStyle({ fontSize: '0.9rem', textAlign: 'center' as const })} value={affForm.jumlah_varian} onChange={e => setAFF('jumlah_varian', e.target.value)} min="1" max="20" placeholder="3" />
                     <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 4 }}>Tiap varian punya hook, angle, dan story yang berbeda. Rekomendasi: 2-3.</div>
                   </div>
@@ -1038,7 +1038,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   </div>
                   {affNaskah && (
                     <button type="button" onClick={saveAffToLibrary}
-                      style={{ background: affSavedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(99,102,241,0.12)', border: `1px solid ${affSavedToLibrary ? '#059669' : '#4f46e5'}`, borderRadius: 8, padding: '7px 14px', color: affSavedToLibrary ? '#059669' : '#818cf8', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                      style={{ background: affSavedToLibrary ? '#059669' : '#6366f1', border: 'none', borderRadius: 8, padding: '7px 14px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
                       {affSavedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
                     </button>
                   )}
