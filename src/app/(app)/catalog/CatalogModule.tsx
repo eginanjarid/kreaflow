@@ -197,7 +197,9 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
             return (
               <div key={p.id} style={{ background: '#fff', border: `1px solid ${p.is_active ? '#e5eaf2' : '#f1f5f9'}`, borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ height: 140, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ fontSize: '2.5rem' }}>{tipe.icon}</div>}
+                  {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ color: tipe.color }}>{{
+                    tipe.icon === 'box' ? <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.55" y2="4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> : tipe.icon === 'digital' ? <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> : <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                  }}</div>}
                   <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: tipe.color, background: tipe.bg, fontWeight: 600 }}>{p.tipe_produk}</div>
                   <div style={{ position: 'absolute', top: 8, right: 8 }}>
                     <button onClick={() => toggleActive(p)} style={{ background: p.is_active ? 'rgba(22,101,52,0.9)' : 'rgba(50,0,0,0.9)', border: 'none', borderRadius: 20, padding: '3px 10px', color: p.is_active ? '#86efac' : '#f87171', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -264,7 +266,9 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                     return (
                       <button key={t} type="button" onClick={() => setField('tipe_produk', t)}
                         style={{ flex: 1, padding: '10px 8px', borderRadius: 10, fontSize: '0.82rem', fontWeight: 600, border: `1px solid ${modal.product.tipe_produk === t ? tc.color : '#e5eaf2'}`, background: modal.product.tipe_produk === t ? tc.bg : '#f1f5f9', color: modal.product.tipe_produk === t ? tc.color : '#64748b', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: '1.1rem' }}>{tc.icon}</span> {t}
+                        <span style={{ color: tc.color }}>{{
+                        tc.icon === 'box' ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.55" y2="4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> : tc.icon === 'digital' ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                      }}</span> {t}
                       </button>
                     )
                   })}

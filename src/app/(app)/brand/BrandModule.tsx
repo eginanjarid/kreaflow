@@ -92,12 +92,12 @@ const MAX_AKUN = 10
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
 const FREQ_LEVELS = [
-  { id: 1, icon: 'G', name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#5a6a85', glow: 'rgba(71,85,105,0.3)' },
-  { id: 2, name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)', icon: 'N' },
-  { id: 3, name: 'Signal', tagline: 'Frekuensimu mulai tertangkap.', desc: 'Kamu sudah punya arah dan niche yang jelas. Orang mulai bisa "membaca" kamu dan tahu kamu ahli di bidang apa.', color: '#38bdf8', glow: 'rgba(56,189,248,0.3)', icon: 'S' },
-  { id: 4, name: 'On Air', tagline: 'Siaran resmi dimulai.', desc: 'Brand kamu sudah live dan konsisten. Ada audiens yang actively menunggu kontenmu dan mempercayai kamu.', color: '#34d399', glow: 'rgba(52,211,153,0.3)', icon: 'O' },
-  { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(66,165,245,0.3)', icon: 'B' },
-  { id: 6, name: 'Icon Frequency', tagline: 'Frekuensimu tidak bisa diabaikan.', desc: 'Nama kamu IS the brand. Kamu sudah jadi simbol di niche-mu — orang sebut topiknya, mereka pikirin kamu.', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', icon: 'I' },
+  { id: 1, icon: 'ghost', name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#5a6a85', glow: 'rgba(71,85,105,0.3)' },
+  { id: 2, icon: 'noise', name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)', icon: 'noise' },
+  { id: 3, name: 'Signal', tagline: 'Frekuensimu mulai tertangkap.', desc: 'Kamu sudah punya arah dan niche yang jelas. Orang mulai bisa "membaca" kamu dan tahu kamu ahli di bidang apa.', color: '#38bdf8', glow: 'rgba(56,189,248,0.3)', icon: 'signal' },
+  { id: 4, name: 'On Air', tagline: 'Siaran resmi dimulai.', desc: 'Brand kamu sudah live dan konsisten. Ada audiens yang actively menunggu kontenmu dan mempercayai kamu.', color: '#34d399', glow: 'rgba(52,211,153,0.3)', icon: 'on-air' },
+  { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(66,165,245,0.3)', icon: 'broadcast' },
+  { id: 6, name: 'Icon Frequency', tagline: 'Frekuensimu tidak bisa diabaikan.', desc: 'Nama kamu IS the brand. Kamu sudah jadi simbol di niche-mu — orang sebut topiknya, mereka pikirin kamu.', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', icon: 'icon-freq' },
 ]
 
 const FREQ_CHECKS = [
@@ -955,7 +955,14 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               <div style={{ position: 'relative' }}>
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Frekuensi Brand Kamu Saat Ini</div>
-                <div style={{ fontSize: '3rem', marginBottom: 4 }}>{freqLevel.icon}</div>
+                <div style={{ marginBottom: 4, color: freqLevel.color }}>
+                  {freqLevel.id === 1 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  : freqLevel.id === 2 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6c0 0 5-2 11-2s11 2 11 2"/><path d="M1 12c0 0 5 2 11 2s11-2 11-2"/><path d="M1 18c0 0 5-2 11-2s11 2 11 2"/></svg>
+                  : freqLevel.id === 3 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                  : freqLevel.id === 4 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/></svg>
+                  : freqLevel.id === 5 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+                  : <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
+                </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: freqLevel.color, letterSpacing: '-0.5px', marginBottom: 6 }}>{freqLevel.name}</div>
                 <div style={{ fontSize: '0.85rem', color: '#5a6a85', fontStyle: 'italic', marginBottom: 20 }}>"{freqLevel.tagline}"</div>
                 <div style={{ fontSize: '0.8rem', color: '#5a6a85', lineHeight: 1.6 }}>{freqLevel.desc}</div>
@@ -1031,7 +1038,14 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tangga Frekuensi</div>
                 {[...FREQ_LEVELS].reverse().map((lvl) => (
                   <div key={lvl.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 8px', borderRadius: 6, background: lvl.id === freqLevel.id ? `${lvl.color}12` : 'transparent', marginBottom: 2 }}>
-                    <span style={{ fontSize: '0.8rem' }}>{lvl.icon}</span>
+                    <span style={{ color: lvl.color, display: 'flex', alignItems: 'center' }}>
+                    {lvl.id === 1 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    : lvl.id === 2 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6c0 0 5-2 11-2s11 2 11 2"/><path d="M1 12c0 0 5 2 11 2s11-2 11-2"/><path d="M1 18c0 0 5-2 11-2s11 2 11 2"/></svg>
+                    : lvl.id === 3 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                    : lvl.id === 4 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49"/></svg>
+                    : lvl.id === 5 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+                    : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
+                  </span>
                     <span style={{ fontSize: '0.75rem', fontWeight: lvl.id === freqLevel.id ? 700 : 400, color: lvl.id === freqLevel.id ? lvl.color : '#5a6a85' }}>
                       {lvl.id}. {lvl.name}
                     </span>
@@ -1394,7 +1408,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     return (
                       <button key={pl.key} type="button" onClick={() => { setBioActivePlatform(pl.key); setBioForm(null); setBioEditId(null) }}
                         style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${bioActivePlatform === pl.key ? '#1a73e8' : '#e5eaf2'}`, background: bioActivePlatform === pl.key ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: bioActivePlatform === pl.key ? '#42a5f5' : '#64748b', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {pl.icon} {pl.label}
+                        {pl.label}
                         {hasUtama && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399', flexShrink: 0 }} />}
                       </button>
                     )
@@ -1670,7 +1684,9 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     ].map(tipe => (
                       <div key={tipe.id} onClick={() => setField('affiliate_tipe', tipe.id)}
                         style={{ padding: '14px 16px', borderRadius: 10, border: `1px solid ${profile.affiliate_tipe === tipe.id ? '#34d399' : '#e5eaf2'}`, background: profile.affiliate_tipe === tipe.id ? 'rgba(52,211,153,0.07)' : '#f8fafc', cursor: 'pointer' }}>
-                        <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>{tipe.icon}</div>
+                        <div style={{ marginBottom: 8, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#c8d1e0' }}>
+                        {tipe.id === 'personal' ? <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> : <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
+                      </div>
                         <div style={{ fontWeight: 600, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#2a3547', fontSize: '0.875rem', marginBottom: 4 }}>{tipe.label}</div>
                         <div style={{ fontSize: '0.75rem', color: '#5a6a85', lineHeight: 1.5 }}>{tipe.desc}</div>
                       </div>
@@ -2071,7 +2087,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', transition: 'all 0.15s', cursor: 'pointer' }}>
-                  <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
+                  <span style={{ fontSize: '0.65rem', width: 32, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: ai.color || '#f1f5f9', color: '#fff', fontWeight: 800, flexShrink: 0, letterSpacing: '-0.5px' }}>{ai.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
                     <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 1 }}>{ai.desc}</div>
@@ -2265,7 +2281,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
             ].map(ai => (
               <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', cursor: 'pointer' }}>
-                <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
+                <span style={{ fontSize: '0.65rem', width: 32, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: ai.color || '#f1f5f9', color: '#fff', fontWeight: 800, flexShrink: 0, letterSpacing: '-0.5px' }}>{ai.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
                   <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 1 }}>{ai.desc}</div>
