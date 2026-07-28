@@ -56,9 +56,29 @@ function selectStyle() {
 }
 
 const TIPE_COLORS: Record<string, { color: string; bg: string; icon: string }> = {
-  Fisik: { color: '#0284c7', bg: 'rgba(2,132,199,0.08)', icon: 'box' },
-  Digital: { color: '#7c3aed', bg: 'rgba(66,165,245,0.1)', icon: 'digital' },
-  Affiliate: { color: '#059669', bg: 'rgba(52,211,153,0.1)', icon: 'link' },
+  Fisik: { color: '#0284c7', bg: 'rgba(2,132,199,0.07)', icon: 'bag' },
+  Digital: { color: '#7c3aed', bg: 'rgba(124,58,237,0.07)', icon: 'monitor' },
+  Affiliate: { color: '#059669', bg: 'rgba(5,150,105,0.07)', icon: 'share' },
+}
+
+function TipeIcon({ icon, color, size = 22 }: { icon: string; color: string; size?: number }) {
+  const s = { width: size, height: size }
+  if (icon === 'bag') return (
+    <svg {...s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 01-8 0"/>
+    </svg>
+  )
+  if (icon === 'monitor') return (
+    <svg {...s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
+  )
+  return (
+    <svg {...s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+    </svg>
+  )
 }
 
 export default function CatalogModule({ initialProducts, workspaceId, modes }: {
@@ -156,8 +176,8 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isAffiliate ? 4 : 3}, 1fr)`, gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Total Produk', value: products.length, color: '#111827' },
-          { label: 'Aktif', value: products.filter(p => p.is_active).length, color: '#059669' },
-          { label: 'Affiliate', value: products.filter(p => p.tipe_produk === 'Affiliate').length, color: '#059669', hide: !isAffiliate },
+          { label: 'Aktif', value: products.filter(p => p.is_active).length, color: '#111827' },
+          { label: 'Affiliate', value: products.filter(p => p.tipe_produk === 'Affiliate').length, color: '#111827', hide: !isAffiliate },
           { label: 'Potensi Komisi/item', value: totalKomisiPotensi > 0 ? formatRp(totalKomisiPotensi) : '-', color: '#1a73e8', hide: !isAffiliate },
         ].filter(s => !s.hide).map(s => (
           <div key={s.label} style={{ background: '#fff', borderRadius: 14, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)' }}>
@@ -195,14 +215,18 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
             const tipe = TIPE_COLORS[p.tipe_produk] || TIPE_COLORS.Fisik
             const komisi = hitungKomisi(p)
             return (
-              <div key={p.id} style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', opacity: p.is_active ? 1 : 0.6 }}>
-                <div style={{ height: 140, background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ color: tipe.color }}>
-                    {tipe.icon === 'box' ? <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.55" y2="4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> : tipe.icon === 'digital' ? <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> : <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>}
-                  </div>}
-                  <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: tipe.color, background: tipe.bg, fontWeight: 600 }}>{p.tipe_produk}</div>
-                  <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                    <button onClick={() => toggleActive(p)} style={{ background: p.is_active ? 'rgba(22,101,52,0.9)' : 'rgba(50,0,0,0.9)', border: 'none', borderRadius: 20, padding: '3px 10px', color: p.is_active ? '#059669' : '#dc2626', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}>
+              <div key={p.id} style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', opacity: p.is_active ? 1 : 0.55 }}>
+                <div style={{ height: 120, background: p.thumbnail_url ? '#f3f4f6' : tipe.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  {p.thumbnail_url
+                    ? <img src={p.thumbnail_url} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <div style={{ width: 52, height: 52, borderRadius: 14, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <TipeIcon icon={tipe.icon} color={tipe.color} size={24} />
+                      </div>
+                  }
+                  <div style={{ position: 'absolute', top: 10, left: 10, fontSize: '0.65rem', padding: '2px 8px', borderRadius: 6, color: tipe.color, background: '#fff', fontWeight: 600, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>{p.tipe_produk}</div>
+                  <div style={{ position: 'absolute', top: 10, right: 10 }}>
+                    <button onClick={() => toggleActive(p)} style={{ background: p.is_active ? 'rgba(16,185,129,0.12)' : 'rgba(0,0,0,0.06)', border: 'none', borderRadius: 20, padding: '3px 9px', color: p.is_active ? '#059669' : '#9ca3af', fontSize: '0.65rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, backdropFilter: 'blur(4px)' }}>
+                      <span style={{ width: 5, height: 5, borderRadius: '50%', background: p.is_active ? '#059669' : '#9ca3af', display: 'inline-block', flexShrink: 0 }} />
                       {p.is_active ? 'Aktif' : 'Nonaktif'}
                     </button>
                   </div>
@@ -213,9 +237,9 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                     {p.kode && <span style={{ fontSize: '0.68rem', color: '#1a73e8', background: 'rgba(26,115,232,0.1)', padding: '2px 6px', borderRadius: 4, flexShrink: 0 }}>{p.kode}</span>}
                   </div>
                   <div style={{ display: 'flex', gap: 5, marginBottom: 8, flexWrap: 'wrap' }}>
-                    {(p.platform || p.platform_affiliate) && <span style={{ fontSize: '0.7rem', color: '#6b7280', background: '#f8fafc', border: '1px solid #e5eaf2', padding: '1px 7px', borderRadius: 4 }}>{p.platform_affiliate || p.platform}</span>}
-                    {p.kategori && <span style={{ fontSize: '0.7rem', color: '#6b7280', background: '#f8fafc', border: '1px solid #e5eaf2', padding: '1px 7px', borderRadius: 4 }}>{p.kategori}</span>}
-                    {p.tipe_digital && <span style={{ fontSize: '0.7rem', color: '#7c3aed', background: 'rgba(66,165,245,0.08)', border: '1px solid rgba(66,165,245,0.2)', padding: '1px 7px', borderRadius: 4 }}>{p.tipe_digital}</span>}
+                    {(p.platform || p.platform_affiliate) && <span style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 7px', borderRadius: 5 }}>{p.platform_affiliate || p.platform}</span>}
+                    {p.kategori && <span style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 7px', borderRadius: 5 }}>{p.kategori}</span>}
+                    {p.tipe_digital && <span style={{ fontSize: '0.68rem', color: '#7c3aed', background: 'rgba(124,58,237,0.08)', padding: '2px 7px', borderRadius: 5 }}>{p.tipe_digital}</span>}
                   </div>
                   <div style={{ marginBottom: 10 }}>
                     {Number(p.harga_normal) > 0 && (
@@ -229,14 +253,14 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                     {komisi && <div style={{ fontSize: '0.75rem', color: '#059669', marginTop: 2 }}>Komisi: {formatRp(komisi)} {p.komisi_tipe === 'persen' ? `(${p.komisi_nilai}%)` : '(flat)'}</div>}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <button onClick={() => openEdit(p)} style={{ flex: 1, background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>Edit</button>
+                    <button onClick={() => openEdit(p)} style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Edit</button>
                     {(p.link_affiliate || p.link) && (
-                      <a href={p.link_affiliate || p.link} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px', color: '#6b7280', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' }}>
+                      <a href={p.link_affiliate || p.link} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px', color: '#374151', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' }}>
                         {p.link_affiliate ? 'Afiliasi' : 'Lihat'}
                       </a>
                     )}
-                    <button onClick={() => handleDelete(p.id!)} disabled={deleting === p.id} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px 10px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}>
-                      {deleting === p.id ? '...' : ''}
+                    <button onClick={() => handleDelete(p.id!)} disabled={deleting === p.id} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 10px', color: '#9ca3af', fontSize: '0.78rem', cursor: 'pointer' }}>
+                      {deleting === p.id ? '…' : '✕'}
                     </button>
                   </div>
                 </div>
@@ -250,7 +274,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       {modal?.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 580, maxHeight: '92vh', overflowY: 'auto' }}>
-            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>{modal.product.id ? 'Edit Produk' : 'Tambah Produk'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
@@ -265,10 +289,9 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                     const tc = TIPE_COLORS[t]
                     return (
                       <button key={t} type="button" onClick={() => setField('tipe_produk', t)}
-                        style={{ flex: 1, padding: '10px 8px', borderRadius: 10, fontSize: '0.82rem', fontWeight: 600, border: `1px solid ${modal.product.tipe_produk === t ? tc.color : '#e5eaf2'}`, background: modal.product.tipe_produk === t ? tc.bg : '#f1f5f9', color: modal.product.tipe_produk === t ? tc.color : '#6b7280', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                        <span style={{ color: tc.color }}>
-                          {tc.icon === 'box' ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.55" y2="4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> : tc.icon === 'digital' ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>}
-                        </span> {t}
+                        style={{ flex: 1, padding: '10px 8px', borderRadius: 10, fontSize: '0.82rem', fontWeight: 600, border: `1px solid ${modal.product.tipe_produk === t ? tc.color : '#e5e7eb'}`, background: modal.product.tipe_produk === t ? tc.bg : '#f9fafb', color: modal.product.tipe_produk === t ? tc.color : '#6b7280', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <TipeIcon icon={tc.icon} color={tc.color} size={20} />
+                        {t}
                       </button>
                     )
                   })}
@@ -394,7 +417,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
               </div>
 
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button type="submit" disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
                   {saving ? 'Menyimpan...' : modal.product.id ? 'Update' : 'Simpan'}
                 </button>
