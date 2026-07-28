@@ -389,7 +389,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       {/* Content area */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
-          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5"/></svg></div>
+          <div style={{ marginBottom: 12, color: '#5a6a85' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5"/></svg></div>
           <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Tidak ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
           {tab === 'antrian' && <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Setelah copywriter simpan naskah di Plan, konten akan muncul di sini</div>}
         </div>

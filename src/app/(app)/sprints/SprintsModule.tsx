@@ -839,7 +839,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </button>
                   ))}
                   <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
-                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#64748b' : '#5a6a85', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#374151' : '#5a6a85', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     Custom
                   </button>
                 </div>
@@ -1425,8 +1425,8 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
 
             if (done) {
               return (
-                <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#34d399', display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <div key={step.id} style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.4)', color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   {step.nama}
                 </div>
               )
@@ -1439,7 +1439,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
                     href={step.href}
                     onClick={e => e.stopPropagation()}
                     title={`Buka ${step.nama}`}
-                    style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.12)', border: '1px solid rgba(66,165,245,0.4)', color: '#42a5f5', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
+                    style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.35)', color: '#1a73e8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     {step.nama}
                   </a>
@@ -1447,16 +1447,16 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
                     type="button"
                     title={`Tandai ${step.nama} selesai`}
                     onClick={e => { e.stopPropagation(); onStepDone(step) }}
-                    style={{ fontSize: '0.6rem', padding: '3px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.3)', color: '#34d399', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    style={{ padding: '3px 7px', borderRadius: 5, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#059669', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 </div>
               )
             }
 
-            // Future step
+            // Future step — dark text for contrast
             return (
-              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f1f5f9', border: '1px solid #dde3ed', color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <div key={step.id} style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#eef1f6', border: '1px solid #d4dbe8', color: '#374151', display: 'flex', alignItems: 'center', gap: 3 }}>
                 <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="9"/></svg>
                 {step.nama}
               </div>

@@ -1026,7 +1026,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${done ? '#34d399' : '#e5eaf2'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
                         {done && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </div>
-                      <span style={{ fontSize: '0.82rem', color: done ? '#64748b' : '#64748b', textDecoration: done ? 'line-through' : 'none', fontWeight: done ? 400 : 500 }}>{check.label}</span>
+                      <span style={{ fontSize: '0.82rem', color: done ? '#374151' : '#64748b', textDecoration: done ? 'line-through' : 'none', fontWeight: done ? 400 : 500 }}>{check.label}</span>
                       {!done && <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: '#5a6a85', flexShrink: 0 }}>→ {check.tab === 'identity' ? 'Identity' : check.tab === 'niche' ? 'Niche' : check.tab === 'story' ? 'Story' : check.tab === 'bio' ? 'Bio' : 'Visual'}</span>}
                     </button>
                   )

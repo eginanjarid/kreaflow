@@ -120,7 +120,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
       {/* Empty */}
       {filtered.length === 0 && (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
-          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+          <div style={{ marginBottom: 12, color: '#5a6a85' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Tidak ada notifikasi</div>
           <div style={{ fontSize: '0.8rem' }}>Notifikasi akan muncul saat ada aktivitas konten di sprint.</div>
         </div>
@@ -143,7 +143,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
                   {/* Content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontWeight: n.is_read ? 500 : 700, color: n.is_read ? '#64748b' : '#f1f5f9', fontSize: '0.875rem', flex: 1 }}>{n.title}</span>
+                      <span style={{ fontWeight: n.is_read ? 500 : 700, color: n.is_read ? '#374151' : '#f1f5f9', fontSize: '0.875rem', flex: 1 }}>{n.title}</span>
                       {!n.is_read && <span style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.color, flexShrink: 0, marginTop: 4 }} />}
                     </div>
                     {n.message && <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, lineHeight: 1.5 }}>{n.message}</div>}

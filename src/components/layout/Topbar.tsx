@@ -242,12 +242,12 @@ export default function Topbar({ user }: Props) {
               {/* Body */}
               <div style={{ flex: 1, overflowY: 'auto' }}>
                 {notifLoading && (
-                  <div style={{ padding: 36, textAlign: 'center', color: '#64748b', fontSize: '0.82rem' }}>Memuat...</div>
+                  <div style={{ padding: 36, textAlign: 'center', color: '#374151', fontSize: '0.82rem' }}>Memuat...</div>
                 )}
                 {!notifLoading && notifs.length === 0 && (
                   <div style={{ padding: 44, textAlign: 'center' }}>
                     <div style={{ fontSize: '2rem', marginBottom: 8 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
-                    <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Belum ada notifikasi</div>
+                    <div style={{ fontSize: '0.82rem', color: '#374151' }}>Belum ada notifikasi</div>
                   </div>
                 )}
                 {!notifLoading && notifs.map(n => {
@@ -268,7 +268,7 @@ export default function Topbar({ user }: Props) {
                           </div>
                         )}
                         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.65rem', color: '#64748b' }}>{relTime(n.created_at)}</span>
+                          <span style={{ fontSize: '0.65rem', color: '#374151' }}>{relTime(n.created_at)}</span>
                           <Link
                             href={href}
                             onClick={() => { if (!n.is_read) markRead(n.id); setBellOpen(false) }}

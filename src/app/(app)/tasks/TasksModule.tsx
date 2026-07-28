@@ -608,7 +608,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
         if (entries.length === 0 && soloTasks.length === 0) {
           return (
             <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-              <div style={{ marginBottom: 10, color: '#c8d1e0' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+              <div style={{ marginBottom: 10, color: '#5a6a85' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada sprint</div>
               <div style={{ fontSize: '0.82rem' }}>Buat sprint lewat tombol Buat Sprint untuk mulai monitoring</div>
             </div>
@@ -876,7 +876,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                               <span style={{ fontSize: '0.72rem', color: '#5a6a85', whiteSpace: 'nowrap' }}>Selesai:</span>
                               <input type="date" min={sprintStart}
-                                style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 6, padding: '3px 8px', color: step.due_date ? '#64748b' : '#334155', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}
+                                style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 6, padding: '3px 8px', color: step.due_date ? '#374151' : '#334155', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}
                                 value={step.due_date}
                                 onChange={e => updateStepDueDate(step.id, e.target.value)}
                               />
