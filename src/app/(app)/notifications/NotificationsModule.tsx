@@ -117,7 +117,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
 
       {/* Empty */}
       {filtered.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🔔</div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Tidak ada notifikasi</div>
           <div style={{ fontSize: '0.8rem' }}>Notifikasi akan muncul saat ada aktivitas konten di sprint.</div>
@@ -127,7 +127,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
       {/* Groups */}
       {dayOrder.map(day => (
         <div key={day} style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{day}</div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{day}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {groups[day].map(n => {
               const cfg = TYPE_CONFIG[n.type] || { color: '#5a6a85', bg: 'rgba(148,163,184,0.1)', label: n.type, icon: '📌', href: '/sprints' }
@@ -146,7 +146,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
                     </div>
                     {n.message && <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, lineHeight: 1.5 }}>{n.message}</div>}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '0.68rem', color: '#334155' }}>{relativeTime(n.created_at)}</span>
+                      <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{relativeTime(n.created_at)}</span>
                       <Link href={cfg.href}
                         onClick={() => { if (!n.is_read) markRead(n.id) }}
                         style={{ fontSize: '0.72rem', color: cfg.color, fontWeight: 600, textDecoration: 'none', padding: '2px 8px', borderRadius: 5, background: cfg.bg, border: `1px solid ${cfg.color}20` }}>
@@ -154,12 +154,12 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
                       </Link>
                       {!n.is_read && (
                         <button onClick={() => markRead(n.id)}
-                          style={{ fontSize: '0.68rem', color: '#334155', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
+                          style={{ fontSize: '0.68rem', color: '#5a6a85', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
                           Tandai dibaca
                         </button>
                       )}
                       <button onClick={() => deleteNotif(n.id)}
-                        style={{ fontSize: '0.68rem', color: '#1f2937', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 'auto' }}>
+                        style={{ fontSize: '0.68rem', color: '#5a6a85', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 'auto' }}>
                         ✕
                       </button>
                     </div>

@@ -815,7 +815,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nama Konten / Judul</label>
                   <input style={fieldStyle({ fontSize: '0.875rem' })} value={sprintNamaKonten} onChange={e => setSprintNamaKonten(e.target.value)} placeholder="cth: Review Serum Vit C Erha, Tutorial Skincare Pagi, 3 Tips Diet Sehat..." />
-                  <div style={{ fontSize: '0.7rem', color: '#334155', marginTop: 4 }}>Nama ini dipakai di semua notifikasi dan task label</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 4 }}>Nama ini dipakai di semua notifikasi dan task label</div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -832,7 +832,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Tayang (Rencana)</label>
                     <input type="date" style={fieldStyle()} value={sprintTanggalTayang} onChange={e => setSprintTanggalTayang(e.target.value)} min={sprintStart} />
-                    <div style={{ fontSize: '0.7rem', color: '#334155', marginTop: 4 }}>Muncul di Calendar. Jika kosong, pakai tanggal deadline step Schedule.</div>
+                    <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 4 }}>Muncul di Calendar. Jika kosong, pakai tanggal deadline step Schedule.</div>
                   </div>
                 </div>
               </div>
@@ -899,7 +899,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               {/* Preview summary */}
               {sprintStart && (sprintProductId || sprintPillar.trim() || sprintCustomLabel.trim() || sprintNamaKonten.trim()) && (
                 <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px', fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.9 }}>
-                  <div style={{ color: '#334155', fontWeight: 600, marginBottom: 4 }}>SPRINT PREVIEW</div>
+                  <div style={{ color: '#5a6a85', fontWeight: 600, marginBottom: 4 }}>SPRINT PREVIEW</div>
                   {sprintNamaKonten.trim() && (
                     <div>Nama Konten: <span style={{ color: '#2a3547', fontWeight: 600 }}>{sprintNamaKonten.trim()}</span></div>
                   )}

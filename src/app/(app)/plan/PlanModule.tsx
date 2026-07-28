@@ -729,7 +729,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                 {brandProfile?.niche && (
                   <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 14px', fontSize: '0.72rem', color: '#5a6a85', lineHeight: 1.7 }}>
-                    <div style={{ color: '#334155', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>Brand context</div>
+                    <div style={{ color: '#5a6a85', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>Brand context</div>
                     <div>Niche: <span style={{ color: '#5a6a85' }}>{brandProfile.niche}</span></div>
                     {brandProfile.tone_of_voice && <div>Tone: <span style={{ color: '#5a6a85' }}>{brandProfile.tone_of_voice}</span></div>}
                     {brandProfile.target_audiens && <div>Audiens: <span style={{ color: '#5a6a85' }}>{brandProfile.target_audiens}</span></div>}
@@ -764,7 +764,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   placeholder={'Klik "Generate Naskah dengan AI" → pilih AI favorit → paste hasilnya di sini.\n\nAtau ketik langsung jika sudah punya drafnya.'}
                 />
                 {generatedNaskah && (
-                  <div style={{ fontSize: '0.7rem', color: '#334155' }}>{generatedNaskah.length} karakter · {generatedNaskah.split(/\s+/).filter(Boolean).length} kata</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{generatedNaskah.length} karakter · {generatedNaskah.split(/\s+/).filter(Boolean).length} kata</div>
                 )}
               </div>
             </div>
@@ -1032,7 +1032,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   placeholder={'Klik "COMPILE SCRIPTS" → pilih AI favorit → paste hasilnya di sini.\n\nAI akan memberikan:\n• Hook options (visual + verbal)\n• Naskah lengkap dengan timestamp\n• Variasi CTA\n• Caption siap posting\n• Hashtag\n• Rekomendasi varian terkuat'}
                 />
                 {affNaskah && (
-                  <div style={{ fontSize: '0.7rem', color: '#334155' }}>{affNaskah.length} karakter · {affNaskah.split(/\s+/).filter(Boolean).length} kata</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{affNaskah.length} karakter · {affNaskah.split(/\s+/).filter(Boolean).length} kata</div>
                 )}
               </div>
 

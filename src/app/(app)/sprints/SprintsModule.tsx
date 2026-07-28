@@ -581,14 +581,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
 
         {tasks.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
             <div style={{ fontSize: '2rem', marginBottom: 10 }}>✅</div>
             <div style={{ fontWeight: 600, color: '#5a6a85' }}>Belum ada task manual</div>
           </div>
         )}
         {tasksTodo.length > 0 && (
           <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Belum Selesai ({tasksTodo.length})</div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Belum Selesai ({tasksTodo.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksTodo.map(t => (
                 <div key={t.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
@@ -598,12 +598,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                       {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
                       {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#475569' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
-                      {t.notes && <span style={{ fontSize: '0.65rem', color: '#334155' }}>{t.notes}</span>}
+                      {t.notes && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{t.notes}</span>}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button onClick={() => setTaskModal({ open: true, task: { ...t } })} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 10px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
-                    <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#334155', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
+                    <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
                   </div>
                 </div>
               ))}
@@ -612,15 +612,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
         )}
         {tasksDone.length > 0 && (
           <div style={{ opacity: 0.45 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Selesai ({tasksDone.length})</div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Selesai ({tasksDone.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksDone.map(t => (
-                <div key={t.id} style={{ background: '#fff', border: '1px solid #1a1a1a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div key={t.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
                   <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #1a73e8', background: '#1a73e8', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </button>
-                  <span style={{ flex: 1, color: '#334155', fontSize: '0.875rem', textDecoration: 'line-through' }}>{t.nama}</span>
-                  <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: 'none', color: '#1f2937', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
+                  <span style={{ flex: 1, color: '#5a6a85', fontSize: '0.875rem', textDecoration: 'line-through' }}>{t.nama}</span>
+                  <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
                 </div>
               ))}
             </div>
@@ -675,14 +675,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
         {/* Left: Sprint List */}
         <div style={{ width: 230, flexShrink: 0, background: '#fff', borderRight: '1px solid #e5eaf2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ padding: '14px 12px 10px', borderBottom: '1px solid #e5eaf2' }}>
-            <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Sprint Mingguan</div>
+            <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Sprint Mingguan</div>
             <button onClick={openSprintModal}
               style={{ width: '100%', background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 0', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
               + Buat Sprint
             </button>
           </div>
           <div style={{ flex: 1, overflowY: 'auto', padding: '6px 8px' }}>
-            {sprints.length === 0 && <div style={{ fontSize: '0.75rem', color: '#1f2937', padding: '20px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
+            {sprints.length === 0 && <div style={{ fontSize: '0.75rem', color: '#5a6a85', padding: '20px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
             {sprints.map(s => {
               const sc = contents.filter(c => c.sprint_id === s.id)
               const done = sc.filter(c => c.status === 'Tayang').length
@@ -704,11 +704,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     >✕</button>
                   </div>
                   <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#42a5f5' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
-                  <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}{s.akun ? ` · @${s.akun.replace(/^@/, '')}` : ''}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}{s.akun ? ` · @${s.akun.replace(/^@/, '')}` : ''}</div>
                   <div style={{ marginTop: 5, height: 3, background: '#f8fafc', borderRadius: 2 }}>
                     <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 2 }} />
                   </div>
-                  <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 2 }}>{done}/{sc.length} done</div>
+                  <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginTop: 2 }}>{done}/{sc.length} done</div>
                 </div>
               )
             })}
@@ -718,7 +718,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         {/* Main: Board */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {!selectedSprint ? (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, color: '#334155' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, color: '#5a6a85' }}>
               <div style={{ fontSize: '2.5rem' }}>⚡</div>
               <div style={{ fontWeight: 700, color: '#5a6a85' }}>Pilih atau buat sprint mingguan</div>
               <button onClick={openSprintModal} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
@@ -736,12 +736,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.1)', border: '1px solid rgba(66,165,245,0.25)', color: '#42a5f5', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
-                    <span style={{ fontSize: '0.7rem', color: '#334155' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
-                    <span style={{ fontSize: '0.7rem', color: '#334155' }}>·</span>
-                    <span style={{ fontSize: '0.7rem', color: '#334155' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
+                    <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
+                    <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>·</span>
+                    <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#42a5f5' }}>{totalPct}% done</span>
                     {/* Step legend */}
-                    <span style={{ fontSize: '0.65rem', color: '#334155', marginLeft: 4 }}>
+                    <span style={{ fontSize: '0.65rem', color: '#5a6a85', marginLeft: 4 }}>
                       Steps: {steps.map(s => s.icon).join(' ')}
                     </span>
                   </div>
@@ -797,14 +797,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                             <div style={{ fontSize: '1.5rem' }}>📋</div>
                             <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#5a6a85' }}>Sprint siap!</div>
-                            <div style={{ fontSize: '0.68rem', color: '#334155' }}>Tambah konten yang mau dikerjakan minggu ini</div>
+                            <div style={{ fontSize: '0.68rem', color: '#5a6a85' }}>Tambah konten yang mau dikerjakan minggu ini</div>
                             <button onClick={openAddModal} style={{ marginTop: 4, background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 7, padding: '7px 16px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
                               + Tambah Konten
                             </button>
                           </div>
                         )}
                         {items.length === 0 && !(col.id === 'todo' && sprintContents.length === 0) && (
-                          <div style={{ textAlign: 'center', padding: '32px 12px', color: '#1f2937', fontSize: '0.72rem', border: '1px dashed #1f1f1f', borderRadius: 8 }}>Kosong</div>
+                          <div style={{ textAlign: 'center', padding: '32px 12px', color: '#5a6a85', fontSize: '0.72rem', border: '1px dashed #e5eaf2', borderRadius: 8 }}>Kosong</div>
                         )}
                       </div>
                     </div>
@@ -848,7 +848,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#5a6a85' }}>Steps Pekerjaan</div>
-                    <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Hapus step yg gak diperlukan, tambah yg kurang, assign ke anggota tim</div>
+                    <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 1 }}>Hapus step yg gak diperlukan, tambah yg kurang, assign ke anggota tim</div>
                   </div>
                   <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{sprintSteps.length} step</span>
                 </div>
@@ -859,7 +859,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div key={`${step.id}-${idx}`} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 10px' }}>
                       {/* Row 1: number + name + delete */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                        <span style={{ fontSize: '0.65rem', color: '#334155', fontWeight: 700, background: '#f8fafc', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#5a6a85', fontWeight: 700, background: '#f8fafc', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
                         <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
                         <span style={{ fontSize: '0.82rem', color: '#2a3547', fontWeight: 600, flex: 1 }}>{step.nama}</span>
                         <button type="button" onClick={() => setSprintSteps(prev => prev.filter((_, i) => i !== idx))}
@@ -887,13 +887,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             style={{ ...fieldStyle({ padding: '5px 8px', fontSize: '0.72rem', color: deadline ? '#fbbf24' : '#334155' }) }}
                             placeholder="Deadline"
                           />
-                          {!deadline && <span style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', fontSize: '0.68rem', color: '#334155', pointerEvents: 'none' }}>📅 Deadline</span>}
+                          {!deadline && <span style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', fontSize: '0.68rem', color: '#5a6a85', pointerEvents: 'none' }}>📅 Deadline</span>}
                         </div>
                       </div>
                     </div>
                   ))}
                   {sprintSteps.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '12px', color: '#1f2937', fontSize: '0.72rem', border: '1px dashed #1f1f1f', borderRadius: 8 }}>Belum ada step — tambah dari daftar di bawah</div>
+                    <div style={{ textAlign: 'center', padding: '12px', color: '#5a6a85', fontSize: '0.72rem', border: '1px dashed #e5eaf2', borderRadius: 8 }}>Belum ada step — tambah dari daftar di bawah</div>
                   )}
                 </div>
 
@@ -913,7 +913,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </button>
                       ))}
                       {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).length === 0 && (
-                        <div style={{ padding: '6px 10px', color: '#334155', fontSize: '0.72rem' }}>Semua step sudah ditambah</div>
+                        <div style={{ padding: '6px 10px', color: '#5a6a85', fontSize: '0.72rem' }}>Semua step sudah ditambah</div>
                       )}
                     </div>
                   )}
@@ -960,7 +960,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#5a6a85' }}>Slot Konten</div>
-                    <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Produk opsional — bisa dikosongkan untuk konten kreator</div>
+                    <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 1 }}>Produk opsional — bisa dikosongkan untuk konten kreator</div>
                   </div>
                   {(() => {
                     const total = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
@@ -992,7 +992,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         <button
                           type="button"
                           onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 5, width: 26, height: 28, color: '#334155', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 5, width: 26, height: 28, color: '#5a6a85', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           ✕
                         </button>
                       </div>
@@ -1173,7 +1173,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
             {/* Step checklist */}
             <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Checklist</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Checklist</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {stepsWithMeta.map(step => {
                   const done = isStepDone(detailItem.status, step.doneAt)
@@ -1215,7 +1215,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
             {/* Jadwal Posting */}
             <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Jadwal Posting</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Jadwal Posting</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 110px', gap: 8 }}>
                 <div>
                   <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Tanggal</div>
@@ -1254,7 +1254,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#86efac' }}>✓ Sudah Tayang — Done</div>
               )}
               <button onClick={() => removeFromSprint(detailItem.id)}
-                style={{ width: '100%', background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px', color: '#334155', fontSize: '0.75rem', cursor: 'pointer' }}>
+                style={{ width: '100%', background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
                 Hapus dari Sprint
               </button>
             </div>
@@ -1369,7 +1369,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   )
                 })}
                 {report.length === 0 && (
-                  <div style={{ textAlign: 'center', color: '#334155', padding: 32 }}>
+                  <div style={{ textAlign: 'center', color: '#5a6a85', padding: 32 }}>
                     Belum ada step yang dikonfigurasi untuk sprint ini
                   </div>
                 )}
@@ -1454,7 +1454,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
 
             // Future step
             return (
-              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#334155', display: 'flex', alignItems: 'center', gap: 2 }}>
+              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', display: 'flex', alignItems: 'center', gap: 2 }}>
                 ○ {step.nama}
               </div>
             )

@@ -756,7 +756,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                       <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#475569', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
                         {modal.idea.status || 'Draft'}
                       </span>
-                      <span style={{ fontSize: '0.72rem', color: '#334155' }}>Diatur otomatis oleh workflow</span>
+                      <span style={{ fontSize: '0.72rem', color: '#5a6a85' }}>Diatur otomatis oleh workflow</span>
                     </div>
                   </div>
                   <div>

@@ -253,7 +253,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
           {queueOpen && (
             <div style={{ borderTop: '1px solid rgba(52,211,153,0.1)', padding: '8px 12px 12px' }}>
               {readyItems.map(item => (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 6px', borderBottom: '1px solid #1a2a1f' }}>
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 6px', borderBottom: '1px solid #d1fae5' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
                       {item.product_nama && (
@@ -322,7 +322,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
               return (
                 <div key={idx} onClick={() => day && openAdd(day)}
                   style={{
-                    minHeight: 88, padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #1a1a1a' : 'none', borderBottom: '1px solid #1a1a1a',
+                    minHeight: 88, padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #e5eaf2' : 'none', borderBottom: '1px solid #e5eaf2',
                     background: day ? 'transparent' : '#0a0a0a', cursor: day ? 'pointer' : 'default',
                     transition: 'background 0.1s',
                   }}>
@@ -365,7 +365,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         shown++
                         return (
                           <div key={p.id} onClick={ev => ev.stopPropagation()}
-                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #334155', color: '#5a6a85', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
+                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #c8d1e0', color: '#5a6a85', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
                             title={`📋 Rencana: ${p.judul}${p.jam_tayang ? ' · ' + p.jam_tayang : ''}`}>
                             {p.jam_tayang && <span style={{ opacity: 0.6 }}>{p.jam_tayang} </span>}
                             {p.product_nama ? `${p.product_nama.split(' ')[0]} · ` : ''}
@@ -402,7 +402,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 <div style={{ width: 48, textAlign: 'center', flexShrink: 0 }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#2a3547' }}>{d.getDate()}</div>
                   <div style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{MONTHS[d.getMonth()].slice(0, 3)}</div>
-                  <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 1 }}>{d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
                 <div style={{ width: 1, height: 44, background: STATUS_COLOR[e.status] || '#e5eaf2', flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -424,7 +424,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                   {!isSprint && <button onClick={() => openEdit(e)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>}
                   {!isSprint && <button onClick={() => deleteEntry(e.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>}
-                  {isSprint && <span style={{ fontSize: '0.7rem', color: '#334155', padding: '5px 0' }}>auto-sync</span>}
+                  {isSprint && <span style={{ fontSize: '0.7rem', color: '#5a6a85', padding: '5px 0' }}>auto-sync</span>}
                 </div>
               </div>
             )

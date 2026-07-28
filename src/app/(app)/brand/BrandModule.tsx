@@ -1108,7 +1108,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opsi Niche dari AI</div>
-                <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Tambah opsi dari hasil AI, pilih satu sebagai utama</div>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>Tambah opsi dari hasil AI, pilih satu sebagai utama</div>
               </div>
               <button type="button" onClick={() => { setNicheForm({ id: crypto.randomUUID(), niche: '', kategori: '', micro_niche: '', nama_akun: '', is_primary: profile.niche_options.length === 0 }); setNicheEditId(null) }}
                 style={{ background: 'rgba(26,115,232,0.12)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1158,7 +1158,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
             {/* Options List */}
             {profile.niche_options.length === 0 && !nicheForm && (
-              <div style={{ textAlign: 'center', padding: '24px 0', color: '#334155', fontSize: '0.82rem' }}>
+              <div style={{ textAlign: 'center', padding: '24px 0', color: '#5a6a85', fontSize: '0.82rem' }}>
                 Belum ada opsi — klik Generate lalu tambah hasil dari AI
               </div>
             )}
@@ -1256,7 +1256,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Premis dari AI</div>
-                <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Tambah variasi, pilih satu sebagai premis utama</div>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>Tambah variasi, pilih satu sebagai premis utama</div>
               </div>
               <button type="button" onClick={() => { setPremisForm({ id: crypto.randomUUID(), teks: '', format: '', is_primary: profile.premis_options.length === 0 }); setPremisEditId(null) }}
                 style={{ background: 'rgba(26,115,232,0.12)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1301,7 +1301,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             )}
 
             {profile.premis_options.length === 0 && !premisForm && (
-              <div style={{ textAlign: 'center', padding: '24px 0', color: '#334155', fontSize: '0.82rem' }}>
+              <div style={{ textAlign: 'center', padding: '24px 0', color: '#5a6a85', fontSize: '0.82rem' }}>
                 Belum ada variasi — klik Generate lalu tambah hasil dari AI
               </div>
             )}
@@ -1406,7 +1406,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio {activePl.label}</div>
-                      <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Maks {activePl.max} karakter</div>
+                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>Maks {activePl.max} karakter</div>
                     </div>
                     <button type="button" onClick={() => { setBioForm({ id: crypto.randomUUID(), teks: '', is_primary: bioList.length === 0 }); setBioEditId(null) }}
                       style={{ background: 'rgba(26,115,232,0.12)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -1446,7 +1446,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   )}
 
                   {bioList.length === 0 && !bioForm && (
-                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#334155', fontSize: '0.82rem' }}>
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#5a6a85', fontSize: '0.82rem' }}>
                       Belum ada variasi — Generate lalu tambah hasilnya
                     </div>
                   )}
@@ -1505,7 +1505,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 ) : profile.logo_main_url ? (
                   <img src={profile.logo_main_url} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                 ) : (
-                  <div style={{ textAlign: 'center', color: '#334155' }}>
+                  <div style={{ textAlign: 'center', color: '#5a6a85' }}>
                     <div style={{ fontSize: '1.4rem' }}>🖼️</div>
                     <div style={{ fontSize: '0.6rem', marginTop: 2 }}>Upload</div>
                   </div>
@@ -1782,7 +1782,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rekomendasi Nama Akun</div>
-                      <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Simpan pilihan nama dari AI, lalu pilih satu sebagai utama</div>
+                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>Simpan pilihan nama dari AI, lalu pilih satu sebagai utama</div>
                     </div>
                     <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_nama_options: [...(p.affiliate_nama_options || []), { id: crypto.randomUUID(), nama: '', alasan: '', is_primary: (p.affiliate_nama_options || []).length === 0 }] }))}
                       style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid #34d399', borderRadius: 8, padding: '7px 14px', color: '#34d399', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -1790,7 +1790,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     </button>
                   </div>
                   {(profile.affiliate_nama_options || []).length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#334155', fontSize: '0.82rem' }}>Belum ada — Generate dengan AI lalu tambahkan hasilnya</div>
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#5a6a85', fontSize: '0.82rem' }}>Belum ada — Generate dengan AI lalu tambahkan hasilnya</div>
                   )}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {(profile.affiliate_nama_options || []).map((opt, idx) => (
@@ -1928,7 +1928,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Akun</div>
-                      <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Simpan beberapa variasi, pilih satu sebagai utama</div>
+                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>Simpan beberapa variasi, pilih satu sebagai utama</div>
                     </div>
                     <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_bio_options: [...(p.affiliate_bio_options || []), { id: crypto.randomUUID(), teks: '', is_primary: (p.affiliate_bio_options || []).length === 0 }] }))}
                       style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid #34d399', borderRadius: 8, padding: '7px 14px', color: '#34d399', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -1936,7 +1936,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     </button>
                   </div>
                   {(profile.affiliate_bio_options || []).length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#334155', fontSize: '0.82rem' }}>Belum ada variasi — Generate lalu tambahkan hasilnya</div>
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#5a6a85', fontSize: '0.82rem' }}>Belum ada variasi — Generate lalu tambahkan hasilnya</div>
                   )}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {(profile.affiliate_bio_options || []).map((opt, idx) => (
@@ -1984,7 +1984,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           {/* Registered accounts */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
             {akunList.length === 0 && (
-              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '28px 20px', textAlign: 'center', color: '#334155', fontSize: '0.85rem' }}>
+              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '28px 20px', textAlign: 'center', color: '#5a6a85', fontSize: '0.85rem' }}>
                 Belum ada akun terdaftar. Tambahkan akun pertama kamu.
               </div>
             )}

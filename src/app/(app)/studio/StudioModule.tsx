@@ -260,7 +260,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
         </div>
         {item.hook && <div style={{ fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.hook}</div>}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 6 }}>
-          {item.scheduled_date ? <span style={{ fontSize: '0.68rem', color: '#fb923c' }}>📅 {item.scheduled_date}</span> : <span style={{ fontSize: '0.68rem', color: '#334155' }}>Belum dijadwalkan</span>}
+          {item.scheduled_date ? <span style={{ fontSize: '0.68rem', color: '#fb923c' }}>📅 {item.scheduled_date}</span> : <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>Belum dijadwalkan</span>}
           <span style={{ fontSize: '0.7rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
         </div>
       </div>
@@ -278,16 +278,16 @@ function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Not
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
         {notifications.length === 0
-          ? <div style={{ textAlign: 'center', color: '#334155', fontSize: '0.82rem', marginTop: 40 }}>Tidak ada notifikasi</div>
+          ? <div style={{ textAlign: 'center', color: '#5a6a85', fontSize: '0.82rem', marginTop: 40 }}>Tidak ada notifikasi</div>
           : notifications.map(n => (
             <div key={n.id} style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', marginBottom: 8, border: '1px solid #e5eaf2', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
               <div style={{ fontSize: '1.2rem', flexShrink: 0 }}>{NOTIF_ICON[n.type] || '🔔'}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>{n.title}</div>
                 {n.message && <div style={{ fontSize: '0.75rem', color: '#5a6a85', lineHeight: 1.4 }}>{n.message}</div>}
-                <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 4 }}>{new Date(n.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 4 }}>{new Date(n.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
               </div>
-              <button onClick={() => onMarkRead(n.id)} style={{ background: 'transparent', border: 'none', color: '#334155', cursor: 'pointer', fontSize: '0.7rem', flexShrink: 0 }}>✓</button>
+              <button onClick={() => onMarkRead(n.id)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.7rem', flexShrink: 0 }}>✓</button>
             </div>
           ))
         }
@@ -386,10 +386,10 @@ export default function StudioModule({ initialContents, products, initialNotific
 
       {/* Content area */}
       {filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
           <div style={{ fontSize: '2rem', marginBottom: 12 }}>{tab === 'antrian' ? '✍️' : tab === 'dikerjakan' ? '🎨' : '✅'}</div>
           <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Tidak ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
-          {tab === 'antrian' && <div style={{ fontSize: '0.82rem', color: '#1e293b' }}>Setelah copywriter simpan naskah di Plan, konten akan muncul di sini</div>}
+          {tab === 'antrian' && <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Setelah copywriter simpan naskah di Plan, konten akan muncul di sini</div>}
         </div>
       ) : viewMode === 'cards' ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
@@ -448,7 +448,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           {/* Grid */}
           {(() => {
             if (igTab === 'tagged') return (
-              <div style={{ padding: '40px 20px', textAlign: 'center', color: '#334155', fontSize: '0.82rem' }}>Tidak ada foto yang menandai kamu</div>
+              <div style={{ padding: '40px 20px', textAlign: 'center', color: '#5a6a85', fontSize: '0.82rem' }}>Tidak ada foto yang menandai kamu</div>
             )
             return (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#f8fafc' }}>
@@ -470,7 +470,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                   )
                 })}
                 {Array.from({ length: Math.max(0, 9 - igFiltered.length) }).map((_, i) => (
-                  <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#fff', border: '1px dashed #1a1a1a' }}>
+                  <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#fff', border: '1px dashed #e5eaf2' }}>
                     {i === 0 && igFiltered.length === 0 && <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '0.6rem', color: '#e5eaf2', textAlign: 'center', padding: 4 }}>{igTab === 'reels' ? 'Belum ada Reels' : 'Belum ada konten'}</span></div>}
                   </div>
                 ))}
