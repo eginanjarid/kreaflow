@@ -62,7 +62,7 @@ type StepDef = { id: string; nama: string; icon: string; doneAt: string; href: s
 const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[] }> = {
   affiliate: {
     label: 'Konten Affiliate',
-    color: '#34d399',
+    color: '#059669',
     steps: [
       { id: 'naskah',   nama: 'Buat Naskah', icon: 'naskah', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'take_vid', nama: 'Take Video',  icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
@@ -72,7 +72,7 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
   },
   creator: {
     label: 'Konten Creator',
-    color: '#42a5f5',
+    color: '#1a73e8',
     steps: [
       { id: 'naskah',   nama: 'Buat Naskah', icon: 'naskah', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'shooting', nama: 'Shooting',    icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
@@ -83,7 +83,7 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
   },
   live: {
     label: 'Live Streaming',
-    color: '#f87171',
+    color: '#dc2626',
     steps: [
       { id: 'rundown',   nama: 'Rundown',    icon: 'list', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'persiapan', nama: 'Persiapan',  icon: 'live', doneAt: 'Produksi',    href: '/studio' },
@@ -134,13 +134,13 @@ const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjad
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
 const PRIORITIES = ['High', 'Medium', 'Low']
-const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf24', Low: '#86efac' }
+const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
 
 const BOARD_COLS = [
   { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#e5eaf2', bg: 'rgba(90,106,133,0.04)' },
-  { id: 'doing', label: 'Dikerjakan', count_color: '#fbbf24', border: 'rgba(251,191,36,0.25)', bg: 'rgba(251,191,36,0.03)' },
-  { id: 'done',  label: 'Done ✓',    count_color: '#86efac', border: 'rgba(134,239,172,0.25)', bg: 'rgba(134,239,172,0.03)' },
+  { id: 'doing', label: 'Dikerjakan', count_color: '#d97706', border: 'rgba(217,119,6,0.25)', bg: 'rgba(217,119,6,0.03)' },
+  { id: 'done',  label: 'Done ✓',    count_color: '#059669', border: 'rgba(5,150,105,0.25)', bg: 'rgba(5,150,105,0.03)' },
 ]
 
 function getColFromStatus(status: string): 'todo' | 'doing' | 'done' {
@@ -705,12 +705,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer', padding: '1px 4px', borderRadius: 4, lineHeight: 1 }}
                     >✕</button>
                   </div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#42a5f5' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#1a73e8' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
                   <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}{s.akun ? ` · @${s.akun.replace(/^@/, '')}` : ''}</div>
                   <div style={{ marginTop: 5, height: 3, background: '#f8fafc', borderRadius: 2 }}>
                     <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 2 }} />
                   </div>
-                  <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginTop: 2 }}>{done}/{sc.length} done</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 2 }}>{done}/{sc.length} done</div>
                 </div>
               )
             })}
@@ -741,7 +741,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
                     <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>·</span>
                     <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
-                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#42a5f5' }}>{totalPct}% done</span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8' }}>{totalPct}% done</span>
                     {/* Step legend */}
                     <span style={{ display: 'flex', alignItems: 'center', gap: 3, marginLeft: 4 }}>
                       {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#5a6a85', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
@@ -759,7 +759,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari..."
                   style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: '#2a3547', fontSize: '0.72rem', outline: 'none', width: 120 }} />
                 <button onClick={() => setReportOpen(true)}
-                  style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 7, padding: '6px 12px', color: '#fbbf24', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.35)', borderRadius: 7, padding: '6px 12px', color: '#d97706', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   Laporan Tim
                 </button>
               </div>
