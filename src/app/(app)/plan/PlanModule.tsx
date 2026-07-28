@@ -1318,74 +1318,72 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
       {/* AI Picker Modal — Affiliate */}
       {affAiModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAffAiModal(null); setAffPromptCopied(false) } }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAffAiModal(null) } }}>
+          <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.14)', width: '100%', maxWidth: 400, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #f3f4f6' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1.15rem', marginBottom: 6 }}>{affAiModal.label || 'Compile Scripts'}</div>
-                <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Pilih AI — prompt langsung terisi, paste hasilnya di kolom output</div>
+                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem' }}>{affAiModal.label || 'Compile Scripts'}</div>
+                <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: 2 }}>Pilih AI, paste hasilnya di kolom output</div>
               </div>
-              <button type="button" onClick={() => { setAffAiModal(null); setAffPromptCopied(false) }} style={{ background: '#f3f4f6', border: 'none', color: '#6b7280', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
+              <button type="button" onClick={() => setAffAiModal(null)} style={{ width: 30, height: 30, background: '#f3f4f6', border: 'none', borderRadius: 8, color: '#6b7280', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✕</button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#1a73e8', url: `https://gemini.google.com/app?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', abbr: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'Claude', desc: 'Anthropic Claude', abbr: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', abbr: 'Gm', color: '#1a73e8', url: `https://gemini.google.com/app?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'DeepSeek', desc: 'DeepSeek R1', abbr: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
-                  <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 1 }}>{ai.desc}</div>
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 12, background: '#f9fafb', textDecoration: 'none' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: ai.color + '14', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 800, color: ai.color, letterSpacing: '-0.2px' }}>{ai.abbr}</span>
                   </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ai.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{ai.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 1 }}>{ai.desc}</div>
+                  </div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                 </a>
               ))}
             </div>
-            <button type="button" onClick={() => { navigator.clipboard.writeText(affAiModal.prompt); setAffPromptCopied(true); setTimeout(() => setAffPromptCopied(false), 2000) }}
-              style={{ background: 'transparent', border: 'none', color: affPromptCopied ? '#059669' : '#6b7280', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
-              {affPromptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
-            </button>
+            <div style={{ height: 12 }} />
           </div>
         </div>
       )}
 
       {/* AI Picker Modal */}
       {aiModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null) } }}>
+          <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.14)', width: '100%', maxWidth: 400, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #f3f4f6' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1.15rem', marginBottom: 6 }}>Generate Naskah</div>
-                <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Pilih AI — prompt langsung terisi, paste hasilnya di kolom kanan</div>
+                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem' }}>Generate Naskah</div>
+                <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: 2 }}>Pilih AI, paste hasilnya di kolom kanan</div>
               </div>
-              <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#f3f4f6', border: 'none', color: '#6b7280', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
+              <button type="button" onClick={() => setAiModal(null)} style={{ width: 30, height: 30, background: '#f3f4f6', border: 'none', borderRadius: 8, color: '#6b7280', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✕</button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#1a73e8', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', abbr: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Claude', desc: 'Anthropic Claude', abbr: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', abbr: 'Gm', color: '#1a73e8', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'DeepSeek', desc: 'DeepSeek R1', abbr: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
-                  <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 1 }}>{ai.desc}</div>
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 12, background: '#f9fafb', textDecoration: 'none' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: ai.color + '14', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 800, color: ai.color, letterSpacing: '-0.2px' }}>{ai.abbr}</span>
                   </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ai.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{ai.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 1 }}>{ai.desc}</div>
+                  </div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                 </a>
               ))}
             </div>
-            <button type="button" onClick={() => copyPrompt(aiModal.prompt)}
-              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#059669' : '#6b7280', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
-              {promptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
-            </button>
+            <div style={{ height: 12 }} />
           </div>
         </div>
       )}
