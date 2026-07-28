@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
+})
 
 export const metadata: Metadata = {
   title: 'KreaFlow — Alur kreasi kontenmu',
@@ -11,8 +15,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${inter.variable} h-full`}>
-      <body className="h-full bg-[#0a0a0a] text-white antialiased">{children}</body>
+    <html lang="id" className={`${jakarta.variable} h-full`}>
+      <body className="h-full antialiased">{children}</body>
     </html>
   )
 }
