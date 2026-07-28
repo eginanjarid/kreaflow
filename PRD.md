@@ -62,7 +62,10 @@ Database produk affiliate.
   - Pilih template: Affiliate / Creator / Live / Custom (bisa add/remove/reorder step)
   - Pilih **Akun Posting** (dropdown dari `kf_accounts`, kalau kosong → link ke Brand)
   - Pilih Platform
-  - Produk × Jumlah konten → auto-generate content slots
+  - **Slot Konten**: default 1 baris kosong (tanpa produk). Produk **opsional** per baris.
+    - Konten kreator: biarkan kosong → slot judul "Konten N"
+    - Affiliator: klik **"+ Tambahkan Semua Produk"** → semua catalog masuk sekaligus
+    - Per baris: produk (opsional) × jumlah + mulai posting + jam + interval
   - Per step: assign anggota tim (by jabatan) + deadline
   - `step_config` JSONB: `[{ id, deadline, memberName }]`
   - `template_type` encoding: `key:step1,step2,...`
@@ -71,6 +74,9 @@ Database produk affiliate.
   - Tombol ✓ kecil hijau = eksplisit tandai step selesai → advance status
   - Done step = chip hijau ✓ (dekoratif)
   - Future step = abu ○ (dekoratif)
+- **Jadwal per konten**: klik kartu → detail modal → section "Jadwal Posting" (tanggal + jam)
+  - Simpan → update `tanggal_tayang` + `jam_tayang` di `kf_content_ideas`
+  - Badge di kartu board menampilkan tanggal + jam
 - **Laporan Tim** (tombol 📊 di sprint header):
   - Per step: member, deadline, selesai, tepat waktu, terlambat, pending+overdue
   - Tracking via `step_log` JSONB: `{ naskah_done_at, editing_done_at, ... }` dicatat saat ✓ diklik

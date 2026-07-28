@@ -20,7 +20,7 @@ const TYPE_CONFIG: Record<string, { color: string; bg: string; label: string; ic
   riset:    { color: '#60a5fa', bg: 'rgba(96,165,250,0.1)',  label: 'Riset',    icon: '🔍', href: '/sprints' },
   naskah:   { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  label: 'Naskah',   icon: '✍️', href: '/plan' },
   produksi: { color: '#f97316', bg: 'rgba(249,115,22,0.1)',  label: 'Produksi', icon: '🎨', href: '/studio' },
-  schedule: { color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', label: 'Schedule', icon: '📅', href: '/calendar' },
+  schedule: { color: '#a78bfa', bg: 'rgba(66,165,245,0.1)', label: 'Schedule', icon: '📅', href: '/calendar' },
 }
 
 function relativeTime(ts: string) {
@@ -87,12 +87,12 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontWeight: 800, fontSize: '1.25rem', color: '#f1f5f9', margin: 0 }}>Notifikasi</h1>
-          {unread > 0 && <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>{unread} belum dibaca</div>}
+          <h1 style={{ fontWeight: 800, fontSize: '1.25rem', color: '#2a3547', margin: 0 }}>Notifikasi</h1>
+          {unread > 0 && <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 2 }}>{unread} belum dibaca</div>}
         </div>
         {unread > 0 && (
           <button onClick={markAllRead} disabled={marking}
-            style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '7px 14px', color: '#94a3b8', fontSize: '0.78rem', cursor: 'pointer' }}>
+            style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px 14px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}>
             {marking ? 'Menandai...' : 'Tandai Semua Dibaca'}
           </button>
         )}
@@ -109,7 +109,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
           { key: 'schedule', label: '📅 Schedule' },
         ].map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
-            style={{ padding: '6px 14px', borderRadius: 20, border: `1px solid ${filter === f.key ? '#7C3AED' : '#2a2a2a'}`, background: filter === f.key ? 'rgba(124,58,237,0.15)' : 'transparent', color: filter === f.key ? '#A78BFA' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: filter === f.key ? 700 : 400, transition: 'all 0.15s' }}>
+            style={{ padding: '6px 14px', borderRadius: 20, border: `1px solid ${filter === f.key ? '#1a73e8' : '#2a2a2a'}`, background: filter === f.key ? 'rgba(26,115,232,0.15)' : 'transparent', color: filter === f.key ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: filter === f.key ? 700 : 400, transition: 'all 0.15s' }}>
             {f.label}
           </button>
         ))}
@@ -119,7 +119,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
       {filtered.length === 0 && (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🔔</div>
-          <div style={{ fontWeight: 600, color: '#475569', marginBottom: 6 }}>Tidak ada notifikasi</div>
+          <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Tidak ada notifikasi</div>
           <div style={{ fontSize: '0.8rem' }}>Notifikasi akan muncul saat ada aktivitas konten di sprint.</div>
         </div>
       )}
@@ -130,7 +130,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
           <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{day}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {groups[day].map(n => {
-              const cfg = TYPE_CONFIG[n.type] || { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', label: n.type, icon: '📌', href: '/sprints' }
+              const cfg = TYPE_CONFIG[n.type] || { color: '#5a6a85', bg: 'rgba(148,163,184,0.1)', label: n.type, icon: '📌', href: '/sprints' }
               return (
                 <div key={n.id}
                   style={{ background: n.is_read ? '#0d0d0d' : '#111', border: `1px solid ${n.is_read ? '#1a1a1a' : cfg.color + '30'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start', transition: 'border-color 0.2s' }}>
@@ -144,7 +144,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
                       <span style={{ fontWeight: n.is_read ? 500 : 700, color: n.is_read ? '#94a3b8' : '#f1f5f9', fontSize: '0.875rem', flex: 1 }}>{n.title}</span>
                       {!n.is_read && <span style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.color, flexShrink: 0, marginTop: 4 }} />}
                     </div>
-                    {n.message && <div style={{ fontSize: '0.78rem', color: '#475569', marginBottom: 6, lineHeight: 1.5 }}>{n.message}</div>}
+                    {n.message && <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, lineHeight: 1.5 }}>{n.message}</div>}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '0.68rem', color: '#334155' }}>{relativeTime(n.created_at)}</span>
                       <Link href={cfg.href}

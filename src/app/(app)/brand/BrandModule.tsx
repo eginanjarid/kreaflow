@@ -92,11 +92,11 @@ const MAX_AKUN = 10
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
 const FREQ_LEVELS = [
-  { id: 1, name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#475569', glow: 'rgba(71,85,105,0.3)', icon: '👻' },
+  { id: 1, name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#5a6a85', glow: 'rgba(71,85,105,0.3)', icon: '👻' },
   { id: 2, name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)', icon: '📻' },
   { id: 3, name: 'Signal', tagline: 'Frekuensimu mulai tertangkap.', desc: 'Kamu sudah punya arah dan niche yang jelas. Orang mulai bisa "membaca" kamu dan tahu kamu ahli di bidang apa.', color: '#38bdf8', glow: 'rgba(56,189,248,0.3)', icon: '📡' },
   { id: 4, name: 'On Air', tagline: 'Siaran resmi dimulai.', desc: 'Brand kamu sudah live dan konsisten. Ada audiens yang actively menunggu kontenmu dan mempercayai kamu.', color: '#34d399', glow: 'rgba(52,211,153,0.3)', icon: '🎙️' },
-  { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(167,139,250,0.3)', icon: '🌐' },
+  { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(66,165,245,0.3)', icon: '🌐' },
   { id: 6, name: 'Icon Frequency', tagline: 'Frekuensimu tidak bisa diabaikan.', desc: 'Nama kamu IS the brand. Kamu sudah jadi simbol di niche-mu — orang sebut topiknya, mereka pikirin kamu.', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', icon: '⚡' },
 ]
 
@@ -142,7 +142,7 @@ function MultiSelect({ label, options, value, onChange }: {
   }
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>{label}</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {options.map(opt => (
           <button
@@ -151,9 +151,9 @@ function MultiSelect({ label, options, value, onChange }: {
             onClick={() => toggle(opt)}
             style={{
               padding: '6px 12px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500,
-              border: selected.includes(opt) ? '1px solid #7C3AED' : '1px solid #2a2a2a',
-              background: selected.includes(opt) ? 'rgba(124,58,237,0.15)' : '#1a1a1a',
-              color: selected.includes(opt) ? '#A78BFA' : '#64748b',
+              border: selected.includes(opt) ? '1px solid #1a73e8' : '1px solid #2a2a2a',
+              background: selected.includes(opt) ? 'rgba(26,115,232,0.15)' : '#1a1a1a',
+              color: selected.includes(opt) ? '#42a5f5' : '#64748b',
               cursor: 'pointer', transition: 'all 0.15s',
             }}>
             {opt}
@@ -172,7 +172,7 @@ function SingleSelect({ label, options, value, onChange }: {
 }) {
   return (
     <div>
-      <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>{label}</label>
+      <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>{label}</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {options.map(opt => (
           <button
@@ -181,9 +181,9 @@ function SingleSelect({ label, options, value, onChange }: {
             onClick={() => onChange(opt)}
             style={{
               padding: '6px 12px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500,
-              border: value === opt ? '1px solid #7C3AED' : '1px solid #2a2a2a',
-              background: value === opt ? 'rgba(124,58,237,0.15)' : '#1a1a1a',
-              color: value === opt ? '#A78BFA' : '#64748b',
+              border: value === opt ? '1px solid #1a73e8' : '1px solid #2a2a2a',
+              background: value === opt ? 'rgba(26,115,232,0.15)' : '#1a1a1a',
+              color: value === opt ? '#42a5f5' : '#64748b',
               cursor: 'pointer', transition: 'all 0.15s',
             }}>
             {opt}
@@ -196,8 +196,8 @@ function SingleSelect({ label, options, value, onChange }: {
 
 function fieldStyle(extra?: object) {
   return {
-    width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a',
-    borderRadius: 8, padding: '10px 12px', color: '#e2e8f0',
+    width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2',
+    borderRadius: 8, padding: '10px 12px', color: '#2a3547',
     fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const,
     ...extra,
   }
@@ -209,7 +209,7 @@ function SaveButton({ loading, saved }: { loading: boolean; saved: boolean }) {
       type="submit"
       disabled={loading}
       style={{
-        background: saved ? '#166534' : 'linear-gradient(135deg, #7C3AED, #A78BFA)',
+        background: saved ? '#166534' : 'linear-gradient(135deg, #1a73e8, #42a5f5)',
         border: 'none', borderRadius: 10, padding: '11px 28px',
         color: '#fff', fontSize: '0.9rem', fontWeight: 600,
         cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
@@ -245,7 +245,7 @@ export default function BrandModule({
     niche: '', kategori: '', micro_niche: '', nama_akun_rekomendasi: '',
     kelebihan: '', kelemahan: '', peluang_brand: '', tantangan: '', premis: '',
     bio_tiktok: '', bio_instagram: '', bio_youtube: '', bio_linkedin: '', bio_facebook: '',
-    logo_main_url: '', color_palette: ['#7C3AED', '#A78BFA', '#F9FAFB'], typography: '',
+    logo_main_url: '', color_palette: ['#1a73e8', '#42a5f5', '#F9FAFB'], typography: '',
     niche_options: [],
     premis_options: [],
     bio_options: {},
@@ -892,7 +892,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
   }
 
   const sectionCard = (children: React.ReactNode) => (
-    <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
       {children}
     </div>
   )
@@ -916,20 +916,20 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
     <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 6 }}>Brand</h1>
-        <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Bangun fondasi identitas brand dan konten kamu</p>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2a3547', marginBottom: 6 }}>Brand</h1>
+        <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Bangun fondasi identitas brand dan konten kamu</p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #1f1f1f', paddingBottom: 0 }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #e5eaf2', paddingBottom: 0 }}>
         {TABS.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             style={{
               padding: '10px 16px', background: 'transparent', border: 'none',
-              borderBottom: tab === t.id ? '2px solid #7C3AED' : '2px solid transparent',
-              color: tab === t.id ? '#A78BFA' : '#64748b',
+              borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent',
+              color: tab === t.id ? '#42a5f5' : '#64748b',
               fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400,
               cursor: 'pointer', transition: 'all 0.15s', marginBottom: -1,
             }}>
@@ -949,21 +949,21 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {tab === 'overview' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {/* Left: Level Display */}
-            <div style={{ background: '#111', border: `1px solid ${freqLevel.color}40`, borderRadius: 16, padding: 28, display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', border: `1px solid ${freqLevel.color}40`, borderRadius: 16, padding: 28, display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', overflow: 'hidden' }}>
               {/* glow bg */}
               <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: freqLevel.glow, filter: 'blur(60px)', pointerEvents: 'none' }} />
 
               <div style={{ position: 'relative' }}>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Frekuensi Brand Kamu Saat Ini</div>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Frekuensi Brand Kamu Saat Ini</div>
                 <div style={{ fontSize: '3rem', marginBottom: 4 }}>{freqLevel.icon}</div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: freqLevel.color, letterSpacing: '-0.5px', marginBottom: 6 }}>{freqLevel.name}</div>
-                <div style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic', marginBottom: 20 }}>"{freqLevel.tagline}"</div>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: 1.6 }}>{freqLevel.desc}</div>
+                <div style={{ fontSize: '0.85rem', color: '#5a6a85', fontStyle: 'italic', marginBottom: 20 }}>"{freqLevel.tagline}"</div>
+                <div style={{ fontSize: '0.8rem', color: '#5a6a85', lineHeight: 1.6 }}>{freqLevel.desc}</div>
               </div>
 
               {/* Signal Bars */}
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: 10, fontWeight: 500 }}>SIGNAL STRENGTH</div>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 10, fontWeight: 500 }}>SIGNAL STRENGTH</div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 48 }}>
                   {FREQ_LEVELS.map((lvl, i) => {
                     const active = i <= freqLevelIdx
@@ -986,14 +986,14 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               {/* Progress */}
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Progress Brand</span>
+                  <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>Progress Brand</span>
                   <span style={{ fontSize: '0.75rem', fontWeight: 700, color: freqLevel.color }}>{freqPct}% ({freqDone}/{freqTotal})</span>
                 </div>
-                <div style={{ height: 6, background: '#1a1a1a', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${freqPct}%`, background: `linear-gradient(90deg, #7C3AED, ${freqLevel.color})`, borderRadius: 3, transition: 'width 0.5s' }} />
+                <div style={{ height: 6, background: '#f8fafc', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${freqPct}%`, background: `linear-gradient(90deg, #1a73e8, ${freqLevel.color})`, borderRadius: 3, transition: 'width 0.5s' }} />
                 </div>
                 {freqLevelIdx < 5 && (
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 6 }}>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 6 }}>
                     Butuh {Math.ceil((FREQ_LEVELS[freqLevelIdx + 1] ? (freqLevelIdx + 1) / 6 * freqTotal : freqTotal) - freqDone)} field lagi untuk jadi <span style={{ color: FREQ_LEVELS[freqLevelIdx + 1]?.color }}>{FREQ_LEVELS[freqLevelIdx + 1]?.name}</span>
                   </div>
                 )}
@@ -1008,8 +1008,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             </div>
 
             {/* Right: Checklist */}
-            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
-              <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Sinyal yang Perlu Dikuatkan</div>
+            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
+              <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Sinyal yang Perlu Dikuatkan</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
                 {FREQ_CHECKS.map((check, i) => {
                   const done = freqChecked[i]
@@ -1020,15 +1020,15 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         {done && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </div>
                       <span style={{ fontSize: '0.82rem', color: done ? '#64748b' : '#94a3b8', textDecoration: done ? 'line-through' : 'none', fontWeight: done ? 400 : 500 }}>{check.label}</span>
-                      {!done && <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: '#475569', flexShrink: 0 }}>→ {check.tab === 'identity' ? 'Identity' : check.tab === 'niche' ? 'Niche' : check.tab === 'story' ? 'Story' : check.tab === 'bio' ? 'Bio' : 'Visual'}</span>}
+                      {!done && <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: '#5a6a85', flexShrink: 0 }}>→ {check.tab === 'identity' ? 'Identity' : check.tab === 'niche' ? 'Niche' : check.tab === 'story' ? 'Story' : check.tab === 'bio' ? 'Bio' : 'Visual'}</span>}
                     </button>
                   )
                 })}
               </div>
 
               {/* Level ladder summary */}
-              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #1f1f1f' }}>
-                <div style={{ fontSize: '0.72rem', color: '#475569', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tangga Frekuensi</div>
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e5eaf2' }}>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tangga Frekuensi</div>
                 {[...FREQ_LEVELS].reverse().map((lvl) => (
                   <div key={lvl.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 8px', borderRadius: 6, background: lvl.id === freqLevel.id ? `${lvl.color}12` : 'transparent', marginBottom: 2 }}>
                     <span style={{ fontSize: '0.8rem' }}>{lvl.icon}</span>
@@ -1046,7 +1046,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {/* Account Identity */}
         {tab === 'identity' && sectionCard(<>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Nama Akun</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Akun</label>
             <input
               style={fieldStyle()}
               value={profile.nama_akun ?? ''}
@@ -1069,10 +1069,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {tab === 'niche' && sectionCard(<>
           {/* Helper banner — muncul kalau suka sudah isi tapi field lain masih kosong */}
           {profile.suka && (!profile.bisa || !profile.dibutuhkan || !profile.peluang) && (
-            <div style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 10, padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Belum tau mau isi kolom lainnya?</span>
+            <div style={{ background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 10, padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>Belum tau mau isi kolom lainnya?</span>
               <button type="button" onClick={() => setAiModal({ prompt: buildHelperPrompt() })}
-                style={{ background: 'none', border: 'none', color: '#A78BFA', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                style={{ background: 'none', border: 'none', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                 ✨ Gak tau? Generate semuanya
               </button>
             </div>
@@ -1080,19 +1080,19 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Apa yang kamu suka?</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Apa yang kamu suka?</label>
               <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.suka ?? ''} onChange={e => setField('suka', e.target.value)} placeholder="Hal-hal yang kamu minati..." />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Apa yang kamu bisa lakukan?</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Apa yang kamu bisa lakukan?</label>
               <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.bisa ?? ''} onChange={e => setField('bisa', e.target.value)} placeholder="Keahlian atau skill kamu..." />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Apa yang dibutuhkan orang?</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Apa yang dibutuhkan orang?</label>
               <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.dibutuhkan ?? ''} onChange={e => setField('dibutuhkan', e.target.value)} placeholder="Problem yang orang butuh solusinya..." />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Peluang penghasilan?</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Peluang penghasilan?</label>
               <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.peluang ?? ''} onChange={e => setField('peluang', e.target.value)} placeholder="Monetisasi yang mungkin..." />
             </div>
           </div>
@@ -1100,26 +1100,26 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             type="button"
             disabled={!profile.suka}
             onClick={() => setAiModal({ prompt: buildNichePrompt() })}
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid #7C3AED', borderRadius: 10, padding: '10px 20px', color: '#A78BFA', fontSize: '0.875rem', fontWeight: 600, cursor: profile.suka ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
+            style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.suka ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>✨</span> Generate dengan AI
           </button>
           {/* Niche Options CRUD */}
-          <div style={{ background: '#0d1117', border: '1px solid #2a2a2a', borderRadius: 12, padding: 20 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opsi Niche dari AI</div>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opsi Niche dari AI</div>
                 <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Tambah opsi dari hasil AI, pilih satu sebagai utama</div>
               </div>
               <button type="button" onClick={() => { setNicheForm({ id: crypto.randomUUID(), niche: '', kategori: '', micro_niche: '', nama_akun: '', is_primary: profile.niche_options.length === 0 }); setNicheEditId(null) }}
-                style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid #7C3AED', borderRadius: 8, padding: '7px 14px', color: '#A78BFA', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                style={{ background: 'rgba(26,115,232,0.12)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                 + Tambah Opsi
               </button>
             </div>
 
             {/* Inline Add/Edit Form */}
             {nicheForm && (
-              <div style={{ background: '#111', border: '1px solid #7C3AED40', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ fontSize: '0.78rem', color: '#A78BFA', fontWeight: 600 }}>{nicheEditId ? 'Edit Opsi' : 'Tambah Opsi Baru'}</div>
+              <div style={{ background: '#fff', border: '1px solid #1a73e840', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: '0.78rem', color: '#42a5f5', fontWeight: 600 }}>{nicheEditId ? 'Edit Opsi' : 'Tambah Opsi Baru'}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   {[
                     { label: 'Niche', key: 'niche' as keyof NicheOption, placeholder: 'cth: Personal Finance' },
@@ -1128,7 +1128,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     { label: 'Nama Akun', key: 'nama_akun' as keyof NicheOption, placeholder: 'cth: @duitgenz' },
                   ].map(({ label, key, placeholder }) => (
                     <div key={key}>
-                      <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
                       <input style={fieldStyle()} value={(nicheForm[key] as string) ?? ''} onChange={e => setNicheForm(f => f ? { ...f, [key]: e.target.value } : f)} placeholder={placeholder} />
                     </div>
                   ))}
@@ -1146,10 +1146,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       setProfile(p => ({ ...p, niche: nicheForm.niche, kategori: nicheForm.kategori, micro_niche: nicheForm.micro_niche, nama_akun_rekomendasi: nicheForm.nama_akun }))
                     }
                     setNicheForm(null); setNicheEditId(null); setSaved(false)
-                  }} style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                  }} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
                     Simpan Opsi
                   </button>
-                  <button type="button" onClick={() => { setNicheForm(null); setNicheEditId(null) }} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 14px', color: '#64748b', fontSize: '0.82rem', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => { setNicheForm(null); setNicheEditId(null) }} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 14px', color: '#5a6a85', fontSize: '0.82rem', cursor: 'pointer' }}>
                     Batal
                   </button>
                 </div>
@@ -1164,17 +1164,17 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {profile.niche_options.map(opt => (
-                <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(124,58,237,0.08)' : '#111', border: `1px solid ${opt.is_primary ? '#7C3AED50' : '#1f1f1f'}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#A78BFA', marginTop: 6, flexShrink: 0 }} />}
+                <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(26,115,232,0.08)' : '#111', border: `1px solid ${opt.is_primary ? '#1a73e850' : '#1f1f1f'}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#42a5f5', marginTop: 6, flexShrink: 0 }} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontWeight: 700, color: opt.is_primary ? '#A78BFA' : '#e2e8f0', fontSize: '0.9rem' }}>{opt.niche}</span>
-                      {opt.is_primary && <span style={{ background: 'rgba(124,58,237,0.2)', color: '#A78BFA', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
+                      <span style={{ fontWeight: 700, color: opt.is_primary ? '#42a5f5' : '#e2e8f0', fontSize: '0.9rem' }}>{opt.niche}</span>
+                      {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                     </div>
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                      {opt.kategori && <span style={{ fontSize: '0.75rem', color: '#64748b' }}>📂 {opt.kategori}</span>}
-                      {opt.micro_niche && <span style={{ fontSize: '0.75rem', color: '#64748b' }}>🎯 {opt.micro_niche}</span>}
-                      {opt.nama_akun && <span style={{ fontSize: '0.75rem', color: '#475569', fontFamily: 'monospace' }}>{opt.nama_akun}</span>}
+                      {opt.kategori && <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>📂 {opt.kategori}</span>}
+                      {opt.micro_niche && <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>🎯 {opt.micro_niche}</span>}
+                      {opt.nama_akun && <span style={{ fontSize: '0.75rem', color: '#5a6a85', fontFamily: 'monospace' }}>{opt.nama_akun}</span>}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
@@ -1183,12 +1183,12 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         const updated = profile.niche_options.map(o => ({ ...o, is_primary: o.id === opt.id }))
                         setProfile(p => ({ ...p, niche_options: updated, niche: opt.niche, kategori: opt.kategori, micro_niche: opt.micro_niche, nama_akun_rekomendasi: opt.nama_akun }))
                         setSaved(false)
-                      }} style={{ background: 'rgba(167,139,250,0.1)', border: '1px solid #7C3AED30', borderRadius: 6, padding: '5px 8px', color: '#7C3AED', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      }} style={{ background: 'rgba(66,165,245,0.1)', border: '1px solid #1a73e830', borderRadius: 6, padding: '5px 8px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>
                         ⭐ Pilih
                       </button>
                     )}
                     <button type="button" title="Edit" onClick={() => { setNicheForm({ ...opt }); setNicheEditId(opt.id) }}
-                      style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #2a2a2a', borderRadius: 6, padding: '5px 8px', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
                       ✏️
                     </button>
                     <button type="button" title="Hapus" onClick={() => {
@@ -1219,10 +1219,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* SWOT helper banner */}
           {profile.niche && (!profile.kelebihan || !profile.kelemahan || !profile.peluang_brand || !profile.tantangan) && (
-            <div style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 10, padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Belum tau mau isi SWOT kamu?</span>
+            <div style={{ background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 10, padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>Belum tau mau isi SWOT kamu?</span>
               <button type="button" onClick={() => setAiModal({ prompt: buildSwotHelperPrompt() })}
-                style={{ background: 'none', border: 'none', color: '#A78BFA', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                style={{ background: 'none', border: 'none', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                 ✨ Gak tau? Generate semuanya
               </button>
             </div>
@@ -1237,7 +1237,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               { label: 'Tantangan', key: 'tantangan' as keyof BrandProfile, placeholder: 'Hambatan yang dihadapi...' },
             ].map(({ label, key, placeholder }) => (
               <div key={key}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>{label}</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>{label}</label>
                 <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={(profile[key] ?? '') as string} onChange={e => setField(key, e.target.value)} placeholder={placeholder} />
               </div>
             ))}
@@ -1247,33 +1247,33 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             type="button"
             disabled={!profile.kelebihan}
             onClick={() => setAiModal({ prompt: buildStoryPrompt() })}
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid #7C3AED', borderRadius: 10, padding: '10px 20px', color: '#A78BFA', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
+            style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>✨</span> Generate Origin Story dengan AI
           </button>
 
           {/* Premis CRUD */}
-          <div style={{ background: '#0d1117', border: '1px solid #2a2a2a', borderRadius: 12, padding: 20 }}>
+          <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Premis dari AI</div>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Premis dari AI</div>
                 <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Tambah variasi, pilih satu sebagai premis utama</div>
               </div>
               <button type="button" onClick={() => { setPremisForm({ id: crypto.randomUUID(), teks: '', format: '', is_primary: profile.premis_options.length === 0 }); setPremisEditId(null) }}
-                style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid #7C3AED', borderRadius: 8, padding: '7px 14px', color: '#A78BFA', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                style={{ background: 'rgba(26,115,232,0.12)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                 + Tambah Variasi
               </button>
             </div>
 
             {/* Inline form */}
             {premisForm && (
-              <div style={{ background: '#111', border: '1px solid #7C3AED40', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ fontSize: '0.78rem', color: '#A78BFA', fontWeight: 600 }}>{premisEditId ? 'Edit Variasi' : 'Tambah Variasi Baru'}</div>
+              <div style={{ background: '#fff', border: '1px solid #1a73e840', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: '0.78rem', color: '#42a5f5', fontWeight: 600 }}>{premisEditId ? 'Edit Variasi' : 'Tambah Variasi Baru'}</div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Format / Nama Variasi</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Format / Nama Variasi</div>
                   <input style={fieldStyle()} value={premisForm.format} onChange={e => setPremisForm(f => f ? { ...f, format: e.target.value } : f)} placeholder="cth: Format Transformasi / Format Misi / Variasi 1" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teks Premis</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teks Premis</div>
                   <textarea style={fieldStyle({ height: 100, resize: 'vertical' })} value={premisForm.teks} onChange={e => setPremisForm(f => f ? { ...f, teks: e.target.value } : f)} placeholder="Paste variasi premis dari AI di sini..." />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -1289,11 +1289,11 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       setProfile(p => ({ ...p, premis: premisForm.teks }))
                     }
                     setPremisForm(null); setPremisEditId(null); setSaved(false)
-                  }} style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                  }} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
                     Simpan Variasi
                   </button>
                   <button type="button" onClick={() => { setPremisForm(null); setPremisEditId(null) }}
-                    style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 14px', color: '#64748b', fontSize: '0.82rem', cursor: 'pointer' }}>
+                    style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 14px', color: '#5a6a85', fontSize: '0.82rem', cursor: 'pointer' }}>
                     Batal
                   </button>
                 </div>
@@ -1308,13 +1308,13 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {profile.premis_options.map(opt => (
-                <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(124,58,237,0.08)' : '#111', border: `1px solid ${opt.is_primary ? '#7C3AED50' : '#1f1f1f'}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#A78BFA', marginTop: 6, flexShrink: 0 }} />}
+                <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(26,115,232,0.08)' : '#111', border: `1px solid ${opt.is_primary ? '#1a73e850' : '#1f1f1f'}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#42a5f5', marginTop: 6, flexShrink: 0 }} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     {opt.format && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                        <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{opt.format}</span>
-                        {opt.is_primary && <span style={{ background: 'rgba(124,58,237,0.2)', color: '#A78BFA', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
+                        <span style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{opt.format}</span>
+                        {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                       </div>
                     )}
                     <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#e2e8f0' : '#94a3b8', lineHeight: 1.6 }}>{opt.teks}</p>
@@ -1325,12 +1325,12 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         const updated = profile.premis_options.map(o => ({ ...o, is_primary: o.id === opt.id }))
                         setProfile(p => ({ ...p, premis_options: updated, premis: opt.teks }))
                         setSaved(false)
-                      }} style={{ background: 'rgba(167,139,250,0.1)', border: '1px solid #7C3AED30', borderRadius: 6, padding: '5px 8px', color: '#7C3AED', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      }} style={{ background: 'rgba(66,165,245,0.1)', border: '1px solid #1a73e830', borderRadius: 6, padding: '5px 8px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>
                         ⭐ Pilih
                       </button>
                     )}
                     <button type="button" onClick={() => { setPremisForm({ ...opt }); setPremisEditId(opt.id) }}
-                      style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #2a2a2a', borderRadius: 6, padding: '5px 8px', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer' }}>✏️</button>
+                      style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>✏️</button>
                     <button type="button" onClick={() => {
                       const filtered = profile.premis_options.filter(o => o.id !== opt.id)
                       setProfile(p => ({ ...p, premis_options: filtered }))
@@ -1364,11 +1364,11 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           {/* Header + Generate */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>Bio Studio</div>
-              <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Simpan beberapa variasi bio per platform, pilih satu sebagai utama</div>
+              <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Bio Studio</div>
+              <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Simpan beberapa variasi bio per platform, pilih satu sebagai utama</div>
             </div>
             <button type="button" disabled={!profile.niche} onClick={() => setAiModal({ prompt: buildBioPrompt() })}
-              style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid #7C3AED', borderRadius: 10, padding: '10px 20px', color: '#A78BFA', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
               <span>✨</span> Generate dengan AI
             </button>
           </div>
@@ -1393,7 +1393,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     const hasUtama = getBioList(pl.key).some(b => b.is_primary)
                     return (
                       <button key={pl.key} type="button" onClick={() => { setBioActivePlatform(pl.key); setBioForm(null); setBioEditId(null) }}
-                        style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${bioActivePlatform === pl.key ? '#7C3AED' : '#2a2a2a'}`, background: bioActivePlatform === pl.key ? 'rgba(124,58,237,0.15)' : '#1a1a1a', color: bioActivePlatform === pl.key ? '#A78BFA' : '#64748b', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${bioActivePlatform === pl.key ? '#1a73e8' : '#2a2a2a'}`, background: bioActivePlatform === pl.key ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: bioActivePlatform === pl.key ? '#42a5f5' : '#64748b', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                         {pl.icon} {pl.label}
                         {hasUtama && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399', flexShrink: 0 }} />}
                       </button>
@@ -1402,25 +1402,25 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* CRUD section */}
-                <div style={{ background: '#0d1117', border: '1px solid #2a2a2a', borderRadius: 12, padding: 20 }}>
+                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                     <div>
-                      <div style={{ fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio {activePl.label}</div>
+                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio {activePl.label}</div>
                       <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Maks {activePl.max} karakter</div>
                     </div>
                     <button type="button" onClick={() => { setBioForm({ id: crypto.randomUUID(), teks: '', is_primary: bioList.length === 0 }); setBioEditId(null) }}
-                      style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid #7C3AED', borderRadius: 8, padding: '7px 14px', color: '#A78BFA', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                      style={{ background: 'rgba(26,115,232,0.12)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
                       + Tambah Variasi
                     </button>
                   </div>
 
                   {/* Inline form */}
                   {bioForm && (
-                    <div style={{ background: '#111', border: '1px solid #7C3AED40', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      <div style={{ fontSize: '0.78rem', color: '#A78BFA', fontWeight: 600 }}>{bioEditId ? 'Edit Variasi' : 'Tambah Variasi Baru'}</div>
+                    <div style={{ background: '#fff', border: '1px solid #1a73e840', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <div style={{ fontSize: '0.78rem', color: '#42a5f5', fontWeight: 600 }}>{bioEditId ? 'Edit Variasi' : 'Tambah Variasi Baru'}</div>
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                          <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teks Bio</div>
+                          <div style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teks Bio</div>
                           <span style={{ fontSize: '0.7rem', color: bioForm.teks.length > activePl.max ? '#f87171' : '#475569' }}>{bioForm.teks.length}/{activePl.max}</span>
                         </div>
                         <textarea style={fieldStyle({ height: 90, resize: 'none' })} value={bioForm.teks} maxLength={activePl.max} onChange={e => setBioForm(f => f ? { ...f, teks: e.target.value } : f)} placeholder={`Paste variasi bio ${activePl.label} dari AI...`} />
@@ -1434,11 +1434,11 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                           setBioList(bioActivePlatform, updated)
                           if (bioForm.is_primary) setField(activePl.profileKey, bioForm.teks)
                           setBioForm(null); setBioEditId(null)
-                        }} style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                        }} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
                           Simpan Variasi
                         </button>
                         <button type="button" onClick={() => { setBioForm(null); setBioEditId(null) }}
-                          style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 14px', color: '#64748b', fontSize: '0.82rem', cursor: 'pointer' }}>
+                          style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 14px', color: '#5a6a85', fontSize: '0.82rem', cursor: 'pointer' }}>
                           Batal
                         </button>
                       </div>
@@ -1453,12 +1453,12 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {bioList.map(opt => (
-                      <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(124,58,237,0.08)' : '#111', border: `1px solid ${opt.is_primary ? '#7C3AED50' : '#1f1f1f'}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                        {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#A78BFA', marginTop: 5, flexShrink: 0 }} />}
+                      <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(26,115,232,0.08)' : '#111', border: `1px solid ${opt.is_primary ? '#1a73e850' : '#1f1f1f'}`, borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                        {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#42a5f5', marginTop: 5, flexShrink: 0 }} />}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            {opt.is_primary && <span style={{ background: 'rgba(124,58,237,0.2)', color: '#A78BFA', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
-                            <span style={{ fontSize: '0.68rem', color: '#475569' }}>{opt.teks.length} karakter</span>
+                            {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
+                            <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{opt.teks.length} karakter</span>
                           </div>
                           <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#e2e8f0' : '#94a3b8', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{opt.teks}</p>
                         </div>
@@ -1467,12 +1467,12 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                             <button type="button" onClick={() => {
                               setBioList(bioActivePlatform, bioList.map(b => ({ ...b, is_primary: b.id === opt.id })))
                               setField(activePl.profileKey, opt.teks)
-                            }} style={{ background: 'rgba(167,139,250,0.1)', border: '1px solid #7C3AED30', borderRadius: 6, padding: '5px 8px', color: '#7C3AED', fontSize: '0.75rem', cursor: 'pointer' }}>
+                            }} style={{ background: 'rgba(66,165,245,0.1)', border: '1px solid #1a73e830', borderRadius: 6, padding: '5px 8px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>
                               ⭐ Pilih
                             </button>
                           )}
                           <button type="button" onClick={() => { setBioForm({ ...opt }); setBioEditId(opt.id) }}
-                            style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #2a2a2a', borderRadius: 6, padding: '5px 8px', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer' }}>✏️</button>
+                            style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>✏️</button>
                           <button type="button" onClick={() => {
                             setBioList(bioActivePlatform, bioList.filter(b => b.id !== opt.id))
                           }} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '5px 8px', color: '#f87171', fontSize: '0.75rem', cursor: 'pointer' }}>🗑️</button>
@@ -1494,14 +1494,14 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {tab === 'visual' && sectionCard(<>
           {/* Logo */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>Logo Utama</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>Logo Utama</label>
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               {/* Preview */}
               <div
                 onClick={() => !logoUploading && logoFileRef.current?.click()}
-                style={{ width: 72, height: 72, borderRadius: 12, border: `2px dashed ${logoUploading ? '#7C3AED' : '#2a2a2a'}`, background: '#1a1a1a', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'border-color 0.2s', position: 'relative' }}>
+                style={{ width: 72, height: 72, borderRadius: 12, border: `2px dashed ${logoUploading ? '#1a73e8' : '#2a2a2a'}`, background: '#f8fafc', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'border-color 0.2s', position: 'relative' }}>
                 {logoUploading ? (
-                  <div style={{ fontSize: '0.7rem', color: '#A78BFA', textAlign: 'center', padding: 4 }}>uploading...</div>
+                  <div style={{ fontSize: '0.7rem', color: '#42a5f5', textAlign: 'center', padding: 4 }}>uploading...</div>
                 ) : profile.logo_main_url ? (
                   <img src={profile.logo_main_url} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                 ) : (
@@ -1527,7 +1527,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   onChange={e => setField('logo_main_url', e.target.value)}
                   placeholder="https://... atau klik kotak untuk upload langsung"
                 />
-                <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 4 }}>
+                <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 4 }}>
                   Klik kotak kiri untuk upload file (maks 2MB) — atau paste URL dari Drive/Imgur
                 </div>
                 {logoError && <div style={{ fontSize: '0.72rem', color: '#f87171', marginTop: 4 }}>{logoError}</div>}
@@ -1537,9 +1537,9 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Color Palette */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>Color Palette Brand</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>Color Palette Brand</label>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-              {(profile.color_palette ?? ['#7C3AED', '#A78BFA', '#F9FAFB']).map((color, i) => (
+              {(profile.color_palette ?? ['#1a73e8', '#42a5f5', '#F9FAFB']).map((color, i) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                   <div style={{ position: 'relative' }}>
                     <input
@@ -1554,13 +1554,13 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       style={{ width: 48, height: 48, border: '2px solid #2a2a2a', borderRadius: 10, cursor: 'pointer', padding: 2, background: 'transparent' }}
                     />
                   </div>
-                  <span style={{ fontSize: '0.68rem', color: '#64748b', fontFamily: 'monospace' }}>{color}</span>
+                  <span style={{ fontSize: '0.68rem', color: '#5a6a85', fontFamily: 'monospace' }}>{color}</span>
                   {(profile.color_palette ?? []).length > 1 && (
                     <button type="button" onClick={() => {
                       const next = (profile.color_palette ?? []).filter((_, idx) => idx !== i)
                       setProfile(p => ({ ...p, color_palette: next }))
                       setSaved(false)
-                    }} style={{ background: 'transparent', border: 'none', color: '#475569', fontSize: '0.7rem', cursor: 'pointer', padding: 0 }}>hapus</button>
+                    }} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '0.7rem', cursor: 'pointer', padding: 0 }}>hapus</button>
                   )}
                 </div>
               ))}
@@ -1568,17 +1568,17 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 <button type="button" onClick={() => {
                   setProfile(p => ({ ...p, color_palette: [...(p.color_palette ?? []), '#000000'] }))
                   setSaved(false)
-                }} style={{ width: 48, height: 48, border: '2px dashed #2a2a2a', borderRadius: 10, background: 'transparent', color: '#475569', fontSize: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                }} style={{ width: 48, height: 48, border: '2px dashed #2a2a2a', borderRadius: 10, background: 'transparent', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
               )}
             </div>
-            <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 6 }}>Klik warna untuk mengubah — maksimal 6 warna</div>
+            <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 6 }}>Klik warna untuk mengubah — maksimal 6 warna</div>
           </div>
 
           {/* Color Preview */}
           {(profile.color_palette ?? []).length > 0 && (
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>Preview Palette</label>
-              <div style={{ display: 'flex', height: 32, borderRadius: 8, overflow: 'hidden', border: '1px solid #2a2a2a' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>Preview Palette</label>
+              <div style={{ display: 'flex', height: 32, borderRadius: 8, overflow: 'hidden', border: '1px solid #e5eaf2' }}>
                 {(profile.color_palette ?? []).map((c, i) => (
                   <div key={i} style={{ flex: 1, background: c }} title={c} />
                 ))}
@@ -1588,12 +1588,12 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Typography */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 8, fontWeight: 500 }}>Tipografi / Font Utama</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>Tipografi / Font Utama</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {['Inter', 'Poppins', 'Roboto', 'Montserrat', 'Playfair Display', 'Nunito', 'DM Sans', 'Raleway', 'Custom'].map(font => (
                 <button key={font} type="button"
                   onClick={() => setField('typography', font)}
-                  style={{ padding: '7px 14px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 500, border: profile.typography === font ? '1px solid #7C3AED' : '1px solid #2a2a2a', background: profile.typography === font ? 'rgba(124,58,237,0.15)' : '#1a1a1a', color: profile.typography === font ? '#A78BFA' : '#64748b', cursor: 'pointer', fontFamily: font !== 'Custom' ? font : 'inherit' }}>
+                  style={{ padding: '7px 14px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 500, border: profile.typography === font ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: profile.typography === font ? 'rgba(26,115,232,0.15)' : '#1a1a1a', color: profile.typography === font ? '#42a5f5' : '#64748b', cursor: 'pointer', fontFamily: font !== 'Custom' ? font : 'inherit' }}>
                   {font}
                 </button>
               ))}
@@ -1605,17 +1605,17 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Brand Summary */}
           {(profile.color_palette?.length || profile.logo_main_url || profile.typography) ? (
-            <div style={{ background: '#0d0d0d', border: '1px solid #1f1f1f', borderRadius: 10, padding: 16, display: 'flex', gap: 14, alignItems: 'center' }}>
+            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: 16, display: 'flex', gap: 14, alignItems: 'center' }}>
               {profile.logo_main_url && (
-                <div style={{ width: 44, height: 44, borderRadius: 8, border: '1px solid #2a2a2a', overflow: 'hidden', flexShrink: 0 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 8, border: '1px solid #e5eaf2', overflow: 'hidden', flexShrink: 0 }}>
                   <img src={profile.logo_main_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
               )}
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem', marginBottom: 4, fontFamily: profile.typography || 'inherit' }}>{profile.nama_akun || 'Nama Brand'}</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.9rem', marginBottom: 4, fontFamily: profile.typography || 'inherit' }}>{profile.nama_akun || 'Nama Brand'}</div>
                 <div style={{ display: 'flex', gap: 4 }}>
                   {(profile.color_palette ?? []).map((c, i) => <div key={i} style={{ width: 14, height: 14, borderRadius: 3, background: c }} />)}
-                  {profile.typography && <span style={{ fontSize: '0.7rem', color: '#475569', marginLeft: 4, fontStyle: 'italic' }}>{profile.typography}</span>}
+                  {profile.typography && <span style={{ fontSize: '0.7rem', color: '#5a6a85', marginLeft: 4, fontStyle: 'italic' }}>{profile.typography}</span>}
                 </div>
               </div>
             </div>
@@ -1637,7 +1637,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {/* Sub-step tabs */}
-              <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #1f1f1f', marginBottom: 24, overflowX: 'auto' }}>
+              <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #e5eaf2', marginBottom: 24, overflowX: 'auto' }}>
                 {affSteps.map((s, i) => (
                   <button key={s.id} type="button" onClick={() => setAffStep(s.id)}
                     style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: affStep === s.id ? '2px solid #34d399' : '2px solid transparent', color: affStep === s.id ? '#34d399' : '#64748b', fontSize: '0.82rem', fontWeight: affStep === s.id ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1651,8 +1651,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               {affStep === 'aff-niche' && sectionCard(<>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>Niche & Target Pembeli</div>
-                    <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Tentukan jenis akun, produk yang mau dijual, dan siapa yang beli</div>
+                    <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Niche & Target Pembeli</div>
+                    <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Tentukan jenis akun, produk yang mau dijual, dan siapa yang beli</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffNichePrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1662,7 +1662,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Tipe akun */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 10, fontWeight: 600 }}>Tipe Akun Affiliate</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 10, fontWeight: 600 }}>Tipe Akun Affiliate</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {[
                       { id: 'personal', icon: '🧑', label: 'Personal Brand', desc: 'Akun personal kamu sendiri + promosi produk affiliate. Audiens kenal kamu sebagai orangnya.' },
@@ -1672,7 +1672,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         style={{ padding: '14px 16px', borderRadius: 10, border: `1px solid ${profile.affiliate_tipe === tipe.id ? '#34d399' : '#2a2a2a'}`, background: profile.affiliate_tipe === tipe.id ? 'rgba(52,211,153,0.07)' : '#111', cursor: 'pointer' }}>
                         <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>{tipe.icon}</div>
                         <div style={{ fontWeight: 600, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#e2e8f0', fontSize: '0.875rem', marginBottom: 4 }}>{tipe.label}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#475569', lineHeight: 1.5 }}>{tipe.desc}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#5a6a85', lineHeight: 1.5 }}>{tipe.desc}</div>
                       </div>
                     ))}
                   </div>
@@ -1680,7 +1680,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Kategori produk */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Kategori Produk Fokus <span style={{ color: '#64748b', fontWeight: 400 }}>(pilih yang paling relevan)</span></label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Kategori Produk Fokus <span style={{ color: '#5a6a85', fontWeight: 400 }}>(pilih yang paling relevan)</span></label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
                     {['Mainan Anak', 'Skincare & Beauty', 'Fashion', 'Gadget & Tech', 'Makanan & Minuman', 'Ibu & Bayi', 'Olahraga & Fitness', 'Rumah & Dekorasi', 'Buku & Edukasi', 'Travel', 'Otomotif', 'Kesehatan', 'Gaming', 'Hewan Peliharaan', 'Peralatan Dapur'].map(kat => {
                       const selected = (profile.affiliate_kategori_fokus || []).includes(kat)
@@ -1731,14 +1731,14 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Target buyer */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Target Pembeli (Buyer Persona)</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Target Pembeli (Buyer Persona)</label>
                   <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.affiliate_target_buyer} onChange={e => setField('affiliate_target_buyer', e.target.value)}
                     placeholder={`cth: Ibu-ibu 25-40 tahun yang punya anak balita, aktif di TikTok, cari produk mainan edukatif yang aman dan harga terjangkau, sering belanja online di Shopee/Tokopedia`} />
                 </div>
 
                 {/* Platform */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Platform Affiliate yang Digunakan</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Platform Affiliate yang Digunakan</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {['TikTok Shop', 'Shopee Affiliate', 'Tokopedia Affiliate', 'Lazada Affiliate', 'Involve Asia', 'AccessTrade', 'Evermos', 'Sociolla Affiliate', 'Traveloka', 'Tiket.com'].map(pl => {
                       const selected = (profile.affiliate_platforms || []).includes(pl)
@@ -1747,7 +1747,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                           const cur = profile.affiliate_platforms || []
                           setProfile(p => ({ ...p, affiliate_platforms: selected ? cur.filter(x => x !== pl) : [...cur, pl] }))
                           setSaved(false)
-                        }} style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? '#A78BFA' : '#2a2a2a'}`, background: selected ? 'rgba(124,58,237,0.12)' : '#1a1a1a', color: selected ? '#A78BFA' : '#64748b', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
+                        }} style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? '#42a5f5' : '#2a2a2a'}`, background: selected ? 'rgba(26,115,232,0.12)' : '#1a1a1a', color: selected ? '#42a5f5' : '#64748b', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
                           {pl}
                         </button>
                       )
@@ -1768,8 +1768,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               {affStep === 'aff-identity' && sectionCard(<>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>Identitas Akun</div>
-                    <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Nama akun, tagline, dan positioning yang bikin orang langsung ngerti akunmu tentang apa</div>
+                    <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Identitas Akun</div>
+                    <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Nama akun, tagline, dan positioning yang bikin orang langsung ngerti akunmu tentang apa</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffIdentityPrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1778,10 +1778,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* Nama akun CRUD */}
-                <div style={{ background: '#0d1117', border: '1px solid #2a2a2a', borderRadius: 12, padding: 20 }}>
+                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
-                      <div style={{ fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rekomendasi Nama Akun</div>
+                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rekomendasi Nama Akun</div>
                       <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Simpan pilihan nama dari AI, lalu pilih satu sebagai utama</div>
                     </div>
                     <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_nama_options: [...(p.affiliate_nama_options || []), { id: crypto.randomUUID(), nama: '', alasan: '', is_primary: (p.affiliate_nama_options || []).length === 0 }] }))}
@@ -1817,16 +1817,16 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Tagline */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Tagline Akun</label>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: 8 }}>1 kalimat singkat yang menjelaskan akunmu (tampil di bio)</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Tagline Akun</label>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>1 kalimat singkat yang menjelaskan akunmu (tampil di bio)</div>
                   <input style={fieldStyle({})} value={profile.affiliate_tagline} onChange={e => setField('affiliate_tagline', e.target.value)}
                     placeholder="cth: Mainan edukatif terpercaya untuk tumbuh kembang si kecil 🧸" />
                 </div>
 
                 {/* Positioning */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Positioning Statement</label>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: 8 }}>Apa yang membedakan akunmu dari akun sejenis?</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Positioning Statement</label>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>Apa yang membedakan akunmu dari akun sejenis?</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
                     {['Honest Reviewer', 'Deal Hunter', 'Niche Expert', 'Lifestyle Curator', 'Tutorial Creator', 'Comparison Expert', 'Budget Finder', 'Premium Curator'].map(opt => (
                       <button key={opt} type="button" onClick={() => setField('affiliate_positioning', profile.affiliate_positioning === opt ? '' : opt)}
@@ -1841,7 +1841,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => setAffStep('aff-niche')} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 16px', color: '#64748b', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                    <button type="button" onClick={() => setAffStep('aff-niche')} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 16px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
                   <button type="button" onClick={() => setAffStep('aff-konten')}
@@ -1855,8 +1855,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               {affStep === 'aff-konten' && sectionCard(<>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>Konten Strategy</div>
-                    <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Set preferensi dasar — eksekusi naskah & konten di modul Plan</div>
+                    <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Konten Strategy</div>
+                    <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Set preferensi dasar — eksekusi naskah & konten di modul Plan</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffKontenPrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1865,26 +1865,26 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* CTA ke Plan */}
-                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(124,58,237,0.3)', background: 'rgba(124,58,237,0.06)', textDecoration: 'none' }}>
+                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(26,115,232,0.3)', background: 'rgba(26,115,232,0.06)', textDecoration: 'none' }}>
                   <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>📝</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: '#A78BFA', fontSize: '0.9rem', marginBottom: 4 }}>Eksekusi di modul Plan</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.6 }}>Naskah, hook, ide konten, jadwal posting — semua dikerjakan di Plan yang sudah baca data brand ini secara otomatis.</div>
+                    <div style={{ fontWeight: 600, color: '#42a5f5', fontSize: '0.9rem', marginBottom: 4 }}>Eksekusi di modul Plan</div>
+                    <div style={{ fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.6 }}>Naskah, hook, ide konten, jadwal posting — semua dikerjakan di Plan yang sudah baca data brand ini secara otomatis.</div>
                   </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#42a5f5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                 </a>
 
                 {/* Content pillars — satu-satunya yang memang brand-level */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Content Pillars Akun</label>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: 8 }}>Tema besar konten yang membentuk identitas akun — generate AI lalu paste di sini</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Content Pillars Akun</label>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>Tema besar konten yang membentuk identitas akun — generate AI lalu paste di sini</div>
                   <textarea style={fieldStyle({ height: 110, resize: 'none' })} value={profile.affiliate_content_pillars} onChange={e => setField('affiliate_content_pillars', e.target.value)}
                     placeholder={'cth:\n1. Review Jujur — test produk sebelum rekomendasiin\n2. Deal Alert — info flash sale & promo\n3. Tutorial — cara pakai produk yang bener\n4. Perbandingan — A vs B, mana worth it?'} />
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => setAffStep('aff-identity')} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 16px', color: '#64748b', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                    <button type="button" onClick={() => setAffStep('aff-identity')} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 16px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
                   <button type="button" onClick={() => setAffStep('aff-bio')}
@@ -1898,8 +1898,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               {affStep === 'aff-bio' && sectionCard(<>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>Bio & Trust Builder</div>
-                    <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Bio yang convert + kalimat yang bikin audiens percaya rekomendasimu</div>
+                    <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Bio & Trust Builder</div>
+                    <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Bio yang convert + kalimat yang bikin audiens percaya rekomendasimu</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffiliatePrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1909,25 +1909,25 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Trust builder */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Kenapa Orang Harus Percaya Rekomendasimu?</label>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: 8 }}>Pengalaman, track record, atau expertise yang kamu punya di niche ini</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Kenapa Orang Harus Percaya Rekomendasimu?</label>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>Pengalaman, track record, atau expertise yang kamu punya di niche ini</div>
                   <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.affiliate_trust_builder} onChange={e => setField('affiliate_trust_builder', e.target.value)}
                     placeholder="cth: Gua ibu 2 anak yang udah 3 tahun kuratasi mainan edukatif — semua produk yang gua rekomendasiin udah gua beliin dulu buat anak gua, bukan asal comot dari seller..." />
                 </div>
 
                 {/* Disclosure */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Kalimat Disclosure Affiliate</label>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: 8 }}>Transparansi ke audiens — justru ini yang bikin makin dipercaya</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Kalimat Disclosure Affiliate</label>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>Transparansi ke audiens — justru ini yang bikin makin dipercaya</div>
                   <input style={fieldStyle({})} value={profile.affiliate_disclosure} onChange={e => setField('affiliate_disclosure', e.target.value)}
                     placeholder="cth: Link di bio adalah affiliate link — gua dapet komisi kecil kalau kamu beli, tapi review gua tetap jujur dan berdasarkan pengalaman sendiri ✓" />
                 </div>
 
                 {/* Bio CRUD */}
-                <div style={{ background: '#0d1117', border: '1px solid #2a2a2a', borderRadius: 12, padding: 20 }}>
+                <div style={{ background: '#0d1117', border: '1px solid #e5eaf2', borderRadius: 12, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
-                      <div style={{ fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Akun</div>
+                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Akun</div>
                       <div style={{ fontSize: '0.72rem', color: '#334155', marginTop: 2 }}>Simpan beberapa variasi, pilih satu sebagai utama</div>
                     </div>
                     <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_bio_options: [...(p.affiliate_bio_options || []), { id: crypto.randomUUID(), teks: '', is_primary: (p.affiliate_bio_options || []).length === 0 }] }))}
@@ -1959,7 +1959,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <button type="button" onClick={() => setAffStep('aff-konten')} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 10, padding: '10px 16px', color: '#64748b', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                  <button type="button" onClick={() => setAffStep('aff-konten')} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 16px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                   <SaveButton loading={saving} saved={saved} />
                 </div>
               </>)}
@@ -1977,28 +1977,28 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       {tab === 'akun' && (
         <div style={{ maxWidth: 600 }}>
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>📲 Akun Sosial Media</div>
-            <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Daftarkan akun-akun sosmed yang kamu kelola. Maksimal {MAX_AKUN} akun per workspace.</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>📲 Akun Sosial Media</div>
+            <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Daftarkan akun-akun sosmed yang kamu kelola. Maksimal {MAX_AKUN} akun per workspace.</div>
           </div>
 
           {/* Registered accounts */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
             {akunList.length === 0 && (
-              <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '28px 20px', textAlign: 'center', color: '#334155', fontSize: '0.85rem' }}>
+              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '28px 20px', textAlign: 'center', color: '#334155', fontSize: '0.85rem' }}>
                 Belum ada akun terdaftar. Tambahkan akun pertama kamu.
               </div>
             )}
             {akunList.map(a => (
-              <div key={a.id} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: 'rgba(124,58,237,0.12)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.2)', whiteSpace: 'nowrap' }}>{a.platform}</span>
+              <div key={a.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: 4, background: 'rgba(26,115,232,0.12)', color: '#42a5f5', border: '1px solid rgba(26,115,232,0.2)', whiteSpace: 'nowrap' }}>{a.platform}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>{a.nama}</div>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 1 }}>@{a.handle}</div>
+                  <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>{a.nama}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 1 }}>@{a.handle}</div>
                 </div>
                 <button
                   onClick={() => deleteAkun(a.id)}
                   disabled={deletingAkun === a.id}
-                  style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: '#475569', fontSize: '0.75rem', cursor: 'pointer' }}>
+                  style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
                   {deletingAkun === a.id ? '...' : '🗑'}
                 </button>
               </div>
@@ -2007,39 +2007,39 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Add new account form */}
           {akunList.length < MAX_AKUN ? (
-            <div style={{ background: '#0f0f0f', border: '1px solid #2a2a2a', borderRadius: 12, padding: '16px 18px' }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', marginBottom: 12 }}>+ Tambah Akun ({akunList.length}/{MAX_AKUN})</div>
+            <div style={{ background: '#0f0f0f', border: '1px solid #e5eaf2', borderRadius: 12, padding: '16px 18px' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#5a6a85', marginBottom: 12 }}>+ Tambah Akun ({akunList.length}/{MAX_AKUN})</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginBottom: 5 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', marginBottom: 5 }}>Platform</label>
                   <select
                     value={akunForm.platform}
                     onChange={e => setAkunForm(f => ({ ...f, platform: e.target.value }))}
-                    style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 10px', color: '#e2e8f0', fontSize: '0.82rem', outline: 'none', cursor: 'pointer' }}>
+                    style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 10px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', cursor: 'pointer' }}>
                     {PLATFORMS_SOSMED.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginBottom: 5 }}>Username / Handle</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', marginBottom: 5 }}>Username / Handle</label>
                   <input
                     value={akunForm.handle}
                     onChange={e => setAkunForm(f => ({ ...f, handle: e.target.value }))}
                     placeholder="namaakun (tanpa @)"
-                    style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 10px', color: '#e2e8f0', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 10px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginBottom: 5 }}>Nama Akun (label untuk kamu)</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', marginBottom: 5 }}>Nama Akun (label untuk kamu)</label>
                   <input
                     value={akunForm.nama}
                     onChange={e => setAkunForm(f => ({ ...f, nama: e.target.value }))}
                     placeholder="cth: Toko Utama, Akun Affiliate A"
-                    style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '8px 10px', color: '#e2e8f0', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 10px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               </div>
               <button
                 onClick={addAkun}
                 disabled={savingAkun || !akunForm.handle.trim() || !akunForm.nama.trim()}
-                style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: savingAkun ? 'default' : 'pointer', opacity: (!akunForm.handle.trim() || !akunForm.nama.trim()) ? 0.5 : 1 }}>
+                style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: savingAkun ? 'default' : 'pointer', opacity: (!akunForm.handle.trim() || !akunForm.nama.trim()) ? 0.5 : 1 }}>
                 {savingAkun ? 'Menyimpan...' : '+ Tambah Akun'}
               </button>
             </div>
@@ -2054,13 +2054,13 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       {/* Universal AI Picker Modal */}
       {aiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
-                <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Pilih AI favorit kamu — prompt langsung terisi otomatis</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
+                <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Pilih AI favorit kamu — prompt langsung terisi otomatis</div>
               </div>
-              <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, lineHeight: 1 }}>✕</button>
+              <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, lineHeight: 1 }}>✕</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -2074,7 +2074,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: 1 }}>{ai.desc}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 1 }}>{ai.desc}</div>
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ai.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}>
                     <path d="M7 17L17 7M17 7H7M17 7v10"/>
@@ -2194,39 +2194,39 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
       </div>
     )}
     <form onSubmit={savePillars}>
-      <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 12, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 12, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>Content Pillars</div>
-            <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Maksimal 10 pillar konten + hashtag set per pillar</div>
+            <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Content Pillars</div>
+            <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Maksimal 10 pillar konten + hashtag set per pillar</div>
           </div>
           <button
             type="button"
             disabled={!profile.niche}
             onClick={() => setAiModal({ prompt: buildPillarsPromptLocal() })}
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid #7C3AED', borderRadius: 10, padding: '10px 20px', color: '#A78BFA', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>✨</span> Generate dengan AI
           </button>
         </div>
 
         {pillars.map((pillar, i) => (
-          <div key={i} style={{ background: '#0d0d0d', border: '1px solid #1f1f1f', borderRadius: 10, padding: 16 }}>
+          <div key={i} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 24, height: 24, borderRadius: 6, background: 'rgba(124,58,237,0.15)', border: '1px solid #7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#A78BFA', flexShrink: 0 }}>
+              <div style={{ width: 24, height: 24, borderRadius: 6, background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#42a5f5', flexShrink: 0 }}>
                 {i + 1}
               </div>
               <input
-                style={{ flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none' }}
+                style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none' }}
                 value={pillar.nama}
                 onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, nama: e.target.value } : x))}
                 placeholder={`Nama pillar ${i + 1}...`}
               />
               {pillars.length > 1 && (
-                <button type="button" onClick={() => removePillar(i)} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.1rem', padding: '0 4px' }}>×</button>
+                <button type="button" onClick={() => removePillar(i)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '1.1rem', padding: '0 4px' }}>×</button>
               )}
             </div>
             <textarea
-              style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 12px', color: '#64748b', fontSize: '0.8rem', outline: 'none', height: 64, resize: 'none', boxSizing: 'border-box' }}
+              style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 12px', color: '#5a6a85', fontSize: '0.8rem', outline: 'none', height: 64, resize: 'none', boxSizing: 'border-box' }}
               value={pillar.hashtags}
               onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, hashtags: e.target.value } : x))}
               placeholder="#hashtag1 #hashtag2 #hashtag3 (max 30 hashtag)"
@@ -2235,7 +2235,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
         ))}
 
         {pillars.length < 10 && (
-          <button type="button" onClick={addPillar} style={{ background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 10, padding: '12px', color: '#64748b', fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button type="button" onClick={addPillar} style={{ background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 10, padding: '12px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             + Tambah Pillar
           </button>
         )}
@@ -2248,13 +2248,13 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
 
     {aiModal && (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-        <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
-              <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Pilih AI favorit kamu — prompt langsung terisi otomatis</div>
+              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
+              <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Pilih AI favorit kamu — prompt langsung terisi otomatis</div>
             </div>
-            <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, lineHeight: 1 }}>✕</button>
+            <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, lineHeight: 1 }}>✕</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
@@ -2268,7 +2268,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
                 <span style={{ fontSize: '1.5rem', width: 32, textAlign: 'center', flexShrink: 0 }}>{ai.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, color: ai.color, fontSize: '0.95rem' }}>{ai.label}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: 1 }}>{ai.desc}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 1 }}>{ai.desc}</div>
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ai.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
               </a>

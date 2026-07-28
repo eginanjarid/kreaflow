@@ -70,7 +70,7 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
   },
   creator: {
     label: 'Konten Creator',
-    color: '#A78BFA',
+    color: '#42a5f5',
     steps: [
       { id: 'naskah',   nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'shooting', nama: 'Shooting',    icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
@@ -133,10 +133,10 @@ const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
 const PRIORITIES = ['High', 'Medium', 'Low']
 const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf24', Low: '#86efac' }
-const PRODUCT_COLORS = ['#7C3AED','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
+const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
 
 const BOARD_COLS = [
-  { id: 'todo',  label: 'Todo',       count_color: '#475569', border: '#2a2a2a', bg: '#0d0d0d' },
+  { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#2a2a2a', bg: '#0d0d0d' },
   { id: 'doing', label: 'Dikerjakan', count_color: '#fbbf24', border: 'rgba(251,191,36,0.25)', bg: 'rgba(251,191,36,0.03)' },
   { id: 'done',  label: 'Done ✓',    count_color: '#86efac', border: 'rgba(134,239,172,0.25)', bg: 'rgba(134,239,172,0.03)' },
 ]
@@ -165,7 +165,7 @@ function fmtDate(d: string) {
 }
 
 function fieldStyle(extra?: object) {
-  return { width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 12px', color: '#e2e8f0', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
+  return { width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
 type WorkspaceMember = { id: string; user_id: string; role: string; jabatan: string; email: string; nama: string }
@@ -551,16 +551,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #1f1f1f', background: '#0d0d0d', flexShrink: 0, paddingLeft: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5eaf2', background: '#fff', flexShrink: 0, paddingLeft: 16 }}>
         {[
           { key: 'board', label: '⚡ Sprint Board' },
           { key: 'tasks', label: '✅ Tasks' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
-            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#7C3AED' : 'transparent'}`, color: activeTab === tab.key ? '#A78BFA' : '#475569', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#42a5f5' : '#475569', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
             {tab.key === 'tasks' && tasksTodo.length > 0 && (
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#1f1f1f', color: '#64748b', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#1f1f1f', color: '#5a6a85', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
             )}
           </button>
         ))}
@@ -571,11 +571,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', maxWidth: 720 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <div style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '1.1rem' }}>Tasks</div>
-            <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: 2 }}>Checklist manual — non-konten (beli alat, meeting, dll)</div>
+            <div style={{ fontWeight: 800, color: '#2a3547', fontSize: '1.1rem' }}>Tasks</div>
+            <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 2 }}>Checklist manual — non-konten (beli alat, meeting, dll)</div>
           </div>
           <button onClick={() => setTaskModal({ open: true, task: emptyTask() })}
-            style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
             + Task
           </button>
         </div>
@@ -583,7 +583,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         {tasks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#334155' }}>
             <div style={{ fontSize: '2rem', marginBottom: 10 }}>✅</div>
-            <div style={{ fontWeight: 600, color: '#475569' }}>Belum ada task manual</div>
+            <div style={{ fontWeight: 600, color: '#5a6a85' }}>Belum ada task manual</div>
           </div>
         )}
         {tasksTodo.length > 0 && (
@@ -591,10 +591,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Belum Selesai ({tasksTodo.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksTodo.map(t => (
-                <div key={t.id} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div key={t.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #2a2a2a', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.875rem' }}>{t.nama}</div>
+                    <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                       {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
                       {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#475569' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
@@ -602,8 +602,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <button onClick={() => setTaskModal({ open: true, task: { ...t } })} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 10px', color: '#64748b', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
-                    <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 6, padding: '4px 8px', color: '#334155', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
+                    <button onClick={() => setTaskModal({ open: true, task: { ...t } })} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 10px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
+                    <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#334155', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
                   </div>
                 </div>
               ))}
@@ -615,8 +615,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Selesai ({tasksDone.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksDone.map(t => (
-                <div key={t.id} style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #7C3AED', background: '#7C3AED', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div key={t.id} style={{ background: '#fff', border: '1px solid #1a1a1a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #1a73e8', background: '#1a73e8', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </button>
                   <span style={{ flex: 1, color: '#334155', fontSize: '0.875rem', textDecoration: 'line-through' }}>{t.nama}</span>
@@ -629,35 +629,35 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 14, width: '100%', maxWidth: 440 }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ fontWeight: 700, color: '#f1f5f9' }}>{taskModal.task.id ? 'Edit Task' : '+ Task Baru'}</div>
-                <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 14, width: '100%', maxWidth: 440 }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontWeight: 700, color: '#2a3547' }}>{taskModal.task.id ? 'Edit Task' : '+ Task Baru'}</div>
+                <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
               </div>
               <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Task *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Nama Task *</label>
                   <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder="cth: Beli tripod, Perpanjang domain..." />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Priority</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Priority</label>
                     <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={taskModal.task.priority} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, priority: e.target.value } } : m)}>
                       {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Deadline</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Deadline</label>
                     <input type="date" style={fieldStyle()} value={taskModal.task.due_date} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, due_date: e.target.value } } : m)} />
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Catatan</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Catatan</label>
                   <input style={fieldStyle()} value={taskModal.task.notes} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, notes: e.target.value } } : m)} placeholder="Detail..." />
                 </div>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                  <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 16px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
-                  <button onClick={saveTask} disabled={savingTask} style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 16px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                  <button onClick={saveTask} disabled={savingTask} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
                     {savingTask ? 'Menyimpan...' : taskModal.task.id ? 'Update' : 'Simpan'}
                   </button>
                 </div>
@@ -673,11 +673,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* Left: Sprint List */}
-        <div style={{ width: 230, flexShrink: 0, background: '#0d0d0d', borderRight: '1px solid #1f1f1f', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '14px 12px 10px', borderBottom: '1px solid #1f1f1f' }}>
+        <div style={{ width: 230, flexShrink: 0, background: '#fff', borderRight: '1px solid #e5eaf2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '14px 12px 10px', borderBottom: '1px solid #e5eaf2' }}>
             <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Sprint Mingguan</div>
             <button onClick={openSprintModal}
-              style={{ width: '100%', background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 0', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+              style={{ width: '100%', background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 0', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
               + Buat Sprint
             </button>
           </div>
@@ -693,20 +693,20 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const tplColor = getTemplateColor(s.template_type)
               return (
                 <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
-                  style={{ position: 'relative', padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(124,58,237,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(124,58,237,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
+                  style={{ position: 'relative', padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(26,115,232,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(26,115,232,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
                     {isCurrent && <span style={{ fontSize: '0.5rem', background: '#34d399', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
                     <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
                     <button
                       onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }}
                       title="Hapus sprint"
-                      style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#475569', fontSize: '0.75rem', cursor: 'pointer', padding: '1px 4px', borderRadius: 4, lineHeight: 1 }}
+                      style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer', padding: '1px 4px', borderRadius: 4, lineHeight: 1 }}
                     >✕</button>
                   </div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#A78BFA' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#42a5f5' : '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
                   <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}{s.akun ? ` · @${s.akun.replace(/^@/, '')}` : ''}</div>
-                  <div style={{ marginTop: 5, height: 3, background: '#1a1a1a', borderRadius: 2 }}>
-                    <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 2 }} />
+                  <div style={{ marginTop: 5, height: 3, background: '#f8fafc', borderRadius: 2 }}>
+                    <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 2 }} />
                   </div>
                   <div style={{ fontSize: '0.6rem', color: '#1f2937', marginTop: 2 }}>{done}/{sc.length} done</div>
                 </div>
@@ -720,42 +720,42 @@ export default function SprintsModule({ initialSprints, initialContents, product
           {!selectedSprint ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, color: '#334155' }}>
               <div style={{ fontSize: '2.5rem' }}>⚡</div>
-              <div style={{ fontWeight: 700, color: '#475569' }}>Pilih atau buat sprint mingguan</div>
-              <button onClick={openSprintModal} style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+              <div style={{ fontWeight: 700, color: '#5a6a85' }}>Pilih atau buat sprint mingguan</div>
+              <button onClick={openSprintModal} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
                 + Buat Sprint Pertama
               </button>
             </div>
           ) : (
             <>
               {/* Sprint header */}
-              <div style={{ padding: '12px 18px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, flexWrap: 'wrap' }}>
+              <div style={{ padding: '12px 18px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontWeight: 800, color: '#f1f5f9', fontSize: '0.95rem' }}>{selectedSprint.nama}</span>
-                    {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{selectedSprint.platform}</span>}
-                    {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.25)', color: '#A78BFA', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
+                    <span style={{ fontWeight: 800, color: '#2a3547', fontSize: '0.95rem' }}>{selectedSprint.nama}</span>
+                    {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{selectedSprint.platform}</span>}
+                    {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.1)', border: '1px solid rgba(66,165,245,0.25)', color: '#42a5f5', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
                     <span style={{ fontSize: '0.7rem', color: '#334155' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
                     <span style={{ fontSize: '0.7rem', color: '#334155' }}>·</span>
                     <span style={{ fontSize: '0.7rem', color: '#334155' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
-                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#A78BFA' }}>{totalPct}% done</span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#42a5f5' }}>{totalPct}% done</span>
                     {/* Step legend */}
                     <span style={{ fontSize: '0.65rem', color: '#334155', marginLeft: 4 }}>
                       Steps: {steps.map(s => s.icon).join(' ')}
                     </span>
                   </div>
                 </div>
-                <div style={{ width: 120, height: 5, background: '#1a1a1a', borderRadius: 3, flexShrink: 0 }}>
-                  <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 3, transition: 'width 0.3s' }} />
+                <div style={{ width: 120, height: 5, background: '#f8fafc', borderRadius: 3, flexShrink: 0 }}>
+                  <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
                 </div>
                 <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                  style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#A78BFA' : '#475569', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#42a5f5' : '#475569', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
                   <option value="">Semua Produk</option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                 </select>
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari..."
-                  style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 7, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.72rem', outline: 'none', width: 120 }} />
+                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: '#2a3547', fontSize: '0.72rem', outline: 'none', width: 120 }} />
                 <button onClick={() => setReportOpen(true)}
                   style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 7, padding: '6px 12px', color: '#fbbf24', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   📊 Laporan Tim
@@ -794,11 +794,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             onStepDone={(step) => advanceToStep(item, step)} />
                         ))}
                         {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
-                          <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(124,58,237,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                          <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                             <div style={{ fontSize: '1.5rem' }}>📋</div>
-                            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Sprint siap!</div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#5a6a85' }}>Sprint siap!</div>
                             <div style={{ fontSize: '0.68rem', color: '#334155' }}>Tambah konten yang mau dikerjakan minggu ini</div>
-                            <button onClick={openAddModal} style={{ marginTop: 4, background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 7, padding: '7px 16px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                            <button onClick={openAddModal} style={{ marginTop: 4, background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 7, padding: '7px 16px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
                               + Tambah Konten
                             </button>
                           </div>
@@ -820,15 +820,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
       {/* ── Sprint Create Modal ─────────────────────────────────────────────── */}
       {sprintModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20, overflowY: 'auto' }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 500, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '18px 22px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>⚡ Buat Sprint Baru</div>
-              <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 500, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '18px 22px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>⚡ Buat Sprint Baru</div>
+              <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
               {/* Template selector */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 8, fontWeight: 600 }}>Jenis Konten</label>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 8, fontWeight: 600 }}>Jenis Konten</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {(Object.entries(TEMPLATES) as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: key })); initStepsFromTemplate(key) }}
@@ -844,26 +844,26 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </div>
 
               {/* ── Step Editor (unified: add/remove steps + assign) ── */}
-              <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>Steps Pekerjaan</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#5a6a85' }}>Steps Pekerjaan</div>
                     <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Hapus step yg gak diperlukan, tambah yg kurang, assign ke anggota tim</div>
                   </div>
-                  <span style={{ fontSize: '0.65rem', color: '#475569' }}>{sprintSteps.length} step</span>
+                  <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{sprintSteps.length} step</span>
                 </div>
 
                 {/* Step rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {sprintSteps.map(({ step, memberId, deadline }, idx) => (
-                    <div key={`${step.id}-${idx}`} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 8, padding: '8px 10px' }}>
+                    <div key={`${step.id}-${idx}`} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 10px' }}>
                       {/* Row 1: number + name + delete */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                        <span style={{ fontSize: '0.65rem', color: '#334155', fontWeight: 700, background: '#1a1a1a', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#334155', fontWeight: 700, background: '#f8fafc', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
                         <span style={{ fontSize: '0.9rem' }}>{step.icon}</span>
-                        <span style={{ fontSize: '0.82rem', color: '#e2e8f0', fontWeight: 600, flex: 1 }}>{step.nama}</span>
+                        <span style={{ fontSize: '0.82rem', color: '#2a3547', fontWeight: 600, flex: 1 }}>{step.nama}</span>
                         <button type="button" onClick={() => setSprintSteps(prev => prev.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 5, width: 22, height: 22, color: '#475569', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 5, width: 22, height: 22, color: '#5a6a85', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           ✕
                         </button>
                       </div>
@@ -873,7 +873,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <select
                             value={memberId}
                             onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
-                            style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '5px 8px', color: memberId ? '#A78BFA' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                            style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: memberId ? '#42a5f5' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
                             <option value="">— Assign ke —</option>
                             {workspaceMembers.map(m => (
                               <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
@@ -900,15 +900,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {/* Add step */}
                 <div style={{ marginTop: 8, position: 'relative' }}>
                   <button type="button" onClick={() => setAddStepOpen(v => !v)}
-                    style={{ width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                    style={{ width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                     <span>+</span> Tambah Step
                   </button>
                   {addStepOpen && (
-                    <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#111', border: '1px solid #2a2a2a', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).map(ms => (
                         <button key={ms.id} type="button"
                           onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '', deadline: '' }]); setAddStepOpen(false) }}
-                          style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#e2e8f0', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
+                          style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#2a3547', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
                           <span style={{ fontSize: '0.9rem' }}>{ms.icon}</span> {ms.nama}
                         </button>
                       ))}
@@ -921,51 +921,51 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama Sprint *</label>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Nama Sprint *</label>
                 <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint 20-26 Jul" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Mulai</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Mulai</label>
                   <input type="date" style={fieldStyle()} value={sprintForm.start_date} onChange={e => setSprintForm(f => ({ ...f, start_date: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
                   <input type="date" style={fieldStyle()} value={sprintForm.end_date} onChange={e => setSprintForm(f => ({ ...f, end_date: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
                     <option value="">Semua Platform</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
                   {accounts.length > 0 ? (
                     <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))}>
                       <option value="">Pilih akun</option>
                       {accounts.map(a => <option key={a.id} value={`${a.nama} (@${a.handle})`}>{a.platform} · {a.nama} (@{a.handle})</option>)}
                     </select>
                   ) : (
-                    <div style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#475569' }}>
-                      Belum ada akun. <a href="/brand?tab=akun" style={{ color: '#A78BFA', textDecoration: 'none' }}>Daftarkan dulu di Brand → Akun Sosial →</a>
+                    <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#5a6a85' }}>
+                      Belum ada akun. <a href="/brand?tab=akun" style={{ color: '#42a5f5', textDecoration: 'none' }}>Daftarkan dulu di Brand → Akun Sosial →</a>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* ── Produk & Jumlah Konten ── */}
-              <div style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8' }}>Slot Konten</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#5a6a85' }}>Slot Konten</div>
                     <div style={{ fontSize: '0.65rem', color: '#334155', marginTop: 1 }}>Produk opsional — bisa dikosongkan untuk konten kreator</div>
                   </div>
                   {(() => {
                     const total = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
                     return total > 0 && (
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#A78BFA', background: 'rgba(124,58,237,0.1)', padding: '3px 8px', borderRadius: 5 }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#42a5f5', background: 'rgba(26,115,232,0.1)', padding: '3px 8px', borderRadius: 5 }}>
                         Total: {total} konten
                       </span>
                     )
@@ -973,13 +973,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {sprintProducts.map((row, idx) => (
-                    <div key={idx} style={{ background: '#0d0d0d', border: '1px solid #2a2a2a', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                    <div key={idx} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
                       {/* Baris 1: produk + jumlah + hapus */}
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'center' }}>
                         <select
                           value={row.product_id}
                           onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
-                          style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: '#e2e8f0', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
+                          style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 8px', color: '#2a3547', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
                           <option value="">— Tanpa Produk —</option>
                           {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                         </select>
@@ -987,41 +987,41 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           type="number" min={1} max={99}
                           value={row.jumlah}
                           onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
-                          style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 4px', color: '#e2e8f0', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }}
+                          style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 4px', color: '#2a3547', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }}
                         />
                         <button
                           type="button"
                           onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 5, width: 26, height: 28, color: '#334155', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 5, width: 26, height: 28, color: '#334155', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           ✕
                         </button>
                       </div>
                       {/* Baris 2: jadwal posting */}
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
                         <div>
-                          <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>📅 Mulai Posting</div>
+                          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>📅 Mulai Posting</div>
                           <input
                             type="date"
                             value={row.mulai}
                             onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
-                            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#e2e8f0' : '#475569', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
+                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#e2e8f0' : '#475569', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
                           />
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Jam</div>
+                          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Jam</div>
                           <input
                             type="time"
                             value={row.jam}
                             onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
-                            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: '#e2e8f0', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
+                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 8px', color: '#2a3547', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
                           />
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Interval</div>
+                          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Interval</div>
                           <select
                             value={row.interval}
                             onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
-                            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '6px 8px', color: '#e2e8f0', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
+                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 8px', color: '#2a3547', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
                             <option value={1}>Tiap 1 hari</option>
                             <option value={2}>Tiap 2 hari</option>
                             <option value={3}>Tiap 3 hari</option>
@@ -1031,7 +1031,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       </div>
                       {/* Preview jadwal */}
                       {row.mulai && (
-                        <div style={{ fontSize: '0.62rem', color: '#475569', background: '#0a0a0a', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
+                        <div style={{ fontSize: '0.62rem', color: '#5a6a85', background: '#f0f5f9', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
                           {(() => {
                             const dates = Array.from({ length: Math.min(row.jumlah, 4) }, (_, i) => {
                               const d = new Date(row.mulai + 'T00:00:00')
@@ -1049,7 +1049,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <button
                     type="button"
                     onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
-                    style={{ flex: 1, background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer' }}>
+                    style={{ flex: 1, background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>
                     + Tambah Baris
                   </button>
                   {products.length > 0 && (
@@ -1059,7 +1059,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         ...prev,
                         ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }))
                       ])}
-                      style={{ flex: 1, background: 'rgba(124,58,237,0.08)', border: '1px dashed rgba(124,58,237,0.3)', borderRadius: 7, padding: '6px', color: '#A78BFA', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
+                      style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#42a5f5', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
                       + Tambahkan Semua Produk
                     </button>
                   )}
@@ -1067,9 +1067,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </div>
 
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 18px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={createSprint} disabled={savingSprint}
-                  style={{ background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
+                  style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
                   {savingSprint ? 'Membuat Sprint...' : `Buat Sprint (${sprintProducts.filter(r=>r.jumlah>0).reduce((s,r)=>s+r.jumlah,0)} konten)`}
                 </button>
               </div>
@@ -1081,46 +1081,46 @@ export default function SprintsModule({ initialSprints, initialContents, product
       {/* ── Add Content Modal ───────────────────────────────────────────────── */}
       {addModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 460 }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 700, color: '#f1f5f9' }}>+ Tambah Konten ke Sprint</div>
-              <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 460 }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontWeight: 700, color: '#2a3547' }}>+ Tambah Konten ke Sprint</div>
+              <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Nama / Judul Konten *</label>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Nama / Judul Konten *</label>
                 <input style={fieldStyle()} value={addForm.judul} onChange={e => setAddForm(f => ({ ...f, judul: e.target.value }))} placeholder="cth: Review Serum Vit C — Drama Version" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Produk</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Produk</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.product_id} onChange={e => setAddForm(f => ({ ...f, product_id: e.target.value }))}>
                     <option value="">— Pilih produk —</option>
                     {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Format</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Format</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.format} onChange={e => setAddForm(f => ({ ...f, format: e.target.value }))}>
                     <option value="">— Format —</option>
                     {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.platform} onChange={e => setAddForm(f => ({ ...f, platform: e.target.value }))}>
                     <option value="">— Platform —</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang</label>
                   <input type="date" style={fieldStyle()} value={addForm.tanggal_tayang} onChange={e => setAddForm(f => ({ ...f, tanggal_tayang: e.target.value }))} />
                 </div>
               </div>
               {workspaceMembers.length > 1 && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Assign Tim (opsional)</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Assign Tim (opsional)</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                     {[
                       { key: 'assigned_naskah', label: '📝 Naskah' },
@@ -1128,7 +1128,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       { key: 'assigned_schedule', label: '📅 Schedule' },
                     ].map(({ key, label }) => (
                       <div key={key}>
-                        <div style={{ fontSize: '0.68rem', color: '#475569', marginBottom: 3 }}>{label}</div>
+                        <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginBottom: 3 }}>{label}</div>
                         <input style={fieldStyle({ fontSize: '0.8rem', padding: '7px 10px' })}
                           value={(addForm as Record<string, string>)[key] || ''}
                           onChange={e => setAddForm(f => ({ ...f, [key]: e.target.value }))}
@@ -1139,7 +1139,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
               )}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: '1px solid #2a2a2a', borderRadius: 8, padding: '9px 18px', color: '#94a3b8', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 18px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={saveContent} disabled={savingAdd}
                   style={{ background: 'linear-gradient(135deg,#059669,#34d399)', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingAdd ? 'not-allowed' : 'pointer' }}>
                   {savingAdd ? 'Menyimpan...' : 'Tambah'}
@@ -1153,26 +1153,26 @@ export default function SprintsModule({ initialSprints, initialContents, product
       {/* ── Detail Modal ────────────────────────────────────────────────────── */}
       {detailItem && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 440 }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 440 }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 {detailItem.product_id && (
                   <div style={{ fontSize: '0.68rem', fontWeight: 700, color: productColorMap[detailItem.product_id], marginBottom: 4 }}>
                     {products.find(p => p.id === detailItem.product_id)?.nama}
                   </div>
                 )}
-                <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.95rem' }}>{detailItem.judul}</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.95rem' }}>{detailItem.judul}</div>
                 <div style={{ display: 'flex', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>
-                  {detailItem.format && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailItem.format}</span>}
-                  {Array.isArray(detailItem.platform) && detailItem.platform[0] && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#64748b' }}>{detailItem.platform[0]}</span>}
+                  {detailItem.format && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{detailItem.format}</span>}
+                  {Array.isArray(detailItem.platform) && detailItem.platform[0] && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{detailItem.platform[0]}</span>}
                   {detailItem.tanggal_tayang && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>📅 {fmtDate(detailItem.tanggal_tayang)}{detailItem.jam_tayang ? ` · ${detailItem.jam_tayang}` : ''}</span>}
                 </div>
               </div>
-              <button onClick={() => setDetailItem(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+              <button onClick={() => setDetailItem(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
 
             {/* Step checklist */}
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid #1f1f1f' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2' }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Checklist</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {stepsWithMeta.map(step => {
@@ -1190,7 +1190,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </div>
                         {!done && (
                           <Link href={step.href} onClick={() => setDetailItem(null)}
-                            style={{ fontSize: '0.68rem', color: '#A78BFA', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)' }}>
+                            style={{ fontSize: '0.68rem', color: '#42a5f5', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>
                             Buka →
                           </Link>
                         )}
@@ -1198,7 +1198,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Meta: assignee + deadline */}
                       {(step.memberName || step.deadline) && (
                         <div style={{ display: 'flex', gap: 10, marginTop: 5, paddingLeft: 26 }}>
-                          {step.memberName && <span style={{ fontSize: '0.65rem', color: '#64748b' }}>👤 {step.memberName}</span>}
+                          {step.memberName && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>👤 {step.memberName}</span>}
                           {step.deadline && (
                             <span style={{ fontSize: '0.65rem', color: isOverdue ? '#f87171' : done ? '#334155' : '#fbbf24', fontWeight: isOverdue ? 700 : 400 }}>
                               {isOverdue ? '⚠️ ' : '📅 '}{new Date(step.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
@@ -1214,24 +1214,24 @@ export default function SprintsModule({ initialSprints, initialContents, product
             </div>
 
             {/* Jadwal Posting */}
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid #1f1f1f' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2' }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Jadwal Posting</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 110px', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Tanggal</div>
+                  <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Tanggal</div>
                   <input type="date" value={detailJadwal.date}
                     onChange={e => setDetailJadwal(prev => ({ ...prev, date: e.target.value }))}
-                    style={{ width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '7px 10px', color: '#e2e8f0', fontSize: '0.8rem', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', background: '#f0f5f9', border: '1px solid #e5eaf2', borderRadius: 6, padding: '7px 10px', color: '#2a3547', fontSize: '0.8rem', boxSizing: 'border-box' }} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.6rem', color: '#475569', marginBottom: 3 }}>Jam</div>
+                  <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Jam</div>
                   <input type="time" value={detailJadwal.time}
                     onChange={e => setDetailJadwal(prev => ({ ...prev, time: e.target.value }))}
-                    style={{ width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a', borderRadius: 6, padding: '7px 10px', color: '#e2e8f0', fontSize: '0.8rem', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', background: '#f0f5f9', border: '1px solid #e5eaf2', borderRadius: 6, padding: '7px 10px', color: '#2a3547', fontSize: '0.8rem', boxSizing: 'border-box' }} />
                 </div>
               </div>
               <button onClick={saveJadwal} disabled={savingJadwal}
-                style={{ marginTop: 8, width: '100%', background: 'linear-gradient(135deg,#7C3AED,#A78BFA)', border: 'none', borderRadius: 7, padding: '8px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: savingJadwal ? 'not-allowed' : 'pointer', opacity: savingJadwal ? 0.7 : 1 }}>
+                style={{ marginTop: 8, width: '100%', background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 7, padding: '8px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: savingJadwal ? 'not-allowed' : 'pointer', opacity: savingJadwal ? 0.7 : 1 }}>
                 {savingJadwal ? 'Menyimpan...' : '💾 Simpan Jadwal'}
               </button>
             </div>
@@ -1240,7 +1240,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {detailItem.status !== 'Terjadwal' && detailItem.status !== 'Tayang' && (
                 <button onClick={() => advanceStatus(detailItem, 'Terjadwal')} disabled={savingAction}
-                  style={{ width: '100%', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 8, padding: '9px', color: '#a78bfa', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                  style={{ width: '100%', background: 'rgba(66,165,245,0.1)', border: '1px solid rgba(66,165,245,0.3)', borderRadius: 8, padding: '9px', color: '#a78bfa', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
                   📅 Tandai Terjadwal
                 </button>
               )}
@@ -1254,7 +1254,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#86efac' }}>✓ Sudah Tayang — Done</div>
               )}
               <button onClick={() => removeFromSprint(detailItem.id)}
-                style={{ width: '100%', background: 'transparent', border: '1px solid #1f1f1f', borderRadius: 8, padding: '8px', color: '#334155', fontSize: '0.75rem', cursor: 'pointer' }}>
+                style={{ width: '100%', background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px', color: '#334155', fontSize: '0.75rem', cursor: 'pointer' }}>
                 Hapus dari Sprint
               </button>
             </div>
@@ -1308,13 +1308,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         return (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
-            <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, width: '100%', maxWidth: 600, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 16, width: '100%', maxWidth: 600, maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
                 <div>
-                  <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '1rem' }}>📊 Laporan Tim — {selectedSprint.nama}</div>
-                  <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: 2 }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)} · {sprintContents.length} konten</div>
+                  <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>📊 Laporan Tim — {selectedSprint.nama}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)} · {sprintContents.length} konten</div>
                 </div>
-                <button onClick={() => setReportOpen(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+                <button onClick={() => setReportOpen(false)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
               </div>
               <div style={{ overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {report.map(r => {
@@ -1328,8 +1328,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: '1rem' }}>{r.step.icon}</span>
                           <div>
-                            <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.85rem' }}>{r.step.nama}</div>
-                            <div style={{ fontSize: '0.68rem', color: '#475569', marginTop: 1 }}>
+                            <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.85rem' }}>{r.step.nama}</div>
+                            <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginTop: 1 }}>
                               {r.memberName}
                               {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#f87171' : '#334155' }}>
                                 · Deadline: {new Date(r.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
@@ -1338,11 +1338,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             </div>
                           </div>
                         </div>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: pct === 100 ? '#86efac' : '#A78BFA' }}>{pct}%</span>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: pct === 100 ? '#86efac' : '#42a5f5' }}>{pct}%</span>
                       </div>
                       {/* Progress bar */}
-                      <div style={{ height: 5, background: '#1a1a1a', borderRadius: 3, marginBottom: 10 }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? '#34d399' : 'linear-gradient(90deg,#7C3AED,#A78BFA)', borderRadius: 3, transition: 'width 0.3s' }} />
+                      <div style={{ height: 5, background: '#f8fafc', borderRadius: 3, marginBottom: 10 }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? '#34d399' : 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
                       </div>
                       {/* Stats row */}
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1361,7 +1361,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             )}
                           </>
                         )}
-                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#1a1a1a', color: r.overdue > 0 ? '#f87171' : '#475569' }}>
+                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#f8fafc', color: r.overdue > 0 ? '#f87171' : '#475569' }}>
                           ○ {r.pending} belum{r.overdue > 0 ? ` (${r.overdue} overdue)` : ''}
                         </span>
                       </div>
@@ -1380,11 +1380,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
       })()}
 
       {deleteUndo && (
-        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 500, background: '#1a1a1a', border: '1px solid #3a3a3a', borderRadius: 12, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 320 }}>
-          <span style={{ fontSize: '0.88rem', color: '#e2e8f0' }}>
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 500, background: '#f8fafc', border: '1px solid #3a3a3a', borderRadius: 12, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 320 }}>
+          <span style={{ fontSize: '0.88rem', color: '#2a3547' }}>
             Sprint <strong>"{deleteUndo.sprintName}"</strong> dihapus
           </span>
-          <button onClick={cancelDelete} style={{ background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+          <button onClick={cancelDelete} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
             Batalkan
           </button>
         </div>
@@ -1404,14 +1404,14 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
   const nextStepIdx = steps.findIndex(s => !isStepDone(item.status, s.doneAt))
 
   return (
-    <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
+    <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
       <div onClick={onClick}>
         {productName && (
           <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ● {productName}
           </div>
         )}
-        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
+        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2a3547', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
       </div>
 
       {/* Step chips */}
@@ -1437,7 +1437,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
                     href={step.href}
                     onClick={e => e.stopPropagation()}
                     title={`Buka ${step.nama}`}
-                    style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.4)', color: '#A78BFA', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
+                    style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.12)', border: '1px solid rgba(66,165,245,0.4)', color: '#42a5f5', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
                     ▶ {step.nama}
                   </a>
                   {/* Mark done — separate explicit button */}
@@ -1454,7 +1454,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
 
             // Future step
             return (
-              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#334155', display: 'flex', alignItems: 'center', gap: 2 }}>
+              <div key={step.id} style={{ fontSize: '0.6rem', padding: '3px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#334155', display: 'flex', alignItems: 'center', gap: 2 }}>
                 ○ {step.nama}
               </div>
             )
@@ -1476,7 +1476,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
           )
         }
         if (item.tanggal_tayang) return (
-          <div style={{ fontSize: '0.6rem', color: '#475569', marginTop: 5 }}>
+          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginTop: 5 }}>
             📅 {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}
           </div>
         )
