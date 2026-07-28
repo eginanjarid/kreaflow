@@ -174,9 +174,9 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
         {NAV_GROUPS.map((group, gi) => (
           <div key={gi} style={{ marginBottom: 8 }}>
             <div style={{
-              fontSize: '0.62rem', fontWeight: 700, color: '#c8d1e0',
-              letterSpacing: '0.8px', textTransform: 'uppercase',
-              padding: '6px 12px 4px',
+              fontSize: '0.65rem', fontWeight: 700, color: '#adb5c2',
+              letterSpacing: '1px', textTransform: 'uppercase',
+              padding: '10px 10px 4px',
             }}>
               {group.label}
             </div>

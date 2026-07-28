@@ -612,7 +612,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2a3547', marginBottom: 6 }}>Plan</h1>
+        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Plan</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Strategi platform dan rencana campaign konten kamu</p>
       </div>
 
@@ -620,7 +620,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       <div style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #e5eaf2' }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#42a5f5' : '#64748b', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+            style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#1a73e8' : '#5a6a85', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
             {t.label}
           </button>
         ))}
@@ -651,7 +651,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           {naskahMode === 'creator' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               {/* Form kiri */}
-              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
                   <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 4 }}>Konfigurasi Naskah</div>
                   <div style={{ fontSize: '0.78rem', color: '#5a6a85' }}>Isi detail konten → Generate → paste hasil AI di kanan</div>
@@ -743,7 +743,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               </div>
 
               {/* Output kanan */}
-              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Hasil Naskah</div>
@@ -775,7 +775,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 760 }}>
 
               {/* STEP 01 — Data Produk */}
-              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #e5eaf2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 4, height: 22, borderRadius: 2, background: '#ec4899' }} />
@@ -841,7 +841,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               </div>
 
               {/* STEP 02 — Konfigurasi */}
-              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #e5eaf2' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 4, height: 22, borderRadius: 2, background: '#38bdf8' }} />
@@ -1011,7 +1011,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               </div>
 
               {/* Output hasil naskah */}
-              <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 700, color: '#2a3547', marginBottom: 2 }}>Hasil Naskah</div>
@@ -1194,7 +1194,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             </button>
           </div>
           {campaigns.length === 0 ? (
-            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎯</div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada campaign</div>
               <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Rencanakan campaign promo, kolaborasi, atau event khusus</div>
@@ -1205,7 +1205,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {campaigns.map(c => (
-                <div key={c.id} style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '16px 20px' }}>
+                <div key={c.id} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '16px 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
@@ -1235,7 +1235,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* Campaign Modal */}
       {modal?.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.campaign.id ? 'Edit Campaign' : 'Tambah Campaign'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
@@ -1298,7 +1298,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* AI Picker Modal — Affiliate */}
       {affAiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAffAiModal(null); setAffPromptCopied(false) } }}>
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>{affAiModal.label || '⚗️ Compile Scripts'}</div>
@@ -1335,7 +1335,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* AI Picker Modal */}
       {aiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate Naskah</div>

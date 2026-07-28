@@ -197,7 +197,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 820, maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 4px 24px rgba(42,53,71,0.08)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 820, maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 6px 30px rgba(42,53,71,0.10)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #e5eaf2' }}>
           <div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>{item.judul}</div>
@@ -347,7 +347,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>Studio</h1>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 4 }}>Studio</h1>
           <p style={{ fontSize: '0.875rem', color: '#5a6a85' }}>Ruang kerja desainer & editor — lihat naskah, input hasil, preview visual</p>
         </div>
         <button onClick={() => setShowNotif(v => !v)}

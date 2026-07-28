@@ -77,7 +77,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2a3547', marginBottom: 6 }}>Budget</h1>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Budget</h1>
           <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Tracking pemasukan dan pengeluaran konten kamu</p>
         </div>
         <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
@@ -87,11 +87,11 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
 
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
-        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '18px 20px' }}>
+        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px' }}>
           <div style={{ fontSize: '0.75rem', color: '#86efac', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Pemasukan</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#86efac' }}>{formatRp(pemasukan)}</div>
         </div>
-        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '18px 20px' }}>
+        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px' }}>
           <div style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Pengeluaran</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f87171' }}>{formatRp(pengeluaran)}</div>
         </div>
@@ -115,7 +115,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
 
       {/* Transaction List */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>💰</div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada transaksi</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Mulai catat pemasukan dan pengeluaran kamu</div>
@@ -124,7 +124,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
           </button>
         </div>
       ) : (
-        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, overflow: 'hidden' }}>
+        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, overflow: 'hidden' }}>
           {filtered.map((t, i) => (
             <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', borderBottom: i < filtered.length - 1 ? '1px solid #1f1f1f' : 'none' }}>
               <div style={{ width: 36, height: 36, borderRadius: 8, background: t.tipe === 'Pemasukan' ? 'rgba(134,239,172,0.1)' : 'rgba(248,113,113,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>
@@ -147,7 +147,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
       {/* Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 460 }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 460 }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.tx.id ? 'Edit Transaksi' : 'Catat Transaksi'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>

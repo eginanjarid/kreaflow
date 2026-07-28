@@ -892,7 +892,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
   }
 
   const sectionCard = (children: React.ReactNode) => (
-    <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
       {children}
     </div>
   )
@@ -916,7 +916,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
     <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2a3547', marginBottom: 6 }}>Brand</h1>
+        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Brand</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Bangun fondasi identitas brand dan konten kamu</p>
       </div>
 
@@ -929,7 +929,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             style={{
               padding: '10px 16px', background: 'transparent', border: 'none',
               borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent',
-              color: tab === t.id ? '#42a5f5' : '#64748b',
+              color: tab === t.id ? '#1a73e8' : '#5a6a85',
               fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400,
               cursor: 'pointer', transition: 'all 0.15s', marginBottom: -1,
             }}>
@@ -1008,7 +1008,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             </div>
 
             {/* Right: Checklist */}
-            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
               <div style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Sinyal yang Perlu Dikuatkan</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
                 {FREQ_CHECKS.map((check, i) => {
@@ -2054,7 +2054,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       {/* Universal AI Picker Modal */}
       {aiModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
@@ -2194,7 +2194,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
       </div>
     )}
     <form onSubmit={savePillars}>
-      <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>Content Pillars</div>
@@ -2248,7 +2248,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
 
     {aiModal && (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setAiModal(null); setPromptCopied(false) } }}>
-        <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <div>
               <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>

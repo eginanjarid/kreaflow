@@ -158,7 +158,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2a3547', marginBottom: 6 }}>Settings</h1>
+        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2a3547', marginBottom: 6 }}>Settings</h1>
         <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Kelola workspace dan akun kamu</p>
       </div>
 
@@ -166,7 +166,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       <div style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #e5eaf2' }}>
         {[{ id: 'workspace', label: 'Workspace' }, { id: 'tim', label: 'Tim' }, { id: 'akun', label: 'Akun' }].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#42a5f5' : '#64748b', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+            style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#1a73e8' : '#5a6a85', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
             {t.label}
           </button>
         ))}
@@ -189,7 +189,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           </div>
 
           {/* Mode Toggle */}
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '18px 20px', marginBottom: 20 }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px', marginBottom: 20 }}>
             <div style={{ fontSize: '0.78rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>Mode Aktif</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {MODE_OPTIONS.map(m => {
@@ -246,7 +246,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           {teamMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#86efac', fontSize: '0.85rem', marginBottom: 16 }}>{teamMsg}</div>}
 
           {/* Members list */}
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
             <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>Member Aktif</div>
               <div style={{ fontSize: '0.75rem', color: '#5a6a85' }}>{members.length} member</div>
@@ -292,7 +292,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
           {/* Pending invites */}
           {pending.length > 0 && (
-            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
+            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5eaf2' }}>
                 <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>Undangan Tertunda</div>
               </div>
@@ -311,7 +311,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
           {/* Invite form */}
           {canManageTeam && (
-            <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '20px' }}>
+            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '20px' }}>
               <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem', marginBottom: 14 }}>Undang Member Baru</div>
               <form onSubmit={sendInvite} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
@@ -358,7 +358,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Akun Tab */}
       {tab === 'akun' && (
         <div style={{ maxWidth: 480 }}>
-          <div style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '20px 22px', marginBottom: 20 }}>
+          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '20px 22px', marginBottom: 20 }}>
             <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Info Akun</div>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
               <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
@@ -371,7 +371,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
             </div>
           </div>
 
-          <form onSubmit={changePassword} style={{ background: '#fff', boxShadow: '0 4px 24px rgba(42,53,71,0.08)', borderRadius: 20, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <form onSubmit={changePassword} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ fontSize: '0.78rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Ganti Password</div>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Password Baru *</label>
