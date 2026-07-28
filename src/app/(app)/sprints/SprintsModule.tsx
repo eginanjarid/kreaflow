@@ -138,9 +138,9 @@ const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d977
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
 
 const BOARD_COLS = [
-  { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#e5eaf2', bg: 'rgba(90,106,133,0.04)' },
-  { id: 'doing', label: 'Dikerjakan', count_color: '#d97706', border: 'rgba(217,119,6,0.25)', bg: 'rgba(217,119,6,0.03)' },
-  { id: 'done',  label: 'Done ✓',    count_color: '#059669', border: 'rgba(5,150,105,0.25)', bg: 'rgba(5,150,105,0.03)' },
+  { id: 'todo',  label: 'Todo',       count_color: '#6b7280', accentColor: '#94a3b8', border: '#e5eaf2', bg: '' },
+  { id: 'doing', label: 'Dikerjakan', count_color: '#d97706', accentColor: '#f59e0b', border: 'rgba(217,119,6,0.25)', bg: '' },
+  { id: 'done',  label: 'Done',       count_color: '#059669', accentColor: '#10b981', border: 'rgba(5,150,105,0.25)', bg: '' },
 ]
 
 function getColFromStatus(status: string): 'todo' | 'doing' | 'done' {
@@ -167,7 +167,7 @@ function fmtDate(d: string) {
 }
 
 function fieldStyle(extra?: object) {
-  return { width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
+  return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
 type WorkspaceMember = { id: string; user_id: string; role: string; jabatan: string; email: string; nama: string }
@@ -551,18 +551,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
+      <style>{`
+        .kf-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
+        .kf-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10) !important; transform: translateY(-1px); }
+        .kf-sprint-item:hover { background: #f9fafb !important; }
+      `}</style>
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5eaf2', background: '#fff', flexShrink: 0, paddingLeft: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', background: '#fff', flexShrink: 0, paddingLeft: 20, paddingRight: 20, borderBottom: '1px solid rgba(0,0,0,0.06)', gap: 4 }}>
         {[
           { key: 'board', label: 'Sprint Board' },
           { key: 'tasks', label: 'Tasks' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
-            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#1a73e8' : '#5a6a85', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+            style={{ padding: '13px 16px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#111827' : '#6b7280', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 600 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
             {tab.key === 'tasks' && tasksTodo.length > 0 && (
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#f1f5f9', color: '#5a6a85', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
+              <span style={{ fontSize: '0.65rem', fontWeight: 700, background: '#ef4444', color: '#fff', borderRadius: 20, padding: '1px 7px' }}>{tasksTodo.length}</span>
             )}
           </button>
         ))}
@@ -577,7 +582,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 2 }}>Checklist manual — non-konten (beli alat, meeting, dll)</div>
           </div>
           <button onClick={() => setTaskModal({ open: true, task: emptyTask() })}
-            style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
             + Task
           </button>
         </div>
@@ -593,8 +598,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Belum Selesai ({tasksTodo.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksTodo.map(t => (
-                <div key={t.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #e5eaf2', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
+                <div key={t.id} className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)' }}>
+                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 5, border: '1.5px solid #d1d5db', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
@@ -617,7 +622,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Selesai ({tasksDone.length})</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {tasksDone.map(t => (
-                <div key={t.id} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div key={t.id} style={{ background: '#fff', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 0 0 1px rgba(0,0,0,0.06)' }}>
                   <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #1a73e8', background: '#1a73e8', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </button>
@@ -672,19 +677,18 @@ export default function SprintsModule({ initialSprints, initialContents, product
     ) : (
 
       // ── SPRINT BOARD TAB ───────────────────────────────────────────────────
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', background: '#f5f6fa' }}>
 
-        {/* Left: Sprint List */}
-        <div style={{ width: 230, flexShrink: 0, background: '#fff', borderRight: '1px solid #e5eaf2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '14px 12px 10px', borderBottom: '1px solid #e5eaf2' }}>
-            <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Sprint Mingguan</div>
+        {/* Left: Sprint sidebar */}
+        <div style={{ width: 224, flexShrink: 0, background: '#fff', boxShadow: 'inset -1px 0 0 rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
             <button onClick={openSprintModal}
-              style={{ width: '100%', background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '9px 0', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+              style={{ width: '100%', background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 0', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.01em' }}>
               + Buat Sprint
             </button>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto', padding: '6px 8px' }}>
-            {sprints.length === 0 && <div style={{ fontSize: '0.75rem', color: '#5a6a85', padding: '20px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
+            {sprints.length === 0 && <div style={{ fontSize: '0.78rem', color: '#9ca3af', padding: '24px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
             {sprints.map(s => {
               const sc = contents.filter(c => c.sprint_id === s.id)
               const done = sc.filter(c => c.status === 'Tayang').length
@@ -693,24 +697,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const isCurrent = s.start_date <= today && s.end_date >= today
               const tplLabel = getTemplateLabel(s.template_type)
               const tplColor = getTemplateColor(s.template_type)
+              const pct = sc.length > 0 ? Math.round(done / sc.length * 100) : 0
               return (
                 <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
-                  style={{ position: 'relative', padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(26,115,232,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(26,115,232,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
-                    {isCurrent && <span style={{ fontSize: '0.65rem', background: '#059669', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
-                    <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
-                    <button
-                      onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }}
-                      title="Hapus sprint"
-                      style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer', padding: '1px 4px', borderRadius: 4, lineHeight: 1 }}
-                    >✕</button>
+                  className="kf-sprint-item"
+                  style={{ position: 'relative', padding: '10px 12px', borderRadius: 10, marginBottom: 2, cursor: 'pointer', background: active ? 'rgba(26,115,232,0.07)' : 'transparent', borderLeft: `3px solid ${active ? '#1a73e8' : 'transparent'}`, transition: 'background 0.15s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                    {isCurrent && <span style={{ fontSize: '0.6rem', background: '#059669', color: '#fff', fontWeight: 700, padding: '2px 6px', borderRadius: 20 }}>AKTIF</span>}
+                    <span style={{ fontSize: '0.65rem', fontWeight: 500, padding: '2px 6px', borderRadius: 20, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
+                    <button onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }} title="Hapus sprint"
+                      style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.8rem', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>✕</button>
                   </div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: active ? 700 : 500, color: active ? '#1a73e8' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.nama}</div>
-                  <div style={{ fontSize: '0.65rem', color: '#5a6a85', marginTop: 1 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}{s.akun ? ` · @${s.akun.replace(/^@/, '')}` : ''}</div>
-                  <div style={{ marginTop: 5, height: 3, background: '#f8fafc', borderRadius: 2 }}>
-                    <div style={{ height: '100%', width: `${sc.length > 0 ? Math.round(done / sc.length * 100) : 0}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 2 }} />
+                  <div style={{ fontSize: '0.82rem', fontWeight: active ? 700 : 500, color: active ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{s.nama}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginBottom: 7 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
+                  <div style={{ height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: active ? '#1a73e8' : '#d1d5db', borderRadius: 4, transition: 'width 0.4s ease' }} />
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 2 }}>{done}/{sc.length} done</div>
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 4 }}>{done}/{sc.length} selesai</div>
                 </div>
               )
             })}
@@ -720,75 +723,79 @@ export default function SprintsModule({ initialSprints, initialContents, product
         {/* Main: Board */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {!selectedSprint ? (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, color: '#5a6a85' }}>
-              <div style={{ fontSize: '2.5rem' }}></div>
-              <div style={{ fontWeight: 700, color: '#5a6a85' }}>Pilih atau buat sprint mingguan</div>
-              <button onClick={openSprintModal} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.95rem' }}>Mulai dengan Sprint Mingguan</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280', textAlign: 'center', maxWidth: 280, lineHeight: 1.6 }}>Buat sprint untuk mengatur konten minggu ini dalam kanban board</div>
+              <button onClick={openSprintModal} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', marginTop: 8 }}>
                 + Buat Sprint Pertama
               </button>
             </div>
           ) : (
             <>
-              {/* Sprint header */}
-              <div style={{ padding: '12px 18px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, flexWrap: 'wrap' }}>
+              {/* Sprint header bar */}
+              <div style={{ padding: '10px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontWeight: 800, color: '#2a3547', fontSize: '0.95rem' }}>{selectedSprint.nama}</span>
-                    {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{selectedSprint.platform}</span>}
-                    {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.1)', border: '1px solid rgba(66,165,245,0.25)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{selectedSprint.nama}</span>
+                    {selectedSprint.platform && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280' }}>{selectedSprint.platform}</span>}
+                    {selectedSprint.akun && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
-                    <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
-                    <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>·</span>
-                    <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
-                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8' }}>{totalPct}% done</span>
-                    {/* Step legend */}
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 3, marginLeft: 4 }}>
-                      {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#5a6a85', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#d1d5db' }}>·</span>
+                    <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8' }}>{totalPct}%</span>
+                    <div style={{ width: 60, height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${totalPct}%`, background: totalPct === 100 ? '#059669' : '#1a73e8', borderRadius: 4, transition: 'width 0.3s' }} />
+                    </div>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                      {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#9ca3af', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
                     </span>
                   </div>
                 </div>
-                <div style={{ width: 120, height: 5, background: '#f8fafc', borderRadius: 3, flexShrink: 0 }}>
-                  <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
+                    style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
+                    <option value="">Semua Produk</option>
+                    {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                  </select>
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
+                    style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
+                  <button onClick={() => setReportOpen(true)}
+                    style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', color: '#374151', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Laporan Tim
+                  </button>
                 </div>
-                <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#1a73e8' : '#5a6a85', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
-                  <option value="">Semua Produk</option>
-                  {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-                </select>
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari..."
-                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: '#2a3547', fontSize: '0.72rem', outline: 'none', width: 120 }} />
-                <button onClick={() => setReportOpen(true)}
-                  style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.35)', borderRadius: 7, padding: '6px 12px', color: '#d97706', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  Laporan Tim
-                </button>
               </div>
 
               {/* 3-Column Kanban */}
-              <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '14px', gap: 12 }}>
+              <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
                 {BOARD_COLS.map(col => {
                   const items = colItems(col.id)
                   return (
-                    <div key={col.id} style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', background: col.bg, border: `1px solid ${col.border}`, borderRadius: 20, overflow: 'hidden' }}>
+                    <div key={col.id} style={{ flex: 1, minWidth: 280, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.06)', borderTop: `3px solid ${col.accentColor}` }}>
                       {/* Column header */}
-                      <div style={{ padding: '10px 14px', borderBottom: `1px solid ${col.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: col.count_color }}>{col.label}</span>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: col.count_color, background: `${col.count_color}15`, border: `1px solid ${col.count_color}30`, borderRadius: 8, padding: '1px 7px' }}>{items.length}</span>
+                      <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{col.label}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9ca3af', background: '#f3f4f6', borderRadius: 20, padding: '2px 9px' }}>{items.length}</span>
                           {col.id === 'todo' && (
                             <button onClick={openAddModal}
-                              style={{ background: 'transparent', border: `1px dashed ${col.count_color}40`, borderRadius: 6, padding: '2px 8px', color: col.count_color, fontSize: '0.68rem', cursor: 'pointer' }}>
+                              style={{ background: '#1a73e8', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#fff', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}>
                               + Konten
                             </button>
                           )}
                         </div>
                       </div>
                       {/* Cards */}
-                      <div style={{ flex: 1, overflowY: 'auto', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 10px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {items.map(item => (
                           <ContentCard key={item.id} item={item} steps={stepsWithMeta}
                             productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
-                            productColor={item.product_id ? productColorMap[item.product_id] : '#5a6a85'}
+                            productColor={item.product_id ? productColorMap[item.product_id] : '#6b7280'}
                             onClick={() => {
                               setDetailItem(item)
                               setDetailJadwal({ date: item.tanggal_tayang || '', time: item.jam_tayang || '18:00' })
@@ -796,17 +803,19 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             onStepDone={(step) => advanceToStep(item, step)} />
                         ))}
                         {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
-                          <div style={{ textAlign: 'center', padding: '28px 16px', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                            <div style={{ fontSize: '1.5rem' }}></div>
-                            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#5a6a85' }}>Sprint siap!</div>
-                            <div style={{ fontSize: '0.68rem', color: '#5a6a85' }}>Tambah konten yang mau dikerjakan minggu ini</div>
-                            <button onClick={openAddModal} style={{ marginTop: 4, background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 7, padding: '7px 16px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '28px 16px', border: '2px dashed #e5e7eb', borderRadius: 12, margin: '4px 0' }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                            </div>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#374151' }}>Sprint siap!</div>
+                            <div style={{ fontSize: '0.72rem', color: '#9ca3af', textAlign: 'center' }}>Tambah konten minggu ini</div>
+                            <button onClick={openAddModal} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                               + Tambah Konten
                             </button>
                           </div>
                         )}
                         {items.length === 0 && !(col.id === 'todo' && sprintContents.length === 0) && (
-                          <div style={{ textAlign: 'center', padding: '32px 12px', color: '#5a6a85', fontSize: '0.72rem', border: '1px dashed #e5eaf2', borderRadius: 8 }}>Kosong</div>
+                          <div style={{ textAlign: 'center', padding: '40px 12px', color: '#d1d5db', fontSize: '0.78rem' }}>Kosong</div>
                         )}
                       </div>
                     </div>
@@ -1406,58 +1415,47 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
   const nextStepIdx = steps.findIndex(s => !isStepDone(item.status, s.doneAt))
 
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
+    <div className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)' }}>
       <div onClick={onClick}>
         {productName && (
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            ● {productName}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: productColor, flexShrink: 0 }} />
+            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: productColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{productName}</span>
           </div>
         )}
-        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2a3547', lineHeight: 1.4, marginBottom: 8 }}>{item.judul}</div>
+        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827', lineHeight: 1.45, marginBottom: 10 }}>{item.judul}</div>
       </div>
 
-      {/* Step chips */}
       {steps.length > 0 && (
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {steps.map((step, idx) => {
             const done = isStepDone(item.status, step.doneAt)
             const isNext = idx === nextStepIdx
 
-            if (done) {
-              return (
-                <div key={step.id} style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.4)', color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            if (done) return (
+              <div key={step.id} style={{ fontSize: '0.68rem', padding: '3px 8px', borderRadius: 20, background: '#dcfce7', color: '#15803d', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+                <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                {step.nama}
+              </div>
+            )
+
+            if (isNext) return (
+              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <a href={step.href} onClick={e => e.stopPropagation()} title={`Buka ${step.nama}`}
+                  style={{ fontSize: '0.68rem', padding: '3px 9px', borderRadius: 20, background: '#dbeafe', color: '#1d4ed8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                   {step.nama}
-                </div>
-              )
-            }
+                </a>
+                <button type="button" onClick={e => { e.stopPropagation(); onStepDone(step) }} title={`Tandai ${step.nama} selesai`}
+                  style={{ padding: '4px 7px', borderRadius: 20, background: '#dcfce7', border: 'none', color: '#15803d', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+              </div>
+            )
 
-            if (isNext) {
-              return (
-                <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <a
-                    href={step.href}
-                    onClick={e => e.stopPropagation()}
-                    title={`Buka ${step.nama}`}
-                    style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.35)', color: '#1a73e8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    {step.nama}
-                  </a>
-                  <button
-                    type="button"
-                    title={`Tandai ${step.nama} selesai`}
-                    onClick={e => { e.stopPropagation(); onStepDone(step) }}
-                    style={{ padding: '3px 7px', borderRadius: 5, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#059669', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </button>
-                </div>
-              )
-            }
-
-            // Future step — dark text for contrast
             return (
-              <div key={step.id} style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#eef1f6', border: '1px solid #d4dbe8', color: '#374151', display: 'flex', alignItems: 'center', gap: 3 }}>
-                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="9"/></svg>
+              <div key={step.id} style={{ fontSize: '0.68rem', padding: '3px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280', display: 'flex', alignItems: 'center', gap: 3 }}>
+                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="9"/></svg>
                 {step.nama}
               </div>
             )
@@ -1465,21 +1463,21 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
         </div>
       )}
 
-      {/* Bottom: deadline of next step or tayang date */}
       {(() => {
         const nextStep = nextStepIdx >= 0 ? steps[nextStepIdx] : null
         const dl = nextStep?.deadline
         if (dl) {
           const overdue = new Date(dl) < new Date()
           return (
-            <div style={{ fontSize: '0.7rem', marginTop: 5, color: overdue ? '#dc2626' : '#5a6a85' }}>
-              {overdue ? '' : ''} Due {new Date(dl).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-              {overdue ? ' — terlambat' : ''}
+            <div style={{ fontSize: '0.7rem', marginTop: 8, color: overdue ? '#dc2626' : '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+              {overdue && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>}
+              Due {new Date(dl).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+              {overdue && ' — terlambat'}
             </div>
           )
         }
         if (item.tanggal_tayang) return (
-          <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 5 }}>
+          <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: 8 }}>
             {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}
           </div>
         )
