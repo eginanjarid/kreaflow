@@ -229,7 +229,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Preview URL (thumbnail)</label><input value={previewUrl} onChange={e => setPreviewUrl(e.target.value)} placeholder="Link GDrive thumbnail..." style={{ width: '100%', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
             <div style={{ marginBottom: 20 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Catatan Studio</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Revisi, catatan untuk scheduler..." rows={3} style={{ width: '100%', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} /></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, color: '#2a3547', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : '💾 Simpan Progress'}</button>
+              <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, color: '#2a3547', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : 'Simpan Progress'}</button>
               <button onClick={handleSelesai} disabled={marking} style={{ padding: 10, background: 'linear-gradient(135deg,#059669,#34d399)', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : 'Tandai Selesai'}</button>
             </div>
           </div>
@@ -374,9 +374,9 @@ export default function StudioModule({ initialContents, products, initialNotific
         {/* View toggle */}
         <div style={{ display: 'flex', gap: 4, paddingBottom: 2 }}>
           {([
-            { mode: 'cards' as ViewMode, label: '☰ Daftar' },
+            { mode: 'cards' as ViewMode, label: 'Daftar' },
             { mode: 'ig' as ViewMode, label: 'IG Grid' },
-            { mode: 'feed' as ViewMode, label: '🖼 Feed' },
+            { mode: 'feed' as ViewMode, label: 'Feed' },
           ]).map(v => (
             <button key={v.mode} onClick={() => setViewMode(v.mode)}
               style={{ padding: '5px 12px', borderRadius: 8, fontSize: '0.78rem', border: viewMode === v.mode ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: viewMode === v.mode ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: viewMode === v.mode ? '#42a5f5' : '#64748b', cursor: 'pointer', fontWeight: 600 }}>
@@ -432,7 +432,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           <div style={{ display: 'flex', gap: 14, padding: '0 16px 16px', overflowX: 'auto' }}>
             {['Baru', 'Tips', 'Promo', 'Behind'].map((h, i) => (
               <div key={h} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid #e5eaf2', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#5a6a85' }}>{i === 0 ? '+' : '📌'}</div>
+                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid #e5eaf2', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#5a6a85' }}>{i === 0 ? '+' : ''}</div>
                 <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{h}</span>
               </div>
             ))}

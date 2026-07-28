@@ -246,7 +246,7 @@ export default function Topbar({ user }: Props) {
                 )}
                 {!notifLoading && notifs.length === 0 && (
                   <div style={{ padding: 44, textAlign: 'center' }}>
-                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>🔔</div>
+                    <div style={{ fontSize: '2rem', marginBottom: 8 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
                     <div style={{ fontSize: '0.82rem', color: '#c8d1e0' }}>Belum ada notifikasi</div>
                   </div>
                 )}

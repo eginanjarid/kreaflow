@@ -178,7 +178,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       await supabase.from('kf_notifications').insert({
         workspace_id: workspaceId,
         type: 'schedule',
-        title: `📅 Terjadwal — ${item.judul}`,
+        title: `Terjadwal — ${item.judul}`,
         message: `Konten dijadwalkan posting ${date} pukul ${time}${platform ? ' di ' + platform : ''}. Sprint progress bertambah!`,
         content_idea_id: item.id,
       })
@@ -366,7 +366,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         return (
                           <div key={p.id} onClick={ev => ev.stopPropagation()}
                             style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #c8d1e0', color: '#5a6a85', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
-                            title={`📋 Rencana: ${p.judul}${p.jam_tayang ? ' · ' + p.jam_tayang : ''}`}>
+                            title={`Rencana: ${p.judul}${p.jam_tayang ? ' · ' + p.jam_tayang : ''}`}>
                             {p.jam_tayang && <span style={{ opacity: 0.6 }}>{p.jam_tayang} </span>}
                             {p.product_nama ? `${p.product_nama.split(' ')[0]} · ` : ''}
                             {p.judul.replace(/^.*?—\s*/, '').slice(0, 18)}
@@ -385,7 +385,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {monthEntries.length === 0 ? (
             <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📅</div>
+              <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada jadwal bulan ini</div>
               <button onClick={() => openAdd()} style={{ marginTop: 8, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                 + Jadwalkan Konten
@@ -413,7 +413,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         {idea.product_nama}
                       </span>
                     )}
-                    {isSprint && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399', fontWeight: 600 }}>⚡ Sprint</span>}
+                    {isSprint && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399', fontWeight: 600 }}>Sprint</span>}
                   </div>
                   <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{displayName}</div>
                   <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>
@@ -423,7 +423,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[e.status], background: `${STATUS_COLOR[e.status]}18`, fontWeight: 600, flexShrink: 0 }}>{e.status}</span>
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                   {!isSprint && <button onClick={() => openEdit(e)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>}
-                  {!isSprint && <button onClick={() => deleteEntry(e.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>}
+                  {!isSprint && <button onClick={() => deleteEntry(e.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>}
                   {isSprint && <span style={{ fontSize: '0.7rem', color: '#5a6a85', padding: '5px 0' }}>auto-sync</span>}
                 </div>
               </div>
@@ -437,7 +437,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
           <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 420 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>📅 Jadwalkan Posting</div>
+              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1rem' }}>Jadwalkan Posting</div>
               <button onClick={() => setSchedModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -478,7 +478,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                   onClick={confirmSchedule}
                   disabled={schedSaving || !schedModal.platform || !schedModal.date}
                   style={{ background: schedSaving ? '#15803d' : 'linear-gradient(135deg, #16a34a, #34d399)', border: 'none', borderRadius: 10, padding: '10px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: (schedSaving || !schedModal.platform) ? 'not-allowed' : 'pointer', opacity: (!schedModal.platform || !schedModal.date) ? 0.5 : 1 }}>
-                  {schedSaving ? 'Menjadwalkan...' : '✓ Jadwalkan'}
+                  {schedSaving ? 'Menjadwalkan...' : 'Jadwalkan'}
                 </button>
               </div>
             </div>

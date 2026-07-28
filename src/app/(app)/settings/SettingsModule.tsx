@@ -34,8 +34,8 @@ type Props = {
 }
 
 const MODE_OPTIONS = [
-  { id: 'creator', label: 'Content Creator', desc: 'Brand building, Library konten, Calendar, Plan, Tracker', icon: '🎬', color: '#42a5f5' },
-  { id: 'affiliate', label: 'Affiliator', desc: 'Catalog produk affiliate + digital, komisi tracker, affiliate stats', icon: '🔗', color: '#34d399' },
+  { id: 'creator', label: 'Content Creator', desc: 'Brand building, Library konten, Calendar, Plan, Tracker', icon: 'creator', color: '#42a5f5' },
+  { id: 'affiliate', label: 'Affiliator', desc: 'Catalog produk affiliate + digital, komisi tracker, affiliate stats', icon: 'link', color: '#34d399' },
 ]
 
 function fieldStyle(extra?: object) {
@@ -284,7 +284,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                   <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: m.role === 'owner' ? 'rgba(26,115,232,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#42a5f5' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
                 )}
                 {canManageTeam && m.role !== 'owner' && m.email !== userEmail && (
-                  <button onClick={() => removeMember(m.id)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.85rem', padding: '4px' }} title="Remove">🗑</button>
+                  <button onClick={() => removeMember(m.id)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.85rem', padding: '4px' }} title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 )}
               </div>
             ))}

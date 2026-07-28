@@ -19,7 +19,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     return (
       <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <div style={{ textAlign: 'center', maxWidth: 400 }}>
-          <div style={{ fontSize: '3rem', marginBottom: 16 }}>⚠️</div>
+          <div style={{ marginBottom: 16, color: '#ef4444' }}><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <h1 style={{ color: '#f1f5f9', fontSize: '1.3rem', fontWeight: 700, marginBottom: 8 }}>Link Tidak Valid</h1>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: 24 }}>Link invite sudah kadaluarsa atau tidak ditemukan.</p>
           <Link href="/login" style={{ padding: '10px 24px', borderRadius: 8, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>Kembali ke Login</Link>

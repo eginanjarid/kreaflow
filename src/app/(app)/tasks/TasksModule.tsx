@@ -494,7 +494,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {view === 'kanban' && tasks.length > 0 && (() => {
         const COLS = [
           { id: 'todo', label: 'Todo', icon: 'topik', color: '#5a6a85' },
-          { id: 'in_progress', label: 'Dikerjakan', icon: '🔄', color: '#fbbf24' },
+          { id: 'in_progress', label: 'Dikerjakan', icon: 'refresh', color: '#fbbf24' },
           { id: 'done', label: 'Selesai', icon: 'check', color: '#86efac' },
         ]
         const colTasks = (colId: string) => filtered.filter(t => getTaskCol(t.percent_complete) === colId)
@@ -738,7 +738,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   ))}
                   <button type="button" onClick={() => switchSprintType('custom')}
                     style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === 'custom' ? '#e879f960' : '#e5eaf2'}`, background: sprintType === 'custom' ? '#e879f912' : '#f1f5f9', color: sprintType === 'custom' ? '#e879f9' : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
-                    ✏️ Custom
+                    Custom
                   </button>
                 </div>
                 {/* Custom label input */}
@@ -1051,7 +1051,7 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
       {/* Actions */}
       <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
         <button onClick={e => { e.stopPropagation(); onEdit(task) }} style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 6, padding: '4px 0', color: '#42a5f5', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
-        <button onClick={e => { e.stopPropagation(); onDelete(task.id!) }} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>🗑</button>
+        <button onClick={e => { e.stopPropagation(); onDelete(task.id!) }} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
       </div>
     </div>
   )
@@ -1088,7 +1088,7 @@ function TaskCard({ task, onEdit, onDelete, onProgress }: {
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <button onClick={() => onEdit(task)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
-          <button onClick={() => onDelete(task.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>
+          <button onClick={() => onDelete(task.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
         </div>
       </div>
     </div>

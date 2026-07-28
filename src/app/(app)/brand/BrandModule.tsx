@@ -75,15 +75,15 @@ type BioOptions = { tiktok?: BioOption[]; instagram?: BioOption[]; youtube?: Bio
 type AffNamaOption = { id: string; nama: string; alasan: string; is_primary: boolean }
 
 const TABS_BASE = [
-  { id: 'overview', label: '📡 Frekuensi', affiliateOnly: false },
+  { id: 'overview', label: 'Frekuensi', affiliateOnly: false },
   { id: 'identity', label: 'Account Identity', affiliateOnly: false },
   { id: 'niche', label: 'Niche Hunt', affiliateOnly: false },
   { id: 'story', label: 'Origin Story', affiliateOnly: false },
   { id: 'pillars', label: 'Content Pillars', affiliateOnly: false },
   { id: 'bio', label: 'Bio Studio', affiliateOnly: false },
   { id: 'visual', label: 'Brand Identity', affiliateOnly: false },
-  { id: 'akun', label: '📲 Akun Sosial', affiliateOnly: false },
-  { id: 'affiliate', label: '🔗 Affiliator Brand', affiliateOnly: true },
+  { id: 'akun', label: 'Akun Sosial', affiliateOnly: false },
+  { id: 'affiliate', label: 'Affiliator Brand', affiliateOnly: true },
 ]
 
 const PLATFORMS_SOSMED = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Twitter/X', 'LinkedIn']
@@ -92,12 +92,12 @@ const MAX_AKUN = 10
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
 const FREQ_LEVELS = [
-  { id: 1, name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#5a6a85', glow: 'rgba(71,85,105,0.3)', icon: '👻' },
-  { id: 2, name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)', icon: '📻' },
-  { id: 3, name: 'Signal', tagline: 'Frekuensimu mulai tertangkap.', desc: 'Kamu sudah punya arah dan niche yang jelas. Orang mulai bisa "membaca" kamu dan tahu kamu ahli di bidang apa.', color: '#38bdf8', glow: 'rgba(56,189,248,0.3)', icon: '📡' },
-  { id: 4, name: 'On Air', tagline: 'Siaran resmi dimulai.', desc: 'Brand kamu sudah live dan konsisten. Ada audiens yang actively menunggu kontenmu dan mempercayai kamu.', color: '#34d399', glow: 'rgba(52,211,153,0.3)', icon: '🎙️' },
-  { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(66,165,245,0.3)', icon: '🌐' },
-  { id: 6, name: 'Icon Frequency', tagline: 'Frekuensimu tidak bisa diabaikan.', desc: 'Nama kamu IS the brand. Kamu sudah jadi simbol di niche-mu — orang sebut topiknya, mereka pikirin kamu.', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', icon: '⚡' },
+  { id: 1, icon: '○', name: 'Ghost', tagline: 'Kamu ada, tapi belum ada yang tahu.', desc: 'Brand kamu masih invisible. Orang tidak bisa menemukan, memahami, atau mengikutimu di mana pun.', color: '#5a6a85', glow: 'rgba(71,85,105,0.3)', icon: 'G' },
+  { id: 2, name: 'Noise', tagline: 'Ada sinyal, tapi masih penuh gangguan.', desc: 'Kamu mulai aktif, tapi konten dan pesan kamu belum jelas. Audiens bingung kamu ini siapa dan ngomong apa.', color: '#f59e0b', glow: 'rgba(245,158,11,0.3)', icon: 'N' },
+  { id: 3, name: 'Signal', tagline: 'Frekuensimu mulai tertangkap.', desc: 'Kamu sudah punya arah dan niche yang jelas. Orang mulai bisa "membaca" kamu dan tahu kamu ahli di bidang apa.', color: '#38bdf8', glow: 'rgba(56,189,248,0.3)', icon: 'S' },
+  { id: 4, name: 'On Air', tagline: 'Siaran resmi dimulai.', desc: 'Brand kamu sudah live dan konsisten. Ada audiens yang actively menunggu kontenmu dan mempercayai kamu.', color: '#34d399', glow: 'rgba(52,211,153,0.3)', icon: 'O' },
+  { id: 5, name: 'Broadcast', tagline: 'Sinyalmu menjangkau jauh.', desc: 'Kamu sudah punya komunitas solid. Kontenmu dishare, dibahas, dan kamu jadi referensi di niche-mu.', color: '#a78bfa', glow: 'rgba(66,165,245,0.3)', icon: 'B' },
+  { id: 6, name: 'Icon Frequency', tagline: 'Frekuensimu tidak bisa diabaikan.', desc: 'Nama kamu IS the brand. Kamu sudah jadi simbol di niche-mu — orang sebut topiknya, mereka pikirin kamu.', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', icon: 'I' },
 ]
 
 const FREQ_CHECKS = [
@@ -1001,7 +1001,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {freqPct === 100 && (
                 <div style={{ background: `${freqLevel.color}18`, border: `1px solid ${freqLevel.color}40`, borderRadius: 10, padding: '12px 16px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.2rem', marginBottom: 4 }}>⚡</div>
+                  
                   <div style={{ fontSize: '0.85rem', fontWeight: 700, color: freqLevel.color }}>Full Power! Brand kamu 100% siap.</div>
                 </div>
               )}
@@ -1073,7 +1073,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>Belum tau mau isi kolom lainnya?</span>
               <button type="button" onClick={() => setAiModal({ prompt: buildHelperPrompt() })}
                 style={{ background: 'none', border: 'none', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                ✨ Gak tau? Generate semuanya
+                Gak tau? Generate semuanya
               </button>
             </div>
           )}
@@ -1101,7 +1101,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             disabled={!profile.suka}
             onClick={() => setAiModal({ prompt: buildNichePrompt() })}
             style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.suka ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>✨</span> Generate dengan AI
+            Generate dengan AI
           </button>
           {/* Niche Options CRUD */}
           <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, padding: 20 }}>
@@ -1172,8 +1172,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                     </div>
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                      {opt.kategori && <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>📂 {opt.kategori}</span>}
-                      {opt.micro_niche && <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>🎯 {opt.micro_niche}</span>}
+                      {opt.kategori && <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>{opt.kategori}</span>}
+                      {opt.micro_niche && <span style={{ fontSize: '0.75rem', color: '#5a6a85' }}>{opt.micro_niche}</span>}
                       {opt.nama_akun && <span style={{ fontSize: '0.75rem', color: '#5a6a85', fontFamily: 'monospace' }}>{opt.nama_akun}</span>}
                     </div>
                   </div>
@@ -1184,19 +1184,19 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         setProfile(p => ({ ...p, niche_options: updated, niche: opt.niche, kategori: opt.kategori, micro_niche: opt.micro_niche, nama_akun_rekomendasi: opt.nama_akun }))
                         setSaved(false)
                       }} style={{ background: 'rgba(66,165,245,0.1)', border: '1px solid #1a73e830', borderRadius: 6, padding: '5px 8px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>
-                        ⭐ Pilih
+                        Pilih
                       </button>
                     )}
                     <button type="button" title="Edit" onClick={() => { setNicheForm({ ...opt }); setNicheEditId(opt.id) }}
                       style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
-                      ✏️
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                     </button>
                     <button type="button" title="Hapus" onClick={() => {
                       const filtered = profile.niche_options.filter(o => o.id !== opt.id)
                       setProfile(p => ({ ...p, niche_options: filtered }))
                       setSaved(false)
                     }} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '5px 8px', color: '#f87171', fontSize: '0.75rem', cursor: 'pointer' }}>
-                      🗑️
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
                     </button>
                   </div>
                 </div>
@@ -1213,7 +1213,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           {/* Step warning */}
           {!profile.niche && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b' }}>
-              ⚠️ Isi tab <button type="button" onClick={() => setTab('niche')} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Niche Hunt</button> dulu dan simpan agar prompt lebih akurat.
+              Perhatian: Isi tab <button type="button" onClick={() => setTab('niche')} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Niche Hunt</button> dulu dan simpan agar prompt lebih akurat.
             </div>
           )}
 
@@ -1223,7 +1223,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>Belum tau mau isi SWOT kamu?</span>
               <button type="button" onClick={() => setAiModal({ prompt: buildSwotHelperPrompt() })}
                 style={{ background: 'none', border: 'none', color: '#42a5f5', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                ✨ Gak tau? Generate semuanya
+                Gak tau? Generate semuanya
               </button>
             </div>
           )}
@@ -1248,7 +1248,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             disabled={!profile.kelebihan}
             onClick={() => setAiModal({ prompt: buildStoryPrompt() })}
             style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>✨</span> Generate Origin Story dengan AI
+            Generate dengan AI
           </button>
 
           {/* Premis CRUD */}
@@ -1326,16 +1326,16 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         setProfile(p => ({ ...p, premis_options: updated, premis: opt.teks }))
                         setSaved(false)
                       }} style={{ background: 'rgba(66,165,245,0.1)', border: '1px solid #1a73e830', borderRadius: 6, padding: '5px 8px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>
-                        ⭐ Pilih
+                        Pilih
                       </button>
                     )}
                     <button type="button" onClick={() => { setPremisForm({ ...opt }); setPremisEditId(opt.id) }}
-                      style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>✏️</button>
+                      style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
                     <button type="button" onClick={() => {
                       const filtered = profile.premis_options.filter(o => o.id !== opt.id)
                       setProfile(p => ({ ...p, premis_options: filtered }))
                       setSaved(false)
-                    }} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '5px 8px', color: '#f87171', fontSize: '0.75rem', cursor: 'pointer' }}>🗑️</button>
+                    }} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '5px 8px', color: '#f87171', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                   </div>
                 </div>
               ))}
@@ -1352,12 +1352,12 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           {/* Step warnings */}
           {!profile.niche && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b' }}>
-              ⚠️ Isi tab <button type="button" onClick={() => setTab('niche')} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Niche Hunt</button> dulu agar bio lebih akurat.
+              Perhatian: Isi tab <button type="button" onClick={() => setTab('niche')} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Niche Hunt</button> dulu agar bio lebih akurat.
             </div>
           )}
           {profile.niche && !profile.premis && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b' }}>
-              ⚠️ Isi tab <button type="button" onClick={() => setTab('story')} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Origin Story</button> dulu agar bio punya premis yang kuat.
+              Perhatian: Isi tab <button type="button" onClick={() => setTab('story')} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Origin Story</button> dulu agar bio punya premis yang kuat.
             </div>
           )}
 
@@ -1369,18 +1369,18 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             </div>
             <button type="button" disabled={!profile.niche} onClick={() => setAiModal({ prompt: buildBioPrompt() })}
               style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>✨</span> Generate dengan AI
+              Generate dengan AI
             </button>
           </div>
 
           {/* Platform tabs */}
           {(() => {
             const BIO_PLATFORMS: { key: keyof BioOptions; label: string; icon: string; max: number; profileKey: keyof BrandProfile }[] = [
-              { key: 'tiktok', label: 'TikTok', icon: '🎵', max: 80, profileKey: 'bio_tiktok' },
-              { key: 'instagram', label: 'Instagram', icon: '📷', max: 150, profileKey: 'bio_instagram' },
-              { key: 'youtube', label: 'YouTube', icon: '▶️', max: 1000, profileKey: 'bio_youtube' },
-              { key: 'linkedin', label: 'LinkedIn', icon: '💼', max: 2600, profileKey: 'bio_linkedin' },
-              { key: 'facebook', label: 'Facebook', icon: '👤', max: 255, profileKey: 'bio_facebook' },
+              { key: 'tiktok', label: 'TikTok', icon: 'TT', max: 80, profileKey: 'bio_tiktok' },
+              { key: 'instagram', label: 'Instagram', icon: 'IG', max: 150, profileKey: 'bio_instagram' },
+              { key: 'youtube', label: 'YouTube', icon: 'YT', max: 1000, profileKey: 'bio_youtube' },
+              { key: 'linkedin', label: 'LinkedIn', icon: 'IN', max: 2600, profileKey: 'bio_linkedin' },
+              { key: 'facebook', label: 'Facebook', icon: 'FB', max: 255, profileKey: 'bio_facebook' },
             ]
             const activePl = BIO_PLATFORMS.find(p => p.key === bioActivePlatform)!
             const bioList = getBioList(bioActivePlatform)
@@ -1468,14 +1468,14 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                               setBioList(bioActivePlatform, bioList.map(b => ({ ...b, is_primary: b.id === opt.id })))
                               setField(activePl.profileKey, opt.teks)
                             }} style={{ background: 'rgba(66,165,245,0.1)', border: '1px solid #1a73e830', borderRadius: 6, padding: '5px 8px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>
-                              ⭐ Pilih
+                              Pilih
                             </button>
                           )}
                           <button type="button" onClick={() => { setBioForm({ ...opt }); setBioEditId(opt.id) }}
-                            style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>✏️</button>
+                            style={{ background: 'rgba(148,163,184,0.08)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
                           <button type="button" onClick={() => {
                             setBioList(bioActivePlatform, bioList.filter(b => b.id !== opt.id))
-                          }} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '5px 8px', color: '#f87171', fontSize: '0.75rem', cursor: 'pointer' }}>🗑️</button>
+                          }} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '5px 8px', color: '#f87171', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                         </div>
                       </div>
                     ))}
@@ -1506,7 +1506,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <img src={profile.logo_main_url} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                 ) : (
                   <div style={{ textAlign: 'center', color: '#5a6a85' }}>
-                    <div style={{ fontSize: '1.4rem' }}>🖼️</div>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8d1e0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                     <div style={{ fontSize: '0.6rem', marginTop: 2 }}>Upload</div>
                   </div>
                 )}
@@ -1656,7 +1656,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffNichePrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>✨</span> Generate dengan AI
+                    Generate dengan AI
                   </button>
                 </div>
 
@@ -1665,8 +1665,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 10, fontWeight: 600 }}>Tipe Akun Affiliate</label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {[
-                      { id: 'personal', icon: '🧑', label: 'Personal Brand', desc: 'Akun personal kamu sendiri + promosi produk affiliate. Audiens kenal kamu sebagai orangnya.' },
-                      { id: 'store', icon: '🏪', label: 'Niche Store', desc: 'Akun khusus satu niche produk (misal kidstuff.id). Fokus produk, bukan personal.' },
+                      { id: 'personal', icon: 'P', label: 'Personal Brand', desc: 'Akun personal kamu sendiri + promosi produk affiliate. Audiens kenal kamu sebagai orangnya.' },
+                      { id: 'store', icon: 'S', label: 'Niche Store', desc: 'Akun khusus satu niche produk (misal kidstuff.id). Fokus produk, bukan personal.' },
                     ].map(tipe => (
                       <div key={tipe.id} onClick={() => setField('affiliate_tipe', tipe.id)}
                         style={{ padding: '14px 16px', borderRadius: 10, border: `1px solid ${profile.affiliate_tipe === tipe.id ? '#34d399' : '#e5eaf2'}`, background: profile.affiliate_tipe === tipe.id ? 'rgba(52,211,153,0.07)' : '#f8fafc', cursor: 'pointer' }}>
@@ -1773,7 +1773,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffIdentityPrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>✨</span> Generate dengan AI
+                    Generate dengan AI
                   </button>
                 </div>
 
@@ -1799,9 +1799,9 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                           {opt.is_primary && <span style={{ background: '#d1fae5', color: '#34d399', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase' }}>Utama</span>}
                           <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
                             {!opt.is_primary && <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_nama_options: (p.affiliate_nama_options || []).map(n => ({ ...n, is_primary: n.id === opt.id })) }))}
-                              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid #34d39930', borderRadius: 6, padding: '4px 8px', color: '#34d399', fontSize: '0.73rem', cursor: 'pointer' }}>⭐ Pilih</button>}
+                              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid #34d39930', borderRadius: 6, padding: '4px 8px', color: '#34d399', fontSize: '0.73rem', cursor: 'pointer' }}>Pilih</button>}
                             <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_nama_options: (p.affiliate_nama_options || []).filter(n => n.id !== opt.id) }))}
-                              style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '4px 8px', color: '#f87171', fontSize: '0.73rem', cursor: 'pointer' }}>🗑️</button>
+                              style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '4px 8px', color: '#f87171', fontSize: '0.73rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                           </div>
                         </div>
                         <input style={fieldStyle({ marginBottom: 8 })} value={opt.nama}
@@ -1820,7 +1820,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600 }}>Tagline Akun</label>
                   <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>1 kalimat singkat yang menjelaskan akunmu (tampil di bio)</div>
                   <input style={fieldStyle({})} value={profile.affiliate_tagline} onChange={e => setField('affiliate_tagline', e.target.value)}
-                    placeholder="cth: Mainan edukatif terpercaya untuk tumbuh kembang si kecil 🧸" />
+                    placeholder="cth: Mainan edukatif terpercaya untuk tumbuh kembang si kecil" />
                 </div>
 
                 {/* Positioning */}
@@ -1860,13 +1860,13 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffKontenPrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>✨</span> Generate dengan AI
+                    Generate dengan AI
                   </button>
                 </div>
 
                 {/* CTA ke Plan */}
                 <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderRadius: 20, border: '1px solid rgba(26,115,232,0.3)', background: 'rgba(26,115,232,0.06)', textDecoration: 'none' }}>
-                  <span style={{ fontSize: '1.8rem', flexShrink: 0 }}>📝</span>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8d1e0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#42a5f5', fontSize: '0.9rem', marginBottom: 4 }}>Eksekusi di modul Plan</div>
                     <div style={{ fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.6 }}>Naskah, hook, ide konten, jadwal posting — semua dikerjakan di Plan yang sudah baca data brand ini secara otomatis.</div>
@@ -1903,7 +1903,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffiliatePrompt() })}
                     style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid #34d399', borderRadius: 10, padding: '10px 20px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>✨</span> Generate dengan AI
+                    Generate dengan AI
                   </button>
                 </div>
 
@@ -1945,9 +1945,9 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                           {opt.is_primary && <span style={{ background: '#d1fae5', color: '#34d399', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase' }}>Utama</span>}
                           <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
                             {!opt.is_primary && <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_bio_options: (p.affiliate_bio_options || []).map(b => ({ ...b, is_primary: b.id === opt.id })) }))}
-                              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid #34d39930', borderRadius: 6, padding: '4px 8px', color: '#34d399', fontSize: '0.73rem', cursor: 'pointer' }}>⭐ Pilih</button>}
+                              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid #34d39930', borderRadius: 6, padding: '4px 8px', color: '#34d399', fontSize: '0.73rem', cursor: 'pointer' }}>Pilih</button>}
                             <button type="button" onClick={() => setProfile(p => ({ ...p, affiliate_bio_options: (p.affiliate_bio_options || []).filter(b => b.id !== opt.id) }))}
-                              style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '4px 8px', color: '#f87171', fontSize: '0.73rem', cursor: 'pointer' }}>🗑️</button>
+                              style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '4px 8px', color: '#f87171', fontSize: '0.73rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
                           </div>
                         </div>
                         <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={opt.teks}
@@ -1977,7 +1977,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       {tab === 'akun' && (
         <div style={{ maxWidth: 600 }}>
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>📲 Akun Sosial Media</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>Akun Sosial Media</div>
             <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Daftarkan akun-akun sosmed yang kamu kelola. Maksimal {MAX_AKUN} akun per workspace.</div>
           </div>
 
@@ -1999,7 +1999,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   onClick={() => deleteAkun(a.id)}
                   disabled={deletingAkun === a.id}
                   style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
-                  {deletingAkun === a.id ? '...' : '🗑'}
+                  {deletingAkun === a.id ? '...' : <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></>}
                 </button>
               </div>
             ))}
@@ -2057,17 +2057,17 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>Generate dengan AI</div>
                 <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Pilih AI favorit kamu — prompt langsung terisi otomatis</div>
               </div>
               <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, lineHeight: 1 }}>✕</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: '🤖', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Claude', desc: 'Anthropic Claude', icon: '✦', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: '♊', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', transition: 'all 0.15s', cursor: 'pointer' }}>
@@ -2185,12 +2185,12 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
     {/* Warning banners — di luar form agar tidak trigger submit */}
     {!profile.niche && (
       <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b', marginBottom: 12 }}>
-        ⚠️ Pillar akan lebih tepat jika kamu sudah mengisi <strong>Niche Hunt</strong> dan <strong>Origin Story</strong> terlebih dahulu.
+        Pillar akan lebih tepat jika kamu sudah mengisi <strong>Niche Hunt</strong> dan <strong>Origin Story</strong> terlebih dahulu.
       </div>
     )}
     {profile.niche && !profile.premis && (
       <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b', marginBottom: 12 }}>
-        ⚠️ Kamu sudah punya niche. Isi juga <strong>Origin Story</strong> agar AI bisa buat pillar yang lebih tajam dan sesuai premis brand.
+        Tip: Kamu sudah punya niche. Isi juga <strong>Origin Story</strong> agar AI bisa buat pillar yang lebih tajam dan sesuai premis brand.
       </div>
     )}
     <form onSubmit={savePillars}>
@@ -2205,7 +2205,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
             disabled={!profile.niche}
             onClick={() => setAiModal({ prompt: buildPillarsPromptLocal() })}
             style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 10, padding: '10px 20px', color: '#42a5f5', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>✨</span> Generate dengan AI
+            Generate dengan AI
           </button>
         </div>
 
@@ -2251,17 +2251,17 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate dengan AI</div>
+              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>Generate dengan AI</div>
               <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Pilih AI favorit kamu — prompt langsung terisi otomatis</div>
             </div>
             <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, lineHeight: 1 }}>✕</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: '🤖', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
-              { label: 'Claude', desc: 'Anthropic Claude', icon: '✦', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-              { label: 'Gemini', desc: 'Google Gemini', icon: '♊', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
-              { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+              { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+              { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
+              { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
+              { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
             ].map(ai => (
               <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none', cursor: 'pointer' }}>

@@ -56,9 +56,9 @@ function selectStyle() {
 }
 
 const TIPE_COLORS: Record<string, { color: string; bg: string; icon: string }> = {
-  Fisik: { color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', icon: '📦' },
-  Digital: { color: '#a78bfa', bg: 'rgba(66,165,245,0.1)', icon: '💻' },
-  Affiliate: { color: '#34d399', bg: 'rgba(52,211,153,0.1)', icon: '🔗' },
+  Fisik: { color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', icon: 'box' },
+  Digital: { color: '#a78bfa', bg: 'rgba(66,165,245,0.1)', icon: 'digital' },
+  Affiliate: { color: '#34d399', bg: 'rgba(52,211,153,0.1)', icon: 'link' },
 }
 
 export default function CatalogModule({ initialProducts, workspaceId, modes }: {
@@ -185,7 +185,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       {/* Grid */}
       {filtered.length === 0 ? (
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📦</div>
+          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="16.5" y1="9.4" x2="7.55" y2="4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>{products.length === 0 ? 'Belum ada produk' : 'Tidak ditemukan'}</div>
           {products.length === 0 && <button onClick={openAdd} style={{ marginTop: 12, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>+ Tambah Produk Pertama</button>}
         </div>
@@ -230,11 +230,11 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                     <button onClick={() => openEdit(p)} style={{ flex: 1, background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>Edit</button>
                     {(p.link_affiliate || p.link) && (
                       <a href={p.link_affiliate || p.link} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px', color: '#5a6a85', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' }}>
-                        {p.link_affiliate ? '🔗 Afiliasi' : 'Lihat'}
+                        {p.link_affiliate ? 'Afiliasi' : 'Lihat'}
                       </a>
                     )}
                     <button onClick={() => handleDelete(p.id!)} disabled={deleting === p.id} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px 10px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}>
-                      {deleting === p.id ? '...' : '🗑'}
+                      {deleting === p.id ? '...' : ''}
                     </button>
                   </div>
                 </div>
@@ -367,7 +367,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                 {/* Links */}
                 {isAffiliateProduct ? (
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#34d399', marginBottom: 6, fontWeight: 500 }}>🔗 Link Affiliate Kamu</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#34d399', marginBottom: 6, fontWeight: 500 }}>Link Affiliate Kamu</label>
                     <input style={fieldStyle({ border: '1px solid rgba(52,211,153,0.3)' })} value={modal.product.link_affiliate} onChange={e => setField('link_affiliate', e.target.value)} placeholder="https://s.shopee.co.id/affiliate-link-kamu" />
                   </div>
                 ) : (
@@ -383,7 +383,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>
                     Deskripsi Produk
-                    <span style={{ marginLeft: 6, fontSize: '0.7rem', color: '#6366f1', fontWeight: 400 }}>💡 Isi lengkap — dipakai auto-fill di Naskah Generator</span>
+                    <span style={{ marginLeft: 6, fontSize: '0.7rem', color: '#6366f1', fontWeight: 400 }}>Tips: Isi lengkap — dipakai auto-fill di Naskah Generator</span>
                   </label>
                   <textarea style={fieldStyle({ height: 110, resize: 'vertical' })} value={modal.product.deskripsi ?? ''} onChange={e => setField('deskripsi', e.target.value)} placeholder="Paste deskripsi produk lengkap di sini: spesifikasi, manfaat, keunggulan, harga, platform beli... Semakin lengkap semakin akurat analisis USP-nya." />
                 </div>

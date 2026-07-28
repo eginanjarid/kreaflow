@@ -105,7 +105,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
 
       {filtered.length === 0 ? (
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📊</div>
+          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada data performa</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Input data bulanan dari setiap platform kamu</div>
           <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -123,7 +123,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button onClick={() => openEdit(m)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
-                  <button onClick={() => deleteMetric(m.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>
+                  <button onClick={() => deleteMetric(m.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>

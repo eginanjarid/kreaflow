@@ -116,7 +116,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
       {/* Transaction List */}
       {filtered.length === 0 ? (
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>💰</div>
+          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada transaksi</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Mulai catat pemasukan dan pengeluaran kamu</div>
           <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -138,7 +138,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
                 {t.tipe === 'Pemasukan' ? '+' : '-'}{formatRp(Number(t.jumlah))}
               </div>
               <button onClick={() => openEdit(t)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
-              <button onClick={() => deleteTx(t.id!)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.85rem' }}>🗑</button>
+              <button onClick={() => deleteTx(t.id!)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.85rem' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
             </div>
           ))}
         </div>

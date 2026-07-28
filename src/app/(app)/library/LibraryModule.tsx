@@ -372,7 +372,7 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
 
   return (
     <div style={{ marginTop: 10, padding: '8px 10px', background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.18)', borderRadius: 8 }}>
-      <div style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, marginBottom: 6, letterSpacing: '0.04em' }}>⚡ SPRINT TIMELINE</div>
+      <div style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, marginBottom: 6, letterSpacing: '0.04em' }}>SPRINT TIMELINE</div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         {sprintTasks.map(t => {
           const rawStep = t.nama.split(' —')[0].trim()
@@ -587,7 +587,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Content */}
       {filtered.length === 0 ? (
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📚</div>
+          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>{ideas.length === 0 ? 'Library kosong' : 'Tidak ada konten'}</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>{ideas.length === 0 ? 'Mulai tambahkan ide konten kamu' : 'Coba filter lain'}</div>
           {ideas.length === 0 && (
@@ -609,8 +609,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {c.platform.map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>)}
-                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>📌 {pillarMap[c.pillar_id]}</span>}
-                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>📦 {productMap[c.product_id]}</span>}
+                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{pillarMap[c.pillar_id]}</span>}
+                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{productMap[c.product_id]}</span>}
                   </div>
                   {c.hook && (
                     <div style={{ marginTop: 8, fontSize: '0.82rem', color: '#5a6a85', fontStyle: 'italic', borderLeft: '2px solid #1a73e8', paddingLeft: 10 }}>
@@ -636,14 +636,11 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <button onClick={() => openSchedule(c)}
                     style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 8, padding: '6px 10px', color: '#38bdf8', fontSize: '0.75rem', cursor: 'pointer' }}
                     title="Jadwalkan ke Calendar">
-                    📅
-                  </button>
+                    </button>
                   <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
                     Edit
                   </button>
-                  <button onClick={() => deleteIdea(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}>
-                    🗑
-                  </button>
+                  <button onClick={() => deleteIdea(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 </div>
               </div>
             </div>
@@ -657,12 +654,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
           <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 400 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#2a3547' }}>📅 Jadwalkan ke Calendar</h3>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#2a3547' }}>Jadwalkan ke Calendar</h3>
               <button onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             {schedDone ? (
               <div style={{ padding: '32px 20px', textAlign: 'center' }}>
-                <div style={{ fontSize: '2rem', marginBottom: 8 }}>✅</div>
+                <div style={{ marginBottom: 8, color: '#34d399' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                 <div style={{ color: '#86efac', fontWeight: 600, fontSize: '0.9rem' }}>Berhasil dijadwalkan!</div>
               </div>
             ) : (
@@ -810,7 +807,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Isi komponen konten atau generate otomatis</div>
                   <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
                     style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
-                    {aiLoading ? '⏳...' : '✨ Generate AI'}
+                    {aiLoading ? '...' : 'Generate AI'}
                   </button>
                 </div>
                 {[
@@ -840,7 +837,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     <label style={{ fontSize: '0.8rem', color: '#5a6a85', fontWeight: 500 }}>Script Lengkap</label>
                     <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
                       style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '5px 12px', color: '#42a5f5', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
-                      {aiLoading ? '⏳ Generating...' : '✨ Generate Script'}
+                      {aiLoading ? 'Generating...' : 'Generate Script'}
                     </button>
                   </div>
                   <textarea style={fieldStyle({ height: 240, resize: 'vertical', lineHeight: '1.6', fontFamily: 'monospace' })} value={modal.idea.script} onChange={e => setField('script', e.target.value)} placeholder="Script lengkap konten akan muncul di sini..." />

@@ -752,7 +752,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {generatedNaskah && (
                     <button type="button" onClick={saveToLibrary}
                       style={{ background: savedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(26,115,232,0.12)', border: `1px solid ${savedToLibrary ? '#34d399' : '#1a73e8'}`, borderRadius: 8, padding: '7px 14px', color: savedToLibrary ? '#34d399' : '#42a5f5', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-                      {savedToLibrary ? '✓ Tersimpan di Library' : '💾 Simpan ke Library'}
+                      {savedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
                     </button>
                   )}
                 </div>
@@ -1005,7 +1005,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {/* Compile Scripts button */}
                   <button type="button" onClick={() => setAffAiModal({ prompt: buildAffNaskahPrompt(), label: 'Compile Scripts' })}
                     style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none', borderRadius: 20, padding: '16px 20px', color: '#fff', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 4 }}>
-                    <span style={{ fontSize: '1.1rem' }}>⚗️</span> COMPILE SCRIPTS
+                    <span style={{ fontSize: '1.1rem' }}></span> COMPILE SCRIPTS
                   </button>
                 </div>
               </div>
@@ -1020,7 +1020,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {affNaskah && (
                     <button type="button" onClick={saveAffToLibrary}
                       style={{ background: affSavedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(99,102,241,0.12)', border: `1px solid ${affSavedToLibrary ? '#34d399' : '#6366f1'}`, borderRadius: 8, padding: '7px 14px', color: affSavedToLibrary ? '#34d399' : '#818cf8', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-                      {affSavedToLibrary ? '✓ Tersimpan di Library' : '💾 Simpan ke Library'}
+                      {affSavedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
                     </button>
                   )}
                 </div>
@@ -1039,11 +1039,11 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               {/* STEP 03 — Alur Produksi (muncul setelah naskah diisi) */}
               {affNaskah.trim() && (() => {
                 const PROD_STEPS = [
-                  { id: 'naskah', label: 'Naskah / Script', icon: '📝', desc: 'Naskah sudah siap', autoCheck: true },
-                  { id: 'take_video', label: 'Take Video', icon: '🎬', desc: 'Rekam video utama sesuai naskah' },
+                  { id: 'naskah', label: 'Naskah / Script', icon: 'naskah', desc: 'Naskah sudah siap', autoCheck: true },
+                  { id: 'take_video', label: 'Take Video', icon: 'take_video', desc: 'Rekam video utama sesuai naskah' },
                   { id: 'broll_vo', label: 'B-roll / Voice Over', icon: '🎥', desc: 'Opsional — tambahan visual atau dubbing', optional: true },
-                  { id: 'editing', label: 'Editing', icon: '✂️', desc: 'Edit, potong, tambah teks & musik' },
-                  { id: 'schedule', label: 'Schedule Post', icon: '📅', desc: 'Jadwalkan posting di waktu terbaik' },
+                  { id: 'editing', label: 'Editing', icon: 'editing', desc: 'Edit, potong, tambah teks & musik' },
+                  { id: 'schedule', label: 'Schedule Post', icon: 'schedule', desc: 'Jadwalkan posting di waktu terbaik' },
                 ]
                 return (
                   <div style={{ background: '#fff', border: '1px solid #1e3a2f', borderRadius: 20, overflow: 'hidden' }}>
@@ -1096,7 +1096,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           </div>
                         ) : (
                           <button type="button" onClick={saveAffToLibrary} style={{ flex: 1, background: 'linear-gradient(135deg, #059669, #34d399)', border: 'none', borderRadius: 10, padding: '12px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            💾 Simpan ke Library & Mulai Produksi
+                            Simpan ke Library & Mulai Produksi
                           </button>
                         )}
                       </div>
@@ -1222,7 +1222,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     </div>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button onClick={() => openEditCampaign(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
-                      <button onClick={() => deleteCampaign(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>🗑</button>
+                      <button onClick={() => deleteCampaign(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                     </div>
                   </div>
                 </div>
@@ -1301,17 +1301,17 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>{affAiModal.label || '⚗️ Compile Scripts'}</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>{affAiModal.label || 'Compile Scripts'}</div>
                 <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Pilih AI — prompt langsung terisi, paste hasilnya di kolom output</div>
               </div>
               <button type="button" onClick={() => { setAffAiModal(null); setAffPromptCopied(false) }} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: '🤖', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'Claude', desc: 'Anthropic Claude', icon: '✦', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: '♊', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
@@ -1345,10 +1345,10 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: '🤖', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Claude', desc: 'Anthropic Claude', icon: '✦', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: '♊', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: '🔮', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
                   style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 20, border: `1px solid ${ai.color}30`, background: `${ai.color}08`, textDecoration: 'none' }}>
