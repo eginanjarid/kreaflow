@@ -75,15 +75,15 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
         </div>
 
         <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, padding: '28px' }}>
-          <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', marginBottom: 20, lineHeight: 1.5 }}>
-            Kamu diundang ke <strong style={{ color: '#e2e8f0' }}>{workspaceName}</strong>.<br />
+          <p style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', marginBottom: 20, lineHeight: 1.5 }}>
+            Kamu diundang ke <strong style={{ color: '#d1d9e6' }}>{workspaceName}</strong>.<br />
             Login atau daftar dengan email <strong style={{ color: '#A78BFA' }}>{invite.email}</strong> untuk bergabung.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <Link href={`/login?redirect=/invite/${token}`} style={{ display: 'block', textAlign: 'center', padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
               Login & Bergabung
             </Link>
-            <Link href={`/register?email=${encodeURIComponent(invite.email)}&redirect=/invite/${token}`} style={{ display: 'block', textAlign: 'center', padding: '12px', borderRadius: 10, border: '1px solid #2a2a2a', color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 500, textDecoration: 'none', background: '#1a1a1a' }}>
+            <Link href={`/register?email=${encodeURIComponent(invite.email)}&redirect=/invite/${token}`} style={{ display: 'block', textAlign: 'center', padding: '12px', borderRadius: 10, border: '1px solid #2a2a2a', color: '#d1d9e6', fontSize: '0.9rem', fontWeight: 500, textDecoration: 'none', background: '#1a1a1a' }}>
               Daftar Akun Baru
             </Link>
           </div>

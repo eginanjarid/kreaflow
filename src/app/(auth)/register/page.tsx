@@ -50,7 +50,7 @@ export default function RegisterPage() {
           </div>
           <span style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.5px', color: '#f1f5f9' }}>KreaFlow</span>
         </div>
-        <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Buat akun gratis kamu</p>
+        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Buat akun gratis kamu</p>
       </div>
 
       <div style={{ background: '#111', border: '1px solid #2a2a2a', borderRadius: 16, padding: '32px 28px' }}>
@@ -61,26 +61,26 @@ export default function RegisterPage() {
         )}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Nama Lengkap</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Nama Lengkap</label>
             <input type="text" value={form.nama} onChange={e => setForm(f => ({ ...f, nama: e.target.value }))} placeholder="Nama kamu" required autoFocus />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Email</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Email</label>
             <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" required />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Password</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Password</label>
             <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder="Min. 8 karakter" required minLength={8} />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>Nama Workspace / Brand</label>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Nama Workspace / Brand</label>
             <input type="text" value={form.workspace} onChange={e => setForm(f => ({ ...f, workspace: e.target.value }))} placeholder="Nama akun atau brand kamu" required />
           </div>
           <button type="submit" disabled={loading} style={{ marginTop: 8, background: loading ? '#5B21B6' : 'linear-gradient(135deg, #7C3AED, #A78BFA)', border: 'none', borderRadius: 10, padding: '12px', color: '#fff', fontSize: '0.9rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}>
             {loading ? 'Membuat akun...' : 'Buat Akun'}
           </button>
         </form>
-        <p style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: '#94a3b8' }}>
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: '0.85rem', color: '#6b7280' }}>
           Sudah punya akun?{' '}
           <Link href="/login" style={{ color: '#A78BFA', textDecoration: 'none', fontWeight: 500 }}>Masuk di sini</Link>
         </p>

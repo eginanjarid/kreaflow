@@ -1026,7 +1026,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${done ? '#34d399' : '#e5eaf2'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
                         {done && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </div>
-                      <span style={{ fontSize: '0.82rem', color: done ? '#64748b' : '#94a3b8', textDecoration: done ? 'line-through' : 'none', fontWeight: done ? 400 : 500 }}>{check.label}</span>
+                      <span style={{ fontSize: '0.82rem', color: done ? '#64748b' : '#64748b', textDecoration: done ? 'line-through' : 'none', fontWeight: done ? 400 : 500 }}>{check.label}</span>
                       {!done && <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: '#5a6a85', flexShrink: 0 }}>→ {check.tab === 'identity' ? 'Identity' : check.tab === 'niche' ? 'Niche' : check.tab === 'story' ? 'Story' : check.tab === 'bio' ? 'Bio' : 'Visual'}</span>}
                     </button>
                   )
@@ -1331,7 +1331,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                       </div>
                     )}
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#2a3547' : '#94a3b8', lineHeight: 1.6 }}>{opt.teks}</p>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#2a3547' : '#64748b', lineHeight: 1.6 }}>{opt.teks}</p>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     {!opt.is_primary && (
@@ -1474,7 +1474,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                             {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                             <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{opt.teks.length} karakter</span>
                           </div>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#2a3547' : '#94a3b8', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{opt.teks}</p>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#2a3547' : '#64748b', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{opt.teks}</p>
                         </div>
                         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                           {!opt.is_primary && (
@@ -1684,7 +1684,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     ].map(tipe => (
                       <div key={tipe.id} onClick={() => setField('affiliate_tipe', tipe.id)}
                         style={{ padding: '14px 16px', borderRadius: 10, border: `1px solid ${profile.affiliate_tipe === tipe.id ? '#34d399' : '#e5eaf2'}`, background: profile.affiliate_tipe === tipe.id ? 'rgba(52,211,153,0.07)' : '#f8fafc', cursor: 'pointer' }}>
-                        <div style={{ marginBottom: 8, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#c8d1e0' }}>
+                        <div style={{ marginBottom: 8, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#64748b' }}>
                         {tipe.id === 'personal' ? <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> : <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
                       </div>
                         <div style={{ fontWeight: 600, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#2a3547', fontSize: '0.875rem', marginBottom: 4 }}>{tipe.label}</div>

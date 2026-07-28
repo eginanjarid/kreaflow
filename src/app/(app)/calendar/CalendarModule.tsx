@@ -348,7 +348,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                       {dayTasks.slice(0, Math.max(0, MAX_SHOW - shown)).map(t => {
                         shown++
                         const pct = t.percent_complete
-                        const taskColor = pct === 100 ? '#86efac' : pct > 0 ? '#fbbf24' : '#94a3b8'
+                        const taskColor = pct === 100 ? '#86efac' : pct > 0 ? '#fbbf24' : '#64748b'
                         const rawStep = t.nama.split(' —')[0].trim()
                         const stepName = rawStep.replace(/^\p{Emoji}\s*/u, '')
                         const ctx = t.nama.match(/—\s*(.+)$/)?.[1]?.trim()
@@ -365,7 +365,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         shown++
                         return (
                           <div key={p.id} onClick={ev => ev.stopPropagation()}
-                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #c8d1e0', color: '#5a6a85', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
+                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #64748b', color: '#5a6a85', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
                             title={`Rencana: ${p.judul}${p.jam_tayang ? ' · ' + p.jam_tayang : ''}`}>
                             {p.jam_tayang && <span style={{ opacity: 0.6 }}>{p.jam_tayang} </span>}
                             {p.product_nama ? `${p.product_nama.split(' ')[0]} · ` : ''}

@@ -242,12 +242,12 @@ export default function Topbar({ user }: Props) {
               {/* Body */}
               <div style={{ flex: 1, overflowY: 'auto' }}>
                 {notifLoading && (
-                  <div style={{ padding: 36, textAlign: 'center', color: '#c8d1e0', fontSize: '0.82rem' }}>Memuat...</div>
+                  <div style={{ padding: 36, textAlign: 'center', color: '#64748b', fontSize: '0.82rem' }}>Memuat...</div>
                 )}
                 {!notifLoading && notifs.length === 0 && (
                   <div style={{ padding: 44, textAlign: 'center' }}>
                     <div style={{ fontSize: '2rem', marginBottom: 8 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
-                    <div style={{ fontSize: '0.82rem', color: '#c8d1e0' }}>Belum ada notifikasi</div>
+                    <div style={{ fontSize: '0.82rem', color: '#64748b' }}>Belum ada notifikasi</div>
                   </div>
                 )}
                 {!notifLoading && notifs.map(n => {
@@ -263,12 +263,12 @@ export default function Topbar({ user }: Props) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '0.8rem', fontWeight: n.is_read ? 400 : 600, color: n.is_read ? '#5a6a85' : '#2a3547', marginBottom: 2, lineHeight: 1.4 }}>{n.title}</div>
                         {n.message && (
-                          <div style={{ fontSize: '0.7rem', color: '#9fa9ba', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, lineHeight: 1.4 }}>
+                          <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, lineHeight: 1.4 }}>
                             {n.message}
                           </div>
                         )}
                         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.65rem', color: '#c8d1e0' }}>{relTime(n.created_at)}</span>
+                          <span style={{ fontSize: '0.65rem', color: '#64748b' }}>{relTime(n.created_at)}</span>
                           <Link
                             href={href}
                             onClick={() => { if (!n.is_read) markRead(n.id); setBellOpen(false) }}
@@ -277,7 +277,7 @@ export default function Topbar({ user }: Props) {
                             Buka →
                           </Link>
                           {!n.is_read && (
-                            <button onClick={() => markRead(n.id)} style={{ fontSize: '0.65rem', color: '#9fa9ba', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 'auto' }}>
+                            <button onClick={() => markRead(n.id)} style={{ fontSize: '0.65rem', color: '#5a6a85', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 'auto' }}>
                               Tandai dibaca
                             </button>
                           )}
@@ -343,7 +343,7 @@ export default function Topbar({ user }: Props) {
             }}>
               <div style={{ padding: '12px 14px', borderBottom: '1px solid #f1f5f9' }}>
                 <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#2a3547' }}>{user.nama}</div>
-                <div style={{ fontSize: '0.68rem', color: '#9fa9ba', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
+                <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
               </div>
               <div style={{ padding: '6px' }}>
                 <Link

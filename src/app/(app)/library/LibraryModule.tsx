@@ -347,7 +347,7 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
         {PREVIEW_RATIOS.map(rx => (
           <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(26,115,232,0.15)' : '#f1f5f9', cursor: 'pointer', gap: 1 }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#42a5f5' : '#94a3b8' }}>{rx.label}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#42a5f5' : '#64748b' }}>{rx.label}</span>
             <span style={{ fontSize: '0.6rem', color: ratio === rx.key ? '#1a73e8' : '#5a6a85' }}>{rx.sub}</span>
           </button>
         ))}

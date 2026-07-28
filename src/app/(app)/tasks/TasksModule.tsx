@@ -876,12 +876,12 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                               <span style={{ fontSize: '0.72rem', color: '#5a6a85', whiteSpace: 'nowrap' }}>Selesai:</span>
                               <input type="date" min={sprintStart}
-                                style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 6, padding: '3px 8px', color: step.due_date ? '#94a3b8' : '#334155', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}
+                                style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 6, padding: '3px 8px', color: step.due_date ? '#64748b' : '#334155', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}
                                 value={step.due_date}
                                 onChange={e => updateStepDueDate(step.id, e.target.value)}
                               />
                             </div>
-                            <select style={{ marginLeft: 'auto', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 5, padding: '3px 8px', color: PRIORITY_COLOR[step.priority] || '#94a3b8', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}
+                            <select style={{ marginLeft: 'auto', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 5, padding: '3px 8px', color: PRIORITY_COLOR[step.priority] || '#64748b', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}
                               value={step.priority}
                               onChange={e => setSprintSteps(prev => prev.map(s => s.id === step.id ? { ...s, priority: e.target.value } : s))}>
                               {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
@@ -1033,9 +1033,9 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
       {/* Drag handle indicator */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 3, flexShrink: 0, opacity: isDragging ? 0.6 : 0.3, transition: 'opacity 0.12s' }}>
-          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /></div>
-          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /></div>
-          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /></div>
+          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /></div>
+          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /></div>
+          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /></div>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 600, color: isDragging ? '#5a6a85' : '#2a3547', fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word', transition: 'color 0.12s' }}>{task.nama}</div>

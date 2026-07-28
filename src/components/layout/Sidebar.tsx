@@ -163,7 +163,7 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
 
         {workspace && (
           <div style={{ marginTop: 12, padding: '8px 10px', background: '#f5f7fb', borderRadius: 8, border: '1px solid #eef1f6' }}>
-            <div style={{ fontSize: '0.6rem', color: '#9fa9ba', fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 2 }}>Workspace</div>
+            <div style={{ fontSize: '0.6rem', color: '#5a6a85', fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 2 }}>Workspace</div>
             <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2a3547', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{workspace.name}</div>
             <div style={{ fontSize: '0.62rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', marginTop: 2 }}>{workspace.plan}</div>
           </div>
@@ -217,7 +217,7 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
           <Link href="/admin" style={{
             ...navItemStyle(pathname.startsWith('/admin')),
             background: pathname.startsWith('/admin') ? 'rgba(239,68,68,0.1)' : 'transparent',
-            color: pathname.startsWith('/admin') ? '#ef4444' : '#9fa9ba',
+            color: pathname.startsWith('/admin') ? '#ef4444' : '#5a6a85',
           }}>
             <AdminIcon />
             Super Admin

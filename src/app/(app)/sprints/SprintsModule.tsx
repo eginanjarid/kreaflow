@@ -126,7 +126,7 @@ function getTemplateLabel(template_type: string): string {
 
 function getTemplateColor(template_type: string): string {
   const { key } = parseTemplateType(template_type)
-  if (key === 'custom') return '#94a3b8'
+  if (key === 'custom') return '#64748b'
   return TEMPLATES[key]?.color || TEMPLATES.affiliate.color
 }
 
@@ -744,7 +744,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#86efac' : '#42a5f5' }}>{totalPct}% done</span>
                     {/* Step legend */}
                     <span style={{ display: 'flex', alignItems: 'center', gap: 3, marginLeft: 4 }}>
-                      {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#9fa9ba', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
+                      {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#5a6a85', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
                     </span>
                   </div>
                 </div>
@@ -839,7 +839,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </button>
                   ))}
                   <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
-                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#5a6a85', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#64748b' : '#5a6a85', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     Custom
                   </button>
                 </div>

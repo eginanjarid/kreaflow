@@ -202,7 +202,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, border: `1px solid ${active ? m.color + '40' : '#e5eaf2'}`, background: active ? m.color + '08' : '#f1f5f9', cursor: 'pointer', transition: 'all 0.15s' }}>
                     <span style={{ fontSize: '1.4rem' }}>{m.icon}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, color: active ? m.color : '#94a3b8', fontSize: '0.875rem', marginBottom: 2 }}>{m.label}</div>
+                      <div style={{ fontWeight: 600, color: active ? m.color : '#64748b', fontSize: '0.875rem', marginBottom: 2 }}>{m.label}</div>
                       <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>{m.desc}</div>
                     </div>
                     <div style={{ width: 36, height: 20, borderRadius: 10, background: active ? m.color : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>

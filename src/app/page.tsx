@@ -60,7 +60,7 @@ export default async function LandingPage() {
             <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.5px', color: '#f1f5f9' }}>KreaFlow</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Link href="/login" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #2a2a2a', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500, textDecoration: 'none', background: 'transparent' }}>
+            <Link href="/login" style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #2a2a2a', color: '#6b7280', fontSize: '0.85rem', fontWeight: 500, textDecoration: 'none', background: 'transparent' }}>
               Masuk
             </Link>
             <Link href="/register" style={{ padding: '7px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', border: 'none' }}>
@@ -81,14 +81,14 @@ export default async function LandingPage() {
             dari ide sampai posting.
           </span>
         </h1>
-        <p style={{ fontSize: '1.1rem', color: '#94a3b8', maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '1.1rem', color: '#6b7280', maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
           KreaFlow menggabungkan Brand, AI content generation, Calendar, Tracker, dan Insights dalam satu platform — khusus untuk content creator dan affiliator Indonesia.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/register" style={{ padding: '13px 28px', borderRadius: 10, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>
             Mulai Sekarang →
           </Link>
-          <Link href="/login" style={{ padding: '13px 28px', borderRadius: 10, border: '1px solid #2a2a2a', color: '#e2e8f0', fontSize: '0.95rem', fontWeight: 600, textDecoration: 'none', display: 'inline-block', background: '#111' }}>
+          <Link href="/login" style={{ padding: '13px 28px', borderRadius: 10, border: '1px solid #2a2a2a', color: '#d1d9e6', fontSize: '0.95rem', fontWeight: 600, textDecoration: 'none', display: 'inline-block', background: '#111' }}>
             Sudah punya akun
           </Link>
         </div>
@@ -115,7 +115,7 @@ export default async function LandingPage() {
                 { title: 'Cara Dapat Komisi Affiliate Tanpa Modal', status: 'Scheduled', platform: 'YouTube' },
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, background: '#0d0d0d', border: '1px solid #1f1f1f', marginBottom: 6 }}>
-                  <div style={{ flex: 1, fontSize: '0.78rem', color: '#e2e8f0', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
+                  <div style={{ flex: 1, fontSize: '0.78rem', color: '#d1d9e6', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
                   <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10, background: item.status === 'Ready' ? 'rgba(134,239,172,0.1)' : item.status === 'Scheduled' ? 'rgba(147,197,253,0.1)' : 'rgba(71,85,105,0.2)', color: item.status === 'Ready' ? '#86efac' : item.status === 'Scheduled' ? '#93c5fd' : '#64748b', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.status}</span>
                   <span style={{ fontSize: '0.68rem', color: '#475569', whiteSpace: 'nowrap' }}>{item.platform}</span>
                 </div>
@@ -135,7 +135,7 @@ export default async function LandingPage() {
           {MODULES.map(m => (
             <div key={m.name} style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: 12, padding: '20px' }}>
               <div style={{ fontSize: '1.6rem', marginBottom: 10 }}>{m.icon}</div>
-              <div style={{ fontWeight: 700, color: '#e2e8f0', marginBottom: 6 }}>{m.name}</div>
+              <div style={{ fontWeight: 700, color: '#d1d9e6', marginBottom: 6 }}>{m.name}</div>
               <div style={{ fontSize: '0.83rem', color: '#64748b', lineHeight: 1.5 }}>{m.desc}</div>
             </div>
           ))}
@@ -156,7 +156,7 @@ export default async function LandingPage() {
                   <div style={{ position: 'absolute', top: 20, left: 'calc(100% - 10px)', width: 20, height: 1, background: '#2a2a2a', display: 'none' }} />
                 )}
                 <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#7C3AED', letterSpacing: '0.1em', marginBottom: 10 }}>STEP {s.n}</div>
-                <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '1rem', marginBottom: 8 }}>{s.title}</div>
+                <div style={{ fontWeight: 700, color: '#d1d9e6', fontSize: '1rem', marginBottom: 8 }}>{s.title}</div>
                 <div style={{ fontSize: '0.83rem', color: '#64748b', lineHeight: 1.5 }}>{s.desc}</div>
               </div>
             ))}
@@ -177,7 +177,7 @@ export default async function LandingPage() {
               {['Bangun identitas brand yang kuat', 'Generate script konten dengan AI', 'Jadwalkan konten multi-platform', 'Evaluasi performa & perbaiki strategi'].map(t => (
                 <div key={t} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                   <span style={{ color: '#7C3AED', flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{t}</span>
+                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>{t}</span>
                 </div>
               ))}
             </div>
@@ -189,7 +189,7 @@ export default async function LandingPage() {
               {['Database produk affiliate terorganisir', 'Generate naskah review & promo AI', 'Hitung potensi komisi per produk', 'Sprint produksi konten affiliate'].map(t => (
                 <div key={t} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                   <span style={{ color: '#34d399', flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{t}</span>
+                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>{t}</span>
                 </div>
               ))}
             </div>
@@ -219,7 +219,7 @@ export default async function LandingPage() {
                   {p.features.map(f => (
                     <div key={f} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                       <span style={{ color: p.color, flexShrink: 0 }}>✓</span>
-                      <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{f}</span>
+                      <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>{f}</span>
                     </div>
                   ))}
                 </div>
@@ -256,7 +256,7 @@ export default async function LandingPage() {
               <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
             </svg>
           </div>
-          <span style={{ fontWeight: 700, color: '#94a3b8', fontSize: '0.9rem' }}>KreaFlow</span>
+          <span style={{ fontWeight: 700, color: '#6b7280', fontSize: '0.9rem' }}>KreaFlow</span>
         </div>
         <p style={{ fontSize: '0.78rem', color: '#475569' }}>© 2026 KreaFlow · TUAS DIGITAL · kreaflow.id</p>
       </footer>

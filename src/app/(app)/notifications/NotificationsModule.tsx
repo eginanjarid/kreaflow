@@ -143,7 +143,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
                   {/* Content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontWeight: n.is_read ? 500 : 700, color: n.is_read ? '#94a3b8' : '#f1f5f9', fontSize: '0.875rem', flex: 1 }}>{n.title}</span>
+                      <span style={{ fontWeight: n.is_read ? 500 : 700, color: n.is_read ? '#64748b' : '#f1f5f9', fontSize: '0.875rem', flex: 1 }}>{n.title}</span>
                       {!n.is_read && <span style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.color, flexShrink: 0, marginTop: 4 }} />}
                     </div>
                     {n.message && <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, lineHeight: 1.5 }}>{n.message}</div>}

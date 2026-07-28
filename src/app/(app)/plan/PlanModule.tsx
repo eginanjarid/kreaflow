@@ -1071,7 +1071,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                             </div>
                             <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{step.icon}</span>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 600, color: done ? '#34d399' : '#94a3b8', fontSize: '0.875rem' }}>
+                              <div style={{ fontWeight: 600, color: done ? '#34d399' : '#64748b', fontSize: '0.875rem' }}>
                                 {step.label}
                                 {step.optional && <span style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 400, marginLeft: 6 }}>(opsional)</span>}
                               </div>
