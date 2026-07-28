@@ -42,10 +42,10 @@ type Stats = {
 }
 
 const PLANS = ['free', 'solo', 'pro', 'team']
-const PLAN_COLORS: Record<string, string> = { free: '#475569', solo: '#1a73e8', pro: '#42a5f5', team: '#34d399' }
+const PLAN_COLORS: Record<string, string> = { free: '#5a6a85', solo: '#1a73e8', pro: '#42a5f5', team: '#34d399' }
 
 function PlanBadge({ plan }: { plan: string }) {
-  const color = PLAN_COLORS[plan] || '#475569'
+  const color = PLAN_COLORS[plan] || '#5a6a85'
   return <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10, background: color + '20', color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{plan || 'free'}</span>
 }
 

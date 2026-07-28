@@ -1032,7 +1032,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 {[...FREQ_LEVELS].reverse().map((lvl) => (
                   <div key={lvl.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 8px', borderRadius: 6, background: lvl.id === freqLevel.id ? `${lvl.color}12` : 'transparent', marginBottom: 2 }}>
                     <span style={{ fontSize: '0.8rem' }}>{lvl.icon}</span>
-                    <span style={{ fontSize: '0.75rem', fontWeight: lvl.id === freqLevel.id ? 700 : 400, color: lvl.id === freqLevel.id ? lvl.color : '#475569' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: lvl.id === freqLevel.id ? 700 : 400, color: lvl.id === freqLevel.id ? lvl.color : '#5a6a85' }}>
                       {lvl.id}. {lvl.name}
                     </span>
                     {lvl.id === freqLevel.id && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', background: `${lvl.color}20`, color: lvl.color, padding: '1px 6px', borderRadius: 4, fontWeight: 700 }}>NOW</span>}
@@ -1168,7 +1168,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   {opt.is_primary && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#42a5f5', marginTop: 6, flexShrink: 0 }} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontWeight: 700, color: opt.is_primary ? '#42a5f5' : '#e2e8f0', fontSize: '0.9rem' }}>{opt.niche}</span>
+                      <span style={{ fontWeight: 700, color: opt.is_primary ? '#42a5f5' : '#2a3547', fontSize: '0.9rem' }}>{opt.niche}</span>
                       {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                     </div>
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -1317,7 +1317,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                       </div>
                     )}
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#e2e8f0' : '#94a3b8', lineHeight: 1.6 }}>{opt.teks}</p>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#2a3547' : '#94a3b8', lineHeight: 1.6 }}>{opt.teks}</p>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     {!opt.is_primary && (
@@ -1421,7 +1421,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                           <div style={{ fontSize: '0.7rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teks Bio</div>
-                          <span style={{ fontSize: '0.7rem', color: bioForm.teks.length > activePl.max ? '#f87171' : '#475569' }}>{bioForm.teks.length}/{activePl.max}</span>
+                          <span style={{ fontSize: '0.7rem', color: bioForm.teks.length > activePl.max ? '#f87171' : '#5a6a85' }}>{bioForm.teks.length}/{activePl.max}</span>
                         </div>
                         <textarea style={fieldStyle({ height: 90, resize: 'none' })} value={bioForm.teks} maxLength={activePl.max} onChange={e => setBioForm(f => f ? { ...f, teks: e.target.value } : f)} placeholder={`Paste variasi bio ${activePl.label} dari AI...`} />
                       </div>
@@ -1460,7 +1460,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                             {opt.is_primary && <span style={{ background: 'rgba(26,115,232,0.2)', color: '#42a5f5', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Utama</span>}
                             <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{opt.teks.length} karakter</span>
                           </div>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#e2e8f0' : '#94a3b8', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{opt.teks}</p>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: opt.is_primary ? '#2a3547' : '#94a3b8', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{opt.teks}</p>
                         </div>
                         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                           {!opt.is_primary && (
@@ -1641,7 +1641,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 {affSteps.map((s, i) => (
                   <button key={s.id} type="button" onClick={() => setAffStep(s.id)}
                     style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: affStep === s.id ? '2px solid #34d399' : '2px solid transparent', color: affStep === s.id ? '#34d399' : '#64748b', fontSize: '0.82rem', fontWeight: affStep === s.id ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: affStep === s.id ? 'rgba(52,211,153,0.15)' : '#f1f5f9', border: `1px solid ${affStep === s.id ? '#34d399' : '#e5eaf2'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, color: affStep === s.id ? '#34d399' : '#475569', flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: affStep === s.id ? 'rgba(52,211,153,0.15)' : '#f1f5f9', border: `1px solid ${affStep === s.id ? '#34d399' : '#e5eaf2'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, color: affStep === s.id ? '#34d399' : '#5a6a85', flexShrink: 0 }}>{i + 1}</span>
                     {s.label}
                   </button>
                 ))}
@@ -1671,7 +1671,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       <div key={tipe.id} onClick={() => setField('affiliate_tipe', tipe.id)}
                         style={{ padding: '14px 16px', borderRadius: 10, border: `1px solid ${profile.affiliate_tipe === tipe.id ? '#34d399' : '#e5eaf2'}`, background: profile.affiliate_tipe === tipe.id ? 'rgba(52,211,153,0.07)' : '#f8fafc', cursor: 'pointer' }}>
                         <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>{tipe.icon}</div>
-                        <div style={{ fontWeight: 600, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#e2e8f0', fontSize: '0.875rem', marginBottom: 4 }}>{tipe.label}</div>
+                        <div style={{ fontWeight: 600, color: profile.affiliate_tipe === tipe.id ? '#34d399' : '#2a3547', fontSize: '0.875rem', marginBottom: 4 }}>{tipe.label}</div>
                         <div style={{ fontSize: '0.75rem', color: '#5a6a85', lineHeight: 1.5 }}>{tipe.desc}</div>
                       </div>
                     ))}
@@ -2083,7 +2083,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               ))}
             </div>
             <button type="button" onClick={() => copyPrompt(aiModal.prompt)}
-              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#475569', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
               {promptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
             </button>
           </div>
@@ -2275,7 +2275,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
             ))}
           </div>
           <button type="button" onClick={() => { navigator.clipboard.writeText(aiModal.prompt); setPromptCopied(true); setTimeout(() => setPromptCopied(false), 2500) }}
-            style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#475569', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+            style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
             {promptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
           </button>
         </div>

@@ -19,7 +19,7 @@ type ViewMode = 'cards' | 'ig' | 'feed'
 type IGTab = 'grid' | 'reels' | 'tagged'
 
 const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai' }
-const STATUS_COLOR: Record<string, string> = { Draft: '#475569', 'Naskah Siap': '#f59e0b', Produksi: '#3b82f6', 'Siap Tayang': '#22c55e', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
+const STATUS_COLOR: Record<string, string> = { Draft: '#5a6a85', 'Naskah Siap': '#f59e0b', Produksi: '#3b82f6', 'Siap Tayang': '#22c55e', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
 const STATUS_BG: Record<string, string> = { Draft: '#f1f5f9', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
 const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
 
@@ -87,7 +87,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
         {caption && <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#2a3547', lineHeight: 1.5, marginBottom: 4 }}><span style={{ fontWeight: 700, marginRight: 6 }}>{handle}</span><span style={{ whiteSpace: 'pre-wrap' }}>{caption.length > 150 ? caption.slice(0, 150) + '...' : caption}</span></div>}
         {hashtags && <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#3b82f6', marginBottom: 4 }}>{hashtags}</div>}
         <div style={{ paddingInline: 14, marginBottom: 6 }}>
-          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[item.status] || '#475569', background: STATUS_BG[item.status] || '#f1f5f9', fontWeight: 600 }}>{item.status}</span>
+          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[item.status] || '#5a6a85', background: STATUS_BG[item.status] || '#f1f5f9', fontWeight: 600 }}>{item.status}</span>
           {item.format && <span style={{ marginLeft: 6, fontSize: '0.68rem', color: '#5a6a85' }}>{item.format}</span>}
         </div>
         <div style={{ fontSize: '0.7rem', color: '#5a6a85', paddingInline: 14, marginBottom: 10 }}>{item.scheduled_date ? `Dijadwalkan: ${item.scheduled_date}` : 'Belum dijadwalkan'}</div>
@@ -148,7 +148,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
       </div>
       <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
         <div style={{ background: 'rgba(30,30,30,0.9)', borderRadius: 8, padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: '0.68rem', color: STATUS_COLOR[item.status] || '#475569', fontWeight: 600 }}>{item.status}</span>
+          <span style={{ fontSize: '0.68rem', color: STATUS_COLOR[item.status] || '#5a6a85', fontWeight: 600 }}>{item.status}</span>
           {item.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>· {item.scheduled_date}</span>}
         </div>
         <button onClick={onEdit} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Input Hasil</button>
@@ -362,7 +362,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5eaf2', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 0 }}>
           {TAB_CONFIG.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)} style={{ background: 'transparent', border: 'none', padding: '10px 16px', cursor: 'pointer', color: tab === t.key ? t.color : '#475569', fontWeight: tab === t.key ? 700 : 400, fontSize: '0.875rem', borderBottom: tab === t.key ? `2px solid ${t.color}` : '2px solid transparent', marginBottom: -1, transition: 'all 0.15s' }}>
+            <button key={t.key} onClick={() => setTab(t.key)} style={{ background: 'transparent', border: 'none', padding: '10px 16px', cursor: 'pointer', color: tab === t.key ? t.color : '#5a6a85', fontWeight: tab === t.key ? 700 : 400, fontSize: '0.875rem', borderBottom: tab === t.key ? `2px solid ${t.color}` : '2px solid transparent', marginBottom: -1, transition: 'all 0.15s' }}>
               {t.label}
               {t.key === 'antrian' && antriCount > 0 && <span style={{ marginLeft: 6, background: '#f59e0b', color: '#000', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{antriCount}</span>}
               {t.key === 'dikerjakan' && dikerjakanCount > 0 && <span style={{ marginLeft: 6, background: '#3b82f6', color: '#fff', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{dikerjakanCount}</span>}
@@ -430,7 +430,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           <div style={{ display: 'flex', gap: 14, padding: '0 16px 16px', overflowX: 'auto' }}>
             {['Baru', 'Tips', 'Promo', 'Behind'].map((h, i) => (
               <div key={h} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid #333', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#5a6a85' }}>{i === 0 ? '+' : '📌'}</div>
+                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid #e5eaf2', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#5a6a85' }}>{i === 0 ? '+' : '📌'}</div>
                 <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{h}</span>
               </div>
             ))}
@@ -462,7 +462,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                       onClick={() => igTab === 'reels' ? setPreviewReels(c) : setPreviewPost(c)}>
                       {thumb ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
                       {c.format && <div style={{ position: 'absolute', bottom: 4, left: 4, fontSize: '0.52rem', fontWeight: 600, color: '#fff', background: isVideo ? 'rgba(220,39,39,0.85)' : 'rgba(30,64,175,0.85)', padding: '2px 4px', borderRadius: 3 }}>{c.format}</div>}
-                      <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#475569', boxShadow: '0 0 4px rgba(0,0,0,0.7)' }} />
+                      <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#5a6a85', boxShadow: '0 0 4px rgba(0,0,0,0.7)' }} />
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.15s' }}>
                         <span style={{ fontSize: '0.58rem', fontWeight: 600, color: '#fff', textAlign: 'center', padding: '0 4px', lineHeight: 1.3 }}>{(c.judul || '').slice(0, 22)}{(c.judul || '').length > 22 ? '…' : ''}</span>
                       </div>
@@ -495,10 +495,10 @@ export default function StudioModule({ initialContents, products, initialNotific
                   {thumb ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, gap: 6, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.2s' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#2a3547', textAlign: 'center', lineHeight: 1.3 }}>{(c.judul || '(Tanpa judul)').slice(0, 40)}</div>
-                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#475569', background: STATUS_BG[c.status] || '#f1f5f9', fontWeight: 600 }}>{c.status}</span>
+                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#5a6a85', background: STATUS_BG[c.status] || '#f1f5f9', fontWeight: 600 }}>{c.status}</span>
                     {c.canva_url && <a href={c.canva_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.62rem', color: '#42a5f5', textDecoration: 'underline' }}>Canva ↗</a>}
                   </div>
-                  {hoveredId !== c.id && <div style={{ position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#475569', boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />}
+                  {hoveredId !== c.id && <div style={{ position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#5a6a85', boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />}
                 </div>
               )
             })}

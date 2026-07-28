@@ -136,7 +136,7 @@ const PRIORITY_COLOR: Record<string, string> = { High: '#f87171', Medium: '#fbbf
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
 
 const BOARD_COLS = [
-  { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#e5eaf2', bg: '#0d0d0d' },
+  { id: 'todo',  label: 'Todo',       count_color: '#5a6a85', border: '#e5eaf2', bg: 'rgba(90,106,133,0.04)' },
   { id: 'doing', label: 'Dikerjakan', count_color: '#fbbf24', border: 'rgba(251,191,36,0.25)', bg: 'rgba(251,191,36,0.03)' },
   { id: 'done',  label: 'Done ✓',    count_color: '#86efac', border: 'rgba(134,239,172,0.25)', bg: 'rgba(134,239,172,0.03)' },
 ]
@@ -557,7 +557,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
           { key: 'tasks', label: '✅ Tasks' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
-            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#42a5f5' : '#475569', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#42a5f5' : '#5a6a85', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
             {tab.key === 'tasks' && tasksTodo.length > 0 && (
               <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#f1f5f9', color: '#5a6a85', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
@@ -597,7 +597,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                       {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
-                      {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#475569' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
+                      {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#5a6a85' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
                       {t.notes && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{t.notes}</span>}
                     </div>
                   </div>
@@ -750,7 +750,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
                 </div>
                 <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#42a5f5' : '#475569', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#42a5f5' : '#5a6a85', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
                   <option value="">Semua Produk</option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                 </select>
@@ -786,7 +786,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         {items.map(item => (
                           <ContentCard key={item.id} item={item} steps={stepsWithMeta}
                             productName={item.product_id ? products.find(p => p.id === item.product_id)?.nama || null : null}
-                            productColor={item.product_id ? productColorMap[item.product_id] : '#475569'}
+                            productColor={item.product_id ? productColorMap[item.product_id] : '#5a6a85'}
                             onClick={() => {
                               setDetailItem(item)
                               setDetailJadwal({ date: item.tanggal_tayang || '', time: item.jam_tayang || '18:00' })
@@ -832,12 +832,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {(Object.entries(TEMPLATES) as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: key })); initStepsFromTemplate(key) }}
-                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#f1f5f9', color: sprintForm.template_type === key ? tpl.color : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#f1f5f9', color: sprintForm.template_type === key ? tpl.color : '#5a6a85', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
                     </button>
                   ))}
                   <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
-                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#475569', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#94a3b8' : '#5a6a85', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     ✏️ Custom
                   </button>
                 </div>
@@ -1004,7 +1004,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             type="date"
                             value={row.mulai}
                             onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
-                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#e2e8f0' : '#475569', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
+                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#2a3547' : '#5a6a85', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
                           />
                         </div>
                         <div>
@@ -1186,7 +1186,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                           </div>
                           <span style={{ fontSize: '0.85rem' }}>{step.icon}</span>
-                          <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#e2e8f0', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
+                          <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#2a3547', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
                         </div>
                         {!done && (
                           <Link href={step.href} onClick={() => setDetailItem(null)}
@@ -1361,7 +1361,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             )}
                           </>
                         )}
-                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#f8fafc', color: r.overdue > 0 ? '#f87171' : '#475569' }}>
+                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#f8fafc', color: r.overdue > 0 ? '#f87171' : '#5a6a85' }}>
                           ○ {r.pending} belum{r.overdue > 0 ? ` (${r.overdue} overdue)` : ''}
                         </span>
                       </div>
@@ -1469,7 +1469,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
         if (dl) {
           const overdue = new Date(dl) < new Date()
           return (
-            <div style={{ fontSize: '0.6rem', marginTop: 5, color: overdue ? '#f87171' : '#475569' }}>
+            <div style={{ fontSize: '0.6rem', marginTop: 5, color: overdue ? '#f87171' : '#5a6a85' }}>
               {overdue ? '⚠️' : '📅'} Due {new Date(dl).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
               {overdue ? ' — terlambat' : ''}
             </div>

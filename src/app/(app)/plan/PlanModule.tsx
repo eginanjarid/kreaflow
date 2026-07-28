@@ -607,7 +607,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setCampaigns(prev => prev.filter(x => x.id !== id))
   }
 
-  const STATUS_COLOR: Record<string, string> = { Planning: '#93c5fd', Active: '#86efac', Completed: '#42a5f5', Cancelled: '#475569' }
+  const STATUS_COLOR: Record<string, string> = { Planning: '#93c5fd', Active: '#86efac', Completed: '#42a5f5', Cancelled: '#5a6a85' }
 
   return (
     <div>
@@ -831,7 +831,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hasil Analisis USP <span style={{ color: '#5a6a85', fontWeight: 400, textTransform: 'none' }}>(paste dari AI)</span></label>
                     <textarea
-                      style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.82rem', lineHeight: 1.7, border: `1px solid ${affForm.usp ? '#ec489940' : '#e5eaf2'}`, color: affForm.usp ? '#e2e8f0' : '#475569' })}
+                      style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.82rem', lineHeight: 1.7, border: `1px solid ${affForm.usp ? '#ec489940' : '#e5eaf2'}`, color: affForm.usp ? '#2a3547' : '#5a6a85' })}
                       value={affForm.usp}
                       onChange={e => setAFF('usp', e.target.value)}
                       placeholder={'Paste hasil analisis USP dari AI di sini...\n\nHasil akan mencakup: USP, pain points, target segmen, angle promosi, objection handling, kata kunci emosional'}
@@ -881,7 +881,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <option value="">— Pilih dari daftar —</option>
                           {NICHE_PRESETS.map(n => <option key={n} value={n}>{n}</option>)}
                         </select>
-                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustomNiche ? '#e2e8f0' : '#475569' })} value={isCustomNiche ? affForm.niche_produk : ''} onChange={e => setAFF('niche_produk', e.target.value)} placeholder="atau ketik niche kustom sendiri..." />
+                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustomNiche ? '#2a3547' : '#5a6a85' })} value={isCustomNiche ? affForm.niche_produk : ''} onChange={e => setAFF('niche_produk', e.target.value)} placeholder="atau ketik niche kustom sendiri..." />
                       </div>
                     )
                   })()}
@@ -897,7 +897,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.target_audiens} onChange={e => setAFF('target_audiens', e.target.value)}>
                             {AUDIENS_PRESETS.map(a => <option key={a} value={a}>{a}</option>)}
                           </select>
-                          <input style={fieldStyle({ fontSize: '0.78rem', marginTop: 6, color: isCustom ? '#e2e8f0' : '#475569' })} value={isCustom ? affForm.target_audiens : ''} onChange={e => setAFF('target_audiens', e.target.value)} placeholder="ketik segmen spesifik..." />
+                          <input style={fieldStyle({ fontSize: '0.78rem', marginTop: 6, color: isCustom ? '#2a3547' : '#5a6a85' })} value={isCustom ? affForm.target_audiens : ''} onChange={e => setAFF('target_audiens', e.target.value)} placeholder="ketik segmen spesifik..." />
                         </>
                       })()}
                     </div>
@@ -928,7 +928,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <option value="">— Pilih dari daftar —</option>
                           {CTA_PRESETS.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
-                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustom ? '#e2e8f0' : '#475569' })} value={isCustom ? affForm.cta_style : ''} onChange={e => setAFF('cta_style', e.target.value)} placeholder="atau ketik style CTA kustom..." />
+                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustom ? '#2a3547' : '#5a6a85' })} value={isCustom ? affForm.cta_style : ''} onChange={e => setAFF('cta_style', e.target.value)} placeholder="atau ketik style CTA kustom..." />
                       </div>
                     )
                   })()}
@@ -944,7 +944,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <option value="">— Pilih dari daftar —</option>
                           {KONVERSI_PRESETS.map(f => <option key={f} value={f}>{f}</option>)}
                         </select>
-                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustom ? '#e2e8f0' : '#475569' })} value={isCustom ? affForm.fokus_konversi : ''} onChange={e => setAFF('fokus_konversi', e.target.value)} placeholder="atau ketik trigger kustom..." />
+                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustom ? '#2a3547' : '#5a6a85' })} value={isCustom ? affForm.fokus_konversi : ''} onChange={e => setAFF('fokus_konversi', e.target.value)} placeholder="atau ketik trigger kustom..." />
                       </div>
                     )
                   })()}
@@ -960,7 +960,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <option value="">— Pilih dari daftar —</option>
                           {VISUAL_PRESETS.map(v => <option key={v} value={v}>{v}</option>)}
                         </select>
-                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustom ? '#e2e8f0' : '#475569' })} value={isCustom ? affForm.visual_hook : ''} onChange={e => setAFF('visual_hook', e.target.value)} placeholder="atau ketik strategi visual kustom..." />
+                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustom ? '#2a3547' : '#5a6a85' })} value={isCustom ? affForm.visual_hook : ''} onChange={e => setAFF('visual_hook', e.target.value)} placeholder="atau ketik strategi visual kustom..." />
                       </div>
                     )
                   })()}
@@ -983,7 +983,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                             <option value="">— Pilih —</option>
                             {FORMAT_PRESETS.map(t => <option key={t} value={t}>{t}</option>)}
                           </select>
-                          <input style={fieldStyle({ fontSize: '0.78rem', marginTop: 6, color: isCustom ? '#e2e8f0' : '#475569' })} value={isCustom ? affForm.tipe_konten : ''} onChange={e => setAFF('tipe_konten', e.target.value)} placeholder="atau format kustom..." />
+                          <input style={fieldStyle({ fontSize: '0.78rem', marginTop: 6, color: isCustom ? '#2a3547' : '#5a6a85' })} value={isCustom ? affForm.tipe_konten : ''} onChange={e => setAFF('tipe_konten', e.target.value)} placeholder="atau format kustom..." />
                         </>
                       })()}
                     </div>
@@ -1117,8 +1117,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               {/* Platform Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: p.is_active ? '1px solid #e5eaf2' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontWeight: 700, color: p.is_active ? '#e2e8f0' : '#475569', fontSize: '0.95rem' }}>{p.platform}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#86efac' : '#475569', background: p.is_active ? 'rgba(134,239,172,0.1)' : '#f1f5f9', fontWeight: 600 }}>
+                  <span style={{ fontWeight: 700, color: p.is_active ? '#2a3547' : '#5a6a85', fontSize: '0.95rem' }}>{p.platform}</span>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#86efac' : '#5a6a85', background: p.is_active ? 'rgba(134,239,172,0.1)' : '#f1f5f9', fontWeight: 600 }}>
                     {p.is_active ? 'Aktif' : 'Tidak Aktif'}
                   </span>
                 </div>
@@ -1166,7 +1166,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {WAKTU.map(t => (
                         <button key={t} type="button" onClick={() => toggleWaktu(p.platform, t)}
-                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: p.waktu_terbaik?.includes(t) ? '#42a5f5' : '#475569', cursor: 'pointer' }}>
+                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: p.waktu_terbaik?.includes(t) ? '#42a5f5' : '#5a6a85', cursor: 'pointer' }}>
                           {t}
                         </button>
                       ))}
@@ -1325,7 +1325,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               ))}
             </div>
             <button type="button" onClick={() => { navigator.clipboard.writeText(affAiModal.prompt); setAffPromptCopied(true); setTimeout(() => setAffPromptCopied(false), 2000) }}
-              style={{ background: 'transparent', border: 'none', color: affPromptCopied ? '#34d399' : '#475569', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+              style={{ background: 'transparent', border: 'none', color: affPromptCopied ? '#34d399' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
               {affPromptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
             </button>
           </div>
@@ -1362,7 +1362,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               ))}
             </div>
             <button type="button" onClick={() => copyPrompt(aiModal.prompt)}
-              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#475569', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
               {promptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
             </button>
           </div>

@@ -36,7 +36,7 @@ const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before
 const STATUSES = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUS_COLOR: Record<string, string> = {
-  Draft: '#475569',
+  Draft: '#5a6a85',
   'Naskah Siap': '#f59e0b',
   Produksi: '#3b82f6',
   'Siap Tayang': '#22c55e',
@@ -348,7 +348,7 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
           <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(26,115,232,0.15)' : '#f1f5f9', cursor: 'pointer', gap: 1 }}>
             <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#42a5f5' : '#94a3b8' }}>{rx.label}</span>
-            <span style={{ fontSize: '0.6rem', color: ratio === rx.key ? '#1a73e8' : '#475569' }}>{rx.sub}</span>
+            <span style={{ fontSize: '0.6rem', color: ratio === rx.key ? '#1a73e8' : '#5a6a85' }}>{rx.sub}</span>
           </button>
         ))}
       </div>
@@ -753,7 +753,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Status</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#475569', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
+                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#5a6a85', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
                         {modal.idea.status || 'Draft'}
                       </span>
                       <span style={{ fontSize: '0.72rem', color: '#5a6a85' }}>Diatur otomatis oleh workflow</span>

@@ -476,7 +476,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                 </button>
               ))}
               <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
-                style={{ marginLeft: 'auto', background: '#f8fafc', border: `1px solid ${filterDate ? '#34d399' : '#e5eaf2'}`, borderRadius: 20, padding: '3px 12px', color: filterDate ? '#34d399' : '#475569', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }} />
+                style={{ marginLeft: 'auto', background: '#f8fafc', border: `1px solid ${filterDate ? '#34d399' : '#e5eaf2'}`, borderRadius: 20, padding: '3px 12px', color: filterDate ? '#34d399' : '#5a6a85', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }} />
               {(filterContext || filterDate) && (
                 <button onClick={() => { setFilterContext(''); setFilterDate('') }}
                   style={{ padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', border: '1px solid #e5eaf2', background: 'transparent', color: '#5a6a85', cursor: 'pointer' }}>
@@ -527,7 +527,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       <span style={{ fontSize: '1rem' }}>{col.icon}</span>
                       <span style={{ fontWeight: 700, color: col.color, fontSize: '0.875rem' }}>{col.label}</span>
                     </div>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#475569', background: isOver ? `${col.color}18` : '#f1f5f9', border: `1px solid ${isOver ? col.color + '50' : '#e5eaf2'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#5a6a85', background: isOver ? `${col.color}18` : '#f1f5f9', border: `1px solid ${isOver ? col.color + '50' : '#e5eaf2'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
                   </div>
                   {/* Cards */}
                   <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 140 }}>
@@ -657,7 +657,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       const stepName = t.nama.split(' —')[0].trim()
                       const col = getTaskCol(t.percent_complete)
                       const overdue = t.due_date && new Date(t.due_date) < new Date() && t.percent_complete < 100
-                      const chipColor = overdue ? '#f87171' : col === 'done' ? '#86efac' : col === 'in_progress' ? '#fbbf24' : '#475569'
+                      const chipColor = overdue ? '#f87171' : col === 'done' ? '#86efac' : col === 'in_progress' ? '#fbbf24' : '#5a6a85'
                       const chipBg = overdue ? 'rgba(248,113,113,0.08)' : col === 'done' ? 'rgba(134,239,172,0.08)' : col === 'in_progress' ? 'rgba(251,191,36,0.08)' : '#f1f5f9'
                       const chipBorder = overdue ? 'rgba(248,113,113,0.3)' : col === 'done' ? 'rgba(134,239,172,0.25)' : col === 'in_progress' ? 'rgba(251,191,36,0.25)' : '#e5eaf2'
                       const icon = col === 'done' ? '✓' : col === 'in_progress' ? '◷' : '○'
@@ -782,7 +782,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                             <option value="">— Pilih pilar dari brand —</option>
                             {pillarLines.map((line, i) => <option key={i} value={line}>{line}</option>)}
                           </select>
-                          <input style={fieldStyle({ fontSize: '0.82rem', marginTop: 6, color: isCustomPillar ? '#e2e8f0' : '#475569' })}
+                          <input style={fieldStyle({ fontSize: '0.82rem', marginTop: 6, color: isCustomPillar ? '#2a3547' : '#5a6a85' })}
                             value={isCustomPillar ? sprintPillar : ''}
                             onChange={e => setSprintPillar(e.target.value)}
                             placeholder="atau ketik tema bebas..." />
@@ -861,7 +861,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                           <input
-                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #e5eaf2', color: step.enabled ? '#e2e8f0' : '#475569', fontSize: '0.875rem', fontWeight: 600, outline: 'none', padding: '0 0 4px 0', width: '100%' }}
+                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #e5eaf2', color: step.enabled ? '#2a3547' : '#5a6a85', fontSize: '0.875rem', fontWeight: 600, outline: 'none', padding: '0 0 4px 0', width: '100%' }}
                             value={step.nama}
                             onChange={e => updateStepNama(step.id, e.target.value)}
                             placeholder="Nama step..."
@@ -1032,7 +1032,7 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
           <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#94a3b8' }} /></div>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, color: isDragging ? '#475569' : '#e2e8f0', fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word', transition: 'color 0.12s' }}>{task.nama}</div>
+          <div style={{ fontWeight: 600, color: isDragging ? '#5a6a85' : '#2a3547', fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word', transition: 'color 0.12s' }}>{task.nama}</div>
         </div>
       </div>
       {/* Badges */}
@@ -1042,7 +1042,7 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
         {overdue && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: '#f87171', background: 'rgba(248,113,113,0.1)' }}>Overdue</span>}
       </div>
       {task.due_date && (
-        <div style={{ fontSize: '0.7rem', color: overdue ? '#f87171' : '#475569' }}>
+        <div style={{ fontSize: '0.7rem', color: overdue ? '#f87171' : '#5a6a85' }}>
           Due: {new Date(task.due_date).toLocaleDateString('id-ID')}
         </div>
       )}
@@ -1072,7 +1072,7 @@ function TaskCard({ task, onEdit, onDelete, onProgress }: {
         </button>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, color: pct === 100 ? '#475569' : '#e2e8f0', fontSize: '0.875rem', textDecoration: pct === 100 ? 'line-through' : 'none' }}>{task.nama}</span>
+            <span style={{ fontWeight: 600, color: pct === 100 ? '#5a6a85' : '#2a3547', fontSize: '0.875rem', textDecoration: pct === 100 ? 'line-through' : 'none' }}>{task.nama}</span>
             {task.priority && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[task.priority], background: PRIORITY_BG[task.priority], fontWeight: 600 }}>{task.priority}</span>}
             {task.platform && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{task.platform}</span>}
             {overdue && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#f87171', background: 'rgba(248,113,113,0.1)' }}>Overdue</span>}

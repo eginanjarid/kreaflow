@@ -154,7 +154,7 @@ export default async function InsightsPage() {
           {contentByStatus.map(({ status, count }) => {
             const total = (ideas || []).length || 1
             const pct = Math.round((count / total) * 100)
-            const colors: Record<string, string> = { Draft: '#475569', Ready: '#86efac', Scheduled: '#93c5fd', Posted: '#42a5f5' }
+            const colors: Record<string, string> = { Draft: '#5a6a85', Ready: '#86efac', Scheduled: '#93c5fd', Posted: '#42a5f5' }
             return (
               <div key={status} style={{ marginBottom: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>

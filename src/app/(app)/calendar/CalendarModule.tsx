@@ -33,7 +33,7 @@ type TaskSnap = { id: string; nama: string; platform: string; due_date: string; 
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUSES = ['Planned', 'Ready', 'Posted', 'Cancelled']
-const STATUS_COLOR: Record<string, string> = { Planned: '#93c5fd', Ready: '#fbbf24', Posted: '#86efac', Cancelled: '#475569' }
+const STATUS_COLOR: Record<string, string> = { Planned: '#93c5fd', Ready: '#fbbf24', Posted: '#86efac', Cancelled: '#5a6a85' }
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 const DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
@@ -219,7 +219,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {tasks.length > 0 && (
             <button onClick={() => setShowTasks(s => !s)}
-              style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#e5eaf2'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#f1f5f9', color: showTasks ? '#fbbf24' : '#475569', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
+              style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#e5eaf2'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#f1f5f9', color: showTasks ? '#fbbf24' : '#5a6a85', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
               ⚡ {showTasks ? 'Tasks ON' : 'Tasks OFF'}
             </button>
           )}
