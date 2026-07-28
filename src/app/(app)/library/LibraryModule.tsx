@@ -36,7 +36,7 @@ const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before
 const STATUSES = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUS_COLOR: Record<string, string> = {
-  Draft: '#5a6a85',
+  Draft: '#6b7280',
   'Naskah Siap': '#d97706',
   Produksi: '#1a73e8',
   'Siap Tayang': '#059669',
@@ -66,13 +66,13 @@ function emptyIdea(workspaceId: string): ContentIdea {
 function fieldStyle(extra?: object) {
   return {
     width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2',
-    borderRadius: 8, padding: '10px 12px', color: '#2a3547',
+    borderRadius: 8, padding: '10px 12px', color: '#111827',
     fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const,
     ...extra,
   }
 }
 function selectStyle() {
-  return { width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }
+  return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }
 }
 
 function extractGdriveId(url: string): string | null {
@@ -116,12 +116,12 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
             {initial}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2a3547', lineHeight: 1 }}>{handle}</div>
-            <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginTop: 2 }}>Original audio</div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827', lineHeight: 1 }}>{handle}</div>
+            <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 2 }}>Original audio</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
-            <span style={{ color: '#5a6a85', fontSize: '1.1rem', cursor: 'pointer', lineHeight: 1 }}>···</span>
+            <span style={{ color: '#6b7280', fontSize: '1.1rem', cursor: 'pointer', lineHeight: 1 }}>···</span>
           </div>
         </div>
 
@@ -155,13 +155,13 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
         </div>
 
         {/* Likes */}
-        <div style={{ paddingInline: 14, fontSize: '0.82rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>
+        <div style={{ paddingInline: 14, fontSize: '0.82rem', fontWeight: 700, color: '#111827', marginBottom: 4 }}>
           {fakeLikes.toLocaleString()} suka
         </div>
 
         {/* Caption */}
         {caption && (
-          <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#2a3547', lineHeight: 1.5, marginBottom: 4 }}>
+          <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#111827', lineHeight: 1.5, marginBottom: 4 }}>
             <span style={{ fontWeight: 700, marginRight: 6 }}>{handle}</span>
             <span style={{ whiteSpace: 'pre-wrap' }}>{caption.length > 150 ? caption.slice(0, 150) + '...' : caption}</span>
           </div>
@@ -179,17 +179,17 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
           <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>
             {idea.status}
           </span>
-          {idea.format && <span style={{ marginLeft: 6, fontSize: '0.68rem', color: '#5a6a85' }}>{idea.format}</span>}
+          {idea.format && <span style={{ marginLeft: 6, fontSize: '0.68rem', color: '#6b7280' }}>{idea.format}</span>}
         </div>
 
-        <div style={{ fontSize: '0.7rem', color: '#5a6a85', paddingInline: 14, marginBottom: 10 }}>
+        <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingInline: 14, marginBottom: 10 }}>
           {idea.scheduled_date ? `Dijadwalkan: ${idea.scheduled_date}` : 'Belum dijadwalkan'}
         </div>
 
         {/* Footer actions */}
-        <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #1a1a1a' }}>
+        <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #f3f4f6' }}>
           <button onClick={onEdit}
-            style={{ flex: 1, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '9px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+            style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
             Edit Konten
           </button>
           {idea.canva_url && (
@@ -200,12 +200,12 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
           )}
           {idea.gdrive_url && (
             <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px', color: '#38bdf8', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+              style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px', color: '#0284c7', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
               Drive ↗
             </a>
           )}
           <button onClick={onClose}
-            style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#5a6a85', fontSize: '0.82rem', cursor: 'pointer' }}>
+            style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>
             ✕
           </button>
         </div>
@@ -295,7 +295,7 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            <span style={{ color: '#2a3547', fontSize: '0.7rem' }}>Audio original · {handle}</span>
+            <span style={{ color: '#111827', fontSize: '0.7rem' }}>Audio original · {handle}</span>
           </div>
         </div>
       </div>
@@ -304,9 +304,9 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
       <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
         <div style={{ background: 'rgba(30,30,30,0.9)', borderRadius: 8, padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: '0.68rem', color: STATUS_COLOR[idea.status], fontWeight: 600 }}>{idea.status}</span>
-          {idea.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>· {idea.scheduled_date}</span>}
+          {idea.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>· {idea.scheduled_date}</span>}
         </div>
-        <button onClick={onEdit} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={onEdit} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
           Edit Konten
         </button>
         {idea.canva_url && (
@@ -315,11 +315,11 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
           </a>
         )}
         {idea.gdrive_url && (
-          <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#38bdf8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+          <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#0284c7', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
             Drive ↗
           </a>
         )}
-        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 12px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}>
+        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 12px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}>
           ✕
         </button>
       </div>
@@ -341,14 +341,14 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
 
   return (
     <div style={{ marginTop: 4 }}>
-      <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>Preview tampilan:</div>
+      <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>Preview tampilan:</div>
       {/* Ratio toggle */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
         {PREVIEW_RATIOS.map(rx => (
           <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(26,115,232,0.15)' : '#f1f5f9', cursor: 'pointer', gap: 1 }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#1a73e8' : '#64748b' }}>{rx.label}</span>
-            <span style={{ fontSize: '0.7rem', color: ratio === rx.key ? '#1a73e8' : '#5a6a85' }}>{rx.sub}</span>
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: ratio === rx.key ? 'rgba(26,115,232,0.10)' : '#f3f4f6', cursor: 'pointer', gap: 1 }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#1a73e8' : '#6b7280' }}>{rx.label}</span>
+            <span style={{ fontSize: '0.7rem', color: ratio === rx.key ? '#1a73e8' : '#6b7280' }}>{rx.sub}</span>
           </button>
         ))}
       </div>
@@ -359,7 +359,7 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
           : <ThumbnailPlaceholder idea={idea} />
         }
       </div>
-      <div style={{ marginTop: 5, fontSize: '0.68rem', color: '#5a6a85' }}>{r.w}×{r.h}px · {r.label} · {r.sub}</div>
+      <div style={{ marginTop: 5, fontSize: '0.68rem', color: '#6b7280' }}>{r.w}×{r.h}px · {r.label} · {r.sub}</div>
     </div>
   )
 }
@@ -379,13 +379,13 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
           const stepName = rawStep.replace(/^\p{Emoji}\s*/u, '')
           const pct = t.percent_complete || 0
           const dot = pct === 100 ? '●' : pct > 0 ? '◑' : '○'
-          const dotColor = pct === 100 ? '#059669' : pct > 0 ? '#d97706' : '#64748b'
+          const dotColor = pct === 100 ? '#059669' : pct > 0 ? '#d97706' : '#6b7280'
           const dateStr = t.due_date ? t.due_date.slice(5).replace('-', '/') : ''
           return (
-            <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>
+            <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#6b7280' }}>
               <span style={{ color: dotColor, fontSize: '0.7rem' }}>{dot}</span>
               <span>{stepName}</span>
-              {dateStr && <span style={{ color: '#5a6a85', marginLeft: 1 }}>{dateStr}</span>}
+              {dateStr && <span style={{ color: '#6b7280', marginLeft: 1 }}>{dateStr}</span>}
             </span>
           )
         })}
@@ -547,10 +547,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Library</h1>
-          <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Bank konten — hook, body, CTA, dan script siap pakai</p>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Library</h1>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Bank konten — hook, body, CTA, dan script siap pakai</p>
         </div>
-        <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+        <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
           + Tambah Konten
         </button>
       </div>
@@ -559,7 +559,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {STATUSES.map(s => (
           <div key={s} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#2a3547' }}>{ideas.filter(c => c.status === s).length}</div>
+            <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#111827' }}>{ideas.filter(c => c.status === s).length}</div>
             <div style={{ fontSize: '0.75rem', color: STATUS_COLOR[s], marginTop: 2, fontWeight: 500 }}>{s}</div>
           </div>
         ))}
@@ -570,14 +570,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           {['', ...STATUSES].map(s => (
             <button key={s} onClick={() => setFilterStatus(s)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterStatus === s ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterStatus === s ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterStatus === s ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterStatus === s ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
               {s || 'Semua'}
             </button>
           ))}
           <div style={{ width: 1, background: '#e5eaf2', margin: '0 4px', alignSelf: 'stretch' }} />
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterPlatform === p ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterPlatform === p ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
               {p || 'Semua Platform'}
             </button>
           ))}
@@ -586,12 +586,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
 
       {/* Content */}
       {filtered.length === 0 ? (
-        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ marginBottom: 12, color: '#5a6a85' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
-          <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>{ideas.length === 0 ? 'Library kosong' : 'Tidak ada konten'}</div>
+        <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
+          <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+          <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>{ideas.length === 0 ? 'Library kosong' : 'Tidak ada konten'}</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>{ideas.length === 0 ? 'Mulai tambahkan ide konten kamu' : 'Coba filter lain'}</div>
           {ideas.length === 0 && (
-            <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
               + Buat Konten Pertama
             </button>
           )}
@@ -599,21 +599,21 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {filtered.map(c => (
-            <div key={c.id} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '16px 20px' }}>
+            <div key={c.id} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
+                    <span style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
                     <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>{c.status}</span>
-                    {c.format && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#5a6a85', background: '#f8fafc', border: '1px solid #e5eaf2' }}>{c.format}</span>}
+                    {c.format && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#6b7280', background: '#f8fafc', border: '1px solid #e5eaf2' }}>{c.format}</span>}
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {c.platform.map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>)}
-                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{pillarMap[c.pillar_id]}</span>}
-                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{productMap[c.product_id]}</span>}
+                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f8fafc' }}>{pillarMap[c.pillar_id]}</span>}
+                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f8fafc' }}>{productMap[c.product_id]}</span>}
                   </div>
                   {c.hook && (
-                    <div style={{ marginTop: 8, fontSize: '0.82rem', color: '#5a6a85', fontStyle: 'italic', borderLeft: '2px solid #1a73e8', paddingLeft: 10 }}>
+                    <div style={{ marginTop: 8, fontSize: '0.82rem', color: '#6b7280', fontStyle: 'italic', borderLeft: '2px solid #1a73e8', paddingLeft: 10 }}>
                       "{c.hook.length > 120 ? c.hook.slice(0, 120) + '...' : c.hook}"
                     </div>
                   )}
@@ -621,7 +621,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     <SprintTimeline tasks={tasks} productName={productMap[c.product_id]} />
                   )}
                   {c.script && expandedScript === c.id && (
-                    <div style={{ marginTop: 10, background: '#fff', borderRadius: 8, padding: 14, fontSize: '0.8rem', color: '#5a6a85', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 200, overflowY: 'auto' }}>
+                    <div style={{ marginTop: 10, background: '#fff', borderRadius: 8, padding: 14, fontSize: '0.8rem', color: '#6b7280', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 200, overflowY: 'auto' }}>
                       {c.script}
                     </div>
                   )}
@@ -629,18 +629,18 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                   {c.script && (
                     <button onClick={() => setExpandedScript(expandedScript === c.id ? null : c.id!)}
-                      style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
                       {expandedScript === c.id ? 'Tutup' : 'Script'}
                     </button>
                   )}
                   <button onClick={() => openSchedule(c)}
-                    style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 8, padding: '6px 10px', color: '#38bdf8', fontSize: '0.75rem', cursor: 'pointer' }}
+                    style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 8, padding: '6px 10px', color: '#0284c7', fontSize: '0.75rem', cursor: 'pointer' }}
                     title="Jadwalkan ke Calendar">
                     </button>
                   <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
                     Edit
                   </button>
-                  <button onClick={() => deleteIdea(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                  <button onClick={() => deleteIdea(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 </div>
               </div>
             </div>
@@ -652,10 +652,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Quick Schedule Modal */}
       {scheduleModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 400 }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 400 }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#2a3547' }}>Jadwalkan ke Calendar</h3>
-              <button onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111827' }}>Jadwalkan ke Calendar</h3>
+              <button onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
             {schedDone ? (
               <div style={{ padding: '32px 20px', textAlign: 'center' }}>
@@ -664,33 +664,33 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               </div>
             ) : (
               <form onSubmit={handleSchedule} style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 12px', fontSize: '0.82rem', color: '#5a6a85', border: '1px solid #e5eaf2' }}>
-                  <span style={{ color: '#5a6a85', fontSize: '0.72rem' }}>Konten: </span>
-                  <span style={{ fontWeight: 600, color: '#2a3547' }}>{scheduleModal.idea.judul}</span>
+                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 12px', fontSize: '0.82rem', color: '#6b7280', border: '1px solid #e5eaf2' }}>
+                  <span style={{ color: '#6b7280', fontSize: '0.72rem' }}>Konten: </span>
+                  <span style={{ fontWeight: 600, color: '#111827' }}>{scheduleModal.idea.judul}</span>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
-                  <select style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
+                  <select style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}
                     value={schedEntry.platform} onChange={e => setSchedEntry(s => ({ ...s, platform: e.target.value }))} required>
                     <option value="">Pilih platform</option>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Jadwal Posting *</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Jadwal Posting *</label>
                   <input type="datetime-local" required
-                    style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const }}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const }}
                     value={schedEntry.scheduled_at} onChange={e => setSchedEntry(s => ({ ...s, scheduled_at: e.target.value }))} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Status</label>
-                  <select style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Status</label>
+                  <select style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}
                     value={schedEntry.status} onChange={e => setSchedEntry(s => ({ ...s, status: e.target.value }))}>
                     {['Planned', 'Ready'].map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 18px', color: '#5a6a85', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
+                  <button type="button" onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
                   <button type="submit" disabled={schedSaving} style={{ background: schedSaving ? '#1557b0' : 'linear-gradient(135deg, #0ea5e9, #38bdf8)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: schedSaving ? 'not-allowed' : 'pointer' }}>
                     {schedSaving ? 'Menjadwalkan...' : 'Jadwalkan'}
                   </button>
@@ -704,20 +704,20 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
             {/* Modal Header */}
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>
                 {modal.idea.id ? 'Edit Konten' : 'Tambah Konten'}
               </h2>
-              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
 
             {/* Modal Tabs */}
             <div style={{ display: 'flex', borderBottom: '1px solid #e5eaf2', flexShrink: 0 }}>
               {MODAL_TABS.map(t => (
                 <button key={t.id} onClick={() => setModal(m => ({ ...m, tab: t.id }))}
-                  style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#1a73e8' : '#64748b', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+                  style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
                   {t.label}
                 </button>
               ))}
@@ -729,71 +729,71 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               {/* Tab: Basic */}
               {modal.tab === 'basic' && <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Judul Konten *</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Judul Konten *</label>
                   <input style={fieldStyle()} value={modal.idea.judul} onChange={e => setField('judul', e.target.value)} placeholder="Judul atau topik konten" required />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Format</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Format</label>
                     <select style={selectStyle()} value={modal.idea.format ?? ''} onChange={e => setField('format', e.target.value)}>
                       <option value="">Pilih format</option>
                       {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Formula</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Formula</label>
                     <select style={selectStyle()} value={modal.idea.formula ?? ''} onChange={e => setField('formula', e.target.value)}>
                       <option value="">Pilih formula</option>
                       {FORMULAS.map(f => <option key={f} value={f}>{f}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Status</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Status</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#5a6a85', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
+                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#6b7280', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
                         {modal.idea.status || 'Draft'}
                       </span>
-                      <span style={{ fontSize: '0.72rem', color: '#5a6a85' }}>Diatur otomatis oleh workflow</span>
+                      <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>Diatur otomatis oleh workflow</span>
                     </div>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Produk</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Produk</label>
                     <select style={selectStyle()} value={modal.idea.product_id ?? ''} onChange={e => setField('product_id', e.target.value)}>
                       <option value="">Tanpa produk</option>
                       {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Pillar</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Pillar</label>
                     <select style={selectStyle()} value={modal.idea.pillar_id ?? ''} onChange={e => setField('pillar_id', e.target.value)}>
                       <option value="">Tanpa pillar</option>
                       {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Tanggal Tayang</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Tanggal Tayang</label>
                     <input type="date" style={fieldStyle()} value={modal.idea.scheduled_date} onChange={e => setField('scheduled_date', e.target.value)} />
                   </div>
                 </div>
                 {['Reels', 'Video Pendek', 'Live'].includes(modal.idea.format) && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 14px' }}>
                     <div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#2a3547' }}>Tampil di Feed</div>
-                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 2 }}>Seperti opsi "Bagikan ke Feed" di Instagram Reels</div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827' }}>Tampil di Feed</div>
+                      <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Seperti opsi "Bagikan ke Feed" di Instagram Reels</div>
                     </div>
                     <button type="button"
                       onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
-                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? '#1a73e8' : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: modal.idea.show_in_feed !== false ? 23 : 3, transition: 'left 0.2s' }} />
                     </button>
                   </div>
                 )}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 8, fontWeight: 500 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>Platform</label>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {PLATFORMS.map(p => (
                       <button key={p} type="button" onClick={() => toggleArr('platform', p)}
-                        style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.idea.platform.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.idea.platform.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.idea.platform.includes(p) ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
+                        style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.idea.platform.includes(p) ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: modal.idea.platform.includes(p) ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: modal.idea.platform.includes(p) ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
                         {p}
                       </button>
                     ))}
@@ -804,9 +804,9 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               {/* Tab: Content */}
               {modal.tab === 'content' && <>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Isi komponen konten atau generate otomatis</div>
+                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Isi komponen konten atau generate otomatis</div>
                   <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
-                    style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
+                    style={{ background: 'rgba(26,115,232,0.10)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
                     {aiLoading ? '...' : 'Generate AI'}
                   </button>
                 </div>
@@ -816,12 +816,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   { label: 'CTA (Call to Action)', key: 'cta' as keyof ContentIdea, placeholder: 'Ajakan di akhir konten...', h: 56 },
                 ].map(({ label, key, placeholder, h }) => (
                   <div key={key}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>{label}</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>{label}</label>
                     <textarea style={fieldStyle({ height: h, resize: 'none' })} value={modal.idea[key] as string} onChange={e => setField(key, e.target.value)} placeholder={placeholder} />
                   </div>
                 ))}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Hashtag (spasi-separated)</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Hashtag (spasi-separated)</label>
                   <input style={fieldStyle()} value={(modal.idea.hashtags || []).join(' ')} onChange={e => setField('hashtags', e.target.value.split(/\s+/).filter(Boolean))} placeholder="#hashtag1 #hashtag2 #hashtag3" />
                 </div>
               </>}
@@ -829,14 +829,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               {/* Tab: Script */}
               {modal.tab === 'script' && <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Prompt Script (untuk AI generator)</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Prompt Script (untuk AI generator)</label>
                   <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={modal.idea.prompt_script} onChange={e => setField('prompt_script', e.target.value)} placeholder="Instruksi khusus untuk generate script..." />
                 </div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <label style={{ fontSize: '0.8rem', color: '#5a6a85', fontWeight: 500 }}>Script Lengkap</label>
+                    <label style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500 }}>Script Lengkap</label>
                     <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
-                      style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '5px 12px', color: '#1a73e8', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
+                      style={{ background: 'rgba(26,115,232,0.10)', border: '1px solid #1a73e8', borderRadius: 8, padding: '5px 12px', color: '#1a73e8', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
                       {aiLoading ? 'Generating...' : 'Generate Script'}
                     </button>
                   </div>
@@ -847,10 +847,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
 
               {/* Footer */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4, borderTop: '1px solid #e5eaf2', marginTop: 4 }}>
-                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>
+                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>
                   Batal
                 </button>
-                <button type="submit" disabled={saving} style={{ background: saving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
+                <button type="submit" disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
                   {saving ? 'Menyimpan...' : modal.idea.id ? 'Update' : 'Simpan'}
                 </button>
               </div>

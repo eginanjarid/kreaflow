@@ -39,7 +39,7 @@ const MODE_OPTIONS = [
 ]
 
 function fieldStyle(extra?: object) {
-  return { width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
+  return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
 export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, modes: initialModes, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
@@ -158,15 +158,15 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Settings</h1>
-        <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Kelola workspace dan akun kamu</p>
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Settings</h1>
+        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Kelola workspace dan akun kamu</p>
       </div>
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #e5eaf2' }}>
         {[{ id: 'workspace', label: 'Workspace' }, { id: 'tim', label: 'Tim' }, { id: 'akun', label: 'Akun' }].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#1a73e8' : '#5a6a85', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+            style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
             {t.label}
           </button>
         ))}
@@ -177,20 +177,20 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
         <div style={{ maxWidth: 480 }}>
           {/* Plan info */}
           <div style={{ background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#1a73e8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 2 }}>Plan saat ini</div>
+              <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 2 }}>Plan saat ini</div>
               <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a73e8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{plan || 'Free'}</div>
             </div>
           </div>
 
           {/* Mode Toggle */}
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px', marginBottom: 20 }}>
-            <div style={{ fontSize: '0.78rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>Mode Aktif</div>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 16, padding: '18px 20px', marginBottom: 20 }}>
+            <div style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>Mode Aktif</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {MODE_OPTIONS.map(m => {
                 const active = activeModes.includes(m.id)
@@ -199,11 +199,16 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     if (active && activeModes.length === 1) return // minimal 1 mode aktif
                     setActiveModes(prev => active ? prev.filter(x => x !== m.id) : [...prev, m.id])
                   }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, border: `1px solid ${active ? m.color + '40' : '#e5eaf2'}`, background: active ? m.color + '08' : '#f1f5f9', cursor: 'pointer', transition: 'all 0.15s' }}>
-                    <span style={{ fontSize: '1.4rem' }}>{m.icon}</span>
+                    style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, border: `1px solid ${active ? m.color + '30' : '#e5e7eb'}`, background: active ? m.color + '08' : '#f9fafb', cursor: 'pointer', transition: 'all 0.15s' }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 10, background: active ? m.color + '15' : '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {m.id === 'creator'
+                        ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? m.color : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? m.color : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                      }
+                    </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, color: active ? m.color : '#64748b', fontSize: '0.875rem', marginBottom: 2 }}>{m.label}</div>
-                      <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>{m.desc}</div>
+                      <div style={{ fontWeight: 600, color: active ? m.color : '#6b7280', fontSize: '0.875rem', marginBottom: 2 }}>{m.label}</div>
+                      <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>{m.desc}</div>
                     </div>
                     <div style={{ width: 36, height: 20, borderRadius: 10, background: active ? m.color : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ position: 'absolute', top: 3, left: active ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
@@ -212,27 +217,27 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 )
               })}
             </div>
-            <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 10 }}>Kedua mode bisa aktif sekaligus. Klik Simpan untuk menyimpan.</div>
+            <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 10 }}>Kedua mode bisa aktif sekaligus. Klik Simpan untuk menyimpan.</div>
           </div>
 
           <form onSubmit={saveWorkspace} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Workspace</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Nama Workspace</label>
               <input style={fieldStyle()} value={wsName} onChange={e => setWsName(e.target.value)} placeholder="Nama workspace..." required />
-              <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 4 }}>Tampil di sidebar dan semua modul</div>
+              <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 4 }}>Tampil di sidebar dan semua modul</div>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Tampilan</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Nama Tampilan</label>
               <input style={fieldStyle()} value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder={userEmail} />
-              <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 4 }}>Tampil di avatar sidebar</div>
+              <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 4 }}>Tampil di avatar sidebar</div>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Email</label>
-              <input style={fieldStyle({ color: '#5a6a85', cursor: 'not-allowed' })} value={userEmail} readOnly />
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Email</label>
+              <input style={fieldStyle({ color: '#6b7280', cursor: 'not-allowed' })} value={userEmail} readOnly />
             </div>
             {wsMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem' }}>{wsMsg}</div>}
             <div>
-              <button type="submit" disabled={wsSaving} style={{ background: wsSaving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: wsSaving ? 'not-allowed' : 'pointer' }}>
+              <button type="submit" disabled={wsSaving} style={{ background: wsSaving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: wsSaving ? 'not-allowed' : 'pointer' }}>
                 {wsSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
               </button>
             </div>
@@ -246,25 +251,25 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           {teamMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem', marginBottom: 16 }}>{teamMsg}</div>}
 
           {/* Members list */}
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
             <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>Member Aktif</div>
-              <div style={{ fontSize: '0.75rem', color: '#5a6a85' }}>{members.length} member</div>
+              <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Member Aktif</div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{members.length} member</div>
             </div>
             {members.map(m => (
-              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #1a1a1a' }}>
-                <div style={{ width: 34, height: 34, borderRadius: '50%', background: m.role === 'owner' ? 'linear-gradient(135deg,#1a73e8,#42a5f5)' : '#f1f5f9', border: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#2a3547', flexShrink: 0 }}>
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #f3f4f6' }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: m.role === 'owner' ? '#1a73e8' : '#f1f5f9', border: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#111827', flexShrink: 0 }}>
                   {(m.nama || m.email).charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 500, color: '#2a3547', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nama || m.email}</div>
-                  {m.nama && <div style={{ fontSize: '0.72rem', color: '#5a6a85', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>}
+                  <div style={{ fontWeight: 500, color: '#111827', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nama || m.email}</div>
+                  {m.nama && <div style={{ fontSize: '0.72rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>}
                 </div>
                 {/* Jabatan */}
                 <select
                   value={m.jabatan || ''}
                   onChange={e => changeJabatan(m.id, e.target.value)}
-                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: m.jabatan ? '#1a73e8' : '#334155', fontSize: '0.72rem', cursor: 'pointer', outline: 'none', minWidth: 110 }}
+                  style={{ background: '#f3f4f6', border: 'none', borderRadius: 6, padding: '4px 8px', color: m.jabatan ? '#1a73e8' : '#374151', fontSize: '0.72rem', cursor: 'pointer', outline: 'none', minWidth: 110 }}
                 >
                   <option value="">— Jabatan —</option>
                   {['Copywriter','Videografer','Editor','Admin Sosmed','Art Director','Content Creator','Owner'].map(j => (
@@ -275,16 +280,16 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                   <select
                     value={m.role}
                     onChange={e => changeRole(m.id, e.target.value)}
-                    style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer', outline: 'none' }}
+                    style={{ background: '#f3f4f6', border: 'none', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', outline: 'none' }}
                   >
                     <option value="admin">Admin</option>
                     <option value="member">Member</option>
                   </select>
                 ) : (
-                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: m.role === 'owner' ? 'rgba(26,115,232,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#1a73e8' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: m.role === 'owner' ? 'rgba(26,115,232,0.10)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#1a73e8' : '#6b7280', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
                 )}
                 {canManageTeam && m.role !== 'owner' && m.email !== userEmail && (
-                  <button onClick={() => removeMember(m.id)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.85rem', padding: '4px' }} title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                  <button onClick={() => removeMember(m.id)} style={{ background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '0.85rem', padding: '4px' }} title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 )}
               </div>
             ))}
@@ -292,18 +297,18 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
           {/* Pending invites */}
           {pending.length > 0 && (
-            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
+            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5eaf2' }}>
-                <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>Undangan Tertunda</div>
+                <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Undangan Tertunda</div>
               </div>
               {pending.map(inv => (
-                <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #1a1a1a' }}>
+                <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #f3f4f6' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.85rem', color: '#2a3547', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.email}</div>
-                    <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>Expires {new Date(inv.expires_at).toLocaleDateString('id-ID')}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.email}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>Expires {new Date(inv.expires_at).toLocaleDateString('id-ID')}</div>
                   </div>
                   <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(254,188,46,0.1)', color: '#d97706', fontWeight: 600, textTransform: 'capitalize' }}>{inv.role}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(71,85,105,0.2)', color: '#5a6a85' }}>Pending</span>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(71,85,105,0.2)', color: '#6b7280' }}>Pending</span>
                 </div>
               ))}
             </div>
@@ -311,8 +316,8 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
           {/* Invite form */}
           {canManageTeam && (
-            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '20px' }}>
-              <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem', marginBottom: 14 }}>Undang Member Baru</div>
+            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px' }}>
+              <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem', marginBottom: 14 }}>Undang Member Baru</div>
               <form onSubmit={sendInvite} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
                   <input
@@ -333,7 +338,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                   </select>
                 </div>
                 {inviteError && <div style={{ color: '#dc2626', fontSize: '0.82rem' }}>{inviteError}</div>}
-                <button type="submit" disabled={inviting} style={{ background: inviting ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 9, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: inviting ? 'not-allowed' : 'pointer', alignSelf: 'flex-start' }}>
+                <button type="submit" disabled={inviting} style={{ background: inviting ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 9, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: inviting ? 'not-allowed' : 'pointer', alignSelf: 'flex-start' }}>
                   {inviting ? 'Membuat link...' : '+ Generate Link Undangan'}
                 </button>
               </form>
@@ -342,10 +347,10 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 <div style={{ marginTop: 16, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.25)', borderRadius: 10, padding: '14px 16px' }}>
                   <div style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, marginBottom: 8 }}>Link Undangan (valid 7 hari)</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <code style={{ flex: 1, fontSize: '0.72rem', color: '#5a6a85', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
+                    <code style={{ flex: 1, fontSize: '0.72rem', color: '#6b7280', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
                     <button
                       onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
-                      style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
+                      style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
                     >Salin</button>
                   </div>
                 </div>
@@ -358,33 +363,33 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Akun Tab */}
       {tab === 'akun' && (
         <div style={{ maxWidth: 480 }}>
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '20px 22px', marginBottom: 20 }}>
-            <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Info Akun</div>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px', marginBottom: 20 }}>
+            <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Info Akun</div>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#1a73e8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                 {(userName || userEmail).charAt(0).toUpperCase()}
               </div>
               <div>
-                <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.9rem' }}>{userName || userEmail}</div>
-                <div style={{ fontSize: '0.78rem', color: '#5a6a85' }}>{userEmail}</div>
+                <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{userName || userEmail}</div>
+                <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>{userEmail}</div>
               </div>
             </div>
           </div>
 
-          <form onSubmit={changePassword} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ fontSize: '0.78rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Ganti Password</div>
+          <form onSubmit={changePassword} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Ganti Password</div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Password Baru *</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Password Baru *</label>
               <input type="password" style={fieldStyle()} value={newPwd} onChange={e => setNewPwd(e.target.value)} placeholder="Minimal 6 karakter" required minLength={6} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Konfirmasi Password *</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Konfirmasi Password *</label>
               <input type="password" style={fieldStyle()} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="Ulangi password baru" required />
             </div>
             {pwdError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{pwdError}</div>}
             {pwdMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem' }}>{pwdMsg}</div>}
             <div>
-              <button type="submit" disabled={pwdSaving} style={{ background: pwdSaving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: pwdSaving ? 'not-allowed' : 'pointer' }}>
+              <button type="submit" disabled={pwdSaving} style={{ background: pwdSaving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: pwdSaving ? 'not-allowed' : 'pointer' }}>
                 {pwdSaving ? 'Mengubah...' : 'Ubah Password'}
               </button>
             </div>

@@ -33,7 +33,7 @@ function emptyMetric(wsId: string): Metric {
   }
 }
 function fieldStyle(extra?: object) {
-  return { width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
+  return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 function fmt(n: number | string) { return Number(n).toLocaleString('id-ID') }
 
@@ -83,10 +83,10 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Tracker</h1>
-          <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Pantau performa bulanan di setiap platform</p>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Tracker</h1>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Pantau performa bulanan di setiap platform</p>
         </div>
-        <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+        <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
           + Input Performa
         </button>
       </div>
@@ -96,7 +96,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
         <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterPlatform === p ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterPlatform === p ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
               {p || 'Semua'}
             </button>
           ))}
@@ -104,26 +104,26 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
       )}
 
       {filtered.length === 0 ? (
-        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ marginBottom: 12, color: '#5a6a85' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-          <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada data performa</div>
+        <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
+          <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>Belum ada data performa</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Input data bulanan dari setiap platform kamu</div>
-          <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
             + Input Pertama
           </button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {filtered.map(m => (
-            <div key={m.id} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '16px 20px' }}>
+            <div key={m.id} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ fontWeight: 700, color: '#1a73e8', fontSize: '0.95rem' }}>{m.platform}</span>
-                  <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>{MONTHS[(m.month as number) - 1]} {m.year}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{MONTHS[(m.month as number) - 1]} {m.year}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button onClick={() => openEdit(m)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
-                  <button onClick={() => deleteMetric(m.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                  <button onClick={() => deleteMetric(m.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
@@ -138,13 +138,13 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
                   { label: 'Konversi', value: m.conversions },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: '#fff', borderRadius: 8, padding: '10px 12px' }}>
-                    <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.9rem' }}>{fmt(value)}</div>
+                    <div style={{ fontSize: '0.68rem', color: '#6b7280', marginBottom: 3 }}>{label}</div>
+                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{fmt(value)}</div>
                   </div>
                 ))}
               </div>
               {Number(m.cost_of_campaign) > 0 && (
-                <div style={{ marginTop: 10, fontSize: '0.78rem', color: '#5a6a85' }}>
+                <div style={{ marginTop: 10, fontSize: '0.78rem', color: '#6b7280' }}>
                   Cost campaign: <span style={{ color: '#dc2626', fontWeight: 600 }}>Rp {fmt(m.cost_of_campaign)}</span>
                   {Number(m.conversions) > 0 && (
                     <span style={{ marginLeft: 16 }}>
@@ -161,28 +161,28 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
       {/* Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>Input Data Performa</h2>
-              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>Input Data Performa</h2>
+              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.metric.platform ?? ''} onChange={e => setField('platform', e.target.value)}>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Bulan</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Bulan</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.metric.month ?? 1} onChange={e => setField('month', Number(e.target.value))}>
                     {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Tahun</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Tahun</label>
                   <input type="number" style={fieldStyle()} value={modal.metric.year} onChange={e => setField('year', Number(e.target.value))} min="2020" max="2030" />
                 </div>
               </div>
@@ -199,14 +199,14 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
                   ['cost_of_campaign', 'Cost Campaign (Rp)'],
                 ] as [keyof Metric, string][]).map(([key, label]) => (
                   <div key={key}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>{label}</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>{label}</label>
                     <input type="number" style={fieldStyle()} value={modal.metric[key] as number} onChange={e => setField(key, e.target.value)} placeholder="0" min="0" />
                   </div>
                 ))}
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
-                <button type="submit" disabled={saving} style={{ background: saving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
+                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button type="submit" disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
                   {saving ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>

@@ -86,7 +86,7 @@ function emptyTask(wsId: string): Task {
   return { workspace_id: wsId, nama: '', platform: '', priority: 'Medium', start_date: '', due_date: '', percent_complete: 0, notes: '' }
 }
 function fieldStyle(extra?: object) {
-  return { width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', color: '#2a3547', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
+  return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 function addDays(dateStr: string, days: number): string {
   if (!dateStr) return ''
@@ -378,24 +378,24 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#2a3547', letterSpacing: '-0.5px', marginBottom: 6 }}>Tasks</h1>
-          <p style={{ color: '#5a6a85', fontSize: '0.9rem' }}>Kelola tugas dan sprint produksi konten kamu</p>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Tasks</h1>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Kelola tugas dan sprint produksi konten kamu</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           {/* View toggle */}
           <div style={{ display: 'flex', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, overflow: 'hidden' }}>
             <button onClick={() => setView('kanban')} title="Kanban Board"
-              style={{ padding: '8px 12px', border: 'none', background: view === 'kanban' ? '#1a73e8' : 'transparent', color: view === 'kanban' ? '#fff' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', fontWeight: view === 'kanban' ? 600 : 400, transition: 'all 0.15s' }}>
+              style={{ padding: '8px 12px', border: 'none', background: view === 'kanban' ? '#1a73e8' : 'transparent', color: view === 'kanban' ? '#fff' : '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', fontWeight: view === 'kanban' ? 600 : 400, transition: 'all 0.15s' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="3" width="5" height="18"/><rect x="17" y="3" width="5" height="18"/></svg>
               Board
             </button>
             <button onClick={() => setView('list')} title="List View"
-              style={{ padding: '8px 12px', border: 'none', background: view === 'list' ? '#1a73e8' : 'transparent', color: view === 'list' ? '#fff' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', fontWeight: view === 'list' ? 600 : 400, transition: 'all 0.15s' }}>
+              style={{ padding: '8px 12px', border: 'none', background: view === 'list' ? '#1a73e8' : 'transparent', color: view === 'list' ? '#fff' : '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', fontWeight: view === 'list' ? 600 : 400, transition: 'all 0.15s' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
               List
             </button>
             <button onClick={() => setView('sprint')} title="Sprint Monitor"
-              style={{ padding: '8px 12px', border: 'none', background: view === 'sprint' ? '#1a73e8' : 'transparent', color: view === 'sprint' ? '#fff' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', fontWeight: view === 'sprint' ? 600 : 400, transition: 'all 0.15s' }}>
+              style={{ padding: '8px 12px', border: 'none', background: view === 'sprint' ? '#1a73e8' : 'transparent', color: view === 'sprint' ? '#fff' : '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', fontWeight: view === 'sprint' ? 600 : 400, transition: 'all 0.15s' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
               Monitor
             </button>
@@ -403,7 +403,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
           <button onClick={openSprint} style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 10, padding: '10px 18px', color: '#059669', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
             Buat Sprint
           </button>
-          <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
             + Task Manual
           </button>
         </div>
@@ -414,9 +414,9 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
         
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, color: '#1a73e8', marginBottom: 2, fontSize: '0.875rem' }}>Mau plan banyak konten dalam 1 minggu?</div>
-          <div style={{ fontSize: '0.78rem', color: '#5a6a85' }}>Gunakan <strong style={{ color: '#1a73e8' }}>Sprint Board</strong> — 1 sprint = 1 minggu = banyak konten sekaligus dalam kanban. Task di sini untuk 1 konten = 1 checklist.</div>
+          <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>Gunakan <strong style={{ color: '#1a73e8' }}>Sprint Board</strong> — 1 sprint = 1 minggu = banyak konten sekaligus dalam kanban. Task di sini untuk 1 konten = 1 checklist.</div>
         </div>
-        <a href="/sprints" style={{ flexShrink: 0, background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+        <a href="/sprints" style={{ flexShrink: 0, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
           Buka Sprint Board →
         </a>
       </div>
@@ -427,8 +427,8 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
           
           <div>
             <div style={{ fontWeight: 700, color: '#059669', marginBottom: 4 }}>Sprint — Auto-generate checklist task sekaligus</div>
-            <div style={{ fontSize: '0.82rem', color: '#5a6a85', lineHeight: 1.7 }}>
-              Klik <strong style={{ color: '#5a6a85' }}>Buat Sprint</strong> untuk template konten (Naskah → Editing → Schedule Post) atau buat checklist custom sendiri — Belajar Ecourse, Persiapan Event, dll.
+            <div style={{ fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.7 }}>
+              Klik <strong style={{ color: '#6b7280' }}>Buat Sprint</strong> untuk template konten (Naskah → Editing → Schedule Post) atau buat checklist custom sendiri — Belajar Ecourse, Persiapan Event, dll.
             </div>
           </div>
         </div>
@@ -437,14 +437,14 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
-          { label: 'Total', value: tasks.length, color: '#5a6a85' },
+          { label: 'Total', value: tasks.length, color: '#6b7280' },
           { label: 'Ongoing', value: tasks.filter(t => t.percent_complete < 100 && t.percent_complete > 0).length, color: '#d97706' },
           { label: 'Selesai', value: tasks.filter(t => t.percent_complete === 100).length, color: '#059669' },
-          { label: 'Belum Mulai', value: tasks.filter(t => t.percent_complete === 0).length, color: '#5a6a85' },
+          { label: 'Belum Mulai', value: tasks.filter(t => t.percent_complete === 0).length, color: '#6b7280' },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontSize: '1.4rem', fontWeight: 700, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: '0.75rem', color: '#5a6a85', marginTop: 2 }}>{s.label}</div>
+            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 2 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -454,10 +454,10 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           {/* Priority filter */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Priority:</span>
+            <span style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Priority:</span>
             {['', ...PRIORITIES].map(p => (
               <button key={p} onClick={() => setFilterPriority(p)}
-                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterPriority === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPriority === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPriority === p ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
+                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterPriority === p ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterPriority === p ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterPriority === p ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
                 {p || 'Semua'}
               </button>
             ))}
@@ -466,22 +466,22 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
           {/* Context filter pills + date */}
           {allContexts.length > 0 && (
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Sprint:</span>
+              <span style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Sprint:</span>
               <button onClick={() => setFilterContext('')}
-                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === '' ? '1px solid #34d399' : '1px solid #2a2a2a', background: filterContext === '' ? 'rgba(52,211,153,0.12)' : '#f1f5f9', color: filterContext === '' ? '#059669' : '#64748b', cursor: 'pointer' }}>
+                style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === '' ? '1px solid #34d399' : '1px solid #e5e7eb', background: filterContext === '' ? 'rgba(52,211,153,0.12)' : '#f1f5f9', color: filterContext === '' ? '#059669' : '#6b7280', cursor: 'pointer' }}>
                 Semua
               </button>
               {allContexts.map(ctx => (
                 <button key={ctx} onClick={() => setFilterContext(ctx === filterContext ? '' : ctx)}
-                  style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === ctx ? '1px solid #34d399' : '1px solid #2a2a2a', background: filterContext === ctx ? 'rgba(52,211,153,0.12)' : '#f1f5f9', color: filterContext === ctx ? '#059669' : '#64748b', cursor: 'pointer', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  style={{ padding: '4px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 500, border: filterContext === ctx ? '1px solid #34d399' : '1px solid #e5e7eb', background: filterContext === ctx ? 'rgba(52,211,153,0.12)' : '#f1f5f9', color: filterContext === ctx ? '#059669' : '#6b7280', cursor: 'pointer', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {ctx}
                 </button>
               ))}
               <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
-                style={{ marginLeft: 'auto', background: '#f8fafc', border: `1px solid ${filterDate ? '#059669' : '#e5eaf2'}`, borderRadius: 20, padding: '3px 12px', color: filterDate ? '#059669' : '#5a6a85', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }} />
+                style={{ marginLeft: 'auto', background: '#f8fafc', border: `1px solid ${filterDate ? '#059669' : '#e5eaf2'}`, borderRadius: 20, padding: '3px 12px', color: filterDate ? '#059669' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }} />
               {(filterContext || filterDate) && (
                 <button onClick={() => { setFilterContext(''); setFilterDate('') }}
-                  style={{ padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', border: '1px solid #e5eaf2', background: 'transparent', color: '#5a6a85', cursor: 'pointer' }}>
+                  style={{ padding: '4px 10px', borderRadius: 20, fontSize: '0.72rem', border: '1px solid #e5eaf2', background: 'transparent', color: '#6b7280', cursor: 'pointer' }}>
                   Reset ✕
                 </button>
               )}
@@ -493,7 +493,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* ── KANBAN BOARD VIEW ── */}
       {view === 'kanban' && tasks.length > 0 && (() => {
         const COLS = [
-          { id: 'todo', label: 'Todo', icon: 'topik', color: '#5a6a85' },
+          { id: 'todo', label: 'Todo', icon: 'topik', color: '#6b7280' },
           { id: 'in_progress', label: 'Dikerjakan', icon: 'refresh', color: '#d97706' },
           { id: 'done', label: 'Selesai', icon: 'check', color: '#059669' },
         ]
@@ -529,7 +529,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       <span style={{ display: 'flex', alignItems: 'center' }}>{STEP_ICON_MAP[col.icon] || null}</span>
                       <span style={{ fontWeight: 700, color: col.color, fontSize: '0.875rem' }}>{col.label}</span>
                     </div>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#5a6a85', background: isOver ? `${col.color}18` : '#f1f5f9', border: `1px solid ${isOver ? col.color + '50' : '#e5eaf2'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#6b7280', background: isOver ? `${col.color}18` : '#f1f5f9', border: `1px solid ${isOver ? col.color + '50' : '#e5eaf2'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
                   </div>
                   {/* Cards */}
                   <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 140 }}>
@@ -563,12 +563,12 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {view === 'list' && (
         <>
           {filtered.length === 0 && tasks.length > 0 ? (
-            <div style={{ color: '#5a6a85', textAlign: 'center', padding: 32 }}>Tidak ada task dengan filter ini.</div>
+            <div style={{ color: '#6b7280', textAlign: 'center', padding: 32 }}>Tidak ada task dengan filter ini.</div>
           ) : filtered.length === 0 ? null : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {ongoing.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Ongoing ({ongoing.length})</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Ongoing ({ongoing.length})</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {ongoing.map(t => <TaskCard key={t.id} task={t} onEdit={openEdit} onDelete={deleteTask} onProgress={updateProgress} />)}
                   </div>
@@ -576,7 +576,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               )}
               {done.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Selesai ({done.length})</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Selesai ({done.length})</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, opacity: 0.6 }}>
                     {done.map(t => <TaskCard key={t.id} task={t} onEdit={openEdit} onDelete={deleteTask} onProgress={updateProgress} />)}
                   </div>
@@ -607,9 +607,9 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
         if (entries.length === 0 && soloTasks.length === 0) {
           return (
-            <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-              <div style={{ marginBottom: 10, color: '#5a6a85' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-              <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada sprint</div>
+            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
+              <div style={{ marginBottom: 10, color: '#6b7280' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+              <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>Belum ada sprint</div>
               <div style={{ fontSize: '0.82rem' }}>Buat sprint lewat tombol Buat Sprint untuk mulai monitoring</div>
             </div>
           )
@@ -634,15 +634,15 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   {/* Header */}
                   <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                      <span style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.92rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ctx}</span>
-                      {platform && <span style={{ fontSize: '0.67rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', flexShrink: 0 }}>{platform}</span>}
+                      <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.92rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ctx}</span>
+                      {platform && <span style={{ fontSize: '0.67rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#6b7280', flexShrink: 0 }}>{platform}</span>}
                       {hasOverdue && pct < 100 && <span style={{ fontSize: '0.67rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#dc2626', flexShrink: 0 }}>⚠ Overdue</span>}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
-                      <div style={{ fontSize: '0.72rem', color: '#5a6a85', textAlign: 'right' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#6b7280', textAlign: 'right' }}>
                         <span style={{ color: '#059669', fontWeight: 600 }}>{doneCount}</span>
                         {inProgressCount > 0 && <span style={{ color: '#d97706', fontWeight: 600 }}> +{inProgressCount}</span>}
-                        <span style={{ color: '#5a6a85' }}> / {total}</span>
+                        <span style={{ color: '#6b7280' }}> / {total}</span>
                       </div>
                       <div style={{ fontWeight: 700, fontSize: '1rem', color: pct === 100 ? '#059669' : '#1a73e8', minWidth: 36, textAlign: 'right' }}>{pct}%</div>
                     </div>
@@ -659,7 +659,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       const stepName = t.nama.split(' —')[0].trim()
                       const col = getTaskCol(t.percent_complete)
                       const overdue = t.due_date && new Date(t.due_date) < new Date() && t.percent_complete < 100
-                      const chipColor = overdue ? '#ef4444' : col === 'done' ? '#059669' : col === 'in_progress' ? '#d97706' : '#64748b'
+                      const chipColor = overdue ? '#ef4444' : col === 'done' ? '#059669' : col === 'in_progress' ? '#d97706' : '#6b7280'
                       const chipBg = overdue ? 'rgba(239,68,68,0.08)' : col === 'done' ? 'rgba(5,150,105,0.08)' : col === 'in_progress' ? 'rgba(217,119,6,0.08)' : '#f1f5f9'
                       const chipBorder = overdue ? 'rgba(239,68,68,0.25)' : col === 'done' ? 'rgba(5,150,105,0.25)' : col === 'in_progress' ? 'rgba(217,119,6,0.25)' : '#e5eaf2'
                       const chipIcon = col === 'done'
@@ -686,9 +686,9 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
                   {/* Date range footer */}
                   {(startDate || endDate) && (
-                    <div style={{ padding: '0 20px 12px', display: 'flex', gap: 20, fontSize: '0.7rem', color: '#5a6a85' }}>
-                      {startDate && <span>Mulai: <span style={{ color: '#5a6a85' }}>{new Date(startDate).toLocaleDateString('id-ID')}</span></span>}
-                      {endDate && <span>Target selesai: <span style={{ color: endDate < new Date().toISOString().split('T')[0] && pct < 100 ? '#dc2626' : '#64748b' }}>{new Date(endDate).toLocaleDateString('id-ID')}</span></span>}
+                    <div style={{ padding: '0 20px 12px', display: 'flex', gap: 20, fontSize: '0.7rem', color: '#6b7280' }}>
+                      {startDate && <span>Mulai: <span style={{ color: '#6b7280' }}>{new Date(startDate).toLocaleDateString('id-ID')}</span></span>}
+                      {endDate && <span>Target selesai: <span style={{ color: endDate < new Date().toISOString().split('T')[0] && pct < 100 ? '#dc2626' : '#6b7280' }}>{new Date(endDate).toLocaleDateString('id-ID')}</span></span>}
                     </div>
                   )}
                 </div>
@@ -699,15 +699,15 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       })()}
 
       {tasks.length === 0 && filtered.length === 0 && (
-        <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
+        <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
           <div style={{ marginBottom: 12, color: '#059669' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-          <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada task</div>
+          <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>Belum ada task</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Gunakan Sprint untuk bikin task produksi konten sekaligus</div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <button onClick={openSprint} style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, padding: '10px 18px', color: '#059669', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
               Buat Sprint
             </button>
-            <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
               + Task Manual
             </button>
           </div>
@@ -717,14 +717,14 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* Sprint Modal */}
       {sprintModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 100, padding: '20px 20px', overflowY: 'auto' }}>
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 580, marginTop: 20, marginBottom: 20 }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 580, marginTop: 20, marginBottom: 20 }}>
             {/* Header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.1rem' }}>Buat Sprint — 1 Konten</div>
-                <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginTop: 2 }}>Checklist per konten. Untuk banyak konten 1 minggu → <a href="/sprints" style={{ color: '#1a73e8', fontWeight: 600 }}>Sprint Board</a></div>
+                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1.1rem' }}>Buat Sprint — 1 Konten</div>
+                <div style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 2 }}>Checklist per konten. Untuk banyak konten 1 minggu → <a href="/sprints" style={{ color: '#1a73e8', fontWeight: 600 }}>Sprint Board</a></div>
               </div>
-              <button onClick={() => setSprintModal(false)} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
+              <button onClick={() => setSprintModal(false)} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#6b7280', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
             </div>
 
             <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -732,16 +732,16 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
               {/* Sprint type selector */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kategori Sprint</label>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kategori Sprint</label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {(Object.entries(SPRINT_TEMPLATES) as [keyof typeof SPRINT_TEMPLATES, typeof SPRINT_TEMPLATES[keyof typeof SPRINT_TEMPLATES]][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => switchSprintType(key)}
-                      style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintType === key ? tpl.color + '12' : '#f1f5f9', color: sprintType === key ? tpl.color : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintType === key ? tpl.color + '12' : '#f1f5f9', color: sprintType === key ? tpl.color : '#6b7280', fontSize: '0.82rem', fontWeight: sprintType === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
                     </button>
                   ))}
                   <button type="button" onClick={() => switchSprintType('custom')}
-                    style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === 'custom' ? '#e879f960' : '#e5eaf2'}`, background: sprintType === 'custom' ? '#e879f912' : '#f1f5f9', color: sprintType === 'custom' ? '#e879f9' : '#64748b', fontSize: '0.82rem', fontWeight: sprintType === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                    style={{ flex: 1, minWidth: 100, padding: '10px', borderRadius: 10, border: `1px solid ${sprintType === 'custom' ? '#e879f960' : '#e5eaf2'}`, background: sprintType === 'custom' ? '#e879f912' : '#f1f5f9', color: sprintType === 'custom' ? '#e879f9' : '#6b7280', fontSize: '0.82rem', fontWeight: sprintType === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                     Custom
                   </button>
                 </div>
@@ -758,7 +758,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {sprintType === 'affiliate' && (
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Produk yang Dikontennin *</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Produk yang Dikontennin *</label>
                     {products.length > 0 ? (
                       <select style={{ ...fieldStyle(), cursor: 'pointer', fontSize: '0.85rem' }} value={sprintProductId} onChange={e => setSprintProductId(e.target.value)}>
                         <option value="">— Pilih produk dari katalog —</option>
@@ -781,14 +781,14 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   const isCustomPillar = sprintPillar !== '' && !pillarLines.includes(sprintPillar)
                   return (
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pilar / Tema Konten *</label>
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pilar / Tema Konten *</label>
                       {pillarLines.length > 0 ? (
                         <>
                           <select style={{ ...fieldStyle(), cursor: 'pointer', fontSize: '0.85rem' }} value={isCustomPillar ? '' : sprintPillar} onChange={e => setSprintPillar(e.target.value)}>
                             <option value="">— Pilih pilar dari brand —</option>
                             {pillarLines.map((line, i) => <option key={i} value={line}>{line}</option>)}
                           </select>
-                          <input style={fieldStyle({ fontSize: '0.82rem', marginTop: 6, color: isCustomPillar ? '#2a3547' : '#5a6a85' })}
+                          <input style={fieldStyle({ fontSize: '0.82rem', marginTop: 6, color: isCustomPillar ? '#111827' : '#6b7280' })}
                             value={isCustomPillar ? sprintPillar : ''}
                             onChange={e => setSprintPillar(e.target.value)}
                             placeholder="atau ketik tema bebas..." />
@@ -796,7 +796,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                       ) : (
                         <>
                           <input style={fieldStyle({ fontSize: '0.85rem' })} value={sprintPillar} onChange={e => setSprintPillar(e.target.value)} placeholder="cth: Tutorial, Review, Behind The Scene, Tips & Trick..." />
-                          <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 4 }}>Lengkapi Content Pillars di <a href="/brand" style={{ color: '#1a73e8' }}>Brand</a> untuk pilihan otomatis.</div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 4 }}>Lengkapi Content Pillars di <a href="/brand" style={{ color: '#1a73e8' }}>Brand</a> untuk pilihan otomatis.</div>
                         </>
                       )}
                     </div>
@@ -805,40 +805,40 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
                 {sprintType === 'live' && (
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Topik Live *</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Topik Live *</label>
                     <input style={fieldStyle({ fontSize: '0.85rem' })} value={sprintPillar} onChange={e => setSprintPillar(e.target.value)} placeholder="cth: Flash Sale Skincare, Live Q&A, Demo Produk Dapur..." />
                   </div>
                 )}
 
                 {sprintType === 'custom' && (
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nama / Label Sprint *</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nama / Label Sprint *</label>
                     <input style={fieldStyle({ fontSize: '0.85rem' })} value={sprintCustomLabel} onChange={e => setSprintCustomLabel(e.target.value)} placeholder="cth: Belajar Copywriting Week 1, Persiapan Webinar Juli, Launch Produk Baru..." />
                   </div>
                 )}
 
                 {/* Nama Konten */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nama Konten / Judul</label>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nama Konten / Judul</label>
                   <input style={fieldStyle({ fontSize: '0.875rem' })} value={sprintNamaKonten} onChange={e => setSprintNamaKonten(e.target.value)} placeholder="cth: Review Serum Vit C Erha, Tutorial Skincare Pagi, 3 Tips Diet Sehat..." />
-                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 4 }}>Nama ini dipakai di semua notifikasi dan task label</div>
+                  <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: 4 }}>Nama ini dipakai di semua notifikasi dan task label</div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Platform</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Platform</label>
                     <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintPlatform} onChange={e => setSprintPlatform(e.target.value)}>
                       {PLATFORMS.map(p => <option key={p} value={p}>{p || 'Semua'}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Mulai *</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Mulai *</label>
                     <input type="date" style={fieldStyle()} value={sprintStart} onChange={e => handleSprintStartChange(e.target.value)} />
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#5a6a85', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Tayang (Rencana)</label>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tanggal Tayang (Rencana)</label>
                     <input type="date" style={fieldStyle()} value={sprintTanggalTayang} onChange={e => setSprintTanggalTayang(e.target.value)} min={sprintStart} />
-                    <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 4 }}>Muncul di Calendar. Jika kosong, pakai tanggal deadline step Schedule.</div>
+                    <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: 4 }}>Muncul di Calendar. Jika kosong, pakai tanggal deadline step Schedule.</div>
                   </div>
                 </div>
               </div>
@@ -846,9 +846,9 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
               {/* Steps */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <label style={{ fontSize: '0.78rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Langkah-langkah Sprint</label>
+                  <label style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Langkah-langkah Sprint</label>
                   <button type="button" onClick={addCustomStep}
-                    style={{ background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '4px 12px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
+                    style={{ background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '4px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
                     + Tambah Step
                   </button>
                 </div>
@@ -867,26 +867,26 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                           <input
-                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #e5eaf2', color: step.enabled ? '#2a3547' : '#5a6a85', fontSize: '0.875rem', fontWeight: 600, outline: 'none', padding: '0 0 4px 0', width: '100%' }}
+                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #e5eaf2', color: step.enabled ? '#111827' : '#6b7280', fontSize: '0.875rem', fontWeight: 600, outline: 'none', padding: '0 0 4px 0', width: '100%' }}
                             value={step.nama}
                             onChange={e => updateStepNama(step.id, e.target.value)}
                             placeholder="Nama step..."
                           />
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <span style={{ fontSize: '0.72rem', color: '#5a6a85', whiteSpace: 'nowrap' }}>Selesai:</span>
+                              <span style={{ fontSize: '0.72rem', color: '#6b7280', whiteSpace: 'nowrap' }}>Selesai:</span>
                               <input type="date" min={sprintStart}
-                                style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 6, padding: '3px 8px', color: step.due_date ? '#374151' : '#334155', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}
+                                style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 6, padding: '3px 8px', color: step.due_date ? '#374151' : '#374151', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}
                                 value={step.due_date}
                                 onChange={e => updateStepDueDate(step.id, e.target.value)}
                               />
                             </div>
-                            <select style={{ marginLeft: 'auto', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 5, padding: '3px 8px', color: PRIORITY_COLOR[step.priority] || '#64748b', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}
+                            <select style={{ marginLeft: 'auto', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 5, padding: '3px 8px', color: PRIORITY_COLOR[step.priority] || '#6b7280', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}
                               value={step.priority}
                               onChange={e => setSprintSteps(prev => prev.map(s => s.id === step.id ? { ...s, priority: e.target.value } : s))}>
                               {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                             </select>
-                            {step.is_optional && <span style={{ fontSize: '0.65rem', color: '#5a6a85', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 3, padding: '1px 5px' }}>opsional</span>}
+                            {step.is_optional && <span style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 3, padding: '1px 5px' }}>opsional</span>}
                             {isCustom && (
                               <button type="button" onClick={() => removeCustomStep(step.id)}
                                 style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: '0.8rem', cursor: 'pointer', padding: '0 4px' }}>✕</button>
@@ -897,34 +897,34 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                     )
                   })}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginTop: 8 }}>
+                <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 8 }}>
                   Toggle on/off tiap step. Tanggal selesai dihitung otomatis dari tanggal mulai — bisa diubah manual per step. Edit nama sesuai workflow kamu.
                 </div>
               </div>
 
               {/* Preview summary */}
               {sprintStart && (sprintProductId || sprintPillar.trim() || sprintCustomLabel.trim() || sprintNamaKonten.trim()) && (
-                <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px', fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.9 }}>
-                  <div style={{ color: '#5a6a85', fontWeight: 600, marginBottom: 4 }}>SPRINT PREVIEW</div>
+                <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px', fontSize: '0.78rem', color: '#6b7280', lineHeight: 1.9 }}>
+                  <div style={{ color: '#6b7280', fontWeight: 600, marginBottom: 4 }}>SPRINT PREVIEW</div>
                   {sprintNamaKonten.trim() && (
-                    <div>Nama Konten: <span style={{ color: '#2a3547', fontWeight: 600 }}>{sprintNamaKonten.trim()}</span></div>
+                    <div>Nama Konten: <span style={{ color: '#111827', fontWeight: 600 }}>{sprintNamaKonten.trim()}</span></div>
                   )}
                   {sprintType === 'affiliate' && sprintProductId && (
-                    <div>Produk: <span style={{ color: '#5a6a85' }}>{products.find(p => p.id === sprintProductId)?.nama}</span></div>
+                    <div>Produk: <span style={{ color: '#6b7280' }}>{products.find(p => p.id === sprintProductId)?.nama}</span></div>
                   )}
                   {(sprintType === 'creator' || sprintType === 'live') && sprintPillar && (
-                    <div>{sprintType === 'live' ? 'Topik' : 'Pilar'}: <span style={{ color: '#5a6a85' }}>{sprintPillar}</span></div>
+                    <div>{sprintType === 'live' ? 'Topik' : 'Pilar'}: <span style={{ color: '#6b7280' }}>{sprintPillar}</span></div>
                   )}
                   {sprintType === 'custom' && sprintCustomLabel && (
-                    <div>Konten: <span style={{ color: '#5a6a85' }}>{sprintCustomLabel}</span></div>
+                    <div>Konten: <span style={{ color: '#6b7280' }}>{sprintCustomLabel}</span></div>
                   )}
-                  <div>Mulai: <span style={{ color: '#5a6a85' }}>{sprintStart}</span> · {sprintSteps.filter(s => s.enabled).length} tasks akan dibuat</div>
+                  <div>Mulai: <span style={{ color: '#6b7280' }}>{sprintStart}</span> · {sprintSteps.filter(s => s.enabled).length} tasks akan dibuat</div>
                   {sprintTanggalTayang && (
                     <div>Tayang: <span style={{ color: '#059669', fontWeight: 600 }}>{sprintTanggalTayang}</span></div>
                   )}
                   {sprintSteps.filter(s => s.enabled && s.due_date).length > 0 && (
                     <div>
-                      Target selesai: <span style={{ color: '#5a6a85' }}>
+                      Target selesai: <span style={{ color: '#6b7280' }}>
                         {sprintSteps.filter(s => s.enabled && s.due_date).map(s => s.due_date).sort().at(-1)}
                       </span>
                     </div>
@@ -934,7 +934,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
               {/* Actions */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '11px 20px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button type="button" onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '11px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button type="button" onClick={createSprint} disabled={savingSprint}
                   style={{ background: savingSprint ? '#1a3a2f' : 'linear-gradient(135deg, #059669, #34d399)', border: 'none', borderRadius: 10, padding: '11px 28px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
                   {savingSprint ? 'Membuat...' : `Buat ${sprintSteps.filter(s => s.enabled).length} Tasks`}
@@ -948,51 +948,51 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* Task Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 500 }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 500 }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#2a3547' }}>{modal.task.id ? 'Edit Task' : 'Tambah Task'}</h2>
-              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>{modal.task.id ? 'Edit Task' : 'Tambah Task'}</h2>
+              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Task *</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Nama Task *</label>
                 <input style={fieldStyle()} value={modal.task.nama} onChange={e => setField('nama', e.target.value)} placeholder="Apa yang perlu dikerjakan?" required />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Priority</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Priority</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.task.priority ?? 'Medium'} onChange={e => setField('priority', e.target.value)}>
                     {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Platform</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.task.platform ?? ''} onChange={e => setField('platform', e.target.value)}>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p || 'Semua'}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Mulai</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Mulai</label>
                   <input type="date" style={fieldStyle()} value={modal.task.start_date} onChange={e => setField('start_date', e.target.value)} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Deadline</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Deadline</label>
                   <input type="date" style={fieldStyle()} value={modal.task.due_date} onChange={e => setField('due_date', e.target.value)} />
                 </div>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Progress ({modal.task.percent_complete}%)</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Progress ({modal.task.percent_complete}%)</label>
                 <input type="range" min="0" max="100" step="5" value={modal.task.percent_complete} onChange={e => setField('percent_complete', Number(e.target.value))}
                   style={{ width: '100%', accentColor: '#1a73e8' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Catatan</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Catatan</label>
                 <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={modal.task.notes} onChange={e => setField('notes', e.target.value)} placeholder="Catatan tambahan..." />
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
-                <button type="submit" disabled={saving} style={{ background: saving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
+                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button type="submit" disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
                   {saving ? 'Menyimpan...' : modal.task.id ? 'Update' : 'Simpan'}
                 </button>
               </div>
@@ -1033,29 +1033,29 @@ function KanbanCard({ task, isDragging, colColor, onDragStart, onDragEnd, onEdit
       {/* Drag handle indicator */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 3, flexShrink: 0, opacity: isDragging ? 0.6 : 0.3, transition: 'opacity 0.12s' }}>
-          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /></div>
-          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /></div>
-          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#64748b' }} /></div>
+          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#6b7280' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#6b7280' }} /></div>
+          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#6b7280' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#6b7280' }} /></div>
+          <div style={{ display: 'flex', gap: 2 }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#6b7280' }} /><div style={{ width: 3, height: 3, borderRadius: '50%', background: '#6b7280' }} /></div>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600, color: isDragging ? '#5a6a85' : '#2a3547', fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word', transition: 'color 0.12s' }}>{task.nama}</div>
+          <div style={{ fontWeight: 600, color: isDragging ? '#6b7280' : '#111827', fontSize: '0.82rem', lineHeight: 1.4, wordBreak: 'break-word', transition: 'color 0.12s' }}>{task.nama}</div>
         </div>
       </div>
       {/* Badges */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: task.due_date ? 6 : 0 }}>
         {task.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[task.priority], background: PRIORITY_BG[task.priority], fontWeight: 600 }}>{task.priority}</span>}
-        {task.platform && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{task.platform}</span>}
+        {task.platform && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f8fafc' }}>{task.platform}</span>}
         {overdue && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: '#dc2626', background: 'rgba(248,113,113,0.1)' }}>Overdue</span>}
       </div>
       {task.due_date && (
-        <div style={{ fontSize: '0.7rem', color: overdue ? '#dc2626' : '#5a6a85' }}>
+        <div style={{ fontSize: '0.7rem', color: overdue ? '#dc2626' : '#6b7280' }}>
           Due: {new Date(task.due_date).toLocaleDateString('id-ID')}
         </div>
       )}
       {/* Actions */}
       <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
         <button onClick={e => { e.stopPropagation(); onEdit(task) }} style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 6, padding: '4px 0', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
-        <button onClick={e => { e.stopPropagation(); onDelete(task.id!) }} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        <button onClick={e => { e.stopPropagation(); onDelete(task.id!) }} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
       </div>
     </div>
   )
@@ -1078,12 +1078,12 @@ function TaskCard({ task, onEdit, onDelete, onProgress }: {
         </button>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, color: pct === 100 ? '#5a6a85' : '#2a3547', fontSize: '0.875rem', textDecoration: pct === 100 ? 'line-through' : 'none' }}>{task.nama}</span>
+            <span style={{ fontWeight: 600, color: pct === 100 ? '#6b7280' : '#111827', fontSize: '0.875rem', textDecoration: pct === 100 ? 'line-through' : 'none' }}>{task.nama}</span>
             {task.priority && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[task.priority], background: PRIORITY_BG[task.priority], fontWeight: 600 }}>{task.priority}</span>}
-            {task.platform && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#5a6a85', background: '#f8fafc' }}>{task.platform}</span>}
+            {task.platform && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f8fafc' }}>{task.platform}</span>}
             {overdue && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#dc2626', background: 'rgba(248,113,113,0.1)' }}>Overdue</span>}
           </div>
-          {task.due_date && <div style={{ fontSize: '0.72rem', color: '#5a6a85', marginBottom: 8 }}>Due: {new Date(task.due_date).toLocaleDateString('id-ID')}</div>}
+          {task.due_date && <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>Due: {new Date(task.due_date).toLocaleDateString('id-ID')}</div>}
           {pct > 0 && pct < 100 && (
             <div style={{ height: 4, background: '#f8fafc', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
               <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg, #1a73e8, #42a5f5)', borderRadius: 2, transition: 'width 0.3s' }} />
@@ -1092,7 +1092,7 @@ function TaskCard({ task, onEdit, onDelete, onProgress }: {
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <button onClick={() => onEdit(task)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
-          <button onClick={() => onDelete(task.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+          <button onClick={() => onDelete(task.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
         </div>
       </div>
     </div>
