@@ -88,16 +88,16 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px' }}>
-          <div style={{ fontSize: '0.75rem', color: '#86efac', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Pemasukan</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#86efac' }}>{formatRp(pemasukan)}</div>
+          <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Pemasukan</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#059669' }}>{formatRp(pemasukan)}</div>
         </div>
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '18px 20px' }}>
-          <div style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Pengeluaran</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f87171' }}>{formatRp(pengeluaran)}</div>
+          <div style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Pengeluaran</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#dc2626' }}>{formatRp(pengeluaran)}</div>
         </div>
         <div style={{ background: '#fff', border: `1px solid ${saldo >= 0 ? 'rgba(134,239,172,0.2)' : 'rgba(248,113,113,0.2)'}`, borderRadius: 20, padding: '18px 20px' }}>
           <div style={{ fontSize: '0.75rem', color: '#5a6a85', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Saldo Bersih</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: saldo >= 0 ? '#42a5f5' : '#f87171' }}>{saldo < 0 ? '-' : ''}{formatRp(saldo)}</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: saldo >= 0 ? '#1a73e8' : '#dc2626' }}>{saldo < 0 ? '-' : ''}{formatRp(saldo)}</div>
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           {['', ...TIPE].map(t => (
             <button key={t} onClick={() => setFilterTipe(t)}
-              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterTipe === t ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterTipe === t ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterTipe === t ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterTipe === t ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
               {t || 'Semua'}
             </button>
           ))}
@@ -134,7 +134,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
                 <div style={{ fontWeight: 500, color: '#2a3547', fontSize: '0.875rem', marginBottom: 2 }}>{t.deskripsi || t.kategori}</div>
                 <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>{t.tanggal} · {t.kategori}</div>
               </div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: t.tipe === 'Pemasukan' ? '#86efac' : '#f87171', marginRight: 8 }}>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: t.tipe === 'Pemasukan' ? '#059669' : '#dc2626', marginRight: 8 }}>
                 {t.tipe === 'Pemasukan' ? '+' : '-'}{formatRp(Number(t.jumlah))}
               </div>
               <button onClick={() => openEdit(t)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
@@ -153,7 +153,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Tipe</label>

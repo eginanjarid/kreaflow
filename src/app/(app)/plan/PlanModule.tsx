@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { STEP_ICON_MAP } from '@/components/ui/Icons'
 
 type PlatformPlan = {
   id?: string
@@ -113,7 +114,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
           const stepName = rawStep.replace(/^\p{Emoji}\s*/u, '')
           const p = t.percent_complete || 0
           const dot = p === 100 ? '●' : p > 0 ? '◑' : '○'
-          const dotColor = p === 100 ? '#86efac' : p > 0 ? '#fbbf24' : '#64748b'
+          const dotColor = p === 100 ? '#059669' : p > 0 ? '#d97706' : '#64748b'
           const dateStr = t.due_date ? t.due_date.slice(5).replace('-', '/') : ''
           return (
             <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>
@@ -607,7 +608,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setCampaigns(prev => prev.filter(x => x.id !== id))
   }
 
-  const STATUS_COLOR: Record<string, string> = { Planning: '#93c5fd', Active: '#86efac', Completed: '#42a5f5', Cancelled: '#5a6a85' }
+  const STATUS_COLOR: Record<string, string> = { Planning: '#1a73e8', Active: '#059669', Completed: '#1a73e8', Cancelled: '#5a6a85' }
 
   return (
     <div>
@@ -630,8 +631,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {tab === 'naskah' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {!brandProfile?.niche && (
-            <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Lengkapi modul <a href="/brand" style={{ color: '#f59e0b', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
+            <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#d97706' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Lengkapi modul <a href="/brand" style={{ color: '#d97706', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
             </div>
           )}
 
@@ -662,7 +663,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'LinkedIn'].map(pl => (
                       <button key={pl} type="button" onClick={() => setNF('platform', pl)}
-                        style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${naskahForm.platform === pl ? '#1a73e8' : '#e5eaf2'}`, background: naskahForm.platform === pl ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: naskahForm.platform === pl ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: naskahForm.platform === pl ? 600 : 400 }}>
+                        style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${naskahForm.platform === pl ? '#1a73e8' : '#e5eaf2'}`, background: naskahForm.platform === pl ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: naskahForm.platform === pl ? '#1a73e8' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: naskahForm.platform === pl ? 600 : 400 }}>
                         {pl}
                       </button>
                     ))}
@@ -684,7 +685,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         const label = line.replace(/^\d+\.\s*/, '').split('—')[0].trim()
                         return (
                           <button key={i} type="button" onClick={() => setNF('pillar', label)}
-                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', marginBottom: 4, borderRadius: 7, border: `1px solid ${naskahForm.pillar === label ? '#34d399' : '#e5eaf2'}`, background: naskahForm.pillar === label ? 'rgba(52,211,153,0.1)' : '#f1f5f9', color: naskahForm.pillar === label ? '#34d399' : '#64748b', fontSize: '0.78rem', cursor: 'pointer' }}>
+                            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', marginBottom: 4, borderRadius: 7, border: `1px solid ${naskahForm.pillar === label ? '#059669' : '#e5eaf2'}`, background: naskahForm.pillar === label ? 'rgba(52,211,153,0.1)' : '#f1f5f9', color: naskahForm.pillar === label ? '#059669' : '#64748b', fontSize: '0.78rem', cursor: 'pointer' }}>
                             {line.replace(/^\d+\.\s*/, '')}
                           </button>
                         )
@@ -699,7 +700,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {['Shock/Surprised', 'Problem-first', 'Result-first', 'Story', 'Question', 'Warning', 'Comparison', 'Social proof'].map(h => (
                       <button key={h} type="button" onClick={() => setNF('hook_angle', naskahForm.hook_angle === h ? '' : h)}
-                        style={{ padding: '5px 10px', borderRadius: 6, border: `1px solid ${naskahForm.hook_angle === h ? '#1a73e8' : '#e5eaf2'}`, background: naskahForm.hook_angle === h ? 'rgba(26,115,232,0.12)' : '#f1f5f9', color: naskahForm.hook_angle === h ? '#42a5f5' : '#64748b', fontSize: '0.75rem', cursor: 'pointer' }}>
+                        style={{ padding: '5px 10px', borderRadius: 6, border: `1px solid ${naskahForm.hook_angle === h ? '#1a73e8' : '#e5eaf2'}`, background: naskahForm.hook_angle === h ? 'rgba(26,115,232,0.12)' : '#f1f5f9', color: naskahForm.hook_angle === h ? '#1a73e8' : '#64748b', fontSize: '0.75rem', cursor: 'pointer' }}>
                         {h}
                       </button>
                     ))}
@@ -751,7 +752,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   </div>
                   {generatedNaskah && (
                     <button type="button" onClick={saveToLibrary}
-                      style={{ background: savedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(26,115,232,0.12)', border: `1px solid ${savedToLibrary ? '#34d399' : '#1a73e8'}`, borderRadius: 8, padding: '7px 14px', color: savedToLibrary ? '#34d399' : '#42a5f5', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                      style={{ background: savedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(26,115,232,0.12)', border: `1px solid ${savedToLibrary ? '#059669' : '#1a73e8'}`, borderRadius: 8, padding: '7px 14px', color: savedToLibrary ? '#059669' : '#1a73e8', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
                       {savedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
                     </button>
                   )}
@@ -797,7 +798,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         {products.map(p => <option key={p.id} value={p.id}>{p.nama}{p.platform_affiliate ? ` (${p.platform_affiliate})` : ''}{!p.deskripsi ? ' (*)' : ''}</option>)}
                       </select>
                       {products.some(p => !p.deskripsi) && (
-                        <div style={{ fontSize: '0.72rem', color: '#f59e0b', marginTop: 4 }}>Produk bertanda (*) belum ada deskripsi — lengkapi di <a href="/catalog" style={{ color: '#f59e0b', fontWeight: 700 }}>Katalog</a> agar auto-isi berfungsi.</div>
+                        <div style={{ fontSize: '0.72rem', color: '#d97706', marginTop: 4 }}>Produk bertanda (*) belum ada deskripsi — lengkapi di <a href="/catalog" style={{ color: '#d97706', fontWeight: 700 }}>Katalog</a> agar auto-isi berfungsi.</div>
                       )}
                       {affForm.product_id && (() => {
                         const prod = products.find(p => p.id === affForm.product_id)
@@ -805,8 +806,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       })()}
                     </div>
                   ) : (
-                    <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b' }}>
-                      Belum ada produk di katalog. <a href="/catalog" style={{ color: '#f59e0b', fontWeight: 700 }}>Tambah produk →</a> Pastikan isi kolom Deskripsi agar bisa auto-fill di sini.
+                    <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#d97706' }}>
+                      Belum ada produk di katalog. <a href="/catalog" style={{ color: '#d97706', fontWeight: 700 }}>Tambah produk →</a> Pastikan isi kolom Deskripsi agar bisa auto-fill di sini.
                     </div>
                   )}
 
@@ -1019,7 +1020,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   </div>
                   {affNaskah && (
                     <button type="button" onClick={saveAffToLibrary}
-                      style={{ background: affSavedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(99,102,241,0.12)', border: `1px solid ${affSavedToLibrary ? '#34d399' : '#6366f1'}`, borderRadius: 8, padding: '7px 14px', color: affSavedToLibrary ? '#34d399' : '#818cf8', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                      style={{ background: affSavedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(99,102,241,0.12)', border: `1px solid ${affSavedToLibrary ? '#059669' : '#4f46e5'}`, borderRadius: 8, padding: '7px 14px', color: affSavedToLibrary ? '#059669' : '#818cf8', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
                       {affSavedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
                     </button>
                   )}
@@ -1041,7 +1042,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 const PROD_STEPS = [
                   { id: 'naskah', label: 'Naskah / Script', icon: 'naskah', desc: 'Naskah sudah siap', autoCheck: true },
                   { id: 'take_video', label: 'Take Video', icon: 'take_video', desc: 'Rekam video utama sesuai naskah' },
-                  { id: 'broll_vo', label: 'B-roll / Voice Over', icon: '🎥', desc: 'Opsional — tambahan visual atau dubbing', optional: true },
+                  { id: 'broll_vo', label: 'B-roll / Voice Over', icon: 'broll_vo', desc: 'Opsional — tambahan visual atau dubbing', optional: true },
                   { id: 'editing', label: 'Editing', icon: 'editing', desc: 'Edit, potong, tambah teks & musik' },
                   { id: 'schedule', label: 'Schedule Post', icon: 'schedule', desc: 'Jadwalkan posting di waktu terbaik' },
                 ]
@@ -1049,7 +1050,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   <div style={{ background: '#fff', border: '1px solid #1e3a2f', borderRadius: 20, overflow: 'hidden' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid #e5eaf2', background: 'rgba(52,211,153,0.03)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 4, height: 22, borderRadius: 2, background: '#34d399' }} />
+                        <div style={{ width: 4, height: 22, borderRadius: 2, background: '#059669' }} />
                         <span style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.05rem' }}>Alur Produksi</span>
                       </div>
                       <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#5a6a85', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 5, padding: '3px 10px', letterSpacing: '0.08em' }}>STEP 03</span>
@@ -1062,16 +1063,16 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <div key={step.id} onClick={() => !step.autoCheck && toggleProdStep(step.id)}
                             style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 10, background: done ? 'rgba(52,211,153,0.06)' : '#f1f5f9', border: `1px solid ${done ? '#34d39920' : '#e5eaf2'}`, cursor: step.autoCheck ? 'default' : 'pointer', transition: 'all 0.15s' }}>
                             {/* step number / check */}
-                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? '#34d399' : '#e5eaf2', transition: 'background 0.2s' }}>
+                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? '#059669' : '#e5eaf2', transition: 'background 0.2s' }}>
                               {done ? (
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                               ) : (
                                 <span style={{ fontSize: '0.65rem', color: '#5a6a85', fontWeight: 700 }}>{i + 1}</span>
                               )}
                             </div>
-                            <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{step.icon}</span>
+                            <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: '#5a6a85' }}>{STEP_ICON_MAP[step.icon] || null}</span>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 600, color: done ? '#34d399' : '#64748b', fontSize: '0.875rem' }}>
+                              <div style={{ fontWeight: 600, color: done ? '#059669' : '#64748b', fontSize: '0.875rem' }}>
                                 {step.label}
                                 {step.optional && <span style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 400, marginLeft: 6 }}>(opsional)</span>}
                               </div>
@@ -1088,7 +1089,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       <div style={{ marginTop: 8, display: 'flex', gap: 10 }}>
                         {affSavedToLibrary ? (
                           <div style={{ flex: 1, background: 'rgba(52,211,153,0.08)', border: '1px solid #34d39930', borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <span style={{ fontSize: '0.85rem', color: '#34d399', fontWeight: 600 }}>✓ Tersimpan di Library</span>
+                            <span style={{ fontSize: '0.85rem', color: '#059669', fontWeight: 600 }}>✓ Tersimpan di Library</span>
                             <a href="/library" style={{ fontSize: '0.78rem', color: '#5a6a85', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
                               Lihat di Library
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
@@ -1118,7 +1119,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: p.is_active ? '1px solid #e5eaf2' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ fontWeight: 700, color: p.is_active ? '#2a3547' : '#5a6a85', fontSize: '0.95rem' }}>{p.platform}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#86efac' : '#5a6a85', background: p.is_active ? 'rgba(134,239,172,0.1)' : '#f1f5f9', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#059669' : '#5a6a85', background: p.is_active ? 'rgba(134,239,172,0.1)' : '#f1f5f9', fontWeight: 600 }}>
                     {p.is_active ? 'Aktif' : 'Tidak Aktif'}
                   </span>
                 </div>
@@ -1166,7 +1167,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {WAKTU.map(t => (
                         <button key={t} type="button" onClick={() => toggleWaktu(p.platform, t)}
-                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: p.waktu_terbaik?.includes(t) ? '#42a5f5' : '#5a6a85', cursor: 'pointer' }}>
+                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: p.waktu_terbaik?.includes(t) ? '#1a73e8' : '#5a6a85', cursor: 'pointer' }}>
                           {t}
                         </button>
                       ))}
@@ -1217,11 +1218,11 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       </div>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                         {(c.platforms || []).map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>)}
-                        {Number(c.budget) > 0 && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#f87171', background: 'rgba(248,113,113,0.1)' }}>Budget: Rp {Number(c.budget).toLocaleString('id-ID')}</span>}
+                        {Number(c.budget) > 0 && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#dc2626', background: 'rgba(248,113,113,0.1)' }}>Budget: Rp {Number(c.budget).toLocaleString('id-ID')}</span>}
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button onClick={() => openEditCampaign(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
+                      <button onClick={() => openEditCampaign(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
                       <button onClick={() => deleteCampaign(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                     </div>
                   </div>
@@ -1241,7 +1242,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={saveCampaign} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Nama Campaign *</label>
                 <input style={fieldStyle()} value={modal.campaign.nama} onChange={e => setCampField('nama', e.target.value)} placeholder="Harbolnas, Ramadan, Kolaborasi Brand..." required />
@@ -1278,7 +1279,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {PLATFORMS.map(p => (
                     <button key={p} type="button" onClick={() => togglePlatform(p)}
-                      style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.campaign.platforms.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.campaign.platforms.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.campaign.platforms.includes(p) ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                      style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.campaign.platforms.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.campaign.platforms.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.campaign.platforms.includes(p) ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
                       {p}
                     </button>
                   ))}
@@ -1310,7 +1311,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               {[
                 { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
                 { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(affAiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(affAiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#1a73e8', url: `https://gemini.google.com/app?q=${encodeURIComponent(affAiModal.prompt)}` },
                 { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(affAiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
@@ -1325,7 +1326,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               ))}
             </div>
             <button type="button" onClick={() => { navigator.clipboard.writeText(affAiModal.prompt); setAffPromptCopied(true); setTimeout(() => setAffPromptCopied(false), 2000) }}
-              style={{ background: 'transparent', border: 'none', color: affPromptCopied ? '#34d399' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+              style={{ background: 'transparent', border: 'none', color: affPromptCopied ? '#059669' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
               {affPromptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
             </button>
           </div>
@@ -1347,7 +1348,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               {[
                 { label: 'ChatGPT', desc: 'OpenAI GPT-4o', icon: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
                 { label: 'Claude', desc: 'Anthropic Claude', icon: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'Gemini', desc: 'Google Gemini', icon: 'Gm', color: '#1a73e8', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
                 { label: 'DeepSeek', desc: 'DeepSeek R1', icon: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
               ].map(ai => (
                 <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
@@ -1362,7 +1363,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               ))}
             </div>
             <button type="button" onClick={() => copyPrompt(aiModal.prompt)}
-              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#34d399' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+              style={{ background: 'transparent', border: 'none', color: promptCopied ? '#059669' : '#5a6a85', fontSize: '0.78rem', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
               {promptCopied ? '✓ Prompt berhasil dicopy!' : 'atau copy prompt manual →'}
             </button>
           </div>
@@ -1377,7 +1378,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             <p style={{ color: '#5a6a85', fontSize: '0.875rem', marginBottom: 16, lineHeight: 1.5 }}>
               Ada slot konten di Sprint aktif untuk produk ini:
               <br />
-              <span style={{ color: '#42a5f5', fontWeight: 600 }}>&ldquo;{sprintLinkModal.draft.judul}&rdquo;</span>
+              <span style={{ color: '#1a73e8', fontWeight: 600 }}>&ldquo;{sprintLinkModal.draft.judul}&rdquo;</span>
               <br /><br />
               Mau update slot sprint itu dengan naskah ini, atau simpan sebagai konten baru terpisah?
             </p>

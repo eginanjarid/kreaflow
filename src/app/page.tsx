@@ -35,7 +35,7 @@ const PRICING = [
   },
   {
     name: 'Team', price: 'Rp399.000', period: '/bln',
-    color: '#34d399', border: 'rgba(52,211,153,0.3)',
+    color: '#059669', border: 'rgba(52,211,153,0.3)',
     features: ['5 workspace', '5 user', 'Unlimited konten', 'AI unlimited', 'Semua 9 modul'],
   },
 ]
@@ -116,7 +116,7 @@ export default async function LandingPage() {
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, background: '#0d0d0d', border: '1px solid #1f1f1f', marginBottom: 6 }}>
                   <div style={{ flex: 1, fontSize: '0.78rem', color: '#d1d9e6', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
-                  <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10, background: item.status === 'Ready' ? 'rgba(134,239,172,0.1)' : item.status === 'Scheduled' ? 'rgba(147,197,253,0.1)' : 'rgba(71,85,105,0.2)', color: item.status === 'Ready' ? '#86efac' : item.status === 'Scheduled' ? '#93c5fd' : '#64748b', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.status}</span>
+                  <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10, background: item.status === 'Ready' ? 'rgba(134,239,172,0.1)' : item.status === 'Scheduled' ? 'rgba(147,197,253,0.1)' : 'rgba(71,85,105,0.2)', color: item.status === 'Ready' ? '#059669' : item.status === 'Scheduled' ? '#1a73e8' : '#64748b', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.status}</span>
                   <span style={{ fontSize: '0.68rem', color: '#475569', whiteSpace: 'nowrap' }}>{item.platform}</span>
                 </div>
               ))}
@@ -183,12 +183,12 @@ export default async function LandingPage() {
             </div>
           </div>
           <div style={{ background: '#111', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 16, padding: '28px' }}>
-            <div style={{ marginBottom: 14, color: '#34d399' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
-            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#34d399', marginBottom: 10 }}>Affiliator</div>
+            <div style={{ marginBottom: 14, color: '#059669' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#059669', marginBottom: 10 }}>Affiliator</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {['Database produk affiliate terorganisir', 'Generate naskah review & promo AI', 'Hitung potensi komisi per produk', 'Sprint produksi konten affiliate'].map(t => (
                 <div key={t} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                  <span style={{ color: '#34d399', flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ color: '#059669', flexShrink: 0, marginTop: 1 }}>✓</span>
                   <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>{t}</span>
                 </div>
               ))}

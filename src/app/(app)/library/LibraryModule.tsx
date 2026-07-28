@@ -37,9 +37,9 @@ const STATUSES = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal'
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUS_COLOR: Record<string, string> = {
   Draft: '#5a6a85',
-  'Naskah Siap': '#f59e0b',
-  Produksi: '#3b82f6',
-  'Siap Tayang': '#22c55e',
+  'Naskah Siap': '#d97706',
+  Produksi: '#1a73e8',
+  'Siap Tayang': '#059669',
   Terjadwal: '#a855f7',
   Tayang: '#6b21a8',
   Ready: '#166534', Scheduled: '#1e40af', Posted: '#6b21a8',
@@ -120,7 +120,7 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
             <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginTop: 2 }}>Original audio</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
+            <span style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
             <span style={{ color: '#5a6a85', fontSize: '1.1rem', cursor: 'pointer', lineHeight: 1 }}>···</span>
           </div>
         </div>
@@ -169,7 +169,7 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
 
         {/* Hashtags */}
         {hashtags && (
-          <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#3b82f6', marginBottom: 4, lineHeight: 1.5 }}>
+          <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#1a73e8', marginBottom: 4, lineHeight: 1.5 }}>
             {hashtags}
           </div>
         )}
@@ -194,7 +194,7 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
           </button>
           {idea.canva_url && (
             <a href={idea.canva_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px', color: '#42a5f5', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+              style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px', color: '#1a73e8', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
               Buka Canva ↗
             </a>
           )}
@@ -289,7 +289,7 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
             </div>
           )}
           {hashtags && (
-            <div style={{ color: '#93c5fd', fontSize: '0.73rem', marginBottom: 8 }}>
+            <div style={{ color: '#1a73e8', fontSize: '0.73rem', marginBottom: 8 }}>
               {hashtags.length > 60 ? hashtags.slice(0, 60) + '…' : hashtags}
             </div>
           )}
@@ -310,7 +310,7 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
           Edit Konten
         </button>
         {idea.canva_url && (
-          <a href={idea.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+          <a href={idea.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
             Canva ↗
           </a>
         )}
@@ -347,8 +347,8 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
         {PREVIEW_RATIOS.map(rx => (
           <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: ratio === rx.key ? 'rgba(26,115,232,0.15)' : '#f1f5f9', cursor: 'pointer', gap: 1 }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#42a5f5' : '#64748b' }}>{rx.label}</span>
-            <span style={{ fontSize: '0.6rem', color: ratio === rx.key ? '#1a73e8' : '#5a6a85' }}>{rx.sub}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#1a73e8' : '#64748b' }}>{rx.label}</span>
+            <span style={{ fontSize: '0.7rem', color: ratio === rx.key ? '#1a73e8' : '#5a6a85' }}>{rx.sub}</span>
           </button>
         ))}
       </div>
@@ -379,7 +379,7 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
           const stepName = rawStep.replace(/^\p{Emoji}\s*/u, '')
           const pct = t.percent_complete || 0
           const dot = pct === 100 ? '●' : pct > 0 ? '◑' : '○'
-          const dotColor = pct === 100 ? '#86efac' : pct > 0 ? '#fbbf24' : '#64748b'
+          const dotColor = pct === 100 ? '#059669' : pct > 0 ? '#d97706' : '#64748b'
           const dateStr = t.due_date ? t.due_date.slice(5).replace('-', '/') : ''
           return (
             <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>
@@ -570,14 +570,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
           {['', ...STATUSES].map(s => (
             <button key={s} onClick={() => setFilterStatus(s)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterStatus === s ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterStatus === s ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterStatus === s ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterStatus === s ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
               {s || 'Semua'}
             </button>
           ))}
           <div style={{ width: 1, background: '#e5eaf2', margin: '0 4px', alignSelf: 'stretch' }} />
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
               {p || 'Semua Platform'}
             </button>
           ))}
@@ -637,7 +637,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 8, padding: '6px 10px', color: '#38bdf8', fontSize: '0.75rem', cursor: 'pointer' }}
                     title="Jadwalkan ke Calendar">
                     </button>
-                  <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
+                  <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
                     Edit
                   </button>
                   <button onClick={() => deleteIdea(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
@@ -659,8 +659,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             </div>
             {schedDone ? (
               <div style={{ padding: '32px 20px', textAlign: 'center' }}>
-                <div style={{ marginBottom: 8, color: '#34d399' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                <div style={{ color: '#86efac', fontWeight: 600, fontSize: '0.9rem' }}>Berhasil dijadwalkan!</div>
+                <div style={{ marginBottom: 8, color: '#059669' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                <div style={{ color: '#059669', fontWeight: 600, fontSize: '0.9rem' }}>Berhasil dijadwalkan!</div>
               </div>
             ) : (
               <form onSubmit={handleSchedule} style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -717,14 +717,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             <div style={{ display: 'flex', borderBottom: '1px solid #e5eaf2', flexShrink: 0 }}>
               {MODAL_TABS.map(t => (
                 <button key={t.id} onClick={() => setModal(m => ({ ...m, tab: t.id }))}
-                  style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#42a5f5' : '#64748b', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+                  style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#1a73e8' : '#64748b', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
                   {t.label}
                 </button>
               ))}
             </div>
 
             <form onSubmit={handleSave} style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
 
               {/* Tab: Basic */}
               {modal.tab === 'basic' && <>
@@ -793,7 +793,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {PLATFORMS.map(p => (
                       <button key={p} type="button" onClick={() => toggleArr('platform', p)}
-                        style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.idea.platform.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.idea.platform.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.idea.platform.includes(p) ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                        style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.idea.platform.includes(p) ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: modal.idea.platform.includes(p) ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: modal.idea.platform.includes(p) ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
                         {p}
                       </button>
                     ))}
@@ -806,7 +806,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Isi komponen konten atau generate otomatis</div>
                   <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
-                    style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
+                    style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
                     {aiLoading ? '...' : 'Generate AI'}
                   </button>
                 </div>
@@ -836,7 +836,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <label style={{ fontSize: '0.8rem', color: '#5a6a85', fontWeight: 500 }}>Script Lengkap</label>
                     <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
-                      style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '5px 12px', color: '#42a5f5', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
+                      style={{ background: 'rgba(26,115,232,0.15)', border: '1px solid #1a73e8', borderRadius: 8, padding: '5px 12px', color: '#1a73e8', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
                       {aiLoading ? 'Generating...' : 'Generate Script'}
                     </button>
                   </div>

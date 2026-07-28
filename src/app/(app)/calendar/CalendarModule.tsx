@@ -33,7 +33,7 @@ type TaskSnap = { id: string; nama: string; platform: string; due_date: string; 
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const STATUSES = ['Planned', 'Ready', 'Posted', 'Cancelled']
-const STATUS_COLOR: Record<string, string> = { Planned: '#93c5fd', Ready: '#fbbf24', Posted: '#86efac', Cancelled: '#5a6a85' }
+const STATUS_COLOR: Record<string, string> = { Planned: '#1a73e8', Ready: '#d97706', Posted: '#059669', Cancelled: '#5a6a85' }
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 const DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
@@ -219,14 +219,14 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {tasks.length > 0 && (
             <button onClick={() => setShowTasks(s => !s)}
-              style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#e5eaf2'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#f1f5f9', color: showTasks ? '#fbbf24' : '#5a6a85', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
+              style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#e5eaf2'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#f1f5f9', color: showTasks ? '#d97706' : '#5a6a85', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
               Tasks {showTasks ? 'ON' : 'OFF'}
             </button>
           )}
           <div style={{ display: 'flex', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, overflow: 'hidden' }}>
             {(['calendar', 'list'] as const).map(v => (
               <button key={v} onClick={() => setView(v)}
-                style={{ padding: '8px 14px', background: view === v ? 'rgba(26,115,232,0.2)' : 'transparent', border: 'none', color: view === v ? '#42a5f5' : '#64748b', fontSize: '0.8rem', fontWeight: view === v ? 600 : 400, cursor: 'pointer' }}>
+                style={{ padding: '8px 14px', background: view === v ? 'rgba(26,115,232,0.2)' : 'transparent', border: 'none', color: view === v ? '#1a73e8' : '#64748b', fontSize: '0.8rem', fontWeight: view === v ? 600 : 400, cursor: 'pointer' }}>
                 {v === 'calendar' ? 'Kalender' : 'List'}
               </button>
             ))}
@@ -245,8 +245,8 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399' }}>Siap Dijadwalkan</span>
-              <span style={{ background: 'rgba(52,211,153,0.15)', color: '#34d399', fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10 }}>{readyItems.length} konten</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#059669' }}>Siap Dijadwalkan</span>
+              <span style={{ background: 'rgba(52,211,153,0.15)', color: '#059669', fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10 }}>{readyItems.length} konten</span>
             </div>
             <span style={{ color: '#5a6a85', fontSize: '0.8rem' }}>{queueOpen ? '▲' : '▼'}</span>
           </button>
@@ -257,7 +257,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
                       {item.product_nama && (
-                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', borderRadius: 3, background: 'rgba(66,165,245,0.12)', color: '#42a5f5', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', borderRadius: 3, background: 'rgba(66,165,245,0.12)', color: '#1a73e8', whiteSpace: 'nowrap' }}>
                           {item.product_nama}
                         </span>
                       )}
@@ -277,7 +277,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                   </div>
                   <button
                     onClick={() => openSchedModal(item)}
-                    style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, color: '#34d399', fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                    style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, color: '#059669', fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
                   >
                     + Jadwalkan
                   </button>
@@ -348,7 +348,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                       {dayTasks.slice(0, Math.max(0, MAX_SHOW - shown)).map(t => {
                         shown++
                         const pct = t.percent_complete
-                        const taskColor = pct === 100 ? '#86efac' : pct > 0 ? '#fbbf24' : '#64748b'
+                        const taskColor = pct === 100 ? '#059669' : pct > 0 ? '#d97706' : '#64748b'
                         const rawStep = t.nama.split(' —')[0].trim()
                         const stepName = rawStep.replace(/^\p{Emoji}\s*/u, '')
                         const ctx = t.nama.match(/—\s*(.+)$/)?.[1]?.trim()
@@ -373,7 +373,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                           </div>
                         )
                       })}
-                      {totalItems > MAX_SHOW && <div style={{ fontSize: '0.6rem', color: '#5a6a85' }}>+{totalItems - MAX_SHOW} lagi</div>}
+                      {totalItems > MAX_SHOW && <div style={{ fontSize: '0.7rem', color: '#5a6a85' }}>+{totalItems - MAX_SHOW} lagi</div>}
                     </>
                   )}
                 </div>
@@ -409,11 +409,11 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                   {/* Product + sprint badges */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
                     {idea?.product_nama && (
-                      <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.12)', color: '#42a5f5', border: '1px solid rgba(66,165,245,0.2)' }}>
+                      <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.12)', color: '#1a73e8', border: '1px solid rgba(66,165,245,0.2)' }}>
                         {idea.product_nama}
                       </span>
                     )}
-                    {isSprint && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399', fontWeight: 600 }}>Sprint</span>}
+                    {isSprint && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.25)', color: '#059669', fontWeight: 600 }}>Sprint</span>}
                   </div>
                   <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{displayName}</div>
                   <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>
@@ -422,7 +422,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 </div>
                 <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[e.status], background: `${STATUS_COLOR[e.status]}18`, fontWeight: 600, flexShrink: 0 }}>{e.status}</span>
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                  {!isSprint && <button onClick={() => openEdit(e)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>}
+                  {!isSprint && <button onClick={() => openEdit(e)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>}
                   {!isSprint && <button onClick={() => deleteEntry(e.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>}
                   {isSprint && <span style={{ fontSize: '0.7rem', color: '#5a6a85', padding: '5px 0' }}>auto-sync</span>}
                 </div>
@@ -444,7 +444,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
               {/* Content info */}
               <div style={{ background: '#f8fafc', borderRadius: 10, padding: '12px 14px' }}>
                 {schedModal.item.product_nama && (
-                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#42a5f5', marginBottom: 4 }}>{schedModal.item.product_nama}</div>
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#1a73e8', marginBottom: 4 }}>{schedModal.item.product_nama}</div>
                 )}
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>{schedModal.item.judul}</div>
                 {schedModal.item.format && <div style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{schedModal.item.format}</div>}
@@ -468,7 +468,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 </select>
               </div>
               {schedError && (
-                <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: '0.8rem', color: '#f87171' }}>
+                <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: '0.8rem', color: '#dc2626' }}>
                   {schedError}
                 </div>
               )}
@@ -495,7 +495,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Konten dari Library</label>
                 <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.entry.content_id ?? ''} onChange={e => setField('content_id', e.target.value)}>
@@ -507,7 +507,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                   ))}
                 </select>
                 {modal.entry.content_id && ideaMap[modal.entry.content_id]?.product_nama && (
-                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#42a5f5' }}>{ideaMap[modal.entry.content_id].product_nama}</div>
+                  <div style={{ marginTop: 5, fontSize: '0.72rem', color: '#1a73e8' }}>{ideaMap[modal.entry.content_id].product_nama}</div>
                 )}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

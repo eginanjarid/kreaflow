@@ -20,7 +20,7 @@ type Notif = {
 
 const TYPE_CONFIG: Record<string, { color: string; bg: string; label: string; icon: string; href: string }> = {
   riset:    { color: '#60a5fa', bg: 'rgba(96,165,250,0.1)',  label: 'Riset',    icon: 'search', href: '/sprints' },
-  naskah:   { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  label: 'Naskah',   icon: 'pen', href: '/plan' },
+  naskah:   { color: '#d97706', bg: 'rgba(251,191,36,0.1)',  label: 'Naskah',   icon: 'pen', href: '/plan' },
   produksi: { color: '#f97316', bg: 'rgba(249,115,22,0.1)',  label: 'Produksi', icon: 'palette', href: '/studio' },
   schedule: { color: '#a78bfa', bg: 'rgba(66,165,245,0.1)', label: 'Schedule', icon: 'calendar', href: '/calendar' },
 }
@@ -111,7 +111,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
           { key: 'schedule', label: 'Schedule' },
         ].map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
-            style={{ padding: '6px 14px', borderRadius: 20, border: `1px solid ${filter === f.key ? '#1a73e8' : '#e5eaf2'}`, background: filter === f.key ? 'rgba(26,115,232,0.15)' : 'transparent', color: filter === f.key ? '#42a5f5' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: filter === f.key ? 700 : 400, transition: 'all 0.15s' }}>
+            style={{ padding: '6px 14px', borderRadius: 20, border: `1px solid ${filter === f.key ? '#1a73e8' : '#e5eaf2'}`, background: filter === f.key ? 'rgba(26,115,232,0.15)' : 'transparent', color: filter === f.key ? '#1a73e8' : '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontWeight: filter === f.key ? 700 : 400, transition: 'all 0.15s' }}>
             {f.label}
           </button>
         ))}

@@ -96,7 +96,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
         <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+              style={{ padding: '5px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterPlatform === p ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterPlatform === p ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
               {p || 'Semua'}
             </button>
           ))}
@@ -118,11 +118,11 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
             <div key={m.id} style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontWeight: 700, color: '#42a5f5', fontSize: '0.95rem' }}>{m.platform}</span>
+                  <span style={{ fontWeight: 700, color: '#1a73e8', fontSize: '0.95rem' }}>{m.platform}</span>
                   <span style={{ fontSize: '0.8rem', color: '#5a6a85' }}>{MONTHS[(m.month as number) - 1]} {m.year}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <button onClick={() => openEdit(m)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => openEdit(m)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.75rem', cursor: 'pointer' }}>Edit</button>
                   <button onClick={() => deleteMetric(m.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 </div>
               </div>
@@ -145,10 +145,10 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
               </div>
               {Number(m.cost_of_campaign) > 0 && (
                 <div style={{ marginTop: 10, fontSize: '0.78rem', color: '#5a6a85' }}>
-                  Cost campaign: <span style={{ color: '#f87171', fontWeight: 600 }}>Rp {fmt(m.cost_of_campaign)}</span>
+                  Cost campaign: <span style={{ color: '#dc2626', fontWeight: 600 }}>Rp {fmt(m.cost_of_campaign)}</span>
                   {Number(m.conversions) > 0 && (
                     <span style={{ marginLeft: 16 }}>
-                      CPR: <span style={{ color: '#42a5f5', fontWeight: 600 }}>Rp {Math.round(Number(m.cost_of_campaign) / Number(m.conversions)).toLocaleString('id-ID')}</span>
+                      CPR: <span style={{ color: '#1a73e8', fontWeight: 600 }}>Rp {Math.round(Number(m.cost_of_campaign) / Number(m.conversions)).toLocaleString('id-ID')}</span>
                     </span>
                   )}
                 </div>
@@ -167,7 +167,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Platform</label>

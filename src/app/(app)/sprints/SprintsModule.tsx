@@ -559,7 +559,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
           { key: 'tasks', label: 'Tasks' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
-            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#42a5f5' : '#5a6a85', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
+            style={{ padding: '14px 20px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#1a73e8' : '#5a6a85', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
             {tab.key === 'tasks' && tasksTodo.length > 0 && (
               <span style={{ fontSize: '0.62rem', fontWeight: 700, background: '#f1f5f9', color: '#5a6a85', borderRadius: 8, padding: '1px 6px' }}>{tasksTodo.length}</span>
@@ -584,7 +584,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         {tasks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
-            <div style={{ marginBottom: 10, color: '#34d399' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div style={{ marginBottom: 10, color: '#059669' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
             <div style={{ fontWeight: 600, color: '#5a6a85' }}>Belum ada task manual</div>
           </div>
         )}
@@ -599,7 +599,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ fontWeight: 600, color: '#2a3547', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                       {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
-                      {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#f87171' : '#5a6a85' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
+                      {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#dc2626' : '#5a6a85' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
                       {t.notes && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{t.notes}</span>}
                     </div>
                   </div>
@@ -697,7 +697,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
                   style={{ position: 'relative', padding: '10px 10px', borderRadius: 8, marginBottom: 4, cursor: 'pointer', background: active ? 'rgba(26,115,232,0.15)' : 'transparent', border: `1px solid ${active ? 'rgba(26,115,232,0.3)' : 'transparent'}`, transition: 'all 0.15s' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
-                    {isCurrent && <span style={{ fontSize: '0.5rem', background: '#34d399', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
+                    {isCurrent && <span style={{ fontSize: '0.65rem', background: '#059669', color: '#000', fontWeight: 700, padding: '1px 5px', borderRadius: 3 }}>AKTIF</span>}
                     <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '1px 5px', borderRadius: 3, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
                     <button
                       onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }}
@@ -735,7 +735,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontWeight: 800, color: '#2a3547', fontSize: '0.95rem' }}>{selectedSprint.nama}</span>
                     {selectedSprint.platform && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{selectedSprint.platform}</span>}
-                    {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.1)', border: '1px solid rgba(66,165,245,0.25)', color: '#42a5f5', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
+                    {selectedSprint.akun && <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 4, background: 'rgba(66,165,245,0.1)', border: '1px solid rgba(66,165,245,0.25)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
                     <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
@@ -752,7 +752,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ height: '100%', width: `${totalPct}%`, background: 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
                 </div>
                 <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#42a5f5' : '#5a6a85', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '6px 10px', color: filterProduct ? '#1a73e8' : '#5a6a85', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
                   <option value="">Semua Produk</option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                 </select>
@@ -875,7 +875,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <select
                             value={memberId}
                             onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
-                            style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: memberId ? '#42a5f5' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                            style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#334155', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
                             <option value="">— Assign ke —</option>
                             {workspaceMembers.map(m => (
                               <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
@@ -886,7 +886,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <input type="date"
                             value={deadline}
                             onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, deadline: e.target.value } : x))}
-                            style={{ ...fieldStyle({ padding: '5px 8px', fontSize: '0.72rem', color: deadline ? '#fbbf24' : '#334155' }) }}
+                            style={{ ...fieldStyle({ padding: '5px 8px', fontSize: '0.72rem', color: deadline ? '#d97706' : '#334155' }) }}
                             placeholder="Deadline"
                           />
                           {!deadline && <span style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', fontSize: '0.68rem', color: '#5a6a85', pointerEvents: 'none' }}>Deadline</span>}
@@ -951,7 +951,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </select>
                   ) : (
                     <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#5a6a85' }}>
-                      Belum ada akun. <a href="/brand?tab=akun" style={{ color: '#42a5f5', textDecoration: 'none' }}>Daftarkan dulu di Brand → Akun Sosial →</a>
+                      Belum ada akun. <a href="/brand?tab=akun" style={{ color: '#1a73e8', textDecoration: 'none' }}>Daftarkan dulu di Brand → Akun Sosial →</a>
                     </div>
                   )}
                 </div>
@@ -967,7 +967,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   {(() => {
                     const total = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
                     return total > 0 && (
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#42a5f5', background: 'rgba(26,115,232,0.1)', padding: '3px 8px', borderRadius: 5 }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', padding: '3px 8px', borderRadius: 5 }}>
                         Total: {total} konten
                       </span>
                     )
@@ -1001,7 +1001,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Baris 2: jadwal posting */}
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
                         <div>
-                          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Mulai Posting</div>
+                          <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginBottom: 3 }}>Mulai Posting</div>
                           <input
                             type="date"
                             value={row.mulai}
@@ -1010,7 +1010,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           />
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Jam</div>
+                          <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginBottom: 3 }}>Jam</div>
                           <input
                             type="time"
                             value={row.jam}
@@ -1019,7 +1019,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           />
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Interval</div>
+                          <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginBottom: 3 }}>Interval</div>
                           <select
                             value={row.interval}
                             onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
@@ -1061,7 +1061,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         ...prev,
                         ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }))
                       ])}
-                      style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#42a5f5', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
+                      style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
                       + Tambahkan Semua Produk
                     </button>
                   )}
@@ -1167,7 +1167,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>
                   {detailItem.format && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{detailItem.format}</span>}
                   {Array.isArray(detailItem.platform) && detailItem.platform[0] && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85' }}>{detailItem.platform[0]}</span>}
-                  {detailItem.tanggal_tayang && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>{fmtDate(detailItem.tanggal_tayang)}{detailItem.jam_tayang ? ` · ${detailItem.jam_tayang}` : ''}</span>}
+                  {detailItem.tanggal_tayang && <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: 4, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#059669' }}>{fmtDate(detailItem.tanggal_tayang)}{detailItem.jam_tayang ? ` · ${detailItem.jam_tayang}` : ''}</span>}
                 </div>
               </div>
               <button onClick={() => setDetailItem(null)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
@@ -1184,15 +1184,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div key={step.id} style={{ padding: '8px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.06)' : '#f1f5f9', border: `1px solid ${isOverdue ? 'rgba(248,113,113,0.3)' : done ? '#d1fae5' : '#e5eaf2'}` }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#34d399' : '#e5eaf2'}`, background: done ? '#34d399' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${done ? '#059669' : '#e5eaf2'}`, background: done ? '#059669' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                           </div>
-                          <span style={{ color: done ? '#34d399' : '#5a6a85', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
-                          <span style={{ fontSize: '0.82rem', color: done ? '#34d399' : '#2a3547', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
+                          <span style={{ color: done ? '#059669' : '#5a6a85', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
+                          <span style={{ fontSize: '0.82rem', color: done ? '#059669' : '#2a3547', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
                         </div>
                         {!done && (
                           <Link href={step.href} onClick={() => setDetailItem(null)}
-                            style={{ fontSize: '0.68rem', color: '#42a5f5', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>
+                            style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>
                             Buka →
                           </Link>
                         )}
@@ -1202,7 +1202,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         <div style={{ display: 'flex', gap: 10, marginTop: 5, paddingLeft: 26 }}>
                           {step.memberName && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>{step.memberName}</span>}
                           {step.deadline && (
-                            <span style={{ fontSize: '0.65rem', color: isOverdue ? '#f87171' : done ? '#334155' : '#fbbf24', fontWeight: isOverdue ? 700 : 400 }}>
+                            <span style={{ fontSize: '0.65rem', color: isOverdue ? '#dc2626' : done ? '#334155' : '#d97706', fontWeight: isOverdue ? 700 : 400 }}>
                               {isOverdue ? 'Perhatian: ' : ''}{new Date(step.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                               {isOverdue && !done ? ' (terlambat)' : ''}
                             </span>
@@ -1220,13 +1220,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5a6a85', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Jadwal Posting</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 110px', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Tanggal</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginBottom: 3 }}>Tanggal</div>
                   <input type="date" value={detailJadwal.date}
                     onChange={e => setDetailJadwal(prev => ({ ...prev, date: e.target.value }))}
                     style={{ width: '100%', background: '#f0f5f9', border: '1px solid #e5eaf2', borderRadius: 6, padding: '7px 10px', color: '#2a3547', fontSize: '0.8rem', boxSizing: 'border-box' }} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginBottom: 3 }}>Jam</div>
+                  <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginBottom: 3 }}>Jam</div>
                   <input type="time" value={detailJadwal.time}
                     onChange={e => setDetailJadwal(prev => ({ ...prev, time: e.target.value }))}
                     style={{ width: '100%', background: '#f0f5f9', border: '1px solid #e5eaf2', borderRadius: 6, padding: '7px 10px', color: '#2a3547', fontSize: '0.8rem', boxSizing: 'border-box' }} />
@@ -1248,12 +1248,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
               )}
               {detailItem.status === 'Terjadwal' && (
                 <button onClick={() => advanceStatus(detailItem, 'Tayang')} disabled={savingAction}
-                  style={{ width: '100%', background: 'rgba(134,239,172,0.1)', border: '1px solid rgba(134,239,172,0.3)', borderRadius: 8, padding: '9px', color: '#86efac', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                  style={{ width: '100%', background: 'rgba(134,239,172,0.1)', border: '1px solid rgba(134,239,172,0.3)', borderRadius: 8, padding: '9px', color: '#059669', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
                   Tandai Tayang → Done
                 </button>
               )}
               {detailItem.status === 'Tayang' && (
-                <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#86efac' }}>✓ Sudah Tayang — Done</div>
+                <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#059669' }}>✓ Sudah Tayang — Done</div>
               )}
               <button onClick={() => removeFromSprint(detailItem.id)}
                 style={{ width: '100%', background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '8px', color: '#5a6a85', fontSize: '0.75rem', cursor: 'pointer' }}>
@@ -1333,37 +1333,37 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.85rem' }}>{r.step.nama}</div>
                             <div style={{ fontSize: '0.68rem', color: '#5a6a85', marginTop: 1 }}>
                               {r.memberName}
-                              {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#f87171' : '#334155' }}>
+                              {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#dc2626' : '#334155' }}>
                                 · Deadline: {new Date(r.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                                 {dlOverdue && ' ⚠ Overdue'}
                               </span>}
                             </div>
                           </div>
                         </div>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: pct === 100 ? '#86efac' : '#42a5f5' }}>{pct}%</span>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: pct === 100 ? '#059669' : '#1a73e8' }}>{pct}%</span>
                       </div>
                       {/* Progress bar */}
                       <div style={{ height: 5, background: '#f8fafc', borderRadius: 3, marginBottom: 10 }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? '#34d399' : 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
+                        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? '#059669' : 'linear-gradient(90deg,#1a73e8,#42a5f5)', borderRadius: 3, transition: 'width 0.3s' }} />
                       </div>
                       {/* Stats row */}
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(134,239,172,0.1)', color: '#86efac' }}>
+                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(134,239,172,0.1)', color: '#059669' }}>
                           ✓ {r.done} selesai
                         </span>
                         {hasDeadline && r.done > 0 && (
                           <>
-                            <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(52,211,153,0.08)', color: '#34d399' }}>
+                            <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(52,211,153,0.08)', color: '#059669' }}>
                               {r.onTime} tepat waktu
                             </span>
                             {r.late > 0 && (
-                              <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(248,113,113,0.08)', color: '#f87171' }}>
+                              <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(248,113,113,0.08)', color: '#dc2626' }}>
                                 ⚠ {r.late} terlambat
                               </span>
                             )}
                           </>
                         )}
-                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#f8fafc', color: r.overdue > 0 ? '#f87171' : '#5a6a85' }}>
+                        <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: '#f8fafc', color: r.overdue > 0 ? '#dc2626' : '#5a6a85' }}>
                           ○ {r.pending} belum{r.overdue > 0 ? ` (${r.overdue} overdue)` : ''}
                         </span>
                       </div>
@@ -1409,7 +1409,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
     <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
       <div onClick={onClick}>
         {productName && (
-          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, color: productColor, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ● {productName}
           </div>
         )}
@@ -1472,14 +1472,14 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
         if (dl) {
           const overdue = new Date(dl) < new Date()
           return (
-            <div style={{ fontSize: '0.6rem', marginTop: 5, color: overdue ? '#f87171' : '#5a6a85' }}>
+            <div style={{ fontSize: '0.7rem', marginTop: 5, color: overdue ? '#dc2626' : '#5a6a85' }}>
               {overdue ? '' : ''} Due {new Date(dl).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
               {overdue ? ' — terlambat' : ''}
             </div>
           )
         }
         if (item.tanggal_tayang) return (
-          <div style={{ fontSize: '0.6rem', color: '#5a6a85', marginTop: 5 }}>
+          <div style={{ fontSize: '0.7rem', color: '#5a6a85', marginTop: 5 }}>
             {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}
           </div>
         )

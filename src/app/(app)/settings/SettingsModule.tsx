@@ -34,8 +34,8 @@ type Props = {
 }
 
 const MODE_OPTIONS = [
-  { id: 'creator', label: 'Content Creator', desc: 'Brand building, Library konten, Calendar, Plan, Tracker', icon: 'creator', color: '#42a5f5' },
-  { id: 'affiliate', label: 'Affiliator', desc: 'Catalog produk affiliate + digital, komisi tracker, affiliate stats', icon: 'link', color: '#34d399' },
+  { id: 'creator', label: 'Content Creator', desc: 'Brand building, Library konten, Calendar, Plan, Tracker', icon: 'creator', color: '#1a73e8' },
+  { id: 'affiliate', label: 'Affiliator', desc: 'Catalog produk affiliate + digital, komisi tracker, affiliate stats', icon: 'link', color: '#059669' },
 ]
 
 function fieldStyle(extra?: object) {
@@ -184,7 +184,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
             </div>
             <div>
               <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginBottom: 2 }}>Plan saat ini</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#42a5f5', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{plan || 'Free'}</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a73e8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{plan || 'Free'}</div>
             </div>
           </div>
 
@@ -230,7 +230,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Email</label>
               <input style={fieldStyle({ color: '#5a6a85', cursor: 'not-allowed' })} value={userEmail} readOnly />
             </div>
-            {wsMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#86efac', fontSize: '0.85rem' }}>{wsMsg}</div>}
+            {wsMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem' }}>{wsMsg}</div>}
             <div>
               <button type="submit" disabled={wsSaving} style={{ background: wsSaving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: wsSaving ? 'not-allowed' : 'pointer' }}>
                 {wsSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
@@ -243,7 +243,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Tim Tab */}
       {tab === 'tim' && (
         <div style={{ maxWidth: 560 }}>
-          {teamMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#86efac', fontSize: '0.85rem', marginBottom: 16 }}>{teamMsg}</div>}
+          {teamMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem', marginBottom: 16 }}>{teamMsg}</div>}
 
           {/* Members list */}
           <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
@@ -264,7 +264,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 <select
                   value={m.jabatan || ''}
                   onChange={e => changeJabatan(m.id, e.target.value)}
-                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: m.jabatan ? '#42a5f5' : '#334155', fontSize: '0.72rem', cursor: 'pointer', outline: 'none', minWidth: 110 }}
+                  style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: m.jabatan ? '#1a73e8' : '#334155', fontSize: '0.72rem', cursor: 'pointer', outline: 'none', minWidth: 110 }}
                 >
                   <option value="">— Jabatan —</option>
                   {['Copywriter','Videografer','Editor','Admin Sosmed','Art Director','Content Creator','Owner'].map(j => (
@@ -281,7 +281,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     <option value="member">Member</option>
                   </select>
                 ) : (
-                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: m.role === 'owner' ? 'rgba(26,115,232,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#42a5f5' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: m.role === 'owner' ? 'rgba(26,115,232,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#1a73e8' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
                 )}
                 {canManageTeam && m.role !== 'owner' && m.email !== userEmail && (
                   <button onClick={() => removeMember(m.id)} style={{ background: 'transparent', border: 'none', color: '#5a6a85', cursor: 'pointer', fontSize: '0.85rem', padding: '4px' }} title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
@@ -302,7 +302,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     <div style={{ fontSize: '0.85rem', color: '#2a3547', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.email}</div>
                     <div style={{ fontSize: '0.72rem', color: '#5a6a85' }}>Expires {new Date(inv.expires_at).toLocaleDateString('id-ID')}</div>
                   </div>
-                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(254,188,46,0.1)', color: '#febc2e', fontWeight: 600, textTransform: 'capitalize' }}>{inv.role}</span>
+                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(254,188,46,0.1)', color: '#d97706', fontWeight: 600, textTransform: 'capitalize' }}>{inv.role}</span>
                   <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(71,85,105,0.2)', color: '#5a6a85' }}>Pending</span>
                 </div>
               ))}
@@ -332,7 +332,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     <option value="admin">Admin</option>
                   </select>
                 </div>
-                {inviteError && <div style={{ color: '#f87171', fontSize: '0.82rem' }}>{inviteError}</div>}
+                {inviteError && <div style={{ color: '#dc2626', fontSize: '0.82rem' }}>{inviteError}</div>}
                 <button type="submit" disabled={inviting} style={{ background: inviting ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 9, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: inviting ? 'not-allowed' : 'pointer', alignSelf: 'flex-start' }}>
                   {inviting ? 'Membuat link...' : '+ Generate Link Undangan'}
                 </button>
@@ -340,7 +340,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
               {inviteLink && (
                 <div style={{ marginTop: 16, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.25)', borderRadius: 10, padding: '14px 16px' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#42a5f5', fontWeight: 600, marginBottom: 8 }}>Link Undangan (valid 7 hari)</div>
+                  <div style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, marginBottom: 8 }}>Link Undangan (valid 7 hari)</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <code style={{ flex: 1, fontSize: '0.72rem', color: '#5a6a85', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
                     <button
@@ -381,8 +381,8 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>Konfirmasi Password *</label>
               <input type="password" style={fieldStyle()} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="Ulangi password baru" required />
             </div>
-            {pwdError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{pwdError}</div>}
-            {pwdMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#86efac', fontSize: '0.85rem' }}>{pwdMsg}</div>}
+            {pwdError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{pwdError}</div>}
+            {pwdMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem' }}>{pwdMsg}</div>}
             <div>
               <button type="submit" disabled={pwdSaving} style={{ background: pwdSaving ? '#1557b0' : 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: pwdSaving ? 'not-allowed' : 'pointer' }}>
                 {pwdSaving ? 'Mengubah...' : 'Ubah Password'}

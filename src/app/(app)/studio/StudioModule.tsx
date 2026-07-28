@@ -21,7 +21,7 @@ type ViewMode = 'cards' | 'ig' | 'feed'
 type IGTab = 'grid' | 'reels' | 'tagged'
 
 const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai' }
-const STATUS_COLOR: Record<string, string> = { Draft: '#5a6a85', 'Naskah Siap': '#f59e0b', Produksi: '#3b82f6', 'Siap Tayang': '#22c55e', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
+const STATUS_COLOR: Record<string, string> = { Draft: '#5a6a85', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
 const STATUS_BG: Record<string, string> = { Draft: '#f1f5f9', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
 const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
 
@@ -69,7 +69,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
             <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2a3547' }}>{handle}</div>
             <div style={{ fontSize: '0.68rem', color: '#5a6a85' }}>Original audio</div>
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
+          <span style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
           <span style={{ color: '#5a6a85', fontSize: '1.1rem', cursor: 'pointer' }}>···</span>
         </div>
         <div style={{ width: '100%', aspectRatio: '4/5', background: '#fff', position: 'relative', overflow: 'hidden' }}>
@@ -87,7 +87,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
         </div>
         <div style={{ paddingInline: 14, fontSize: '0.82rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>{fakeLikes.toLocaleString()} suka</div>
         {caption && <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#2a3547', lineHeight: 1.5, marginBottom: 4 }}><span style={{ fontWeight: 700, marginRight: 6 }}>{handle}</span><span style={{ whiteSpace: 'pre-wrap' }}>{caption.length > 150 ? caption.slice(0, 150) + '...' : caption}</span></div>}
-        {hashtags && <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#3b82f6', marginBottom: 4 }}>{hashtags}</div>}
+        {hashtags && <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#1a73e8', marginBottom: 4 }}>{hashtags}</div>}
         <div style={{ paddingInline: 14, marginBottom: 6 }}>
           <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[item.status] || '#5a6a85', background: STATUS_BG[item.status] || '#f1f5f9', fontWeight: 600 }}>{item.status}</span>
           {item.format && <span style={{ marginLeft: 6, fontSize: '0.68rem', color: '#5a6a85' }}>{item.format}</span>}
@@ -95,7 +95,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
         <div style={{ fontSize: '0.7rem', color: '#5a6a85', paddingInline: 14, marginBottom: 10 }}>{item.scheduled_date ? `Dijadwalkan: ${item.scheduled_date}` : 'Belum dijadwalkan'}</div>
         <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #1a1a1a' }}>
           <button onClick={onEdit} style={{ flex: 1, background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: 9, color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Input Hasil</button>
-          {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: 9, color: '#42a5f5', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Canva ↗</a>}
+          {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: 9, color: '#1a73e8', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Canva ↗</a>}
           {item.gdrive_url && <a href={item.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: 9, color: '#38bdf8', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Drive ↗</a>}
           <button onClick={onClose} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#5a6a85', fontSize: '0.82rem', cursor: 'pointer' }}>✕</button>
         </div>
@@ -141,7 +141,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
             <span style={{ color: '#fff', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.6)', borderRadius: 6, padding: '2px 10px', cursor: 'pointer' }}>Ikuti</span>
           </div>
           {caption && <div style={{ color: '#fff', fontSize: '0.78rem', lineHeight: 1.4, marginBottom: 6 }}>{caption.length > 100 ? caption.slice(0, 100) + '…' : caption}</div>}
-          {hashtags && <div style={{ color: '#93c5fd', fontSize: '0.73rem', marginBottom: 8 }}>{hashtags.length > 60 ? hashtags.slice(0, 60) + '…' : hashtags}</div>}
+          {hashtags && <div style={{ color: '#1a73e8', fontSize: '0.73rem', marginBottom: 8 }}>{hashtags.length > 60 ? hashtags.slice(0, 60) + '…' : hashtags}</div>}
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             <span style={{ color: '#2a3547', fontSize: '0.7rem' }}>Audio original · {handle}</span>
@@ -154,7 +154,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
           {item.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>· {item.scheduled_date}</span>}
         </div>
         <button onClick={onEdit} style={{ background: 'linear-gradient(135deg,#1a73e8,#42a5f5)', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Input Hasil</button>
-        {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Canva ↗</a>}
+        {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Canva ↗</a>}
         {item.gdrive_url && <a href={item.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#38bdf8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Drive ↗</a>}
         <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 12px', color: '#5a6a85', fontSize: '0.78rem', cursor: 'pointer' }}>✕</button>
       </div>
@@ -204,7 +204,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
           <div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 4 }}>{item.judul}</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {product && <span style={{ fontSize: '0.72rem', background: 'rgba(26,115,232,0.15)', color: '#42a5f5', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>{product.nama}</span>}
+              {product && <span style={{ fontSize: '0.72rem', background: 'rgba(26,115,232,0.15)', color: '#1a73e8', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>{product.nama}</span>}
               {item.format && <span style={{ fontSize: '0.72rem', background: '#f8fafc', color: '#5a6a85', padding: '2px 8px', borderRadius: 4 }}>{item.format}</span>}
               {(item.platform || []).map(p => <span key={p} style={{ fontSize: '0.72rem', background: '#f8fafc', color: '#5a6a85', padding: '2px 8px', borderRadius: 4 }}>{p}</span>)}
               {item.scheduled_date && <span style={{ fontSize: '0.72rem', background: 'rgba(251,146,60,0.1)', color: '#fb923c', padding: '2px 8px', borderRadius: 4 }}>{item.scheduled_date}</span>}
@@ -219,10 +219,10 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
             {item.body && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Body</div><div style={{ fontSize: '0.85rem', color: '#2a3547', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8, whiteSpace: 'pre-wrap' }}>{item.body}</div></div>}
             {item.cta && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>CTA</div><div style={{ fontSize: '0.85rem', color: '#2a3547', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8 }}>{item.cta}</div></div>}
             {item.script && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Script Lengkap</div><div style={{ fontSize: '0.82rem', color: '#5a6a85', lineHeight: 1.7, background: '#fff', padding: '10px 12px', borderRadius: 8, whiteSpace: 'pre-wrap', maxHeight: 200, overflowY: 'auto' }}>{item.script}</div></div>}
-            {(item.hashtags || []).length > 0 && <div><div style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Hashtag</div><div style={{ fontSize: '0.78rem', color: '#3b82f6', lineHeight: 1.6 }}>{item.hashtags.join(' ')}</div></div>}
+            {(item.hashtags || []).length > 0 && <div><div style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Hashtag</div><div style={{ fontSize: '0.78rem', color: '#1a73e8', lineHeight: 1.6 }}>{item.hashtags.join(' ')}</div></div>}
           </div>
           <div style={{ padding: '20px 24px' }}>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Input Hasil Produksi</div>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Input Hasil Produksi</div>
             {getThumbnail(item) && <div style={{ marginBottom: 16, borderRadius: 8, overflow: 'hidden', aspectRatio: '16/9', background: '#fff' }}><img src={getThumbnail(item)!} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Canva Link</label><input value={canvaUrl} onChange={e => setCanvaUrl(e.target.value)} placeholder="https://www.canva.com/design/..." style={{ width: '100%', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Google Drive Link</label><input value={gdriveUrl} onChange={e => setGdriveUrl(e.target.value)} placeholder="https://drive.google.com/file/d/..." style={{ width: '100%', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
@@ -243,7 +243,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
   const thumb = getThumbnail(item)
   const product = products.find(p => p.id === item.product_id)
   const stage = STATUS_STAGE[item.status]
-  const stageColor: Record<Tab, string> = { antrian: '#f59e0b', dikerjakan: '#3b82f6', selesai: '#22c55e' }
+  const stageColor: Record<Tab, string> = { antrian: '#d97706', dikerjakan: '#1a73e8', selesai: '#059669' }
   const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
 
   return (
@@ -256,7 +256,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
       <div style={{ padding: '12px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#2a3547', lineHeight: 1.3 }}>{item.judul || '(Tanpa judul)'}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {product && <span style={{ fontSize: '0.68rem', color: '#42a5f5', background: 'rgba(26,115,232,0.12)', padding: '2px 6px', borderRadius: 3 }}>{product.nama}</span>}
+          {product && <span style={{ fontSize: '0.68rem', color: '#1a73e8', background: 'rgba(26,115,232,0.12)', padding: '2px 6px', borderRadius: 3 }}>{product.nama}</span>}
           {item.format && <span style={{ fontSize: '0.68rem', color: '#5a6a85', background: '#f8fafc', padding: '2px 6px', borderRadius: 3 }}>{item.format}</span>}
           {(item.platform || []).slice(0, 2).map(p => <span key={p} style={{ fontSize: '0.68rem', color: '#5a6a85', background: '#f8fafc', padding: '2px 6px', borderRadius: 3 }}>{p}</span>)}
         </div>
@@ -333,9 +333,9 @@ export default function StudioModule({ initialContents, products, initialNotific
   }
 
   const TAB_CONFIG = [
-    { key: 'antrian' as Tab, label: 'Antrian', color: '#f59e0b' },
-    { key: 'dikerjakan' as Tab, label: 'Sedang Dikerjakan', color: '#3b82f6' },
-    { key: 'selesai' as Tab, label: 'Selesai', color: '#22c55e' },
+    { key: 'antrian' as Tab, label: 'Antrian', color: '#d97706' },
+    { key: 'dikerjakan' as Tab, label: 'Sedang Dikerjakan', color: '#1a73e8' },
+    { key: 'selesai' as Tab, label: 'Selesai', color: '#059669' },
   ]
 
   const antriCount = contents.filter(c => STATUS_STAGE[c.status] === 'antrian').length
@@ -366,8 +366,8 @@ export default function StudioModule({ initialContents, products, initialNotific
           {TAB_CONFIG.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{ background: 'transparent', border: 'none', padding: '10px 16px', cursor: 'pointer', color: tab === t.key ? t.color : '#5a6a85', fontWeight: tab === t.key ? 700 : 400, fontSize: '0.875rem', borderBottom: tab === t.key ? `2px solid ${t.color}` : '2px solid transparent', marginBottom: -1, transition: 'all 0.15s' }}>
               {t.label}
-              {t.key === 'antrian' && antriCount > 0 && <span style={{ marginLeft: 6, background: '#f59e0b', color: '#000', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{antriCount}</span>}
-              {t.key === 'dikerjakan' && dikerjakanCount > 0 && <span style={{ marginLeft: 6, background: '#3b82f6', color: '#fff', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{dikerjakanCount}</span>}
+              {t.key === 'antrian' && antriCount > 0 && <span style={{ marginLeft: 6, background: '#d97706', color: '#000', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{antriCount}</span>}
+              {t.key === 'dikerjakan' && dikerjakanCount > 0 && <span style={{ marginLeft: 6, background: '#1a73e8', color: '#fff', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{dikerjakanCount}</span>}
             </button>
           ))}
         </div>
@@ -379,7 +379,7 @@ export default function StudioModule({ initialContents, products, initialNotific
             { mode: 'feed' as ViewMode, label: 'Feed' },
           ]).map(v => (
             <button key={v.mode} onClick={() => setViewMode(v.mode)}
-              style={{ padding: '5px 12px', borderRadius: 8, fontSize: '0.78rem', border: viewMode === v.mode ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: viewMode === v.mode ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: viewMode === v.mode ? '#42a5f5' : '#64748b', cursor: 'pointer', fontWeight: 600 }}>
+              style={{ padding: '5px 12px', borderRadius: 8, fontSize: '0.78rem', border: viewMode === v.mode ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: viewMode === v.mode ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: viewMode === v.mode ? '#1a73e8' : '#64748b', cursor: 'pointer', fontWeight: 600 }}>
               {v.label}
             </button>
           ))}
@@ -473,7 +473,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                 })}
                 {Array.from({ length: Math.max(0, 9 - igFiltered.length) }).map((_, i) => (
                   <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#fff', border: '1px dashed #e5eaf2' }}>
-                    {i === 0 && igFiltered.length === 0 && <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '0.6rem', color: '#e5eaf2', textAlign: 'center', padding: 4 }}>{igTab === 'reels' ? 'Belum ada Reels' : 'Belum ada konten'}</span></div>}
+                    {i === 0 && igFiltered.length === 0 && <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '0.7rem', color: '#e5eaf2', textAlign: 'center', padding: 4 }}>{igTab === 'reels' ? 'Belum ada Reels' : 'Belum ada konten'}</span></div>}
                   </div>
                 ))}
               </div>
@@ -498,7 +498,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, gap: 6, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.2s' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#2a3547', textAlign: 'center', lineHeight: 1.3 }}>{(c.judul || '(Tanpa judul)').slice(0, 40)}</div>
                     <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#5a6a85', background: STATUS_BG[c.status] || '#f1f5f9', fontWeight: 600 }}>{c.status}</span>
-                    {c.canva_url && <a href={c.canva_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.62rem', color: '#42a5f5', textDecoration: 'underline' }}>Canva ↗</a>}
+                    {c.canva_url && <a href={c.canva_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.62rem', color: '#1a73e8', textDecoration: 'underline' }}>Canva ↗</a>}
                   </div>
                   {hoveredId !== c.id && <div style={{ position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#5a6a85', boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />}
                 </div>

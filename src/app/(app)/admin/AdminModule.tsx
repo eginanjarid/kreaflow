@@ -42,7 +42,7 @@ type Stats = {
 }
 
 const PLANS = ['free', 'solo', 'pro', 'team']
-const PLAN_COLORS: Record<string, string> = { free: '#5a6a85', solo: '#1a73e8', pro: '#42a5f5', team: '#34d399' }
+const PLAN_COLORS: Record<string, string> = { free: '#5a6a85', solo: '#1a73e8', pro: '#1a73e8', team: '#059669' }
 
 function PlanBadge({ plan }: { plan: string }) {
   const color = PLAN_COLORS[plan] || '#5a6a85'
@@ -116,11 +116,11 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>
         {[
-          { label: 'Total User', value: stats.total, color: '#42a5f5' },
-          { label: 'Hari Ini', value: stats.today, color: '#86efac' },
-          { label: '7 Hari', value: stats.week, color: '#86efac' },
-          { label: '30 Hari', value: stats.month, color: '#93c5fd' },
-          { label: 'Workspace', value: stats.totalWorkspaces, color: '#fbbf24' },
+          { label: 'Total User', value: stats.total, color: '#1a73e8' },
+          { label: 'Hari Ini', value: stats.today, color: '#059669' },
+          { label: '7 Hari', value: stats.week, color: '#059669' },
+          { label: '30 Hari', value: stats.month, color: '#1a73e8' },
+          { label: 'Workspace', value: stats.totalWorkspaces, color: '#d97706' },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 14px' }}>
             <div style={{ fontSize: '0.65rem', color: '#5a6a85', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{s.label}</div>
@@ -144,7 +144,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
       <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid #e5eaf2' }}>
         {([['users', 'Users'], ['workspaces', 'Workspaces']] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
-            style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === id ? '2px solid #f87171' : '2px solid transparent', color: tab === id ? '#f87171' : '#64748b', fontSize: '0.875rem', fontWeight: tab === id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+            style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === id ? '2px solid #f87171' : '2px solid transparent', color: tab === id ? '#dc2626' : '#64748b', fontSize: '0.875rem', fontWeight: tab === id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
             {label} <span style={{ fontSize: '0.72rem', color: '#5a6a85', marginLeft: 4 }}>{id === 'users' ? users.length : workspaces.length}</span>
           </button>
         ))}
@@ -159,7 +159,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
           <div style={{ display: 'flex', gap: 6 }}>
             {['', ...PLANS].map(p => (
               <button key={p} onClick={() => setFilterPlan(p)}
-                style={{ padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#f87171'}` : '1px solid #2a2a2a', background: filterPlan === p ? (PLAN_COLORS[p] || '#f87171') + '20' : '#f1f5f9', color: filterPlan === p ? (PLAN_COLORS[p] || '#f87171') : '#64748b', cursor: 'pointer', textTransform: 'uppercase' }}>
+                style={{ padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#dc2626'}` : '1px solid #2a2a2a', background: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') + '20' : '#f1f5f9', color: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') : '#64748b', cursor: 'pointer', textTransform: 'uppercase' }}>
                 {p || 'All'}
               </button>
             ))}
@@ -186,7 +186,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
               <div style={{ paddingLeft: 12 }}><PlanBadge plan={u.plan} /></div>
               <div style={{ fontSize: '0.7rem', color: '#5a6a85', paddingLeft: 12, whiteSpace: 'nowrap' }}>{fmtDate(u.created_at)}</div>
               <div style={{ display: 'flex', gap: 6, paddingLeft: 12 }}>
-                <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#42a5f5', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
+                <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
                 <button onClick={() => openUserAction(u, 'password')} style={{ background: 'rgba(71,85,105,0.15)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#5a6a85', fontSize: '0.68rem', cursor: 'pointer' }}>PW</button>
               </div>
             </div>
@@ -207,13 +207,13 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
                     <span style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.9rem' }}>{ws.name}</span>
                     <PlanBadge plan={ws.plan} />
                     {ws.modes.map(m => (
-                      <span key={m} style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 8, background: m === 'affiliate' ? 'rgba(52,211,153,0.1)' : 'rgba(66,165,245,0.1)', color: m === 'affiliate' ? '#34d399' : '#42a5f5', fontWeight: 600 }}>{m}</span>
+                      <span key={m} style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 8, background: m === 'affiliate' ? 'rgba(52,211,153,0.1)' : 'rgba(66,165,245,0.1)', color: m === 'affiliate' ? '#059669' : '#1a73e8', fontWeight: 600 }}>{m}</span>
                     ))}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#5a6a85' }}>Owner: {ws.owner_email} · {ws.member_count} member{ws.pending_invites > 0 ? ` · ${ws.pending_invites} pending invite` : ''} · Dibuat {fmtDate(ws.created_at)}</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => openWsPlan(ws)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 7, padding: '5px 10px', color: '#42a5f5', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>Ubah Plan</button>
+                  <button onClick={() => openWsPlan(ws)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>Ubah Plan</button>
                   <button onClick={() => setExpandedWs(expandedWs === ws.id ? null : ws.id)} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 10px', color: '#5a6a85', fontSize: '0.72rem', cursor: 'pointer' }}>
                     {expandedWs === ws.id ? 'Tutup' : 'Lihat Tim'}
                   </button>
@@ -231,7 +231,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
                         <div style={{ fontSize: '0.8rem', color: '#2a3547', fontWeight: 500 }}>{m.nama || m.email}</div>
                         {m.nama && <div style={{ fontSize: '0.68rem', color: '#5a6a85' }}>{m.email}</div>}
                       </div>
-                      <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 8, background: m.role === 'owner' ? 'rgba(26,115,232,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#42a5f5' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
+                      <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 8, background: m.role === 'owner' ? 'rgba(26,115,232,0.15)' : 'rgba(71,85,105,0.2)', color: m.role === 'owner' ? '#1a73e8' : '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>{m.role}</span>
                       <span style={{ fontSize: '0.65rem', color: '#5a6a85' }}>Bergabung {fmtDate(m.joined_at)}</span>
                     </div>
                   ))}
@@ -271,7 +271,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
               </div>
             )}
 
-            {msg && <div style={{ marginBottom: 12, fontSize: '0.82rem', color: msg.startsWith('Error') ? '#f87171' : '#86efac' }}>{msg}</div>}
+            {msg && <div style={{ marginBottom: 12, fontSize: '0.82rem', color: msg.startsWith('Error') ? '#dc2626' : '#059669' }}>{msg}</div>}
 
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={closeAction} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 9, padding: '9px 18px', color: '#5a6a85', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>

@@ -57,8 +57,8 @@ function selectStyle() {
 
 const TIPE_COLORS: Record<string, { color: string; bg: string; icon: string }> = {
   Fisik: { color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', icon: 'box' },
-  Digital: { color: '#a78bfa', bg: 'rgba(66,165,245,0.1)', icon: 'digital' },
-  Affiliate: { color: '#34d399', bg: 'rgba(52,211,153,0.1)', icon: 'link' },
+  Digital: { color: '#7c3aed', bg: 'rgba(66,165,245,0.1)', icon: 'digital' },
+  Affiliate: { color: '#059669', bg: 'rgba(52,211,153,0.1)', icon: 'link' },
 }
 
 export default function CatalogModule({ initialProducts, workspaceId, modes }: {
@@ -156,9 +156,9 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isAffiliate ? 4 : 3}, 1fr)`, gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Total Produk', value: products.length, color: '#2a3547' },
-          { label: 'Aktif', value: products.filter(p => p.is_active).length, color: '#86efac' },
-          { label: 'Affiliate', value: products.filter(p => p.tipe_produk === 'Affiliate').length, color: '#34d399', hide: !isAffiliate },
-          { label: 'Potensi Komisi/item', value: totalKomisiPotensi > 0 ? formatRp(totalKomisiPotensi) : '-', color: '#42a5f5', hide: !isAffiliate },
+          { label: 'Aktif', value: products.filter(p => p.is_active).length, color: '#059669' },
+          { label: 'Affiliate', value: products.filter(p => p.tipe_produk === 'Affiliate').length, color: '#059669', hide: !isAffiliate },
+          { label: 'Potensi Komisi/item', value: totalKomisiPotensi > 0 ? formatRp(totalKomisiPotensi) : '-', color: '#1a73e8', hide: !isAffiliate },
         ].filter(s => !s.hide).map(s => (
           <div key={s.label} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '16px 20px' }}>
             <div style={{ fontSize: s.value.toString().startsWith('Rp') ? '1.1rem' : '1.5rem', fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -174,7 +174,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
           <div style={{ display: 'flex', gap: 6 }}>
             {['', ...tipes].map(t => (
               <button key={t} onClick={() => setFilterTipe(t)}
-                style={{ padding: '8px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterTipe === t ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterTipe === t ? '#42a5f5' : '#64748b', cursor: 'pointer' }}>
+                style={{ padding: '8px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #2a2a2a', background: filterTipe === t ? 'rgba(26,115,232,0.15)' : '#f1f5f9', color: filterTipe === t ? '#1a73e8' : '#64748b', cursor: 'pointer' }}>
                 {t || 'Semua'} {t && `(${products.filter(p => p.tipe_produk === t).length})`}
               </button>
             ))}
@@ -202,7 +202,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                   </div>}
                   <div style={{ position: 'absolute', top: 8, left: 8, fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: tipe.color, background: tipe.bg, fontWeight: 600 }}>{p.tipe_produk}</div>
                   <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                    <button onClick={() => toggleActive(p)} style={{ background: p.is_active ? 'rgba(22,101,52,0.9)' : 'rgba(50,0,0,0.9)', border: 'none', borderRadius: 20, padding: '3px 10px', color: p.is_active ? '#86efac' : '#f87171', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}>
+                    <button onClick={() => toggleActive(p)} style={{ background: p.is_active ? 'rgba(22,101,52,0.9)' : 'rgba(50,0,0,0.9)', border: 'none', borderRadius: 20, padding: '3px 10px', color: p.is_active ? '#059669' : '#dc2626', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}>
                       {p.is_active ? 'Aktif' : 'Nonaktif'}
                     </button>
                   </div>
@@ -215,21 +215,21 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                   <div style={{ display: 'flex', gap: 5, marginBottom: 8, flexWrap: 'wrap' }}>
                     {(p.platform || p.platform_affiliate) && <span style={{ fontSize: '0.7rem', color: '#5a6a85', background: '#f8fafc', border: '1px solid #e5eaf2', padding: '1px 7px', borderRadius: 4 }}>{p.platform_affiliate || p.platform}</span>}
                     {p.kategori && <span style={{ fontSize: '0.7rem', color: '#5a6a85', background: '#f8fafc', border: '1px solid #e5eaf2', padding: '1px 7px', borderRadius: 4 }}>{p.kategori}</span>}
-                    {p.tipe_digital && <span style={{ fontSize: '0.7rem', color: '#a78bfa', background: 'rgba(66,165,245,0.08)', border: '1px solid rgba(66,165,245,0.2)', padding: '1px 7px', borderRadius: 4 }}>{p.tipe_digital}</span>}
+                    {p.tipe_digital && <span style={{ fontSize: '0.7rem', color: '#7c3aed', background: 'rgba(66,165,245,0.08)', border: '1px solid rgba(66,165,245,0.2)', padding: '1px 7px', borderRadius: 4 }}>{p.tipe_digital}</span>}
                   </div>
                   <div style={{ marginBottom: 10 }}>
                     {Number(p.harga_normal) > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         {Number(p.harga_diskon) > 0 ? <>
-                          <span style={{ fontWeight: 700, color: '#42a5f5', fontSize: '0.9rem' }}>{formatRp(p.harga_diskon)}</span>
+                          <span style={{ fontWeight: 700, color: '#1a73e8', fontSize: '0.9rem' }}>{formatRp(p.harga_diskon)}</span>
                           <span style={{ color: '#5a6a85', fontSize: '0.75rem', textDecoration: 'line-through' }}>{formatRp(p.harga_normal)}</span>
-                        </> : <span style={{ fontWeight: 700, color: '#42a5f5', fontSize: '0.9rem' }}>{formatRp(p.harga_normal)}</span>}
+                        </> : <span style={{ fontWeight: 700, color: '#1a73e8', fontSize: '0.9rem' }}>{formatRp(p.harga_normal)}</span>}
                       </div>
                     )}
-                    {komisi && <div style={{ fontSize: '0.75rem', color: '#34d399', marginTop: 2 }}>Komisi: {formatRp(komisi)} {p.komisi_tipe === 'persen' ? `(${p.komisi_nilai}%)` : '(flat)'}</div>}
+                    {komisi && <div style={{ fontSize: '0.75rem', color: '#059669', marginTop: 2 }}>Komisi: {formatRp(komisi)} {p.komisi_tipe === 'persen' ? `(${p.komisi_nilai}%)` : '(flat)'}</div>}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <button onClick={() => openEdit(p)} style={{ flex: 1, background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px', color: '#42a5f5', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>Edit</button>
+                    <button onClick={() => openEdit(p)} style={{ flex: 1, background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>Edit</button>
                     {(p.link_affiliate || p.link) && (
                       <a href={p.link_affiliate || p.link} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px', color: '#5a6a85', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' }}>
                         {p.link_affiliate ? 'Afiliasi' : 'Lihat'}
@@ -255,7 +255,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
             <form onSubmit={handleSave} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#f87171', fontSize: '0.85rem' }}>{error}</div>}
+              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
 
               {/* Tipe Produk */}
               <div>
@@ -371,7 +371,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                 {/* Links */}
                 {isAffiliateProduct ? (
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#34d399', marginBottom: 6, fontWeight: 500 }}>Link Affiliate Kamu</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#059669', marginBottom: 6, fontWeight: 500 }}>Link Affiliate Kamu</label>
                     <input style={fieldStyle({ border: '1px solid rgba(52,211,153,0.3)' })} value={modal.product.link_affiliate} onChange={e => setField('link_affiliate', e.target.value)} placeholder="https://s.shopee.co.id/affiliate-link-kamu" />
                   </div>
                 ) : (
@@ -387,7 +387,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#5a6a85', marginBottom: 6, fontWeight: 500 }}>
                     Deskripsi Produk
-                    <span style={{ marginLeft: 6, fontSize: '0.7rem', color: '#6366f1', fontWeight: 400 }}>Tips: Isi lengkap — dipakai auto-fill di Naskah Generator</span>
+                    <span style={{ marginLeft: 6, fontSize: '0.7rem', color: '#4f46e5', fontWeight: 400 }}>Tips: Isi lengkap — dipakai auto-fill di Naskah Generator</span>
                   </label>
                   <textarea style={fieldStyle({ height: 110, resize: 'vertical' })} value={modal.product.deskripsi ?? ''} onChange={e => setField('deskripsi', e.target.value)} placeholder="Paste deskripsi produk lengkap di sini: spesifikasi, manfaat, keunggulan, harga, platform beli... Semakin lengkap semakin akurat analisis USP-nya." />
                 </div>
