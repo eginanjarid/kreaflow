@@ -773,7 +773,10 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
           {/* ── AFFILIATE FLOW ── */}
           {naskahMode === 'affiliate' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 760 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+
+              {/* LEFT — Config */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* STEP 01 — Data Produk */}
               <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
@@ -1011,6 +1014,11 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 </div>
               </div>
 
+              </div>{/* END LEFT column */}
+
+              {/* RIGHT — Output */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
               {/* Output hasil naskah */}
               <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1027,7 +1035,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 </div>
                 <textarea
                   ref={affNaskahRef}
-                  style={fieldStyle({ minHeight: 360, resize: 'none', fontSize: '0.82rem', lineHeight: '1.7', fontFamily: 'inherit' })}
+                  style={fieldStyle({ minHeight: 480, resize: 'none', fontSize: '0.82rem', lineHeight: '1.7', fontFamily: 'inherit' })}
                   value={affNaskah}
                   onChange={e => setAffNaskah(e.target.value)}
                   placeholder={'Klik "COMPILE SCRIPTS" → pilih AI favorit → paste hasilnya di sini.\n\nAI akan memberikan:\n• Hook options (visual + verbal)\n• Naskah lengkap dengan timestamp\n• Variasi CTA\n• Caption siap posting\n• Hashtag\n• Rekomendasi varian terkuat'}
@@ -1105,6 +1113,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   </div>
                 )
               })()}
+
+              </div>{/* END RIGHT column */}
             </div>
           )}
         </div>
