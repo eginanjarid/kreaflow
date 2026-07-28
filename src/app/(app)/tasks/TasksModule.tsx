@@ -1,5 +1,7 @@
 'use client'
 
+import { STEP_ICON_MAP, IZap, ICheckCircle, IBarChart, IList, IClipboard, IRefresh } from '@/components/ui/Icons'
+
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -46,36 +48,36 @@ const SPRINT_TEMPLATES: Record<string, { label: string; color: string; steps: Sp
     label: 'Konten Affiliate',
     color: '#34d399',
     steps: [
-      { id: 'riset', nama: 'Riset Produk & Analisis USP', enabled: false, is_optional: true, days_offset: 0, due_date: '', priority: 'Medium', icon: '🔍' },
-      { id: 'naskah', nama: 'Buat Naskah / Script', enabled: true, is_optional: false, days_offset: 0, due_date: '', priority: 'High', icon: '📝' },
-      { id: 'take_video', nama: 'Take Video', enabled: true, is_optional: false, days_offset: 1, due_date: '', priority: 'High', icon: '🎬' },
-      { id: 'broll_vo', nama: 'Take B-roll / Voice Over', enabled: false, is_optional: true, days_offset: 2, due_date: '', priority: 'Medium', icon: '🎥' },
-      { id: 'editing', nama: 'Editing', enabled: true, is_optional: false, days_offset: 3, due_date: '', priority: 'High', icon: '✂️' },
-      { id: 'schedule', nama: 'Schedule Post', enabled: true, is_optional: false, days_offset: 4, due_date: '', priority: 'Medium', icon: '📅' },
+      { id: 'riset', nama: 'Riset Produk & Analisis USP', enabled: false, is_optional: true, days_offset: 0, due_date: '', priority: 'Medium', icon: 'riset' },
+      { id: 'naskah', nama: 'Buat Naskah / Script', enabled: true, is_optional: false, days_offset: 0, due_date: '', priority: 'High', icon: 'naskah' },
+      { id: 'take_video', nama: 'Take Video', enabled: true, is_optional: false, days_offset: 1, due_date: '', priority: 'High', icon: 'take_video' },
+      { id: 'broll_vo', nama: 'Take B-roll / Voice Over', enabled: false, is_optional: true, days_offset: 2, due_date: '', priority: 'Medium', icon: 'broll' },
+      { id: 'editing', nama: 'Editing', enabled: true, is_optional: false, days_offset: 3, due_date: '', priority: 'High', icon: 'editing' },
+      { id: 'schedule', nama: 'Schedule Post', enabled: true, is_optional: false, days_offset: 4, due_date: '', priority: 'Medium', icon: 'schedule' },
     ],
   },
   creator: {
     label: 'Konten Creator',
     color: '#42a5f5',
     steps: [
-      { id: 'riset', nama: 'Riset Topik & Hook Angle', enabled: false, is_optional: true, days_offset: 0, due_date: '', priority: 'High', icon: '🔍' },
-      { id: 'naskah', nama: 'Buat Naskah / Script', enabled: true, is_optional: false, days_offset: 0, due_date: '', priority: 'High', icon: '📝' },
-      { id: 'shooting', nama: 'Shooting / Take Video', enabled: true, is_optional: false, days_offset: 1, due_date: '', priority: 'High', icon: '🎬' },
-      { id: 'broll', nama: 'Take B-roll', enabled: false, is_optional: true, days_offset: 2, due_date: '', priority: 'Medium', icon: '🎥' },
-      { id: 'editing', nama: 'Editing', enabled: true, is_optional: false, days_offset: 3, due_date: '', priority: 'High', icon: '✂️' },
-      { id: 'caption', nama: 'Review & Buat Caption', enabled: true, is_optional: false, days_offset: 4, due_date: '', priority: 'Medium', icon: '✍️' },
-      { id: 'schedule', nama: 'Schedule Post', enabled: true, is_optional: false, days_offset: 4, due_date: '', priority: 'Medium', icon: '📅' },
+      { id: 'riset', nama: 'Riset Topik & Hook Angle', enabled: false, is_optional: true, days_offset: 0, due_date: '', priority: 'High', icon: 'riset' },
+      { id: 'naskah', nama: 'Buat Naskah / Script', enabled: true, is_optional: false, days_offset: 0, due_date: '', priority: 'High', icon: 'naskah' },
+      { id: 'shooting', nama: 'Shooting / Take Video', enabled: true, is_optional: false, days_offset: 1, due_date: '', priority: 'High', icon: 'take_video' },
+      { id: 'broll', nama: 'Take B-roll', enabled: false, is_optional: true, days_offset: 2, due_date: '', priority: 'Medium', icon: 'broll' },
+      { id: 'editing', nama: 'Editing', enabled: true, is_optional: false, days_offset: 3, due_date: '', priority: 'High', icon: 'editing' },
+      { id: 'caption', nama: 'Review & Buat Caption', enabled: true, is_optional: false, days_offset: 4, due_date: '', priority: 'Medium', icon: 'caption' },
+      { id: 'schedule', nama: 'Schedule Post', enabled: true, is_optional: false, days_offset: 4, due_date: '', priority: 'Medium', icon: 'schedule' },
     ],
   },
   live: {
     label: 'Live Streaming',
     color: '#f87171',
     steps: [
-      { id: 'topik', nama: 'Tentukan Topik & Rundown Live', enabled: true, is_optional: false, days_offset: 0, due_date: '', priority: 'High', icon: '📋' },
-      { id: 'persiapan', nama: 'Persiapan Set & Produk', enabled: true, is_optional: false, days_offset: 1, due_date: '', priority: 'High', icon: '🎙️' },
-      { id: 'promo', nama: 'Buat Konten Promo (Story/Feed)', enabled: false, is_optional: true, days_offset: 1, due_date: '', priority: 'Medium', icon: '📣' },
-      { id: 'live', nama: 'Live Streaming', enabled: true, is_optional: false, days_offset: 2, due_date: '', priority: 'High', icon: '🔴' },
-      { id: 'clip', nama: 'Clip Highlight untuk Repost', enabled: false, is_optional: true, days_offset: 3, due_date: '', priority: 'Low', icon: '🎞️' },
+      { id: 'topik', nama: 'Tentukan Topik & Rundown Live', enabled: true, is_optional: false, days_offset: 0, due_date: '', priority: 'High', icon: 'topik' },
+      { id: 'persiapan', nama: 'Persiapan Set & Produk', enabled: true, is_optional: false, days_offset: 1, due_date: '', priority: 'High', icon: 'persiapan' },
+      { id: 'promo', nama: 'Buat Konten Promo (Story/Feed)', enabled: false, is_optional: true, days_offset: 1, due_date: '', priority: 'Medium', icon: 'promo' },
+      { id: 'live', nama: 'Live Streaming', enabled: true, is_optional: false, days_offset: 2, due_date: '', priority: 'High', icon: 'live' },
+      { id: 'clip', nama: 'Clip Highlight untuk Repost', enabled: false, is_optional: true, days_offset: 3, due_date: '', priority: 'Low', icon: 'clip' },
     ],
   },
 }
@@ -164,7 +166,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       // Start with one blank step
       const now = new Date()
       const today = sprintStart || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-      setSprintSteps([{ id: `custom_${Date.now()}`, nama: '', enabled: true, is_optional: false, days_offset: 0, due_date: today, priority: 'High', icon: '⚙️' }])
+      setSprintSteps([{ id: `custom_${Date.now()}`, nama: '', enabled: true, is_optional: false, days_offset: 0, due_date: today, priority: 'High', icon: 'custom' }])
     } else {
       setSprintSteps(stepsWithDates(t, sprintStart || new Date().toISOString().split('T')[0]))
     }
@@ -198,7 +200,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       days_offset: maxOffset,
       due_date: sprintStart ? addDays(sprintStart, maxOffset) : '',
       priority: 'Medium',
-      icon: '⚙️',
+      icon: 'custom',
     }
     setSprintSteps(prev => [...prev, newStep])
   }
@@ -229,7 +231,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
     const newTasks: Task[] = enabledSteps.map(step => ({
       workspace_id: workspaceId,
-      nama: `${step.icon} ${step.nama}${contentLabel ? ' — ' + contentLabel : ''}`,
+      nama: `${step.nama}${contentLabel ? ' — ' + contentLabel : ''}`,
       platform: sprintPlatform,
       priority: step.priority,
       start_date: sprintStart,
@@ -248,7 +250,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
     // Auto-create calendar entries for "schedule" steps
     const scheduleSteps = enabledSteps
       .map((step, i) => ({ step, taskId: data[i].id }))
-      .filter(({ step }) => step.id === 'schedule' || step.id.startsWith('schedule') || step.icon === '📅')
+      .filter(({ step }) => step.id === 'schedule' || step.id.startsWith('schedule') || step.icon === 'schedule')
     if (scheduleSteps.length > 0) {
       const tanggalTayang = sprintTanggalTayang || null
       const calEntries = scheduleSteps.map(({ step, taskId }) => ({
@@ -399,7 +401,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
             </button>
           </div>
           <button onClick={openSprint} style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 10, padding: '10px 18px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-            ⚡ Buat Sprint
+            Buat Sprint
           </button>
           <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
             + Task Manual
@@ -409,7 +411,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
       {/* Sprint Board banner — always visible */}
       <div style={{ background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 20, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ fontSize: '1.4rem', flexShrink: 0 }}>⚡</div>
+        
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 700, color: '#42a5f5', marginBottom: 2, fontSize: '0.875rem' }}>Mau plan banyak konten dalam 1 minggu?</div>
           <div style={{ fontSize: '0.78rem', color: '#5a6a85' }}>Gunakan <strong style={{ color: '#42a5f5' }}>Sprint Board</strong> — 1 sprint = 1 minggu = banyak konten sekaligus dalam kanban. Task di sini untuk 1 konten = 1 checklist.</div>
@@ -422,7 +424,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* Sprint template info card (only show when no tasks) */}
       {tasks.length === 0 && (
         <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)', borderRadius: 20, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-          <div style={{ fontSize: '1.6rem', flexShrink: 0, marginTop: 2 }}>⚡</div>
+          
           <div>
             <div style={{ fontWeight: 700, color: '#34d399', marginBottom: 4 }}>Sprint — Auto-generate checklist task sekaligus</div>
             <div style={{ fontSize: '0.82rem', color: '#5a6a85', lineHeight: 1.7 }}>
@@ -491,9 +493,9 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       {/* ── KANBAN BOARD VIEW ── */}
       {view === 'kanban' && tasks.length > 0 && (() => {
         const COLS = [
-          { id: 'todo', label: 'Todo', icon: '📋', color: '#5a6a85' },
+          { id: 'todo', label: 'Todo', icon: 'topik', color: '#5a6a85' },
           { id: 'in_progress', label: 'Dikerjakan', icon: '🔄', color: '#fbbf24' },
-          { id: 'done', label: 'Selesai', icon: '✅', color: '#86efac' },
+          { id: 'done', label: 'Selesai', icon: 'check', color: '#86efac' },
         ]
         const colTasks = (colId: string) => filtered.filter(t => getTaskCol(t.percent_complete) === colId)
 
@@ -524,7 +526,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                   {/* Column header */}
                   <div style={{ padding: '13px 16px', borderBottom: `1px solid ${isOver ? col.color + '30' : '#e5eaf2'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'border-color 0.12s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: '1rem' }}>{col.icon}</span>
+                      <span style={{ display: 'flex', alignItems: 'center' }}>{STEP_ICON_MAP[col.icon] || null}</span>
                       <span style={{ fontWeight: 700, color: col.color, fontSize: '0.875rem' }}>{col.label}</span>
                     </div>
                     <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isOver ? col.color : '#5a6a85', background: isOver ? `${col.color}18` : '#f1f5f9', border: `1px solid ${isOver ? col.color + '50' : '#e5eaf2'}`, borderRadius: 10, padding: '2px 8px', transition: 'all 0.12s' }}>{colItems.length}</span>
@@ -606,9 +608,9 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
         if (entries.length === 0 && soloTasks.length === 0) {
           return (
             <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-              <div style={{ fontSize: '2rem', marginBottom: 10 }}>📊</div>
+              <div style={{ marginBottom: 10, color: '#c8d1e0' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada sprint</div>
-              <div style={{ fontSize: '0.82rem' }}>Buat sprint lewat tombol ⚡ Buat Sprint untuk mulai monitoring</div>
+              <div style={{ fontSize: '0.82rem' }}>Buat sprint lewat tombol Buat Sprint untuk mulai monitoring</div>
             </div>
           )
         }
@@ -694,12 +696,12 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
       {tasks.length === 0 && filtered.length === 0 && (
         <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>✅</div>
+          <div style={{ marginBottom: 12, color: '#34d399' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
           <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada task</div>
           <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Gunakan Sprint untuk bikin task produksi konten sekaligus</div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <button onClick={openSprint} style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, padding: '10px 18px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-              ⚡ Buat Sprint
+              Buat Sprint
             </button>
             <button onClick={openAdd} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
               + Task Manual
@@ -715,7 +717,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
             {/* Header */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.1rem' }}>⚡ Buat Sprint — 1 Konten</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.1rem' }}>Buat Sprint — 1 Konten</div>
                 <div style={{ fontSize: '0.78rem', color: '#5a6a85', marginTop: 2 }}>Checklist per konten. Untuk banyak konten 1 minggu → <a href="/sprints" style={{ color: '#42a5f5', fontWeight: 600 }}>Sprint Board</a></div>
               </div>
               <button onClick={() => setSprintModal(false)} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
@@ -857,7 +859,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                           <div style={{ position: 'absolute', top: 3, left: step.enabled ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                         </div>
 
-                        <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: 1 }}>{step.icon}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
 
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                           <input
@@ -931,7 +933,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                 <button type="button" onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '11px 20px', color: '#5a6a85', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button type="button" onClick={createSprint} disabled={savingSprint}
                   style={{ background: savingSprint ? '#1a3a2f' : 'linear-gradient(135deg, #059669, #34d399)', border: 'none', borderRadius: 10, padding: '11px 28px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
-                  {savingSprint ? 'Membuat...' : `⚡ Buat ${sprintSteps.filter(s => s.enabled).length} Tasks`}
+                  {savingSprint ? 'Membuat...' : `Buat ${sprintSteps.filter(s => s.enabled).length} Tasks`}
                 </button>
               </div>
             </div>

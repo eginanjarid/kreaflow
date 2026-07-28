@@ -1,5 +1,7 @@
 'use client'
 
+import { ISearch, IPen, IVideo, IFilm, IScissors, ICalendar, STEP_ICON_MAP } from '@/components/ui/Icons'
+
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -62,45 +64,45 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
     label: 'Konten Affiliate',
     color: '#34d399',
     steps: [
-      { id: 'naskah',   nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
-      { id: 'take_vid', nama: 'Take Video',  icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
-      { id: 'editing',  nama: 'Editing',     icon: '✂️', doneAt: 'Siap Tayang', href: '/studio' },
-      { id: 'schedule', nama: 'Schedule',    icon: '📅', doneAt: 'Terjadwal',   href: '/calendar' },
+      { id: 'naskah',   nama: 'Buat Naskah', icon: 'naskah', doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'take_vid', nama: 'Take Video',  icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
+      { id: 'editing',  nama: 'Editing',     icon: 'scissors', doneAt: 'Siap Tayang', href: '/studio' },
+      { id: 'schedule', nama: 'Schedule',    icon: 'calendar', doneAt: 'Terjadwal',   href: '/calendar' },
     ],
   },
   creator: {
     label: 'Konten Creator',
     color: '#42a5f5',
     steps: [
-      { id: 'naskah',   nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
-      { id: 'shooting', nama: 'Shooting',    icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
-      { id: 'editing',  nama: 'Editing',     icon: '✂️', doneAt: 'Siap Tayang', href: '/studio' },
-      { id: 'caption',  nama: 'Caption',     icon: '✍️', doneAt: 'Siap Tayang', href: '/plan' },
-      { id: 'schedule', nama: 'Schedule',    icon: '📅', doneAt: 'Terjadwal',   href: '/calendar' },
+      { id: 'naskah',   nama: 'Buat Naskah', icon: 'naskah', doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'shooting', nama: 'Shooting',    icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
+      { id: 'editing',  nama: 'Editing',     icon: 'scissors', doneAt: 'Siap Tayang', href: '/studio' },
+      { id: 'caption',  nama: 'Caption',     icon: 'pen', doneAt: 'Siap Tayang', href: '/plan' },
+      { id: 'schedule', nama: 'Schedule',    icon: 'calendar', doneAt: 'Terjadwal',   href: '/calendar' },
     ],
   },
   live: {
     label: 'Live Streaming',
     color: '#f87171',
     steps: [
-      { id: 'rundown',   nama: 'Rundown',    icon: '📋', doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'rundown',   nama: 'Rundown',    icon: 'list', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'persiapan', nama: 'Persiapan',  icon: '🎙️', doneAt: 'Produksi',    href: '/studio' },
-      { id: 'live',      nama: 'Live',       icon: '🔴', doneAt: 'Terjadwal',   href: '/studio' },
+      { id: 'live',      nama: 'Live',       icon: 'live', doneAt: 'Terjadwal',   href: '/studio' },
     ],
   },
 }
 
 const MASTER_STEPS: StepDef[] = [
-  { id: 'naskah',    nama: 'Buat Naskah', icon: '📝', doneAt: 'Naskah Siap', href: '/plan' },
-  { id: 'take_vid',  nama: 'Take Video',  icon: '🎬', doneAt: 'Produksi',    href: '/studio' },
+  { id: 'naskah',    nama: 'Buat Naskah', icon: 'naskah', doneAt: 'Naskah Siap', href: '/plan' },
+  { id: 'take_vid',  nama: 'Take Video',  icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
   { id: 'shooting',  nama: 'Shooting',    icon: '📷', doneAt: 'Produksi',    href: '/studio' },
-  { id: 'editing',   nama: 'Editing',     icon: '✂️', doneAt: 'Siap Tayang', href: '/studio' },
-  { id: 'caption',   nama: 'Caption',     icon: '✍️', doneAt: 'Siap Tayang', href: '/plan' },
+  { id: 'editing',   nama: 'Editing',     icon: 'scissors', doneAt: 'Siap Tayang', href: '/studio' },
+  { id: 'caption',   nama: 'Caption',     icon: 'pen', doneAt: 'Siap Tayang', href: '/plan' },
   { id: 'thumbnail', nama: 'Thumbnail',   icon: '🖼️', doneAt: 'Siap Tayang', href: '/studio' },
   { id: 'review',    nama: 'Review',      icon: '👀', doneAt: 'Siap Tayang', href: '/studio' },
-  { id: 'rundown',   nama: 'Rundown',     icon: '📋', doneAt: 'Naskah Siap', href: '/plan' },
-  { id: 'schedule',  nama: 'Schedule',    icon: '📅', doneAt: 'Terjadwal',   href: '/calendar' },
-  { id: 'live',      nama: 'Live',        icon: '🔴', doneAt: 'Terjadwal',   href: '/studio' },
+  { id: 'rundown',   nama: 'Rundown',     icon: 'list', doneAt: 'Naskah Siap', href: '/plan' },
+  { id: 'schedule',  nama: 'Schedule',    icon: 'calendar', doneAt: 'Terjadwal',   href: '/calendar' },
+  { id: 'live',      nama: 'Live',        icon: 'live', doneAt: 'Terjadwal',   href: '/studio' },
 ]
 
 function parseTemplateType(template_type: string): { key: string; stepIds: string[] | null } {

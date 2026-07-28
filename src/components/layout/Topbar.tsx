@@ -1,5 +1,7 @@
 'use client'
 
+import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
+
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -22,10 +24,10 @@ const PAGE_TITLES: Record<string, { title: string; sub: string }> = {
 }
 
 const NOTIF_TYPE: Record<string, { icon: string; color: string; href: string }> = {
-  riset:    { icon: '🔍', color: '#3b82f6', href: '/sprints' },
-  naskah:   { icon: '✍️', color: '#f59e0b', href: '/plan' },
-  produksi: { icon: '🎨', color: '#f97316', href: '/studio' },
-  schedule: { icon: '📅', color: '#8b5cf6', href: '/calendar' },
+  riset:    { icon: 'riset', color: '#3b82f6', href: '/sprints' },
+  naskah:   { icon: 'naskah', color: '#f59e0b', href: '/plan' },
+  produksi: { icon: 'produksi', color: '#f97316', href: '/studio' },
+  schedule: { icon: 'schedule', color: '#8b5cf6', href: '/calendar' },
 }
 
 type NotifItem = {
@@ -257,7 +259,7 @@ export default function Topbar({ user }: Props) {
                       background: n.is_read ? '#fff' : '#f0f7ff',
                       display: 'flex', gap: 10, alignItems: 'flex-start',
                     }}>
-                      <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: 1 }}>{cfg?.icon || '📌'}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginTop: 1 }}>{NOTIF_ICON_MAP[n.type] || <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9fa9ba" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '0.8rem', fontWeight: n.is_read ? 400 : 600, color: n.is_read ? '#5a6a85' : '#2a3547', marginBottom: 2, lineHeight: 1.4 }}>{n.title}</div>
                         {n.message && (

@@ -73,7 +73,7 @@ type AffNaskahForm = {
 }
 
 const TABS_BASE = [
-  { id: 'naskah', label: '✍️ Naskah Generator' },
+  { id: 'naskah', label: 'Naskah Generator' },
   { id: 'platforms', label: 'Platform Strategy' },
   { id: 'campaigns', label: 'Campaign Planner' },
 ]
@@ -101,7 +101,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
   return (
     <div style={{ background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 10, padding: '12px 16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', letterSpacing: '0.05em' }}>⚡ SPRINT AKTIF — {productName}</span>
+        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', letterSpacing: '0.05em' }}>SPRINT AKTIF — {productName}</span>
         <span style={{ fontSize: '0.7rem', color: '#5a6a85' }}>{done}/{total} selesai · {pct}%</span>
       </div>
       <div style={{ height: 3, background: '#e5eaf2', borderRadius: 2, marginBottom: 8 }}>
@@ -631,14 +631,14 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {!brandProfile?.niche && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b' }}>
-              ⚠️ Lengkapi modul <a href="/brand" style={{ color: '#f59e0b', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Lengkapi modul <a href="/brand" style={{ color: '#f59e0b', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
             </div>
           )}
 
           {/* Mode switcher — hanya tampil kalau isAffiliate */}
           {isAffiliate && (
             <div style={{ display: 'flex', gap: 0, background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, overflow: 'hidden', alignSelf: 'flex-start' }}>
-              {[{ id: 'creator', label: '🎬 Creator' }, { id: 'affiliate', label: '🔗 Affiliator' }].map(m => (
+              {[{ id: 'creator', label: 'Creator' }, { id: 'affiliate', label: 'Affiliator' }].map(m => (
                 <button key={m.id} type="button" onClick={() => setNaskahMode(m.id as 'creator' | 'affiliate')}
                   style={{ padding: '9px 22px', border: 'none', background: naskahMode === m.id ? 'linear-gradient(135deg, #1a73e8, #42a5f5)' : 'transparent', color: naskahMode === m.id ? '#fff' : '#64748b', fontSize: '0.85rem', fontWeight: naskahMode === m.id ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                   {m.label}
@@ -738,7 +738,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                 <button type="button" onClick={() => setAiModal({ prompt: buildNaskahPrompt() })}
                   style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 10, padding: '12px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  ✨ Generate Naskah dengan AI
+                  Generate Naskah dengan AI
                 </button>
               </div>
 
@@ -794,10 +794,10 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         setAffForm(f => ({ ...f, product_id: pid, deskripsi_produk: prod?.deskripsi || f.deskripsi_produk, niche_produk: prod?.kategori || f.niche_produk }))
                       }}>
                         <option value="">— Pilih produk dari katalog —</option>
-                        {products.map(p => <option key={p.id} value={p.id}>{p.nama}{p.platform_affiliate ? ` (${p.platform_affiliate})` : ''}{!p.deskripsi ? ' ⚠️' : ''}</option>)}
+                        {products.map(p => <option key={p.id} value={p.id}>{p.nama}{p.platform_affiliate ? ` (${p.platform_affiliate})` : ''}{!p.deskripsi ? ' (*)' : ''}</option>)}
                       </select>
                       {products.some(p => !p.deskripsi) && (
-                        <div style={{ fontSize: '0.72rem', color: '#f59e0b', marginTop: 4 }}>⚠️ Produk bertanda ⚠️ belum ada deskripsi — lengkapi di <a href="/catalog" style={{ color: '#f59e0b', fontWeight: 700 }}>Katalog</a> agar auto-isi berfungsi.</div>
+                        <div style={{ fontSize: '0.72rem', color: '#f59e0b', marginTop: 4 }}>Produk bertanda (*) belum ada deskripsi — lengkapi di <a href="/catalog" style={{ color: '#f59e0b', fontWeight: 700 }}>Katalog</a> agar auto-isi berfungsi.</div>
                       )}
                       {affForm.product_id && (() => {
                         const prod = products.find(p => p.id === affForm.product_id)
@@ -824,7 +824,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {/* Generate USP button */}
                   <button type="button" onClick={() => setAffAiModal({ prompt: buildUSPPrompt(), label: 'Analisis USP Produk' })}
                     style={{ background: 'transparent', border: '1px solid #ec4899', borderRadius: 20, padding: '14px 20px', color: '#ec4899', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.15s' }}>
-                    <span style={{ fontSize: '1rem' }}>⚡</span> GENERATE USP (AI ANALYSIS)
+                    GENERATE USP (AI ANALYSIS)
                   </button>
 
                   {/* USP result paste area */}
@@ -1195,7 +1195,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           </div>
           {campaigns.length === 0 ? (
             <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#5a6a85' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎯</div>
+              <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
               <div style={{ fontWeight: 600, color: '#5a6a85', marginBottom: 6 }}>Belum ada campaign</div>
               <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Rencanakan campaign promo, kolaborasi, atau event khusus</div>
               <button onClick={openAddCampaign} style={{ background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -1338,7 +1338,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           <div style={{ background: '#fff', boxShadow: '0 6px 30px rgba(42,53,71,0.10)', borderRadius: 20, width: '100%', maxWidth: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>✨ Generate Naskah</div>
+                <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '1.15rem', marginBottom: 6 }}>Generate Naskah</div>
                 <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Pilih AI — prompt langsung terisi, paste hasilnya di kolom kanan</div>
               </div>
               <button type="button" onClick={() => { setAiModal(null); setPromptCopied(false) }} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', color: '#5a6a85', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>✕</button>
@@ -1373,7 +1373,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {sprintLinkModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
           <div style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, padding: 28, maxWidth: 420, width: '100%' }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 8 }}>🔗 Slot Sprint Tersedia</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2a3547', marginBottom: 8 }}>Slot Sprint Tersedia</div>
             <p style={{ color: '#5a6a85', fontSize: '0.875rem', marginBottom: 16, lineHeight: 1.5 }}>
               Ada slot konten di Sprint aktif untuk produk ini:
               <br />

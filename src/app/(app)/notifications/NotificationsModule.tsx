@@ -1,5 +1,7 @@
 'use client'
 
+import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
+
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'

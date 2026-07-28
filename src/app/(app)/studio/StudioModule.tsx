@@ -1,5 +1,7 @@
 'use client'
 
+import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
+
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -205,7 +207,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
               {product && <span style={{ fontSize: '0.72rem', background: 'rgba(26,115,232,0.15)', color: '#42a5f5', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>{product.nama}</span>}
               {item.format && <span style={{ fontSize: '0.72rem', background: '#f8fafc', color: '#5a6a85', padding: '2px 8px', borderRadius: 4 }}>{item.format}</span>}
               {(item.platform || []).map(p => <span key={p} style={{ fontSize: '0.72rem', background: '#f8fafc', color: '#5a6a85', padding: '2px 8px', borderRadius: 4 }}>{p}</span>)}
-              {item.scheduled_date && <span style={{ fontSize: '0.72rem', background: 'rgba(251,146,60,0.1)', color: '#fb923c', padding: '2px 8px', borderRadius: 4 }}>📅 {item.scheduled_date}</span>}
+              {item.scheduled_date && <span style={{ fontSize: '0.72rem', background: 'rgba(251,146,60,0.1)', color: '#fb923c', padding: '2px 8px', borderRadius: 4 }}>{item.scheduled_date}</span>}
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#5a6a85', fontSize: '1.2rem', cursor: 'pointer', padding: 4, flexShrink: 0 }}>✕</button>
@@ -228,7 +230,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
             <div style={{ marginBottom: 20 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#5a6a85', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Catatan Studio</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Revisi, catatan untuk scheduler..." rows={3} style={{ width: '100%', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#2a3547', fontSize: '0.82rem', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} /></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, color: '#2a3547', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : '💾 Simpan Progress'}</button>
-              <button onClick={handleSelesai} disabled={marking} style={{ padding: 10, background: 'linear-gradient(135deg,#059669,#34d399)', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : '✅ Tandai Selesai → Notif Schedule'}</button>
+              <button onClick={handleSelesai} disabled={marking} style={{ padding: 10, background: 'linear-gradient(135deg,#059669,#34d399)', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : 'Tandai Selesai'}</button>
             </div>
           </div>
         </div>
@@ -260,7 +262,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
         </div>
         {item.hook && <div style={{ fontSize: '0.78rem', color: '#5a6a85', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.hook}</div>}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 6 }}>
-          {item.scheduled_date ? <span style={{ fontSize: '0.68rem', color: '#fb923c' }}>📅 {item.scheduled_date}</span> : <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>Belum dijadwalkan</span>}
+          {item.scheduled_date ? <span style={{ fontSize: '0.68rem', color: '#fb923c' }}>{item.scheduled_date}</span> : <span style={{ fontSize: '0.68rem', color: '#5a6a85' }}>Belum dijadwalkan</span>}
           <span style={{ fontSize: '0.7rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
         </div>
       </div>
@@ -269,7 +271,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
 }
 
 function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Notification[]; onClose: () => void; onMarkRead: (id: string) => void }) {
-  const NOTIF_ICON: Record<string, string> = { riset: '🔍', naskah: '✍️', produksi: '🎨', schedule: '📅' }
+  
   return (
     <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 340, background: '#fff', borderLeft: '1px solid #e5eaf2', zIndex: 300, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid #e5eaf2' }}>
@@ -281,7 +283,7 @@ function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Not
           ? <div style={{ textAlign: 'center', color: '#5a6a85', fontSize: '0.82rem', marginTop: 40 }}>Tidak ada notifikasi</div>
           : notifications.map(n => (
             <div key={n.id} style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', marginBottom: 8, border: '1px solid #e5eaf2', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <div style={{ fontSize: '1.2rem', flexShrink: 0 }}>{NOTIF_ICON[n.type] || '🔔'}</div>
+              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{NOTIF_ICON_MAP[n.type] || <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fa9ba" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#2a3547', marginBottom: 2 }}>{n.title}</div>
                 {n.message && <div style={{ fontSize: '0.75rem', color: '#5a6a85', lineHeight: 1.4 }}>{n.message}</div>}
@@ -373,7 +375,7 @@ export default function StudioModule({ initialContents, products, initialNotific
         <div style={{ display: 'flex', gap: 4, paddingBottom: 2 }}>
           {([
             { mode: 'cards' as ViewMode, label: '☰ Daftar' },
-            { mode: 'ig' as ViewMode, label: '📱 IG Grid' },
+            { mode: 'ig' as ViewMode, label: 'IG Grid' },
             { mode: 'feed' as ViewMode, label: '🖼 Feed' },
           ]).map(v => (
             <button key={v.mode} onClick={() => setViewMode(v.mode)}
@@ -387,7 +389,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       {/* Content area */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#5a6a85' }}>
-          <div style={{ fontSize: '2rem', marginBottom: 12 }}>{tab === 'antrian' ? '✍️' : tab === 'dikerjakan' ? '🎨' : '✅'}</div>
+          <div style={{ marginBottom: 12, color: '#c8d1e0' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5"/></svg></div>
           <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Tidak ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
           {tab === 'antrian' && <div style={{ fontSize: '0.82rem', color: '#5a6a85' }}>Setelah copywriter simpan naskah di Plan, konten akan muncul di sini</div>}
         </div>
