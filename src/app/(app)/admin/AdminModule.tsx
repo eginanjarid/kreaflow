@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 type UserRow = {
   id: string
@@ -55,6 +56,7 @@ function fmtDate(s: string) {
 }
 
 export default function AdminModule({ users, workspaces, stats }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats }) {
+  const isMobile = useIsMobile()
   const [tab, setTab] = useState<'users' | 'workspaces'>('users')
   const [search, setSearch] = useState('')
   const [filterPlan, setFilterPlan] = useState('')
@@ -156,10 +158,10 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
           value={search} onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: 200, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
         {tab === 'users' && (
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 6 }}>
             {['', ...PLANS].map(p => (
               <button key={p} onClick={() => setFilterPlan(p)}
-                style={{ padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#dc2626'}` : '1px solid #e5e7eb', background: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') + '20' : '#f1f5f9', color: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') : '#6b7280', cursor: 'pointer', textTransform: 'uppercase' }}>
+                style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#dc2626'}` : '1px solid #e5e7eb', background: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') + '20' : '#f1f5f9', color: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') : '#6b7280', cursor: 'pointer', textTransform: 'uppercase' }}>
                 {p || 'All'}
               </button>
             ))}
@@ -170,27 +172,57 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
       {/* Users Tab */}
       {tab === 'users' && (
         <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', padding: '10px 16px', borderBottom: '1px solid #e5eaf2', fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            <div>User</div><div>Workspace</div><div>Plan</div><div>Daftar</div><div>Aksi</div>
-          </div>
           {filteredUsers.length === 0 && <div style={{ padding: 28, textAlign: 'center', color: '#6b7280', fontSize: '0.85rem' }}>Tidak ada user</div>}
-          {filteredUsers.map((u, i) => (
-            <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', padding: '11px 16px', borderBottom: i < filteredUsers.length - 1 ? '1px solid #f3f4f6' : 'none', alignItems: 'center' }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 500, color: '#111827', fontSize: '0.82rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.nama || u.email}</div>
-                {u.nama && <div style={{ fontSize: '0.7rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>}
+
+          {isMobile ? (
+            /* Mobile: card layout per user */
+            filteredUsers.map((u, i) => (
+              <div key={u.id} style={{ padding: '14px 16px', borderBottom: i < filteredUsers.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 6 }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.nama || u.email}</div>
+                    {u.nama && <div style={{ fontSize: '0.72rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '5px 10px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
+                    <button onClick={() => openUserAction(u, 'password')} style={{ background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 10px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>PW</button>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  {u.workspaces[0]?.name && <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{u.workspaces[0].name}</span>}
+                  {u.workspaces[0]?.name && <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>}
+                  <PlanBadge plan={u.plan} />
+                  <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>
+                  <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>{fmtDate(u.created_at)}</span>
+                </div>
               </div>
-              <div style={{ minWidth: 0, fontSize: '0.78rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>
-                {u.workspaces[0]?.name || <span style={{ color: '#6b7280' }}>—</span>}
+            ))
+          ) : (
+            /* Desktop: table grid */
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', padding: '10px 16px', borderBottom: '1px solid #e5eaf2', fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div>User</div><div>Workspace</div><div>Plan</div><div>Daftar</div><div>Aksi</div>
               </div>
-              <div style={{ paddingLeft: 12 }}><PlanBadge plan={u.plan} /></div>
-              <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingLeft: 12, whiteSpace: 'nowrap' }}>{fmtDate(u.created_at)}</div>
-              <div style={{ display: 'flex', gap: 6, paddingLeft: 12 }}>
-                <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
-                <button onClick={() => openUserAction(u, 'password')} style={{ background: 'rgba(71,85,105,0.15)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.68rem', cursor: 'pointer' }}>PW</button>
-              </div>
-            </div>
-          ))}
+              {filteredUsers.map((u, i) => (
+                <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', padding: '11px 16px', borderBottom: i < filteredUsers.length - 1 ? '1px solid #f3f4f6' : 'none', alignItems: 'center' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 500, color: '#111827', fontSize: '0.82rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.nama || u.email}</div>
+                    {u.nama && <div style={{ fontSize: '0.7rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>}
+                  </div>
+                  <div style={{ minWidth: 0, fontSize: '0.78rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>
+                    {u.workspaces[0]?.name || <span style={{ color: '#6b7280' }}>—</span>}
+                  </div>
+                  <div style={{ paddingLeft: 12 }}><PlanBadge plan={u.plan} /></div>
+                  <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingLeft: 12, whiteSpace: 'nowrap' }}>{fmtDate(u.created_at)}</div>
+                  <div style={{ display: 'flex', gap: 6, paddingLeft: 12 }}>
+                    <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
+                    <button onClick={() => openUserAction(u, 'password')} style={{ background: 'rgba(71,85,105,0.15)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.68rem', cursor: 'pointer' }}>PW</button>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
           <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.72rem', color: '#6b7280' }}>{filteredUsers.length} dari {users.length} user</div>
         </div>
       )}
@@ -201,22 +233,25 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
           {filteredWs.length === 0 && <div style={{ padding: 28, textAlign: 'center', color: '#6b7280', fontSize: '0.85rem', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20 }}>Tidak ada workspace</div>}
           {filteredWs.map(ws => (
             <div key={ws.id} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{ws.name}</span>
-                    <PlanBadge plan={ws.plan} />
-                    {ws.modes.map(m => (
-                      <span key={m} style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 8, background: m === 'affiliate' ? 'rgba(52,211,153,0.1)' : 'rgba(66,165,245,0.1)', color: m === 'affiliate' ? '#059669' : '#1a73e8', fontWeight: 600 }}>{m}</span>
-                    ))}
+              <div style={{ padding: '14px 18px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 6 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{ws.name}</span>
+                      <PlanBadge plan={ws.plan} />
+                      {ws.modes.map(m => (
+                        <span key={m} style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 8, background: m === 'affiliate' ? 'rgba(52,211,153,0.1)' : 'rgba(66,165,245,0.1)', color: m === 'affiliate' ? '#059669' : '#1a73e8', fontWeight: 600 }}>{m}</span>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>Owner: {ws.owner_email}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 2 }}>{ws.member_count} member{ws.pending_invites > 0 ? ` · ${ws.pending_invites} pending` : ''} · {fmtDate(ws.created_at)}</div>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Owner: {ws.owner_email} · {ws.member_count} member{ws.pending_invites > 0 ? ` · ${ws.pending_invites} pending invite` : ''} · Dibuat {fmtDate(ws.created_at)}</div>
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => openWsPlan(ws)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>Ubah Plan</button>
-                  <button onClick={() => setExpandedWs(expandedWs === ws.id ? null : ws.id)} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 10px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>
-                    {expandedWs === ws.id ? 'Tutup' : 'Lihat Tim'}
-                  </button>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexDirection: isMobile ? 'column' : 'row' }}>
+                    <button onClick={() => openWsPlan(ws)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 7, padding: '5px 10px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>Ubah Plan</button>
+                    <button onClick={() => setExpandedWs(expandedWs === ws.id ? null : ws.id)} style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '5px 10px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      {expandedWs === ws.id ? 'Tutup' : 'Lihat Tim'}
+                    </button>
+                  </div>
                 </div>
               </div>
               {expandedWs === ws.id && (
