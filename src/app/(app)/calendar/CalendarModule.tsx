@@ -62,7 +62,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [error, setError] = useState('')
   const isMobile = useIsMobile()
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
-  useEffect(() => { if (isMobile) setView('list') }, [isMobile])
+  const effectiveView = isMobile ? 'list' : view
   const [showTasks, setShowTasks] = useState(true)
   const [queueOpen, setQueueOpen] = useState(true)
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
@@ -226,14 +226,16 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
               Tasks {showTasks ? 'ON' : 'OFF'}
             </button>
           )}
-          <div style={{ display: 'flex', background: '#f3f4f6', border: 'none', borderRadius: 8, overflow: 'hidden' }}>
-            {(['calendar', 'list'] as const).map(v => (
-              <button key={v} onClick={() => setView(v)}
-                style={{ padding: '8px 14px', background: view === v ? 'rgba(26,115,232,0.10)' : 'transparent', border: 'none', color: view === v ? '#1a73e8' : '#6b7280', fontSize: '0.8rem', fontWeight: view === v ? 600 : 400, cursor: 'pointer' }}>
-                {v === 'calendar' ? 'Kalender' : 'List'}
-              </button>
-            ))}
-          </div>
+          {!isMobile && (
+            <div style={{ display: 'flex', background: '#f3f4f6', border: 'none', borderRadius: 8, overflow: 'hidden' }}>
+              {(['calendar', 'list'] as const).map(v => (
+                <button key={v} onClick={() => setView(v)}
+                  style={{ padding: '8px 14px', background: effectiveView === v ? 'rgba(26,115,232,0.10)' : 'transparent', border: 'none', color: effectiveView === v ? '#1a73e8' : '#6b7280', fontSize: '0.8rem', fontWeight: effectiveView === v ? 600 : 400, cursor: 'pointer' }}>
+                  {v === 'calendar' ? 'Kalender' : 'List'}
+                </button>
+              ))}
+            </div>
+          )}
           <button onClick={() => openAdd()} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 18px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
             + Jadwalkan
           </button>
@@ -309,7 +311,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         </span>
       </div>
 
-      {view === 'calendar' ? (
+      {effectiveView === 'calendar' ? (
         <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
           {/* Day headers */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #f3f4f6' }}>
