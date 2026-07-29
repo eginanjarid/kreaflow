@@ -88,6 +88,8 @@ body {
   [style*="1fr 130px"] { grid-template-columns: 1fr !important; }
   /* Page headers: allow button to drop to next line */
   .kf-page-header { flex-wrap: wrap !important; gap: 10px !important; }
+  /* Section cards: reduce padding on narrow screens */
+  .kf-section-card { padding: 16px !important; }
   /* Hide secondary info on very small screens */
   .hide-xs { display: none !important; }
 }

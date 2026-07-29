@@ -892,7 +892,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
   }
 
   const sectionCard = (children: React.ReactNode) => (
-    <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="kf-section-card" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
       {children}
     </div>
   )
@@ -1127,7 +1127,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           </button>
           {/* Niche Options CRUD */}
           <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opsi Niche dari AI</div>
                 <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Tambah opsi dari hasil AI, pilih satu sebagai utama</div>
@@ -1275,7 +1275,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Premis CRUD */}
           <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Premis dari AI</div>
                 <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Tambah variasi, pilih satu sebagai premis utama</div>
@@ -1384,7 +1384,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           )}
 
           {/* Header + Generate */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio Studio</div>
               <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Simpan beberapa variasi bio per platform, pilih satu sebagai utama</div>
@@ -1425,7 +1425,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* CRUD section */}
                 <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio {activePl.label}</div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Maks {activePl.max} karakter</div>
@@ -1671,7 +1671,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 1: Niche & Target ── */}
               {affStep === 'aff-niche' && sectionCard(<>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Niche & Target Pembeli</div>
                     <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Tentukan jenis akun, produk yang mau dijual, dan siapa yang beli</div>
@@ -1779,7 +1779,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <SaveButton loading={saving} saved={saved} />
                   <button type="button" onClick={() => setAffStep('aff-identity')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
@@ -1790,7 +1790,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 2: Identitas Akun ── */}
               {affStep === 'aff-identity' && sectionCard(<>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Identitas Akun</div>
                     <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Nama akun, tagline, dan positioning yang bikin orang langsung ngerti akunmu tentang apa</div>
@@ -1803,7 +1803,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Nama akun CRUD */}
                 <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rekomendasi Nama Akun</div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Simpan pilihan nama dari AI, lalu pilih satu sebagai utama</div>
@@ -1863,7 +1863,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     placeholder="cth: Satu-satunya akun TikTok yang test & review mainan anak secara langsung sebelum rekomendasiin — gak ada titipan, semuanya jujur" />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
                     <button type="button" onClick={() => setAffStep('aff-niche')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
@@ -1877,7 +1877,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 3: Konten Strategy ── */}
               {affStep === 'aff-konten' && sectionCard(<>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Konten Strategy</div>
                     <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Set preferensi dasar — eksekusi naskah & konten di modul Plan</div>
@@ -1906,7 +1906,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     placeholder={'cth:\n1. Review Jujur — test produk sebelum rekomendasiin\n2. Deal Alert — info flash sale & promo\n3. Tutorial — cara pakai produk yang bener\n4. Perbandingan — A vs B, mana worth it?'} />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
                     <button type="button" onClick={() => setAffStep('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
@@ -1920,7 +1920,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 4: Bio & Trust ── */}
               {affStep === 'aff-bio' && sectionCard(<>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Trust Builder</div>
                     <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Bio yang convert + kalimat yang bikin audiens percaya rekomendasimu</div>
@@ -1949,7 +1949,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 {/* Bio CRUD */}
                 <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Akun</div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Simpan beberapa variasi, pilih satu sebagai utama</div>
@@ -1982,7 +1982,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <button type="button" onClick={() => setAffStep('aff-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                   <SaveButton loading={saving} saved={saved} />
                 </div>
@@ -2212,8 +2212,8 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
       </div>
     )}
     <form onSubmit={savePillars}>
-      <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="kf-section-card" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Content Pillars</div>
             <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Maksimal 10 pillar konten + hashtag set per pillar</div>
