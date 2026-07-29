@@ -949,28 +949,33 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {tab === 'overview' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {/* Left: Level Display */}
-            <div style={{ background: '#fff', border: `1px solid ${freqLevel.color}40`, borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 28, display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', overflow: 'hidden' }}>
               {/* glow bg */}
-              <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: freqLevel.glow, filter: 'blur(60px)', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: freqLevel.glow, filter: 'blur(70px)', pointerEvents: 'none' }} />
 
               <div style={{ position: 'relative' }}>
-                <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Frekuensi Brand Kamu Saat Ini</div>
-                <div style={{ marginBottom: 4, color: freqLevel.color }}>
-                  {freqLevel.id === 1 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  : freqLevel.id === 2 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6c0 0 5-2 11-2s11 2 11 2"/><path d="M1 12c0 0 5 2 11 2s11-2 11-2"/><path d="M1 18c0 0 5-2 11-2s11 2 11 2"/></svg>
-                  : freqLevel.id === 3 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                  : freqLevel.id === 4 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/></svg>
-                  : freqLevel.id === 5 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
-                  : <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
+                {/* Icon + level header row */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 16 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: `${freqLevel.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: freqLevel.color, flexShrink: 0 }}>
+                    {freqLevel.id === 1 ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    : freqLevel.id === 2 ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6c0 0 5-2 11-2s11 2 11 2"/><path d="M1 12c0 0 5 2 11 2s11-2 11-2"/><path d="M1 18c0 0 5-2 11-2s11 2 11 2"/></svg>
+                    : freqLevel.id === 3 ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                    : freqLevel.id === 4 ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/></svg>
+                    : freqLevel.id === 5 ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+                    : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 500, marginBottom: 5 }}>Frekuensi brand kamu</div>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 800, color: freqLevel.color, letterSpacing: '-0.5px', lineHeight: 1 }}>{freqLevel.name}</div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: freqLevel.color, letterSpacing: '-0.5px', marginBottom: 6 }}>{freqLevel.name}</div>
-                <div style={{ fontSize: '0.85rem', color: '#6b7280', fontStyle: 'italic', marginBottom: 20 }}>"{freqLevel.tagline}"</div>
+                <div style={{ fontSize: '0.85rem', color: '#6b7280', fontStyle: 'italic', marginBottom: 10 }}>"{freqLevel.tagline}"</div>
                 <div style={{ fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.6 }}>{freqLevel.desc}</div>
               </div>
 
               {/* Signal Bars */}
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 10, fontWeight: 500 }}>SIGNAL STRENGTH</div>
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 10, fontWeight: 500 }}>Signal strength</div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 48 }}>
                   {FREQ_LEVELS.map((lvl, i) => {
                     const active = i <= freqLevelIdx
@@ -978,7 +983,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     return (
                       <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                         <div style={{
-                          width: '100%', height: heights[i], borderRadius: 4,
+                          width: '100%', height: heights[i], borderRadius: '4px 4px 0 0',
                           background: active ? lvl.color : '#e8eaed',
                           boxShadow: active ? `0 0 8px ${lvl.glow}` : 'none',
                           transition: 'all 0.3s',
@@ -1016,7 +1021,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
             {/* Right: Checklist */}
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
-              <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Sinyal yang Perlu Dikuatkan</div>
+              <div style={{ fontSize: '0.82rem', color: '#111827', fontWeight: 700, marginBottom: 16 }}>Sinyal yang perlu dikuatkan</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
                 {FREQ_CHECKS.map((check, i) => {
                   const done = freqChecked[i]
@@ -1035,7 +1040,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* Level ladder summary */}
               <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f3f4f6' }}>
-                <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tangga Frekuensi</div>
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af', fontWeight: 600, marginBottom: 10 }}>Tangga frekuensi</div>
                 {[...FREQ_LEVELS].reverse().map((lvl) => (
                   <div key={lvl.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 8px', borderRadius: 6, background: lvl.id === freqLevel.id ? `${lvl.color}12` : 'transparent', marginBottom: 2 }}>
                     <span style={{ color: lvl.color, display: 'flex', alignItems: 'center' }}>
