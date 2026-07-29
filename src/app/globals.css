@@ -77,12 +77,28 @@ body {
 
 /* ── Responsive module content ── */
 @media (max-width: 640px) {
-  /* 4-column stats grids → 2 columns */
+  /* 4-column stats → 2 columns */
   [style*="repeat(4, 1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
+  /* 3-column → 2 columns */
+  [style*="repeat(3, 1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
   /* 2-column form grids → 1 column */
-  [style*="'1fr 1fr'"], [style*="1fr 1fr"] { grid-template-columns: 1fr !important; }
+  [style*="1fr 1fr"] { grid-template-columns: 1fr !important; }
+  /* Layout splits (content + sidebar) → stack */
+  [style*="1fr 300px"] { grid-template-columns: 1fr !important; }
+  [style*="1fr 130px"] { grid-template-columns: 1fr !important; }
+  /* Page headers: allow button to drop to next line */
+  .kf-page-header { flex-wrap: wrap !important; gap: 10px !important; }
   /* Hide secondary info on very small screens */
   .hide-xs { display: none !important; }
+}
+
+@media (max-width: 768px) {
+  /* Sprint sidebar: hide on mobile so kanban gets full width */
+  .kf-sprint-sidebar { display: none !important; }
+  /* IG preview modals: clamp to viewport */
+  .kf-ig-modal { max-width: calc(100vw - 32px) !important; width: 100% !important; }
+  /* Side drawer: clamp to viewport width */
+  .kf-drawer { width: 100vw !important; max-width: 340px; }
 }
 
 input, textarea, select {

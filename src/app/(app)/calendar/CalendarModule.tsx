@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 type Entry = {
   id?: string
@@ -59,7 +60,9 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [modal, setModal] = useState<{ open: boolean; entry: Entry } | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const isMobile = useIsMobile()
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
+  useEffect(() => { if (isMobile) setView('list') }, [isMobile])
   const [showTasks, setShowTasks] = useState(true)
   const [queueOpen, setQueueOpen] = useState(true)
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
@@ -211,7 +214,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Calendar</h1>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Jadwal posting konten kamu</p>

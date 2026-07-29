@@ -162,7 +162,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Catalog</h1>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Produk fisik, digital, dan affiliate yang kamu promosikan</p>

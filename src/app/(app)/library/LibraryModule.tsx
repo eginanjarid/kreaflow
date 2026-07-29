@@ -545,7 +545,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Library</h1>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Bank konten — hook, body, CTA, dan script siap pakai</p>

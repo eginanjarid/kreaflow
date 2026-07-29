@@ -680,7 +680,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden', background: '#f5f6fa' }}>
 
         {/* Left: Sprint sidebar */}
-        <div style={{ width: 224, flexShrink: 0, background: '#fff', boxShadow: 'inset -1px 0 0 rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className="kf-sprint-sidebar" style={{ width: 224, flexShrink: 0, background: '#fff', boxShadow: 'inset -1px 0 0 rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <div style={{ padding: '12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
             <button onClick={openSprintModal}
               style={{ width: '100%', background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 0', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.01em' }}>

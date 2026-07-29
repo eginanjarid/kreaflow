@@ -62,7 +62,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 20, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
+      <div onClick={e => e.stopPropagation()} className="kf-ig-modal" style={{ maxWidth: 390, width: '100%', maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 20, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
           <div style={{ flex: 1 }}>
@@ -115,7 +115,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, flexDirection: 'column', gap: 12 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
+      <div onClick={e => e.stopPropagation()} className="kf-ig-modal" style={{ position: 'relative', maxWidth: 340, width: '100%', height: 'min(604px, 85vh)', borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
         {thumb ? <img src={thumb} alt={item.judul} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ position: 'absolute', inset: 0 }}><ThumbnailPlaceholder item={item} /></div>}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.15) 45%,rgba(0,0,0,0.35) 100%)' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', padding: '14px 14px 0' }}>
@@ -273,7 +273,7 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
 function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Notification[]; onClose: () => void; onMarkRead: (id: string) => void }) {
   
   return (
-    <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 340, background: '#fff', borderLeft: 'none', boxShadow: '-4px 0 24px rgba(0,0,0,0.08)', zIndex: 300, display: 'flex', flexDirection: 'column' }}>
+    <div className="kf-drawer" style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 340, background: '#fff', borderLeft: 'none', boxShadow: '-4px 0 24px rgba(0,0,0,0.08)', zIndex: 300, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' }}>
         <div style={{ fontSize: '1rem', fontWeight: 700, color: '#111827' }}>Notifikasi</div>
         <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
@@ -347,7 +347,7 @@ export default function StudioModule({ initialContents, products, initialNotific
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Studio</h1>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Ruang kerja desainer & editor — lihat naskah, input hasil, preview visual</p>

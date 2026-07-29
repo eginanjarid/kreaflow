@@ -75,7 +75,7 @@ export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Tr
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Budget</h1>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Tracking pemasukan dan pengeluaran konten kamu</p>
