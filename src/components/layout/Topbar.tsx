@@ -129,8 +129,8 @@ export default function Topbar({ user, onMenuClick }: Props) {
   }
 
   return (
-    <header style={{
-      height: 72,
+    <header className="kf-topbar" style={{
+      height: 64,
       background: '#fff',
       borderBottom: '1px solid #f1f5f9',
       display: 'flex',

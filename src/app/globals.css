@@ -92,7 +92,7 @@ body {
   .hide-xs { display: none !important; }
 }
 
-/* Scrollable tab bars — always, so swipe works on mobile */
+/* Scrollable tab bars */
 .kf-tabs-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -101,12 +101,19 @@ body {
 .kf-tabs-scroll::-webkit-scrollbar { display: none; }
 
 @media (max-width: 768px) {
-  /* Sprint sidebar: hide on mobile so kanban gets full width */
+  /* Tab bars: fade right edge as scroll hint */
+  .kf-tabs-scroll {
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  }
+  /* Sprint sidebar: hide so kanban gets full width */
   .kf-sprint-sidebar { display: none !important; }
   /* IG preview modals: clamp to viewport */
   .kf-ig-modal { max-width: calc(100vw - 32px) !important; width: 100% !important; }
   /* Side drawer: clamp to viewport width */
   .kf-drawer { width: 100vw !important; max-width: 340px; }
+  /* Topbar: reduce side padding on mobile */
+  .kf-topbar { padding: 0 14px !important; }
 }
 
 input, textarea, select {
