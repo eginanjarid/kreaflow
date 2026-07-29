@@ -289,13 +289,19 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
       )}
 
       {/* Month Nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-        <button onClick={prevMonth} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 12px', color: '#6b7280', cursor: 'pointer', fontSize: '1rem' }}>‹</button>
-        <span style={{ fontWeight: 700, color: '#111827', fontSize: '1.1rem', minWidth: 160, textAlign: 'center' }}>{MONTHS[viewMonth]} {viewYear}</span>
-        <button onClick={nextMonth} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 12px', color: '#6b7280', cursor: 'pointer', fontSize: '1rem' }}>›</button>
-        <span style={{ fontSize: '0.8rem', color: '#6b7280', marginLeft: 8 }}>
-          {monthEntries.length} jadwal
-          {monthTasks.length > 0 ? ` · ${monthTasks.length} deadline task` : ''}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+        <button onClick={prevMonth} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#374151', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 600, flexShrink: 0 }}>‹</button>
+        <span style={{ fontWeight: 700, color: '#111827', fontSize: '1.05rem', minWidth: 150, textAlign: 'center' }}>{MONTHS[viewMonth]} {viewYear}</span>
+        <button onClick={nextMonth} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#374151', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 600, flexShrink: 0 }}>›</button>
+        {(viewYear !== now.getFullYear() || viewMonth !== now.getMonth()) && (
+          <button onClick={() => { setViewYear(now.getFullYear()); setViewMonth(now.getMonth()) }}
+            style={{ background: 'rgba(26,115,232,0.08)', border: 'none', borderRadius: 8, padding: '5px 12px', color: '#1a73e8', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600 }}>
+            Hari Ini
+          </button>
+        )}
+        <span style={{ fontSize: '0.78rem', color: '#9ca3af', marginLeft: 4 }}>
+          {monthEntries.length > 0 && `${monthEntries.length} jadwal`}
+          {monthTasks.length > 0 ? ` · ${monthTasks.length} deadline` : ''}
           {(() => { const mp = plannedItems.filter(p => { const d = new Date(p.tanggal_tayang); return d.getFullYear() === viewYear && d.getMonth() === viewMonth }).length; return mp > 0 ? ` · ${mp} rencana` : '' })()}
         </span>
       </div>
@@ -304,8 +310,8 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
           {/* Day headers */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #f3f4f6' }}>
-            {DAYS.map(d => (
-              <div key={d} style={{ padding: '10px 8px', textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>{d}</div>
+            {DAYS.map((d, i) => (
+              <div key={d} style={{ padding: '10px 8px', textAlign: 'center', fontSize: '0.72rem', fontWeight: 600, color: i === 0 ? '#ef4444' : i === 6 ? '#1a73e8' : '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{d}</div>
             ))}
           </div>
           {/* Calendar grid */}
@@ -323,12 +329,14 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                 <div key={idx} onClick={() => day && openAdd(day)}
                   style={{
                     minHeight: 88, padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #f3f4f6' : 'none', borderBottom: '1px solid #f3f4f6',
-                    background: day ? 'transparent' : '#0a0a0a', cursor: day ? 'pointer' : 'default',
+                    background: day ? 'transparent' : '#f9fafb', cursor: day ? 'pointer' : 'default',
                     transition: 'background 0.1s',
-                  }}>
+                  }}
+                  onMouseEnter={e => { if (day) e.currentTarget.style.background = '#f9fafb' }}
+                  onMouseLeave={e => { if (day) e.currentTarget.style.background = 'transparent' }}>
                   {day && (
                     <>
-                      <div style={{ fontSize: '0.78rem', fontWeight: isToday ? 700 : 400, color: isToday ? '#fff' : '#6b7280', width: 22, height: 22, borderRadius: '50%', background: isToday ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
+                      <div style={{ fontSize: '0.78rem', fontWeight: isToday ? 700 : 400, color: isToday ? '#fff' : idx % 7 === 0 ? '#ef4444' : '#374151', width: 22, height: 22, borderRadius: '50%', background: isToday ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
                         {day}
                       </div>
                       {dayEntries.slice(0, MAX_SHOW).map(e => {
@@ -339,7 +347,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                         const timeStr = e.scheduled_at ? new Date(e.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
                         return (
                           <div key={e.id} onClick={ev => { ev.stopPropagation(); openEdit(e) }}
-                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'rgba(26,115,232,0.10)', border: `1px solid ${STATUS_COLOR[e.status] || '#e5e7eb'}`, color: STATUS_COLOR[e.status] || '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
+                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 4, marginBottom: 2, background: `${STATUS_COLOR[e.status] || '#6b7280'}18`, borderLeft: `2px solid ${STATUS_COLOR[e.status] || '#6b7280'}`, color: STATUS_COLOR[e.status] || '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
                             title={`${idea?.product_nama ? idea.product_nama + ' · ' : ''}${displayName} · ${timeStr}`}>
                             {timeStr && <span style={{ opacity: 0.7 }}>{timeStr} </span>}{productLabel}{displayName}
                           </div>
