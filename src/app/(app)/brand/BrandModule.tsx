@@ -1043,7 +1043,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     : lvl.id === 2 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6c0 0 5-2 11-2s11 2 11 2"/><path d="M1 12c0 0 5 2 11 2s11-2 11-2"/><path d="M1 18c0 0 5-2 11-2s11 2 11 2"/></svg>
                     : lvl.id === 3 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
                     : lvl.id === 4 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49"/></svg>
-                    : lvl.id === 5 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+                    : lvl.id === 5 ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
                     : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
                   </span>
                     <span style={{ fontSize: '0.75rem', fontWeight: lvl.id === freqLevel.id ? 700 : 400, color: lvl.id === freqLevel.id ? lvl.color : '#6b7280' }}>
@@ -1118,7 +1118,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             Generate dengan AI
           </button>
           {/* Niche Options CRUD */}
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 20 }}>
+          <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opsi Niche dari AI</div>
@@ -1266,7 +1266,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           </button>
 
           {/* Premis CRUD */}
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 20 }}>
+          <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Premis dari AI</div>
@@ -1416,7 +1416,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* CRUD section */}
-                <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 20 }}>
+                <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio {activePl.label}</div>
@@ -1619,7 +1619,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
           {/* Brand Summary */}
           {(profile.color_palette?.length || profile.logo_main_url || profile.typography) ? (
-            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 10, padding: 16, display: 'flex', gap: 14, alignItems: 'center' }}>
+            <div style={{ background: '#f9fafb', borderRadius: 12, padding: 16, display: 'flex', gap: 14, alignItems: 'center' }}>
               {profile.logo_main_url && (
                 <div style={{ width: 44, height: 44, borderRadius: 8, border: '1px solid #f3f4f6', overflow: 'hidden', flexShrink: 0 }}>
                   <img src={profile.logo_main_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -1794,7 +1794,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* Nama akun CRUD */}
-                <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 20 }}>
+                <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rekomendasi Nama Akun</div>
@@ -1940,7 +1940,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 {/* Bio CRUD */}
-                <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 20 }}>
+                <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Akun</div>
