@@ -49,7 +49,7 @@ type Props = {
 export default function Sidebar({ workspace, isSuperAdmin, className }: Props) {
   const pathname = usePathname()
   const [studioCount, setStudioCount] = useState(0)
-  const [collapsed, setCollapsed] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
   const [tooltip, setTooltip] = useState<{ label: string; top: number } | null>(null)
 
   useEffect(() => {
