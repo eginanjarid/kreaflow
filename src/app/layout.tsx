@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   description: 'Platform manajemen konten sosial media berbasis AI untuk creator dan affiliator Indonesia.',
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={`${jakarta.variable} h-full`}>

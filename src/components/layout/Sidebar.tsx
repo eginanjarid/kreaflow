@@ -103,9 +103,11 @@ const NAV_GROUPS = [
 type Props = {
   workspace: { id: string; name: string; plan: string } | null
   isSuperAdmin: boolean
+  className?: string
+  onClose?: () => void
 }
 
-export default function Sidebar({ workspace, isSuperAdmin }: Props) {
+export default function Sidebar({ workspace, isSuperAdmin, className, onClose }: Props) {
   const pathname = usePathname()
   const [studioCount, setStudioCount] = useState(0)
 
@@ -142,7 +144,7 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
   }
 
   return (
-    <aside style={{
+    <aside className={className} style={{
       width: 260,
       background: '#fff',
       borderRight: '1px solid #f1f5f9',
@@ -154,17 +156,24 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
     }}>
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #f1f5f9', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: 10,
-            background: 'linear-gradient(135deg, #1a73e8, #42a5f5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-            </svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 10,
+              background: 'linear-gradient(135deg, #1a73e8, #42a5f5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#2a3547', letterSpacing: '-0.3px' }}>KreaFlow</span>
           </div>
-          <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#2a3547', letterSpacing: '-0.3px' }}>KreaFlow</span>
+          {onClose && (
+            <button onClick={onClose} className="sidebar-close-btn" style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: '#9ca3af', display: 'none' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          )}
         </div>
 
         {workspace && (
@@ -191,7 +200,7 @@ export default function Sidebar({ workspace, isSuperAdmin }: Props) {
               const active = pathname.startsWith(item.href)
               const isStudio = item.href === '/studio'
               return (
-                <Link key={item.href} href={item.href} style={navItemStyle(active)}>
+                <Link key={item.href} href={item.href} style={navItemStyle(active)} onClick={onClose}>
                   {item.icon}
                   {item.label}
                   {isStudio && studioCount > 0 && (

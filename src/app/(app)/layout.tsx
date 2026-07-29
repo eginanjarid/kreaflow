@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import Sidebar from '@/components/layout/Sidebar'
-import Topbar from '@/components/layout/Topbar'
+import AppShell from '@/components/layout/AppShell'
 
 const SUPER_ADMINS = ['eginanjarism@gmail.com']
 
@@ -21,19 +20,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const isSuperAdmin = SUPER_ADMINS.includes(user.email!)
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <Sidebar
-        workspace={(workspace?.kf_workspaces as unknown) as { id: string; name: string; plan: string } | null}
-        isSuperAdmin={isSuperAdmin}
-      />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Topbar user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }} />
-        <main style={{ flex: 1, overflowY: 'auto', background: '#f5f7fb' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 28px' }}>
-            {children}
-          </div>
-        </main>
-      </div>
-    </div>
+    <AppShell
+      workspace={(workspace?.kf_workspaces as unknown) as { id: string; name: string; plan: string } | null}
+      isSuperAdmin={isSuperAdmin}
+      user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
+    >
+      {children}
+    </AppShell>
   )
 }

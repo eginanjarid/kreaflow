@@ -51,9 +51,10 @@ function relTime(ts: string) {
 
 type Props = {
   user: { email: string; nama: string }
+  onMenuClick?: () => void
 }
 
-export default function Topbar({ user }: Props) {
+export default function Topbar({ user, onMenuClick }: Props) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -142,7 +143,7 @@ export default function Topbar({ user }: Props) {
     }}>
       {/* Left: Hamburger + Search */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginRight: 24 }}>
-        <button style={{
+        <button onClick={onMenuClick} style={{
           background: 'none', border: 'none', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', color: '#5a6a85',
@@ -163,7 +164,7 @@ export default function Topbar({ user }: Props) {
       </div>
 
       {/* Middle: Quick Nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 28, flex: 1 }}>
+      <div className="topbar-nav" style={{ display: 'flex', alignItems: 'center', gap: 28, flex: 1 }}>
         {[
           { href: '/sprints', label: 'Sprints' },
           { href: '/plan', label: 'Plan' },
@@ -326,7 +327,7 @@ export default function Topbar({ user }: Props) {
             }}>
               {initials}
             </div>
-            <span style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#5a6a85', whiteSpace: 'nowrap' }}>
+            <span className="topbar-username" style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#5a6a85', whiteSpace: 'nowrap' }}>
               Hi, <strong style={{ fontWeight: 700, color: '#2a3547' }}>{user.nama.split(' ')[0]}</strong>
             </span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9fa9ba" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

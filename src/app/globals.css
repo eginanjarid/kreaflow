@@ -40,6 +40,51 @@ body {
   padding: 16px;
 }
 
+/* ── Mobile responsive shell ── */
+.app-sidebar {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 149;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .app-sidebar {
+    position: fixed !important;
+    top: 0; left: 0;
+    height: 100vh !important;
+    z-index: 150;
+    transform: translateX(-100%);
+  }
+  .app-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  }
+  .sidebar-overlay.open {
+    display: block;
+  }
+  .topbar-nav { display: none !important; }
+  .topbar-username { display: none !important; }
+  .main-content-inner { padding: 16px 14px !important; }
+  .sidebar-close-btn { display: flex !important; }
+}
+
+/* ── Responsive module content ── */
+@media (max-width: 640px) {
+  /* 4-column stats grids → 2 columns */
+  [style*="repeat(4, 1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
+  /* 2-column form grids → 1 column */
+  [style*="'1fr 1fr'"], [style*="1fr 1fr"] { grid-template-columns: 1fr !important; }
+  /* Hide secondary info on very small screens */
+  .hide-xs { display: none !important; }
+}
+
 input, textarea, select {
   background: #fff;
   border: 1px solid var(--border);
