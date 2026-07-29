@@ -15,7 +15,7 @@ export default function AppShell({ workspace, isSuperAdmin, user, children }: Pr
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div className="kf-app-shell">
       <div
         className={`sidebar-overlay${sidebarOpen ? ' open' : ''}`}
         onClick={() => setSidebarOpen(false)}
@@ -31,7 +31,7 @@ export default function AppShell({ workspace, isSuperAdmin, user, children }: Pr
           user={user}
           onMenuClick={() => setSidebarOpen(v => !v)}
         />
-        <main style={{ flex: 1, overflowY: 'auto', background: '#f5f7fb' }}>
+        <main className="kf-main-scroll" style={{ background: '#f5f7fb' }}>
           <div className="main-content-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 28px' }}>
             {children}
           </div>
