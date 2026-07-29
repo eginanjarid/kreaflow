@@ -161,7 +161,7 @@ const CSS = `
   .lp-testi-quote { font-size: 1.4rem; color: #1a73e8; font-weight: 900; margin-bottom: 12px; line-height: 1; }
   .lp-testi-text { font-size: 0.875rem; color: #334155; line-height: 1.65; margin-bottom: 18px; }
   .lp-testi-author { display: flex; align-items: center; gap: 10px; }
-  .lp-testi-avatar { width: 34px; height: 34px; border-radius: 50%; background: #1a73e8; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .lp-testi-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
   .lp-testi-name { font-size: 0.82rem; font-weight: 700; color: #0f172a; }
   .lp-testi-role { font-size: 0.75rem; color: #94a3b8; }
 
@@ -190,8 +190,10 @@ const CSS = `
   .lp-faq { display: flex; flex-direction: column; gap: 0; max-width: 680px; margin: 0 auto; border: 1.5px solid #f1f5f9; border-radius: 14px; overflow: hidden; }
   .lp-faq-item { border-bottom: 1px solid #f1f5f9; }
   .lp-faq-item:last-child { border-bottom: none; }
-  .lp-faq-q { padding: 18px 22px; font-size: 0.9rem; font-weight: 600; color: #0f172a; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .lp-faq-icon { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.8rem; color: #94a3b8; }
+  .lp-faq-q { padding: 18px 22px; font-size: 0.9rem; font-weight: 600; color: #0f172a; display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; list-style: none; user-select: none; }
+  .lp-faq-q::-webkit-details-marker { display: none; }
+  .lp-faq-q::after { content: '+'; font-size: 1.1rem; color: #94a3b8; font-weight: 400; flex-shrink: 0; line-height: 1; }
+  .lp-faq-item[open] .lp-faq-q::after { content: '×'; }
   .lp-faq-a { padding: 0 22px 18px; font-size: 0.84rem; color: #64748b; line-height: 1.7; }
 
   /* CTA BLOCK */
@@ -209,7 +211,7 @@ const CSS = `
 
   /* FOOTER */
   .lp-footer { border-top: 1px solid #f1f5f9; padding: 48px 28px 32px; }
-  .lp-footer-inner { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .lp-footer-inner { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
   .lp-footer-brand-desc { font-size: 0.82rem; color: #94a3b8; line-height: 1.6; margin-top: 10px; max-width: 200px; }
   .lp-footer-col-title { font-size: 0.78rem; font-weight: 800; color: #374151; margin-bottom: 14px; letter-spacing: 0.02em; }
   .lp-footer-links { display: flex; flex-direction: column; gap: 8px; }
@@ -228,7 +230,7 @@ const CSS = `
     .lp-testi-grid { grid-template-columns: 1fr; }
     .lp-pricing-grid { grid-template-columns: 1fr; }
     .lp-cta-block { flex-direction: column; text-align: center; padding: 48px 28px; }
-    .lp-footer-inner { grid-template-columns: 1fr 1fr; }
+    .lp-footer-inner { grid-template-columns: 1fr 1fr 1fr; }
   }
   @media (max-width: 640px) {
     .lp-hero { padding: 56px 20px 0; }
@@ -247,7 +249,7 @@ const FAQS = [
   { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga ini hanya tersedia selama masa launch.' },
   { q: 'Berapa workspace yang bisa saya buat?', a: 'Unlimited. Satu akun bisa mengelola banyak brand atau klien sekaligus tanpa batas.' },
   { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule (Pro Add-on) sedang dalam pengembangan dan akan segera hadir. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
-  { q: 'Bagaimana cara memulainya?', a: 'Daftar gratis, buat workspace, isi identitas brand, dan mulai susun konten. Tidak perlu kartu kredit untuk memulai.' },
+  { q: 'Bagaimana cara memulainya?', a: 'Beli paket Lifetime Deal, daftar akun, buat workspace, dan langsung mulai susun konten. Proses setup kurang dari 5 menit.' },
 ]
 
 export default async function LandingPage() {
@@ -277,7 +279,7 @@ export default async function LandingPage() {
           </div>
           <div className="lp-nav-right">
             <Link href="/login" className="lp-nav-login">Masuk</Link>
-            <Link href="/register" className="lp-nav-cta">Mulai Gratis</Link>
+            <Link href="/register" className="lp-nav-cta">Mulai Sekarang</Link>
           </div>
         </div>
       </nav>
@@ -297,7 +299,7 @@ export default async function LandingPage() {
                 <img key={n} className="lp-avatar" src={`https://i.pravatar.cc/60?img=${n}`} alt="user" />
               ))}
             </div>
-            Dipercaya creator & affiliator Indonesia
+            Dibuat untuk creator & affiliator Indonesia
           </div>
           <h1 className="lp-hero-h1">
             Workflow konten dari ide<br />
@@ -307,7 +309,7 @@ export default async function LandingPage() {
             Brand, konten, jadwal, dan performa terhubung dalam satu alur kerja. Tidak perlu pindah-pindah tools lagi.
           </p>
           <div className="lp-hero-ctas">
-            <Link href="/register" className="lp-btn-blue">Mulai Gratis →</Link>
+            <Link href="#harga" className="lp-btn-blue">Lihat Harga →</Link>
             <Link href="/login" className="lp-btn-outline">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="#e2e8f0"/><polygon points="10,8 16,12 10,16" fill="#374151"/></svg>
               Sudah punya akun
@@ -520,7 +522,7 @@ export default async function LandingPage() {
               },
               {
                 name: 'Brand & Catalog',
-                desc: 'Bangun identitas brand yang konsisten,, content pillars, dan tone of voice. Kelola database produk affiliate dan produk sendiri lengkap dengan komisi.',
+                desc: 'Bangun identitas brand yang konsisten, content pillars, dan tone of voice. Kelola database produk affiliate dan produk sendiri lengkap dengan komisi.',
                 visual: (
                   <div style={{ width: '100%' }}>
                     <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: 10, padding: '12px 14px', marginBottom: 8 }}>
@@ -608,15 +610,16 @@ export default async function LandingPage() {
           </div>
           <div className="lp-testi-grid">
             {[
-              { text: '"Sebelum pakai KreaFlow, ide konten gue berserakan di mana-mana: notes, spreadsheet, DM ke diri sendiri. Sekarang semua ada tempatnya dan gue bisa fokus bikin konten."', name: 'Rina Amalia', role: 'TikTok Creator · 120K followers', init: 'RA', color: '#1a73e8' },
-              { text: '"Sebagai affiliator yang promosiin 10+ produk sekaligus, Catalog dan Sprint KreaFlow beneran ngubah cara kerja gue. Sekarang tahu persis konten mana yang performance-nya bagus."', name: 'Dika Kurniawan', role: 'Affiliator Shopee & TikTok', init: 'DK', color: '#059669' },
-              { text: '"Gue handle 3 brand berbeda. Dulu chaosnya minta ampun. KreaFlow bikin gue bisa pisahin workspace per brand dan kelola semua dari satu akun. Game changer."', name: 'Fitri Nadia', role: 'Social Media Manager', init: 'FN', color: '#8b5cf6' },
+              { text: '"Sebelum pakai KreaFlow, ide konten gue berserakan di mana-mana: notes, spreadsheet, DM ke diri sendiri. Sekarang semua ada tempatnya dan gue bisa fokus bikin konten."', name: 'Rina Amalia', role: 'TikTok Creator · 120K followers', img: 5 },
+              { text: '"Sebagai affiliator yang promosiin 10+ produk sekaligus, Catalog dan Sprint KreaFlow beneran ngubah cara kerja gue. Sekarang tahu persis konten mana yang performance-nya bagus."', name: 'Dika Kurniawan', role: 'Affiliator Shopee & TikTok', img: 12 },
+              { text: '"Gue handle 3 brand berbeda. Dulu chaosnya minta ampun. KreaFlow bikin gue bisa pisahin workspace per brand dan kelola semua dari satu akun. Game changer."', name: 'Fitri Nadia', role: 'Social Media Manager', img: 25 },
             ].map(t => (
               <div key={t.name} className="lp-testi-card">
                 <div className="lp-testi-quote">"</div>
                 <p className="lp-testi-text">{t.text}</p>
                 <div className="lp-testi-author">
-                  <div className="lp-testi-avatar" style={{ background: t.color }}>{t.init}</div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="lp-testi-avatar" src={`https://i.pravatar.cc/80?img=${t.img}`} alt={t.name} />
                   <div>
                     <div className="lp-testi-name">{t.name}</div>
                     <div className="lp-testi-role">{t.role}</div>
@@ -687,13 +690,10 @@ export default async function LandingPage() {
           </div>
           <div className="lp-faq">
             {FAQS.map((f, i) => (
-              <div key={i} className="lp-faq-item">
-                <div className="lp-faq-q">
-                  {f.q}
-                  <div className="lp-faq-icon">{i === 0 ? '×' : '+'}</div>
-                </div>
-                {i === 0 && <div className="lp-faq-a">{f.a}</div>}
-              </div>
+              <details key={i} className="lp-faq-item">
+                <summary className="lp-faq-q">{f.q}</summary>
+                <div className="lp-faq-a">{f.a}</div>
+              </details>
             ))}
           </div>
         </div>
@@ -713,10 +713,10 @@ export default async function LandingPage() {
               <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Bergabung bersama creator Indonesia</span>
             </div>
             <h2 className="lp-cta-block-h2">Mulai kelola konten<br />lebih terstruktur.</h2>
-            <p className="lp-cta-block-sub">Tanpa kartu kredit · Akun langsung aktif</p>
+            <p className="lp-cta-block-sub">Lifetime deal · Bayar sekali, pakai selamanya</p>
           </div>
           <div className="lp-cta-block-right">
-            <Link href="/register" className="lp-btn-white">Mulai Gratis →</Link>
+            <Link href="/register" className="lp-btn-white">Mulai Sekarang →</Link>
           </div>
         </div>
       </div>
@@ -754,9 +754,17 @@ export default async function LandingPage() {
           <div>
             <div className="lp-footer-col-title">Info</div>
             <div className="lp-footer-links">
-              {['Kebijakan Privasi','Syarat & Ketentuan','Hubungi Kami'].map(l => (
-                <a key={l} href="#" className="lp-footer-link">{l}</a>
-              ))}
+              <a href="/privacy" className="lp-footer-link">Kebijakan Privasi</a>
+              <a href="/terms" className="lp-footer-link">Syarat & Ketentuan</a>
+              <a href="mailto:hello@kreaflow.id" className="lp-footer-link">Hubungi Kami</a>
+            </div>
+          </div>
+          <div>
+            <div className="lp-footer-col-title">Sosial</div>
+            <div className="lp-footer-links">
+              <a href="https://www.tiktok.com/@kreaflowid" target="_blank" rel="noopener noreferrer" className="lp-footer-link">TikTok</a>
+              <a href="https://www.instagram.com/kreaflowid" target="_blank" rel="noopener noreferrer" className="lp-footer-link">Instagram</a>
+              <a href="https://www.youtube.com/@kreaflowid" target="_blank" rel="noopener noreferrer" className="lp-footer-link">YouTube</a>
             </div>
           </div>
         </div>
