@@ -139,6 +139,8 @@ body {
 @media (max-width: 768px) {
   /* Sprint sidebar: hide so kanban gets full width */
   .kf-sprint-sidebar { display: none !important; }
+  /* Sprint mobile bar: replace sidebar with top strip */
+  .kf-sprint-mobile-bar { display: flex !important; }
   /* IG preview modals: clamp to viewport */
   .kf-ig-modal { max-width: calc(100vw - 32px) !important; width: 100% !important; }
   /* Side drawer: clamp to viewport width */

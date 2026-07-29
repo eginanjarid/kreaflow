@@ -722,6 +722,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         {/* Main: Board */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+          {/* Mobile: Sprint picker bar (hidden on desktop via CSS) */}
+          <div className="kf-sprint-mobile-bar" style={{ display: 'none', background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.06)', padding: '8px 12px', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+            <div style={{ flex: 1, overflowX: 'auto', display: 'flex', gap: 6, paddingBottom: 2 }}>
+              {sprints.map(s => (
+                <button key={s.id} onClick={() => setSelectedSprintId(s.id)}
+                  style={{ flexShrink: 0, padding: '5px 12px', borderRadius: 20, border: `1.5px solid ${selectedSprintId === s.id ? '#1a73e8' : '#e5eaf2'}`, background: selectedSprintId === s.id ? 'rgba(26,115,232,0.08)' : 'transparent', color: selectedSprintId === s.id ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', fontWeight: selectedSprintId === s.id ? 700 : 400, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {s.nama}
+                </button>
+              ))}
+            </div>
+            <button onClick={openSprintModal}
+              style={{ flexShrink: 0, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+              + Sprint
+            </button>
+          </div>
+
           {!selectedSprint ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
               <div style={{ width: 56, height: 56, borderRadius: 16, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
