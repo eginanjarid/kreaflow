@@ -144,6 +144,9 @@ body {
   /* Sprint form: stack assign+deadline and dates grids on mobile */
   .kf-sprint-step-grid { grid-template-columns: 1fr !important; }
   .kf-sprint-dates-grid { grid-template-columns: 1fr 1fr !important; }
+  /* Studio: modal 2-col → 1-col, tab bar wraps */
+  .kf-studio-modal-grid { grid-template-columns: 1fr !important; }
+  .kf-studio-modal-grid > div:first-child { border-right: none !important; border-bottom: 1px solid #f3f4f6; }
   /* IG preview modals: clamp to viewport */
   .kf-ig-modal { max-width: calc(100vw - 32px) !important; width: 100% !important; }
   /* Side drawer: clamp to viewport width */
