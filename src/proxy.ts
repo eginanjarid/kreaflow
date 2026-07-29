@@ -26,7 +26,9 @@ export async function proxy(request: NextRequest) {
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register')
 
-  const isPublicRoute = request.nextUrl.pathname === '/'
+  const isPublicRoute = request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname === '/privacy' ||
+    request.nextUrl.pathname === '/terms'
 
   if (!user && !isAuthRoute && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
