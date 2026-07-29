@@ -921,22 +921,24 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
       </div>
 
       {/* Tabs */}
-      <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #f3f4f6', paddingBottom: 0 }}>
-        {TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            style={{
-              padding: '10px 16px', background: 'transparent', border: 'none',
-              borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent',
-              color: tab === t.id ? '#1a73e8' : '#6b7280',
-              fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400,
-              cursor: 'pointer', transition: 'all 0.15s', marginBottom: -1,
-              flexShrink: 0, whiteSpace: 'nowrap',
-            }}>
-            {t.label}
-          </button>
-        ))}
+      <div className="kf-tabs-wrap">
+        <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #f3f4f6', paddingBottom: 0 }}>
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              style={{
+                padding: '10px 16px', background: 'transparent', border: 'none',
+                borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent',
+                color: tab === t.id ? '#1a73e8' : '#6b7280',
+                fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400,
+                cursor: 'pointer', transition: 'all 0.15s', marginBottom: -1,
+                flexShrink: 0, whiteSpace: 'nowrap',
+              }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {error && (

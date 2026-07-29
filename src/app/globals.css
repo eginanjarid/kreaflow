@@ -100,12 +100,21 @@ body {
 }
 .kf-tabs-scroll::-webkit-scrollbar { display: none; }
 
+/* Wrapper that holds the right-edge gradient indicator */
+.kf-tabs-wrap { position: relative; }
 @media (max-width: 768px) {
-  /* Tab bars: fade right edge as scroll hint */
-  .kf-tabs-scroll {
-    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
-    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  .kf-tabs-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 56px;
+    background: linear-gradient(to right, transparent, var(--tabs-bg, #f5f7fb));
+    pointer-events: none;
+    z-index: 2;
   }
+}
+
+@media (max-width: 768px) {
   /* Sprint sidebar: hide so kanban gets full width */
   .kf-sprint-sidebar { display: none !important; }
   /* IG preview modals: clamp to viewport */
