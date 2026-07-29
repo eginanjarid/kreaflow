@@ -960,7 +960,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   : freqLevel.id === 2 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6c0 0 5-2 11-2s11 2 11 2"/><path d="M1 12c0 0 5 2 11 2s11-2 11-2"/><path d="M1 18c0 0 5-2 11-2s11 2 11 2"/></svg>
                   : freqLevel.id === 3 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
                   : freqLevel.id === 4 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/></svg>
-                  : freqLevel.id === 5 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+                  : freqLevel.id === 5 ? <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
                   : <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
                 </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: freqLevel.color, letterSpacing: '-0.5px', marginBottom: 6 }}>{freqLevel.name}</div>
@@ -1114,7 +1114,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             type="button"
             disabled={!profile.suka}
             onClick={() => setAiModal({ prompt: buildNichePrompt() })}
-            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.suka ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
+            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.suka ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8, alignSelf: 'flex-start' }}>
             Generate dengan AI
           </button>
           {/* Niche Options CRUD */}
@@ -1261,7 +1261,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             type="button"
             disabled={!profile.kelebihan}
             onClick={() => setAiModal({ prompt: buildStoryPrompt() })}
-            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8 }}>
+            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8, alignSelf: 'flex-start' }}>
             Generate dengan AI
           </button>
 
