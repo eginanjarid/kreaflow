@@ -97,7 +97,6 @@ body {
 /* Scrollable tab bars */
 .kf-tabs-scroll {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;         /* hidden on desktop */
 }
 .kf-tabs-scroll::-webkit-scrollbar { display: none; }
