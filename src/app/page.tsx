@@ -58,8 +58,10 @@ const CSS = `
   .lp-hero { max-width: 1160px; margin: 0 auto; padding: 80px 28px 0; text-align: center; position: relative; z-index: 1; }
   .lp-hero-social { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; font-size: 0.82rem; color: #64748b; font-weight: 500; }
   .lp-avatars { display: flex; }
-  .lp-avatar { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #eef3ff; margin-left: -6px; background: #cbd5e1; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; color: #fff; }
+  .lp-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #eef3ff; margin-left: -8px; overflow: hidden; object-fit: cover; display: block; }
   .lp-avatar:first-child { margin-left: 0; }
+  .lp-avatar-cta { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1557b0; margin-left: -8px; overflow: hidden; object-fit: cover; display: block; }
+  .lp-avatar-cta:first-child { margin-left: 0; }
   .lp-hero-h1 { font-size: clamp(2.6rem, 5.5vw, 4rem); font-weight: 900; line-height: 1.08; letter-spacing: -2px; color: #0f172a; margin-bottom: 18px; }
   .lp-hero-sub { font-size: 1rem; color: #64748b; max-width: 480px; margin: 0 auto 36px; line-height: 1.7; }
   .lp-hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
@@ -102,6 +104,12 @@ const CSS = `
   .lp-mockup-tag { font-size: 0.6rem; padding: 2px 7px; border-radius: 5px; font-weight: 700; white-space: nowrap; }
   .lp-mockup-plat { font-size: 0.6rem; color: #94a3b8; white-space: nowrap; }
 
+
+  /* BRAND BAR */
+  .lp-brandbar { border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; background: #fff; padding: 18px 28px; overflow: hidden; }
+  .lp-brandbar-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .lp-brandbar-label { font-size: 0.75rem; color: #cbd5e1; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  .lp-brandbar-item { font-size: 0.8rem; font-weight: 600; color: #94a3b8; white-space: nowrap; padding: 4px 12px; border-radius: 20px; background: #f8fafc; }
 
   /* PILL BADGE */
   .lp-pill { display: inline-block; background: #fff3ed; border: 1px solid #fed7aa; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 700; color: #c2410c; margin-bottom: 14px; }
@@ -284,15 +292,16 @@ export default async function LandingPage() {
         <div className="lp-hero">
           <div className="lp-hero-social">
             <div className="lp-avatars">
-              {['RA','DK','FN','AS','BW'].map((i,idx) => (
-                <div key={idx} className="lp-avatar" style={{ background: ['#1a73e8','#059669','#f59e0b','#8b5cf6','#ef4444'][idx] }}>{i}</div>
+              {[47, 53, 58, 62, 65].map((n) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={n} className="lp-avatar" src={`https://i.pravatar.cc/60?img=${n}`} alt="user" />
               ))}
             </div>
             Dipercaya creator & affiliator Indonesia
           </div>
           <h1 className="lp-hero-h1">
             Workflow konten dari ide<br />
-            sampai publikasi — satu platform.
+            sampai publikasi, satu platform.
           </h1>
           <p className="lp-hero-sub">
             Brand, konten, jadwal, dan performa terhubung dalam satu alur kerja. Tidak perlu pindah-pindah tools lagi.
@@ -368,6 +377,16 @@ export default async function LandingPage() {
         </div>
       </div>
 
+
+      {/* BRAND BAR */}
+      <div className="lp-brandbar">
+        <div className="lp-brandbar-inner">
+          <span className="lp-brandbar-label">Cocok untuk</span>
+          {['TikTok Creator','Affiliator Shopee','Instagram Creator','YouTube Creator','Brand Lokal','SMM Agency'].map(b => (
+            <span key={b} className="lp-brandbar-item">{b}</span>
+          ))}
+        </div>
+      </div>
 
       {/* PLATFORM */}
       <section className="lp-sec" id="fitur">
@@ -686,8 +705,9 @@ export default async function LandingPage() {
           <div className="lp-cta-block-left">
             <div className="lp-cta-block-social">
               <div className="lp-avatars">
-                {['RA','DK','FN','AS','BW'].map((i,idx) => (
-                  <div key={idx} className="lp-avatar" style={{ border: '2px solid #1557b0', background: ['#fff','#dbeafe','#bfdbfe','#93c5fd','#60a5fa'][idx], color: '#1a73e8' }}>{i}</div>
+                {[47, 53, 58, 62, 65].map((n) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={n} className="lp-avatar-cta" src={`https://i.pravatar.cc/60?img=${n}`} alt="user" />
                 ))}
               </div>
               <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Bergabung bersama creator Indonesia</span>
