@@ -399,19 +399,19 @@ export default function StudioModule({ initialContents, products, initialNotific
         </div>
       ) : viewMode === 'ig' ? (
         /* IG Profile Mockup */
-        <div style={{ maxWidth: 480, margin: '0 auto', background: '#000', borderRadius: 20, border: '1px solid #f3f4f6', overflow: 'hidden' }}>
+        <div style={{ maxWidth: 480, margin: '0 auto', background: '#fff', borderRadius: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
           {/* Top bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
               <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#111827' }}>{handle}</span>
             </div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </div>
           {/* Profile info */}
           <div style={{ padding: '0 16px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 14 }}>
-              <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.8rem', color: '#fff', flexShrink: 0, border: '3px solid #000', outline: '2px solid #444' }}>{initial}</div>
+              <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.8rem', color: '#fff', flexShrink: 0, border: '3px solid #fff', outline: '2px solid #f3f4f6' }}>{initial}</div>
               <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around' }}>
                 {[['Postingan', filtered.length], ['Pengikut', '1,234'], ['Mengikuti', '567']].map(([label, val]) => (
                   <div key={label as string} style={{ textAlign: 'center' }}>
@@ -424,15 +424,15 @@ export default function StudioModule({ initialContents, products, initialNotific
             <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827', marginBottom: 2 }}>{workspaceName}</div>
             <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 12 }}>Content preview — KreaFlow Studio</div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '7px', color: '#e5e7eb', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Edit profil</button>
-              <button style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '7px', color: '#e5e7eb', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Bagikan profil</button>
+              <button style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px', color: '#111827', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Edit profil</button>
+              <button style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px', color: '#111827', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Bagikan profil</button>
             </div>
           </div>
           {/* Highlights */}
           <div style={{ display: 'flex', gap: 14, padding: '0 16px 16px', overflowX: 'auto' }}>
             {['Baru', 'Tips', 'Promo', 'Behind'].map((h, i) => (
               <div key={h} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid rgba(255,255,255,0.2)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#6b7280' }}>{i === 0 ? '+' : ''}</div>
+                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #9ca3af' : '2px solid #e5e7eb', background: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#6b7280' }}>{i === 0 ? '+' : ''}</div>
                 <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{h}</span>
               </div>
             ))}
@@ -440,11 +440,11 @@ export default function StudioModule({ initialContents, products, initialNotific
           {/* Tab bar */}
           <div style={{ display: 'flex', borderTop: '1px solid #f3f4f6', borderBottom: '1px solid #f3f4f6' }}>
             {([
-              { key: 'grid' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill={igTab==='grid'?'#f1f5f9':'none'} stroke={igTab==='grid'?'none':'#555'} strokeWidth="1.5"><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg> },
-              { key: 'reels' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={igTab==='reels'?'#f1f5f9':'#555'} strokeWidth="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> },
-              { key: 'tagged' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={igTab==='tagged'?'#f1f5f9':'#555'} strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
+              { key: 'grid' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill={igTab==='grid'?'#111827':'none'} stroke={igTab==='grid'?'none':'#9ca3af'} strokeWidth="1.5"><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg> },
+              { key: 'reels' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={igTab==='reels'?'#111827':'#9ca3af'} strokeWidth="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> },
+              { key: 'tagged' as IGTab, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={igTab==='tagged'?'#111827':'#9ca3af'} strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
             ]).map(t => (
-              <button key={t.key} onClick={() => setIgTab(t.key)} style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '10px 0', background: 'transparent', border: 'none', borderBottom: igTab === t.key ? '1px solid #f1f5f9' : '1px solid transparent', cursor: 'pointer' }}>{t.icon}</button>
+              <button key={t.key} onClick={() => setIgTab(t.key)} style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '10px 0', background: 'transparent', border: 'none', borderBottom: igTab === t.key ? '1px solid #111827' : '1px solid transparent', cursor: 'pointer' }}>{t.icon}</button>
             ))}
           </div>
           {/* Grid */}
@@ -453,27 +453,27 @@ export default function StudioModule({ initialContents, products, initialNotific
               <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280', fontSize: '0.82rem' }}>Tidak ada foto yang menandai kamu</div>
             )
             return (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#f0f0f0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#e5e7eb' }}>
                 {igFiltered.map(c => {
                   const thumb = getThumbnail(c)
                   const isVideo = VIDEO_FORMATS.includes(c.format)
                   return (
                     <div key={c.id}
-                      style={{ position: 'relative', aspectRatio: igTab === 'reels' ? '9/16' : '1/1', overflow: 'hidden', cursor: 'pointer', background: '#fff' }}
+                      style={{ position: 'relative', aspectRatio: igTab === 'reels' ? '9/16' : '1/1', overflow: 'hidden', cursor: 'pointer', background: '#f3f4f6' }}
                       onMouseEnter={() => setHoveredId(c.id)} onMouseLeave={() => setHoveredId(null)}
                       onClick={() => igTab === 'reels' ? setPreviewReels(c) : setPreviewPost(c)}>
                       {thumb ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
                       {c.format && <div style={{ position: 'absolute', bottom: 4, left: 4, fontSize: '0.52rem', fontWeight: 600, color: '#fff', background: isVideo ? 'rgba(220,39,39,0.85)' : 'rgba(30,64,175,0.85)', padding: '2px 4px', borderRadius: 3 }}>{c.format}</div>}
-                      <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#6b7280', boxShadow: '0 0 4px rgba(0,0,0,0.7)' }} />
-                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.15s' }}>
+                      <div style={{ position: 'absolute', top: 4, right: 4, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#6b7280', boxShadow: '0 0 4px rgba(0,0,0,0.4)' }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.15s' }}>
                         <span style={{ fontSize: '0.58rem', fontWeight: 600, color: '#fff', textAlign: 'center', padding: '0 4px', lineHeight: 1.3 }}>{(c.judul || '').slice(0, 22)}{(c.judul || '').length > 22 ? '…' : ''}</span>
                       </div>
                     </div>
                   )
                 })}
                 {Array.from({ length: Math.max(0, 9 - igFiltered.length) }).map((_, i) => (
-                  <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#fff', border: '1px dashed #d1d5db' }}>
-                    {i === 0 && igFiltered.length === 0 && <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '0.7rem', color: '#e5eaf2', textAlign: 'center', padding: 4 }}>{igTab === 'reels' ? 'Belum ada Reels' : 'Belum ada konten'}</span></div>}
+                  <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#f9fafb', border: '1px dashed #d1d5db' }}>
+                    {i === 0 && igFiltered.length === 0 && <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '0.7rem', color: '#9ca3af', textAlign: 'center', padding: 4 }}>{igTab === 'reels' ? 'Belum ada Reels' : 'Belum ada konten'}</span></div>}
                   </div>
                 ))}
               </div>
