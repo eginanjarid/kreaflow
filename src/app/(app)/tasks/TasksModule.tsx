@@ -376,7 +376,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Tasks</h1>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Kelola tugas dan sprint produksi konten kamu</p>
@@ -848,7 +848,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <label style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Langkah-langkah Sprint</label>
                   <button type="button" onClick={addCustomStep}
-                    style={{ background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '4px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
+                    style={{ background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '4px 12px', color: '#9fa9ba', fontSize: '0.75rem', cursor: 'pointer' }}>
                     + Tambah Step
                   </button>
                 </div>

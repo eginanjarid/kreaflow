@@ -87,7 +87,7 @@ export default function NotificationsModule({ initialNotifs, workspaceId }: {
   return (
     <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontWeight: 800, fontSize: '1.4rem', color: '#111827', letterSpacing: '-0.3px', margin: 0 }}>Notifikasi</h1>
           {unread > 0 && <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 2 }}>{unread} belum dibaca</div>}
