@@ -550,7 +550,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 80px)', overflow: 'hidden' }}>
       <style>{`
         .kf-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
         .kf-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10) !important; transform: translateY(-1px); }
@@ -575,8 +575,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
     {activeTab === 'tasks' ? (
       // ── TASKS TAB ──────────────────────────────────────────────────────────
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', maxWidth: 720 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 0', maxWidth: 720 }}>
+        <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
             <div style={{ fontWeight: 800, color: '#111827', fontSize: '1.1rem' }}>Tasks</div>
             <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 2 }}>Checklist manual — non-konten (beli alat, meeting, dll)</div>
@@ -756,7 +756,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                   <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
                     style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
                     <option value="">Semua Produk</option>
@@ -911,7 +911,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {/* Add step */}
                 <div style={{ marginTop: 8, position: 'relative' }}>
                   <button type="button" onClick={() => setAddStepOpen(v => !v)}
-                    style={{ width: '100%', background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                    style={{ width: '100%', background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                     <span>+</span> Tambah Step
                   </button>
                   {addStepOpen && (
@@ -1060,7 +1060,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <button
                     type="button"
                     onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
-                    style={{ flex: 1, background: 'transparent', border: '1px dashed #2a2a2a', borderRadius: 7, padding: '6px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>
+                    style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>
                     + Tambah Baris
                   </button>
                   {products.length > 0 && (
