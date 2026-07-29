@@ -92,6 +92,14 @@ body {
   .hide-xs { display: none !important; }
 }
 
+/* Scrollable tab bars — always, so swipe works on mobile */
+.kf-tabs-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.kf-tabs-scroll::-webkit-scrollbar { display: none; }
+
 @media (max-width: 768px) {
   /* Sprint sidebar: hide on mobile so kanban gets full width */
   .kf-sprint-sidebar { display: none !important; }

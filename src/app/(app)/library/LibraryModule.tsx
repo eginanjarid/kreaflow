@@ -714,10 +714,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             </div>
 
             {/* Modal Tabs */}
-            <div style={{ display: 'flex', borderBottom: '1px solid #f3f4f6', flexShrink: 0 }}>
+            <div className="kf-tabs-scroll" style={{ display: 'flex', borderBottom: '1px solid #f3f4f6', flexShrink: 0 }}>
               {MODAL_TABS.map(t => (
                 <button key={t.id} onClick={() => setModal(m => ({ ...m, tab: t.id }))}
-                  style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+                  style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1, flexShrink: 0, whiteSpace: 'nowrap' }}>
                   {t.label}
                 </button>
               ))}
