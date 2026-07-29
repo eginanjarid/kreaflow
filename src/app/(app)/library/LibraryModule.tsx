@@ -45,7 +45,7 @@ const STATUS_COLOR: Record<string, string> = {
   Ready: '#166534', Scheduled: '#1e40af', Posted: '#6b21a8',
 }
 const STATUS_BG: Record<string, string> = {
-  Draft: '#f1f5f9',
+  Draft: '#f3f4f6',
   'Naskah Siap': 'rgba(245,158,11,0.12)',
   Produksi: 'rgba(59,130,246,0.12)',
   'Siap Tayang': 'rgba(34,197,94,0.12)',
@@ -65,7 +65,7 @@ function emptyIdea(workspaceId: string): ContentIdea {
 
 function fieldStyle(extra?: object) {
   return {
-    width: '100%', background: '#f8fafc', border: '1px solid #e5eaf2',
+    width: '100%', background: '#f3f4f6', border: 'none',
     borderRadius: 8, padding: '10px 12px', color: '#111827',
     fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const,
     ...extra,
@@ -194,18 +194,18 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
           </button>
           {idea.canva_url && (
             <a href={idea.canva_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px', color: '#1a73e8', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+              style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px', color: '#93c5fd', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
               Buka Canva ↗
             </a>
           )}
           {idea.gdrive_url && (
             <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px', color: '#0284c7', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+              style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px', color: '#7dd3fc', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
               Drive ↗
             </a>
           )}
           <button onClick={onClose}
-            style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px 12px', color: '#e5e7eb', fontSize: '0.82rem', cursor: 'pointer' }}>
             ✕
           </button>
         </div>
@@ -230,7 +230,7 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
       onClick={onClose}>
       {/* Reel container */}
       <div onClick={e => e.stopPropagation()}
-        style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid #e5eaf2', flexShrink: 0 }}>
+        style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
 
         {/* Background thumbnail */}
         {thumb
@@ -310,16 +310,16 @@ function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
           Edit Konten
         </button>
         {idea.canva_url && (
-          <a href={idea.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+          <a href={idea.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', color: '#93c5fd', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
             Canva ↗
           </a>
         )}
         {idea.gdrive_url && (
-          <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#0284c7', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
+          <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', color: '#7dd3fc', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
             Drive ↗
           </a>
         )}
-        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 12px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}>
+        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', color: '#e5e7eb', fontSize: '0.78rem', cursor: 'pointer' }}>
           ✕
         </button>
       </div>
@@ -353,7 +353,7 @@ function MediaPreview({ idea }: { idea: ContentIdea }) {
         ))}
       </div>
       {/* Preview box */}
-      <div style={{ width: r.w, height: r.h, borderRadius: 8, overflow: 'hidden', border: '1px solid #e5eaf2', background: '#fff', transition: 'all 0.2s' }}>
+      <div style={{ width: r.w, height: r.h, borderRadius: 8, overflow: 'hidden', border: 'none', background: '#f3f4f6', transition: 'all 0.2s' }}>
         {thumb
           ? <img src={thumb} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
           : <ThumbnailPlaceholder idea={idea} />
@@ -382,7 +382,7 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
           const dotColor = pct === 100 ? '#059669' : pct > 0 ? '#d97706' : '#6b7280'
           const dateStr = t.due_date ? t.due_date.slice(5).replace('-', '/') : ''
           return (
-            <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f8fafc', border: '1px solid #e5eaf2', color: '#6b7280' }}>
+            <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f3f4f6', border: 'none', color: '#6b7280' }}>
               <span style={{ color: dotColor, fontSize: '0.7rem' }}>{dot}</span>
               <span>{stepName}</span>
               {dateStr && <span style={{ color: '#6b7280', marginLeft: 1 }}>{dateStr}</span>}
@@ -558,7 +558,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {STATUSES.map(s => (
-          <div key={s} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10, padding: '14px 16px' }}>
+          <div key={s} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#111827' }}>{ideas.filter(c => c.status === s).length}</div>
             <div style={{ fontSize: '0.75rem', color: STATUS_COLOR[s], marginTop: 2, fontWeight: 500 }}>{s}</div>
           </div>
@@ -574,7 +574,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               {s || 'Semua'}
             </button>
           ))}
-          <div style={{ width: 1, background: '#e5eaf2', margin: '0 4px', alignSelf: 'stretch' }} />
+          <div style={{ width: 1, background: '#e5e7eb', margin: '0 4px', alignSelf: 'stretch' }} />
           {['', ...PLATFORMS].map(p => (
             <button key={p} onClick={() => setFilterPlatform(p)}
               style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterPlatform === p ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterPlatform === p ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
@@ -605,12 +605,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
                     <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>{c.status}</span>
-                    {c.format && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#6b7280', background: '#f8fafc', border: '1px solid #e5eaf2' }}>{c.format}</span>}
+                    {c.format && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#6b7280', background: '#f3f4f6', border: 'none' }}>{c.format}</span>}
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {c.platform.map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>)}
-                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f8fafc' }}>{pillarMap[c.pillar_id]}</span>}
-                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f8fafc' }}>{productMap[c.product_id]}</span>}
+                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f3f4f6' }}>{pillarMap[c.pillar_id]}</span>}
+                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f3f4f6' }}>{productMap[c.product_id]}</span>}
                   </div>
                   {c.hook && (
                     <div style={{ marginTop: 8, fontSize: '0.82rem', color: '#6b7280', fontStyle: 'italic', borderLeft: '2px solid #1a73e8', paddingLeft: 10 }}>
@@ -621,7 +621,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                     <SprintTimeline tasks={tasks} productName={productMap[c.product_id]} />
                   )}
                   {c.script && expandedScript === c.id && (
-                    <div style={{ marginTop: 10, background: '#fff', borderRadius: 8, padding: 14, fontSize: '0.8rem', color: '#6b7280', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 200, overflowY: 'auto' }}>
+                    <div style={{ marginTop: 10, background: '#f9fafb', borderRadius: 8, padding: 14, fontSize: '0.8rem', color: '#6b7280', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 200, overflowY: 'auto' }}>
                       {c.script}
                     </div>
                   )}
@@ -629,7 +629,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                   {c.script && (
                     <button onClick={() => setExpandedScript(expandedScript === c.id ? null : c.id!)}
-                      style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
                       {expandedScript === c.id ? 'Tutup' : 'Script'}
                     </button>
                   )}
@@ -640,7 +640,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
                     Edit
                   </button>
-                  <button onClick={() => deleteIdea(c.id!)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                  <button onClick={() => deleteIdea(c.id!)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
                 </div>
               </div>
             </div>
@@ -653,7 +653,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       {scheduleModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 400 }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111827' }}>Jadwalkan ke Calendar</h3>
               <button onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
@@ -664,7 +664,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
               </div>
             ) : (
               <form onSubmit={handleSchedule} style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 12px', fontSize: '0.82rem', color: '#6b7280', border: '1px solid #e5eaf2' }}>
+                <div style={{ background: '#f3f4f6', borderRadius: 8, padding: '10px 12px', fontSize: '0.82rem', color: '#6b7280', border: 'none' }}>
                   <span style={{ color: '#6b7280', fontSize: '0.72rem' }}>Konten: </span>
                   <span style={{ fontWeight: 600, color: '#111827' }}>{scheduleModal.idea.judul}</span>
                 </div>
@@ -690,8 +690,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
-                  <button type="submit" disabled={schedSaving} style={{ background: schedSaving ? '#1557b0' : 'linear-gradient(135deg, #0ea5e9, #38bdf8)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: schedSaving ? 'not-allowed' : 'pointer' }}>
+                  <button type="button" onClick={() => setScheduleModal(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
+                  <button type="submit" disabled={schedSaving} style={{ background: schedSaving ? '#1557b0' : '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: schedSaving ? 'not-allowed' : 'pointer' }}>
                     {schedSaving ? 'Menjadwalkan...' : 'Jadwalkan'}
                   </button>
                 </div>
@@ -706,7 +706,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
             {/* Modal Header */}
-            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>
                 {modal.idea.id ? 'Edit Konten' : 'Tambah Konten'}
               </h2>
@@ -714,7 +714,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
             </div>
 
             {/* Modal Tabs */}
-            <div style={{ display: 'flex', borderBottom: '1px solid #e5eaf2', flexShrink: 0 }}>
+            <div style={{ display: 'flex', borderBottom: '1px solid #f3f4f6', flexShrink: 0 }}>
               {MODAL_TABS.map(t => (
                 <button key={t.id} onClick={() => setModal(m => ({ ...m, tab: t.id }))}
                   style={{ flex: 1, padding: '10px', background: 'transparent', border: 'none', borderBottom: modal.tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: modal.tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.82rem', fontWeight: modal.tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
@@ -750,7 +750,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Status</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#6b7280', background: STATUS_BG[modal.idea.status] || '#f1f5f9', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5eaf2'}33` }}>
+                      <span style={{ fontSize: '0.82rem', padding: '6px 12px', borderRadius: 8, color: STATUS_COLOR[modal.idea.status] || '#6b7280', background: STATUS_BG[modal.idea.status] || '#f3f4f6', fontWeight: 600, border: `1px solid ${STATUS_COLOR[modal.idea.status] || '#e5e7eb'}33` }}>
                         {modal.idea.status || 'Draft'}
                       </span>
                       <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>Diatur otomatis oleh workflow</span>
@@ -776,14 +776,14 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   </div>
                 </div>
                 {['Reels', 'Video Pendek', 'Live'].includes(modal.idea.format) && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '10px 14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f9fafb', border: 'none', borderRadius: 8, padding: '10px 14px' }}>
                     <div>
                       <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827' }}>Tampil di Feed</div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Seperti opsi "Bagikan ke Feed" di Instagram Reels</div>
                     </div>
                     <button type="button"
                       onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
-                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? '#1a73e8' : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                      style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? '#1a73e8' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: modal.idea.show_in_feed !== false ? 23 : 3, transition: 'left 0.2s' }} />
                     </button>
                   </div>
@@ -806,7 +806,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Isi komponen konten atau generate otomatis</div>
                   <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
-                    style={{ background: 'rgba(26,115,232,0.10)', border: '1px solid #1a73e8', borderRadius: 8, padding: '7px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
+                    style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 14px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer', flexShrink: 0 }}>
                     {aiLoading ? '...' : 'Generate AI'}
                   </button>
                 </div>
@@ -836,7 +836,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <label style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500 }}>Script Lengkap</label>
                     <button type="button" disabled={aiLoading || !modal.idea.judul} onClick={generateScript}
-                      style={{ background: 'rgba(26,115,232,0.10)', border: '1px solid #1a73e8', borderRadius: 8, padding: '5px 12px', color: '#1a73e8', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
+                      style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '5px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 600, cursor: aiLoading ? 'not-allowed' : 'pointer' }}>
                       {aiLoading ? 'Generating...' : 'Generate Script'}
                     </button>
                   </div>
@@ -846,8 +846,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
 
 
               {/* Footer */}
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4, borderTop: '1px solid #e5eaf2', marginTop: 4 }}>
-                <button type="button" onClick={closeModal} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4, borderTop: '1px solid #f3f4f6', marginTop: 4 }}>
+                <button type="button" onClick={closeModal} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>
                   Batal
                 </button>
                 <button type="submit" disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
