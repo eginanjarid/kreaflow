@@ -22,7 +22,7 @@ type IGTab = 'grid' | 'reels' | 'tagged'
 
 const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai' }
 const STATUS_COLOR: Record<string, string> = { Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
-const STATUS_BG: Record<string, string> = { Draft: '#f1f5f9', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
+const STATUS_BG: Record<string, string> = { Draft: '#f3f4f6', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
 const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
 
 function extractGdriveId(url: string): string | null {
@@ -46,8 +46,8 @@ function getThumbnail(item: ContentItem): string | null {
 function ThumbnailPlaceholder({ item }: { item: ContentItem }) {
   return (
     <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 8 }}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5eaf2" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <span style={{ fontSize: '0.58rem', color: '#e5eaf2', textAlign: 'center', lineHeight: 1.3 }}>{item.format || 'Preview'}</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span style={{ fontSize: '0.58rem', color: '#d1d5db', textAlign: 'center', lineHeight: 1.3 }}>{item.format || 'Preview'}</span>
     </div>
   )
 }
@@ -95,9 +95,9 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
         <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingInline: 14, marginBottom: 10 }}>{item.scheduled_date ? `Dijadwalkan: ${item.scheduled_date}` : 'Belum dijadwalkan'}</div>
         <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #f3f4f6' }}>
           <button onClick={onEdit} style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 8, padding: 9, color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Input Hasil</button>
-          {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: 9, color: '#1a73e8', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Canva ↗</a>}
-          {item.gdrive_url && <a href={item.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: 9, color: '#0284c7', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Drive ↗</a>}
-          <button onClick={onClose} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>✕</button>
+          {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: 9, color: '#93c5fd', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Canva ↗</a>}
+          {item.gdrive_url && <a href={item.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: 9, color: '#7dd3fc', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>Drive ↗</a>}
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px 12px', color: '#e5e7eb', fontSize: '0.82rem', cursor: 'pointer' }}>✕</button>
         </div>
       </div>
     </div>
@@ -115,7 +115,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, flexDirection: 'column', gap: 12 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid #e5eaf2', flexShrink: 0 }}>
+      <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
         {thumb ? <img src={thumb} alt={item.judul} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ position: 'absolute', inset: 0 }}><ThumbnailPlaceholder item={item} /></div>}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.15) 45%,rgba(0,0,0,0.35) 100%)' }} />
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', padding: '14px 14px 0' }}>
@@ -154,9 +154,9 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
           {item.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>· {item.scheduled_date}</span>}
         </div>
         <button onClick={onEdit} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Input Hasil</button>
-        {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Canva ↗</a>}
-        {item.gdrive_url && <a href={item.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 14px', color: '#0284c7', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Drive ↗</a>}
-        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid #e5eaf2', borderRadius: 8, padding: '6px 12px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}>✕</button>
+        {item.canva_url && <a href={item.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', color: '#93c5fd', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Canva ↗</a>}
+        {item.gdrive_url && <a href={item.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', color: '#7dd3fc', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>Drive ↗</a>}
+        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', color: '#e5e7eb', fontSize: '0.78rem', cursor: 'pointer' }}>✕</button>
       </div>
     </div>
   )
@@ -200,20 +200,20 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 820, maxHeight: '92vh', overflowY: 'auto', background: '#fff', borderRadius: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #e5eaf2' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #f3f4f6' }}>
           <div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111827', marginBottom: 4 }}>{item.judul}</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {product && <span style={{ fontSize: '0.72rem', background: 'rgba(26,115,232,0.10)', color: '#1a73e8', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>{product.nama}</span>}
-              {item.format && <span style={{ fontSize: '0.72rem', background: '#f8fafc', color: '#6b7280', padding: '2px 8px', borderRadius: 4 }}>{item.format}</span>}
-              {(item.platform || []).map(p => <span key={p} style={{ fontSize: '0.72rem', background: '#f8fafc', color: '#6b7280', padding: '2px 8px', borderRadius: 4 }}>{p}</span>)}
+              {item.format && <span style={{ fontSize: '0.72rem', background: '#f3f4f6', color: '#6b7280', padding: '2px 8px', borderRadius: 4 }}>{item.format}</span>}
+              {(item.platform || []).map(p => <span key={p} style={{ fontSize: '0.72rem', background: '#f3f4f6', color: '#6b7280', padding: '2px 8px', borderRadius: 4 }}>{p}</span>)}
               {item.scheduled_date && <span style={{ fontSize: '0.72rem', background: 'rgba(251,146,60,0.1)', color: '#fb923c', padding: '2px 8px', borderRadius: 4 }}>{item.scheduled_date}</span>}
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer', padding: 4, flexShrink: 0 }}>✕</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-          <div style={{ padding: '20px 24px', borderRight: '1px solid #e5eaf2' }}>
+          <div style={{ padding: '20px 24px', borderRight: '1px solid #f3f4f6' }}>
             <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Naskah Copywriter</div>
             {item.hook && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Hook</div><div style={{ fontSize: '0.85rem', color: '#111827', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8, borderLeft: '3px solid #1a73e8' }}>{item.hook}</div></div>}
             {item.body && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Body</div><div style={{ fontSize: '0.85rem', color: '#111827', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8, whiteSpace: 'pre-wrap' }}>{item.body}</div></div>}
@@ -229,7 +229,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Preview URL (thumbnail)</label><input value={previewUrl} onChange={e => setPreviewUrl(e.target.value)} placeholder="Link GDrive thumbnail..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
             <div style={{ marginBottom: 20 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Catatan Studio</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Revisi, catatan untuk scheduler..." rows={3} style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} /></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, color: '#111827', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : 'Simpan Progress'}</button>
+              <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f3f4f6', border: 'none', borderRadius: 8, color: '#111827', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : 'Simpan Progress'}</button>
               <button onClick={handleSelesai} disabled={marking} style={{ padding: 10, background: '#059669', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : 'Tandai Selesai'}</button>
             </div>
           </div>
@@ -247,8 +247,8 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
   const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
 
   return (
-    <div onClick={onClick} style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 20, overflow: 'hidden', cursor: 'pointer', transition: 'border-color 0.15s', display: 'flex', flexDirection: 'column' }}
-      onMouseEnter={e => (e.currentTarget.style.borderColor = '#1a73e8')} onMouseLeave={e => (e.currentTarget.style.borderColor = '#e5eaf2')}>
+    <div onClick={onClick} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.15s', display: 'flex', flexDirection: 'column' }}
+      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(26,115,232,0.15)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)')}>
       <div style={{ aspectRatio: '16/9', background: '#fff', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
         {thumb ? <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={item} />}
         <div style={{ position: 'absolute', top: 8, right: 8, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: stageColor[stage], padding: '2px 8px', borderRadius: 4 }}>{stageLabel[stage]}</div>
@@ -257,8 +257,8 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
         <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#111827', lineHeight: 1.3 }}>{item.judul || '(Tanpa judul)'}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {product && <span style={{ fontSize: '0.68rem', color: '#1a73e8', background: 'rgba(26,115,232,0.12)', padding: '2px 6px', borderRadius: 3 }}>{product.nama}</span>}
-          {item.format && <span style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f8fafc', padding: '2px 6px', borderRadius: 3 }}>{item.format}</span>}
-          {(item.platform || []).slice(0, 2).map(p => <span key={p} style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f8fafc', padding: '2px 6px', borderRadius: 3 }}>{p}</span>)}
+          {item.format && <span style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 6px', borderRadius: 3 }}>{item.format}</span>}
+          {(item.platform || []).slice(0, 2).map(p => <span key={p} style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 6px', borderRadius: 3 }}>{p}</span>)}
         </div>
         {item.hook && <div style={{ fontSize: '0.78rem', color: '#6b7280', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.hook}</div>}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 6 }}>
@@ -273,8 +273,8 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
 function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Notification[]; onClose: () => void; onMarkRead: (id: string) => void }) {
   
   return (
-    <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 340, background: '#fff', borderLeft: '1px solid #e5eaf2', zIndex: 300, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid #e5eaf2' }}>
+    <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 340, background: '#fff', borderLeft: 'none', boxShadow: '-4px 0 24px rgba(0,0,0,0.08)', zIndex: 300, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' }}>
         <div style={{ fontSize: '1rem', fontWeight: 700, color: '#111827' }}>Notifikasi</div>
         <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
       </div>
@@ -282,7 +282,7 @@ function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Not
         {notifications.length === 0
           ? <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.82rem', marginTop: 40 }}>Tidak ada notifikasi</div>
           : notifications.map(n => (
-            <div key={n.id} style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', marginBottom: 8, border: '1px solid #e5eaf2', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+            <div key={n.id} style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', marginBottom: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{NOTIF_ICON_MAP[n.type] || <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fa9ba" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827', marginBottom: 2 }}>{n.title}</div>
@@ -353,7 +353,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Ruang kerja desainer & editor — lihat naskah, input hasil, preview visual</p>
         </div>
         <button onClick={() => setShowNotif(v => !v)}
-          style={{ position: 'relative', background: unread > 0 ? 'rgba(26,115,232,0.12)' : '#f1f5f9', border: `1px solid ${unread > 0 ? '#1a73e8' : '#e5eaf2'}`, borderRadius: 10, padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: '#111827' }}>
+          style={{ position: 'relative', background: unread > 0 ? 'rgba(26,115,232,0.12)' : '#f3f4f6', border: `1px solid ${unread > 0 ? '#1a73e8' : '#e5e7eb'}`, borderRadius: 10, padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: '#111827' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
           <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Notifikasi</span>
           {unread > 0 && <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 18, height: 18, background: '#ef4444', borderRadius: '50%', fontSize: '0.65rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{unread}</span>}
@@ -361,7 +361,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5eaf2', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 0 }}>
           {TAB_CONFIG.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{ background: 'transparent', border: 'none', padding: '10px 16px', cursor: 'pointer', color: tab === t.key ? t.color : '#6b7280', fontWeight: tab === t.key ? 700 : 400, fontSize: '0.875rem', borderBottom: tab === t.key ? `2px solid ${t.color}` : '2px solid transparent', marginBottom: -1, transition: 'all 0.15s' }}>
@@ -424,15 +424,15 @@ export default function StudioModule({ initialContents, products, initialNotific
             <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827', marginBottom: 2 }}>{workspaceName}</div>
             <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 12 }}>Content preview — KreaFlow Studio</div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px', color: '#111827', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Edit profil</button>
-              <button style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px', color: '#111827', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Bagikan profil</button>
+              <button style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '7px', color: '#e5e7eb', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Edit profil</button>
+              <button style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '7px', color: '#e5e7eb', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>Bagikan profil</button>
             </div>
           </div>
           {/* Highlights */}
           <div style={{ display: 'flex', gap: 14, padding: '0 16px 16px', overflowX: 'auto' }}>
             {['Baru', 'Tips', 'Promo', 'Behind'].map((h, i) => (
               <div key={h} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid #e5eaf2', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#6b7280' }}>{i === 0 ? '+' : ''}</div>
+                <div style={{ width: 58, height: 58, borderRadius: '50%', border: i === 0 ? '2px dashed #475569' : '2px solid rgba(255,255,255,0.2)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: i === 0 ? '1.5rem' : '0.8rem', color: '#6b7280' }}>{i === 0 ? '+' : ''}</div>
                 <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{h}</span>
               </div>
             ))}
@@ -453,7 +453,7 @@ export default function StudioModule({ initialContents, products, initialNotific
               <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280', fontSize: '0.82rem' }}>Tidak ada foto yang menandai kamu</div>
             )
             return (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#f8fafc' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5, background: '#f0f0f0' }}>
                 {igFiltered.map(c => {
                   const thumb = getThumbnail(c)
                   const isVideo = VIDEO_FORMATS.includes(c.format)
@@ -472,7 +472,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                   )
                 })}
                 {Array.from({ length: Math.max(0, 9 - igFiltered.length) }).map((_, i) => (
-                  <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#fff', border: '1px dashed #e5eaf2' }}>
+                  <div key={`empty-${i}`} style={{ aspectRatio: igTab === 'reels' ? '9/16' : '1/1', background: '#fff', border: '1px dashed #d1d5db' }}>
                     {i === 0 && igFiltered.length === 0 && <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '0.7rem', color: '#e5eaf2', textAlign: 'center', padding: 4 }}>{igTab === 'reels' ? 'Belum ada Reels' : 'Belum ada konten'}</span></div>}
                   </div>
                 ))}
@@ -497,7 +497,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                   {thumb ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, gap: 6, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.2s' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#111827', textAlign: 'center', lineHeight: 1.3 }}>{(c.judul || '(Tanpa judul)').slice(0, 40)}</div>
-                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#6b7280', background: STATUS_BG[c.status] || '#f1f5f9', fontWeight: 600 }}>{c.status}</span>
+                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#6b7280', background: STATUS_BG[c.status] || '#f3f4f6', fontWeight: 600 }}>{c.status}</span>
                     {c.canva_url && <a href={c.canva_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.62rem', color: '#1a73e8', textDecoration: 'underline' }}>Canva ↗</a>}
                   </div>
                   {hoveredId !== c.id && <div style={{ position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#6b7280', boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />}
