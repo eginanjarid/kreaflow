@@ -1590,7 +1590,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 <button type="button" onClick={() => {
                   setProfile(p => ({ ...p, color_palette: [...(p.color_palette ?? []), '#000000'] }))
                   setSaved(false)
-                }} style={{ width: 48, height: 48, border: '2px dashed #2a2a2a', borderRadius: 10, background: 'transparent', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                }} style={{ width: 36, height: 36, border: '1.5px dashed #c8d1e0', borderRadius: 10, background: 'transparent', color: '#9fa9ba', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
               )}
             </div>
             <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 6 }}>Klik warna untuk mengubah — maksimal 6 warna</div>
