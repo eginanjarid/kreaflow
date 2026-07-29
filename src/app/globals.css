@@ -141,6 +141,9 @@ body {
   .kf-sprint-sidebar { display: none !important; }
   /* Sprint mobile bar: replace sidebar with top strip */
   .kf-sprint-mobile-bar { display: flex !important; }
+  /* Sprint form: stack assign+deadline and dates grids on mobile */
+  .kf-sprint-step-grid { grid-template-columns: 1fr !important; }
+  .kf-sprint-dates-grid { grid-template-columns: 1fr 1fr !important; }
   /* IG preview modals: clamp to viewport */
   .kf-ig-modal { max-width: calc(100vw - 32px) !important; width: 100% !important; }
   /* Side drawer: clamp to viewport width */

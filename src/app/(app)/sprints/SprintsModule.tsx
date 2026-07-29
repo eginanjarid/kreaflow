@@ -847,13 +847,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
       {/* ── Sprint Create Modal ─────────────────────────────────────────────── */}
       {sprintModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20, overflowY: 'auto' }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 500, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '18px 22px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 100, overflowY: 'auto', padding: '20px 16px' }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 500, margin: '0 auto' }}>
+            <div style={{ padding: '18px 22px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#fff', borderRadius: '20px 20px 0 0', zIndex: 1 }}>
               <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem' }}>Buat Sprint Baru</div>
               <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
-            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
+            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Template selector */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Jenis Konten</label>
@@ -896,7 +896,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </button>
                       </div>
                       {/* Row 2: assign + deadline */}
-                      <div style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr 130px' : '1fr', gap: 6 }}>
+                      <div className="kf-sprint-step-grid" style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr 130px' : '1fr', gap: 6 }}>
                         {workspaceMembers.length > 0 && (
                           <select
                             value={memberId}
@@ -1025,7 +1025,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </button>
                       </div>
                       {/* Baris 2: jadwal posting */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
+                      <div className="kf-sprint-dates-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
                         <div>
                           <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
                           <input
