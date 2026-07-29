@@ -114,6 +114,7 @@ body {
 .kf-tabs-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; /* required for iOS scroll */
+  overscroll-behavior-x: none;       /* prevent rubber-band bounce at edges */
   scrollbar-width: none;             /* hidden on desktop */
 }
 .kf-tabs-scroll::-webkit-scrollbar { display: none; }
