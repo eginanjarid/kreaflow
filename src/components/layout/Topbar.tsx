@@ -51,10 +51,9 @@ function relTime(ts: string) {
 
 type Props = {
   user: { email: string; nama: string }
-  onMenuClick?: () => void
 }
 
-export default function Topbar({ user, onMenuClick }: Props) {
+export default function Topbar({ user }: Props) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -141,48 +140,18 @@ export default function Topbar({ user, onMenuClick }: Props) {
       position: 'relative',
       zIndex: 100,
     }}>
-      {/* Left: Hamburger + Search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginRight: 24 }}>
-        <button onClick={onMenuClick} style={{
-          background: 'none', border: 'none', padding: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: '#5a6a85',
-        }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      {/* Mobile brand (hidden on desktop, shown on mobile) */}
+      <div className="kf-topbar-brand" style={{ alignItems: 'center', gap: 8, marginRight: 'auto' }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
-        </button>
-        <button style={{
-          background: 'none', border: 'none', padding: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: '#5a6a85',
-        }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </button>
+        </div>
+        <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#2a3547', letterSpacing: '-0.3px' }}>KreaFlow</span>
       </div>
 
-      {/* Middle: Quick Nav */}
-      <div className="topbar-nav" style={{ display: 'flex', alignItems: 'center', gap: 28, flex: 1 }}>
-        {[
-          { href: '/sprints', label: 'Sprints' },
-          { href: '/plan', label: 'Plan' },
-          { href: '/studio', label: 'Studio' },
-          { href: '/calendar', label: 'Calendar' },
-        ].map(link => {
-          const active = pathname.startsWith(link.href)
-          return (
-            <Link key={link.href} href={link.href} style={{
-              fontSize: '0.9375rem', fontWeight: active ? 600 : 500,
-              color: active ? '#1a73e8' : '#374151',
-              textDecoration: 'none', transition: 'color 0.15s',
-            }}>
-              {link.label}
-            </Link>
-          )
-        })}
-      </div>
+      {/* Desktop spacer */}
+      <div style={{ flex: 1 }} />
 
       {/* Right actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
