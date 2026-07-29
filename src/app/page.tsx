@@ -761,7 +761,7 @@ export default async function LandingPage() {
           </div>
         </div>
         <div className="lp-footer-bottom">
-          <span className="lp-footer-copy">© 2026 KreaFlow by TUAS DIGITAL · kreaflow.id</span>
+          <span className="lp-footer-copy">© 2026 KreaFlow · PT. Kiblat Pemuda Kreatif · kreaflow.id</span>
           <span className="lp-footer-copy">All rights reserved.</span>
         </div>
       </footer>
