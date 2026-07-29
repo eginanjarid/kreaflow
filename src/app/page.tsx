@@ -243,7 +243,7 @@ const CSS = `
 `
 
 const FAQS = [
-  { q: 'Apa itu KreaFlow?', a: 'KreaFlow adalah platform manajemen konten end-to-end untuk content creator dan affiliator Indonesia. Mulai dari membangun brand, menyusun konten, menjadwalkan, hingga memantau performa — semua dalam satu platform.' },
+  { q: 'Apa itu KreaFlow?', a: 'KreaFlow adalah platform manajemen konten end-to-end untuk content creator dan affiliator Indonesia. Mulai dari membangun brand, menyusun konten, menjadwalkan, hingga memantau performa, semua dalam satu platform.' },
   { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga ini hanya tersedia selama masa launch.' },
   { q: 'Berapa workspace yang bisa saya buat?', a: 'Unlimited. Satu akun bisa mengelola banyak brand atau klien sekaligus tanpa batas.' },
   { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule (Pro Add-on) sedang dalam pengembangan dan akan segera hadir. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
@@ -322,7 +322,7 @@ export default async function LandingPage() {
             </div>
             <div className="lp-hero-float lp-hero-float-2">
               <div className="lp-float-dot" style={{ background: '#22c55e' }} />
-              <span className="lp-float-text">Library — 12 siap</span>
+              <span className="lp-float-text">Library: 12 siap</span>
             </div>
             <div className="lp-hero-float lp-hero-float-3">
               <div className="lp-float-dot" style={{ background: '#1a73e8' }} />
@@ -355,12 +355,12 @@ export default async function LandingPage() {
                 </div>
                 <div className="lp-mockup-main">
                   <div className="lp-mockup-head">
-                    <span className="lp-mockup-title">Library — Bank Konten</span>
+                    <span className="lp-mockup-title">Library: Bank Konten</span>
                     <div className="lp-mockup-addbtn">+ Tambah</div>
                   </div>
                   {[
                     { t: '5 Hook TikTok untuk Produk Skincare', s: 'Siap', sc: '#15803d', sb: '#f0fdf4', p: 'TikTok' },
-                    { t: 'Review Jujur Serum Vitamin C — Naskah', s: 'Draft', sc: '#92400e', sb: '#fffbeb', p: 'Instagram' },
+                    { t: 'Review Jujur Serum Vitamin C, Naskah', s: 'Draft', sc: '#92400e', sb: '#fffbeb', p: 'Instagram' },
                     { t: 'Cara Dapat Komisi Affiliate Tanpa Modal', s: 'Selesai', sc: '#1d4ed8', sb: '#eff6ff', p: 'YouTube' },
                     { t: 'Unboxing Produk Baru GRWM Version', s: 'Draft', sc: '#92400e', sb: '#fffbeb', p: 'TikTok' },
                   ].map((r,i) => (
@@ -393,7 +393,7 @@ export default async function LandingPage() {
         <div className="lp-sec-head">
           <div className="lp-pill">Platform KreaFlow</div>
           <h2 className="lp-h2">Workflow end-to-end<br />dalam satu platform</h2>
-          <p className="lp-sec-sub">Setiap modul terhubung dan saling mendukung — dari membangun brand hingga evaluasi performa konten.</p>
+          <p className="lp-sec-sub">Setiap modul terhubung dan saling mendukung, dari membangun brand hingga evaluasi performa konten.</p>
         </div>
         <div className="lp-platform-card">
           <div className="lp-platform-tabs">
@@ -428,7 +428,7 @@ export default async function LandingPage() {
           </div>
           <div className="lp-platform-screen">
             <div className="lp-platform-screen-head">
-              <span className="lp-platform-screen-title">Brand — Identitas & Content Pillars</span>
+              <span className="lp-platform-screen-title">Brand: Identitas & Content Pillars</span>
               <div className="lp-platform-screen-btn">Edit Brand</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
@@ -464,7 +464,7 @@ export default async function LandingPage() {
                   <div style={{ width: '100%' }}>
                     {[
                       { t: 'Hook TikTok Skincare Vol.2', s: 'Siap', sc: '#15803d', sb: '#f0fdf4' },
-                      { t: 'Script Review Affiliate — Serum C', s: 'Draft', sc: '#92400e', sb: '#fffbeb' },
+                      { t: 'Script Review Affiliate, Serum C', s: 'Draft', sc: '#92400e', sb: '#fffbeb' },
                       { t: 'Caption IG Weekly Recap', s: 'Siap', sc: '#15803d', sb: '#f0fdf4' },
                     ].map((r,i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: '1px solid #f1f5f9', borderRadius: 8, padding: '8px 10px', marginBottom: 5, boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
@@ -477,7 +477,7 @@ export default async function LandingPage() {
               },
               {
                 name: 'Calendar & Sprint',
-                desc: 'Jadwalkan konten secara visual per platform di Calendar. Kelola progres produksi dengan Sprint kanban — plan, in-progress, dan selesai.',
+                desc: 'Jadwalkan konten secara visual per platform di Calendar. Kelola progres produksi dengan Sprint kanban: plan, in-progress, dan selesai.',
                 visual: (
                   <div style={{ width: '100%' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4, marginBottom: 8 }}>
@@ -520,7 +520,7 @@ export default async function LandingPage() {
               },
               {
                 name: 'Brand & Catalog',
-                desc: 'Bangun identitas brand yang konsisten — niche, content pillars, dan tone of voice. Kelola database produk affiliate dan produk sendiri lengkap dengan komisi.',
+                desc: 'Bangun identitas brand yang konsisten,, content pillars, dan tone of voice. Kelola database produk affiliate dan produk sendiri lengkap dengan komisi.',
                 visual: (
                   <div style={{ width: '100%' }}>
                     <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: 10, padding: '12px 14px', marginBottom: 8 }}>
@@ -562,7 +562,7 @@ export default async function LandingPage() {
           <div>
             <div className="lp-split-pill"><div className="lp-pill">Untuk Affiliator</div></div>
             <h2 className="lp-split-h2">Database produk & komisi dalam genggaman</h2>
-            <p className="lp-split-sub">Simpan semua produk affiliate yang kamu promosikan — lengkap dengan link, komisi, dan catatan performa. Tidak ada lagi spreadsheet berantakan.</p>
+            <p className="lp-split-sub">Simpan semua produk affiliate yang kamu promosikan, lengkap dengan link, komisi, dan catatan performa. Tidak ada lagi spreadsheet berantakan.</p>
             <div className="lp-split-list">
               {['Catat komisi per produk dan hitung potensi penghasilan','Tag platform yang akan dipromosikan per produk','Hubungkan langsung ke Sprint dan Plan konten'].map(i => (
                 <div key={i} className="lp-split-item">
@@ -576,7 +576,7 @@ export default async function LandingPage() {
           </div>
           <div className="lp-split-visual">
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Catalog — Produk Affiliate</div>
+              <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Catalog: Produk Affiliate</div>
               {[
                 { name: 'Serum Vit C Somethinc', platform: 'Shopee', komisi: '12%', status: 'Aktif' },
                 { name: 'Sunscreen SPF 50 Azarine', platform: 'TikTok Shop', komisi: '10%', status: 'Aktif' },
@@ -608,7 +608,7 @@ export default async function LandingPage() {
           </div>
           <div className="lp-testi-grid">
             {[
-              { text: '"Sebelum pakai KreaFlow, ide konten gue berserakan di mana-mana — notes, spreadsheet, DM ke diri sendiri. Sekarang semua ada tempatnya dan gue bisa fokus bikin konten."', name: 'Rina Amalia', role: 'TikTok Creator · 120K followers', init: 'RA', color: '#1a73e8' },
+              { text: '"Sebelum pakai KreaFlow, ide konten gue berserakan di mana-mana: notes, spreadsheet, DM ke diri sendiri. Sekarang semua ada tempatnya dan gue bisa fokus bikin konten."', name: 'Rina Amalia', role: 'TikTok Creator · 120K followers', init: 'RA', color: '#1a73e8' },
               { text: '"Sebagai affiliator yang promosiin 10+ produk sekaligus, Catalog dan Sprint KreaFlow beneran ngubah cara kerja gue. Sekarang tahu persis konten mana yang performance-nya bagus."', name: 'Dika Kurniawan', role: 'Affiliator Shopee & TikTok', init: 'DK', color: '#059669' },
               { text: '"Gue handle 3 brand berbeda. Dulu chaosnya minta ampun. KreaFlow bikin gue bisa pisahin workspace per brand dan kelola semua dari satu akun. Game changer."', name: 'Fitri Nadia', role: 'Social Media Manager', init: 'FN', color: '#8b5cf6' },
             ].map(t => (
