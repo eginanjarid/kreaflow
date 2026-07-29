@@ -52,6 +52,7 @@ body {
 .kf-main-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch; /* smooth momentum scroll on iOS */
   overscroll-behavior-y: contain;    /* prevent scroll chaining to body */
 }
