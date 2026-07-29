@@ -191,7 +191,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       {products.length > 0 && (
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <input style={fieldStyle({ maxWidth: 260 })} placeholder="Cari produk..." value={filter} onChange={e => setFilter(e.target.value)} />
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {['', ...tipes].map(t => (
               <button key={t} onClick={() => setFilterTipe(t)}
                 style={{ padding: '8px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: filterTipe === t ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterTipe === t ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterTipe === t ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
