@@ -20,9 +20,42 @@ const CSS = `
   .lp-nav-cta { padding: 9px 20px; border-radius: 8px; background: #1a73e8; color: #fff; font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: background 0.15s; display: inline-block; }
   .lp-nav-cta:hover { background: #1557b0; }
 
+  /* AURORA ANIMATIONS */
+  @keyframes blob1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -30px) scale(1.08); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+  @keyframes blob2 {
+    0%, 100% { transform: translate(0, 0) scale(1.05); }
+    33% { transform: translate(-50px, 30px) scale(0.92); }
+    66% { transform: translate(30px, -20px) scale(1.1); }
+  }
+  @keyframes blob3 {
+    0%, 100% { transform: translate(0, 0) scale(0.95); }
+    50% { transform: translate(30px, 40px) scale(1.05); }
+  }
+  @keyframes float1 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes float3 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
   /* HERO */
-  .lp-hero-wrap { background: #eef3ff; }
-  .lp-hero { max-width: 1160px; margin: 0 auto; padding: 80px 28px 0; text-align: center; }
+  .lp-hero-wrap { background: #eef3ff; position: relative; overflow: hidden; }
+  .lp-aurora { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .lp-aurora-blob { position: absolute; border-radius: 50%; filter: blur(72px); }
+  .lp-aurora-b1 { width: 560px; height: 560px; top: -180px; left: 50%; margin-left: -320px; background: radial-gradient(circle, rgba(26,115,232,0.22) 0%, transparent 70%); animation: blob1 9s ease-in-out infinite; }
+  .lp-aurora-b2 { width: 420px; height: 420px; top: 0; right: -80px; background: radial-gradient(circle, rgba(139,92,246,0.14) 0%, transparent 70%); animation: blob2 11s ease-in-out infinite; }
+  .lp-aurora-b3 { width: 380px; height: 380px; bottom: -60px; left: -60px; background: radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%); animation: blob3 8s ease-in-out infinite; }
+  .lp-hero { max-width: 1160px; margin: 0 auto; padding: 80px 28px 0; text-align: center; position: relative; z-index: 1; }
   .lp-hero-social { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; font-size: 0.82rem; color: #64748b; font-weight: 500; }
   .lp-avatars { display: flex; }
   .lp-avatar { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #eef3ff; margin-left: -6px; background: #cbd5e1; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; color: #fff; }
@@ -38,9 +71,9 @@ const CSS = `
   /* HERO MOCKUP */
   .lp-hero-mockup-wrap { position: relative; max-width: 860px; margin: 0 auto; }
   .lp-hero-float { position: absolute; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(15,23,42,0.12); padding: 10px 14px; z-index: 10; }
-  .lp-hero-float-1 { left: -20px; top: 40px; display: flex; flex-direction: column; gap: 2px; min-width: 130px; }
-  .lp-hero-float-2 { right: -20px; top: 80px; display: flex; align-items: center; gap: 8px; }
-  .lp-hero-float-3 { left: 20px; bottom: 60px; display: flex; align-items: center; gap: 8px; }
+  .lp-hero-float-1 { left: -20px; top: 40px; display: flex; flex-direction: column; gap: 2px; min-width: 130px; animation: float1 4s ease-in-out infinite; }
+  .lp-hero-float-2 { right: -20px; top: 80px; display: flex; align-items: center; gap: 8px; animation: float2 5s ease-in-out infinite; }
+  .lp-hero-float-3 { left: 20px; bottom: 60px; display: flex; align-items: center; gap: 8px; animation: float3 3.5s ease-in-out infinite; }
   .lp-float-label { font-size: 0.62rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
   .lp-float-value { font-size: 0.9rem; font-weight: 800; color: #1a73e8; }
   .lp-float-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -69,12 +102,6 @@ const CSS = `
   .lp-mockup-tag { font-size: 0.6rem; padding: 2px 7px; border-radius: 5px; font-weight: 700; white-space: nowrap; }
   .lp-mockup-plat { font-size: 0.6rem; color: #94a3b8; white-space: nowrap; }
 
-  /* BRAND BAR */
-  .lp-brandbar { border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; background: #fff; padding: 20px 28px; overflow: hidden; }
-  .lp-brandbar-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 0; justify-content: space-around; }
-  .lp-brandbar-label { font-size: 0.75rem; color: #cbd5e1; font-weight: 600; white-space: nowrap; }
-  .lp-brandbar-logos { display: flex; align-items: center; gap: 36px; flex-wrap: wrap; justify-content: center; }
-  .lp-brandbar-item { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; white-space: nowrap; letter-spacing: -0.2px; }
 
   /* PILL BADGE */
   .lp-pill { display: inline-block; background: #fff3ed; border: 1px solid #fed7aa; border-radius: 20px; padding: 4px 14px; font-size: 0.75rem; font-weight: 700; color: #c2410c; margin-bottom: 14px; }
@@ -249,6 +276,11 @@ export default async function LandingPage() {
 
       {/* HERO */}
       <div className="lp-hero-wrap">
+        <div className="lp-aurora" aria-hidden="true">
+          <div className="lp-aurora-blob lp-aurora-b1" />
+          <div className="lp-aurora-blob lp-aurora-b2" />
+          <div className="lp-aurora-blob lp-aurora-b3" />
+        </div>
         <div className="lp-hero">
           <div className="lp-hero-social">
             <div className="lp-avatars">
@@ -336,17 +368,6 @@ export default async function LandingPage() {
         </div>
       </div>
 
-      {/* BRAND BAR */}
-      <div className="lp-brandbar">
-        <div className="lp-brandbar-inner">
-          <span className="lp-brandbar-label">Cocok untuk</span>
-          <div className="lp-brandbar-logos">
-            {['TikTok Creator','Affiliator Shopee','Instagram Creator','YouTube Creator','Brand Lokal','SMM Agency'].map(b => (
-              <span key={b} className="lp-brandbar-item">{b}</span>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {/* PLATFORM */}
       <section className="lp-sec" id="fitur">
