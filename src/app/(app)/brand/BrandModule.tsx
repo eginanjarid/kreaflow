@@ -1659,10 +1659,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {/* Sub-step tabs */}
-              <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #f3f4f6', marginBottom: 24, overflowX: 'auto' }}>
+              <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 0, borderBottom: '1px solid #f3f4f6', marginBottom: 24 }}>
                 {affSteps.map((s, i) => (
                   <button key={s.id} type="button" onClick={() => setAffStep(s.id)}
-                    style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: affStep === s.id ? '2px solid #34d399' : '2px solid transparent', color: affStep === s.id ? '#059669' : '#6b7280', fontSize: '0.82rem', fontWeight: affStep === s.id ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: affStep === s.id ? '2px solid #34d399' : '2px solid transparent', color: affStep === s.id ? '#059669' : '#6b7280', fontSize: '0.82rem', fontWeight: affStep === s.id ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                     <span style={{ width: 20, height: 20, borderRadius: '50%', background: affStep === s.id ? 'rgba(52,211,153,0.15)' : '#f3f4f6', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, color: affStep === s.id ? '#059669' : '#6b7280', flexShrink: 0 }}>{i + 1}</span>
                     {s.label}
                   </button>

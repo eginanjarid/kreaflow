@@ -96,23 +96,26 @@ body {
 .kf-tabs-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  scrollbar-width: none;         /* hidden on desktop */
 }
 .kf-tabs-scroll::-webkit-scrollbar { display: none; }
 
-/* Wrapper that holds the right-edge gradient indicator */
-.kf-tabs-wrap { position: relative; }
+/* On mobile: show thin visible scrollbar as scroll hint */
 @media (max-width: 768px) {
-  .kf-tabs-wrap::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 56px;
-    background: linear-gradient(to right, transparent, var(--tabs-bg, #f5f7fb));
-    pointer-events: none;
-    z-index: 2;
+  .kf-tabs-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+    padding-bottom: 3px;
   }
+  .kf-tabs-scroll::-webkit-scrollbar {
+    display: block;
+    height: 3px;
+  }
+  .kf-tabs-scroll::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 2px; }
+  .kf-tabs-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
 }
+
+.kf-tabs-wrap { position: relative; }
 
 @media (max-width: 768px) {
   /* Sprint sidebar: hide so kanban gets full width */
