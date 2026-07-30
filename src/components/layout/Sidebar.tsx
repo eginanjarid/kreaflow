@@ -178,6 +178,20 @@ export default function Sidebar({ workspace, isSuperAdmin, className }: Props) {
         })}
       </nav>
 
+      {/* Upgrade banner (free plan only) */}
+      {workspace && workspace.plan !== 'lifetime' && (
+        collapsed ? (
+          <Link href="/upgrade" title="Upgrade ke Lifetime" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '6px 10px', height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', textDecoration: 'none', flexShrink: 0 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+          </Link>
+        ) : (
+          <Link href="/upgrade" style={{ display: 'block', margin: '6px 10px', padding: '10px 12px', background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', borderRadius: 10, textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fff', marginBottom: 2 }}>Upgrade ke Lifetime</div>
+            <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.75)' }}>Rp149.000 · bayar sekali</div>
+          </Link>
+        )
+      )}
+
       {/* Toggle button */}
       <div style={{ borderTop: '1px solid #f1f5f9', padding: '10px 0', display: 'flex', justifyContent: collapsed ? 'center' : 'flex-end', paddingRight: collapsed ? 0 : 12, flexShrink: 0 }}>
         <button
