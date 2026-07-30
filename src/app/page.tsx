@@ -263,7 +263,7 @@ const FAQS = [
 export default async function LandingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (user) redirect('/brand')
+  if (user) redirect('/sprints')
 
   return (
     <div className="lp">

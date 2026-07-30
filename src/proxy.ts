@@ -35,7 +35,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && isAuthRoute) {
-    return NextResponse.redirect(new URL('/brand', request.url))
+    return NextResponse.redirect(new URL('/sprints', request.url))
   }
 
   return supabaseResponse
