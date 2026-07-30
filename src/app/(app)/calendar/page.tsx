@@ -14,6 +14,9 @@ export default async function CalendarPage() {
 
   const wsId = member.workspace_id
 
+  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brandCheck?.niche) redirect('/brand?setup=1')
+
   const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: plannedRaw }] = await Promise.all([
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id').eq('workspace_id', wsId),

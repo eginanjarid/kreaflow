@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import BrandModule from './BrandModule'
 
-export default async function BrandPage() {
+export default async function BrandPage({ searchParams }: { searchParams: Promise<{ setup?: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -24,13 +24,24 @@ export default async function BrandPage() {
   ])
 
   const modes = (workspace?.modes as string[] | null) ?? ['creator']
+  const { setup } = await searchParams
 
   return (
-    <BrandModule
-      initialProfile={profile}
-      workspaceId={member.workspace_id}
-      modes={modes}
-      initialAkun={(akun || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
-    />
+    <>
+      {setup === '1' && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '12px 18px', margin: '16px 0 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: '1rem' }}>⚡</span>
+          <span style={{ fontSize: '0.875rem', color: '#92400e', fontWeight: 600 }}>
+            Lengkapi Brand terlebih dahulu — isi minimal Niche untuk mulai menggunakan Sprint, Plan, Studio, dan Calendar.
+          </span>
+        </div>
+      )}
+      <BrandModule
+        initialProfile={profile}
+        workspaceId={member.workspace_id}
+        modes={modes}
+        initialAkun={(akun || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
+      />
+    </>
   )
 }

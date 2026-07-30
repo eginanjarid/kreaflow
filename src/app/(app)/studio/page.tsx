@@ -19,6 +19,9 @@ export default async function StudioPage() {
 
   const wsId = member.workspace_id
 
+  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brandCheck?.niche) redirect('/brand?setup=1')
+
   const [{ data: contents }, { data: products }, { data: notifications }, { data: workspace }] = await Promise.all([
     supabase
       .from('kf_content_ideas')

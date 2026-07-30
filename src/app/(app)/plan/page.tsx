@@ -14,6 +14,9 @@ export default async function PlanPage() {
 
   const wsId = member.workspace_id
 
+  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brandCheck?.niche) redirect('/brand?setup=1')
+
   const [{ data: platforms }, { data: campaigns }, { data: brandProfile }, { data: products }, { data: workspace }, { data: tasks }, { data: sprintDrafts }] = await Promise.all([
     supabase.from('kf_plan_platforms').select('*').eq('workspace_id', wsId),
     supabase.from('kf_campaigns').select('*').eq('workspace_id', wsId).order('tanggal_mulai', { ascending: false }),

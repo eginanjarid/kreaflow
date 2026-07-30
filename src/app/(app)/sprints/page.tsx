@@ -20,6 +20,9 @@ export default async function SprintsPage() {
 
   const wsId = member.workspace_id
 
+  const { data: brand } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brand?.niche) redirect('/brand?setup=1')
+
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const [{ data: sprints }, { data: contents }, { data: products }, { data: membersRaw }, { data: tasks }, { data: authUsersData }, { data: accounts }] = await Promise.all([
