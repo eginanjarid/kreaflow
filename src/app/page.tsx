@@ -17,7 +17,7 @@ const CSS = `
   .lp-nav-link:hover { background: #f8fafc; color: #0f172a; }
   .lp-nav-right { display: flex; align-items: center; gap: 10px; }
   .lp-nav-login { padding: 8px 16px; font-size: 0.875rem; font-weight: 500; color: #64748b; text-decoration: none; }
-  .lp-nav-cta { padding: 9px 20px; border-radius: 8px; background: #1a73e8; color: #fff; font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: background 0.15s; display: inline-block; }
+  .lp-nav-cta { padding: 9px 20px; border-radius: 8px; background: #1a73e8; color: #fff; font-size: 0.875rem; font-weight: 700; text-decoration: none; transition: background 0.15s; display: inline-block; white-space: nowrap; }
   .lp-nav-cta:hover { background: #1557b0; }
 
   /* AURORA ANIMATIONS */
@@ -124,8 +124,9 @@ const CSS = `
 
   /* PLATFORM SECTION (blue card) */
   .lp-platform-card { background: #1a73e8; border-radius: 20px; padding: 36px 36px 0; overflow: hidden; }
-  .lp-platform-tabs { display: flex; gap: 0; margin-bottom: 28px; }
-  .lp-platform-tab { padding: 8px 18px; border-radius: 7px; font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.5); cursor: default; display: flex; align-items: center; gap: 7px; }
+  .lp-platform-tabs { display: flex; gap: 0; margin-bottom: 28px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .lp-platform-tabs::-webkit-scrollbar { display: none; }
+  .lp-platform-tab { padding: 8px 18px; border-radius: 7px; font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.5); cursor: default; display: flex; align-items: center; gap: 7px; white-space: nowrap; flex-shrink: 0; }
   .lp-platform-tab.on { background: rgba(255,255,255,0.15); color: #fff; }
   .lp-platform-tab-desc { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; margin-bottom: 28px; }
   .lp-platform-tab-item { }
@@ -237,10 +238,17 @@ const CSS = `
     .lp-hero-h1 { letter-spacing: -1.5px; }
     .lp-sec { padding: 64px 20px; }
     .lp-sec-alt-in { padding: 64px 20px; }
+    .lp-platform-card { padding: 24px 20px 0; border-radius: 16px; }
+    .lp-platform-tab { padding: 7px 14px; font-size: 0.78rem; }
     .lp-platform-tab-desc { grid-template-columns: 1fr; }
     .lp-mockup-sb { display: none; }
-    .lp-footer-inner { grid-template-columns: 1fr; }
+    .lp-nav-login { display: none; }
+    .lp-nav-cta { padding: 8px 14px; font-size: 0.8rem; }
+    .lp-footer-inner { grid-template-columns: 1fr 1fr; }
     .lp-cta-block-wrap { padding: 0 20px 64px; }
+  }
+  @media (max-width: 400px) {
+    .lp-footer-inner { grid-template-columns: 1fr; }
   }
 `
 
