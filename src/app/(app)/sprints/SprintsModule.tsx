@@ -214,6 +214,31 @@ export default function SprintsModule({ initialSprints, initialContents, product
     if (searchParams.get('tab') === 'tasks') setActiveTab('tasks')
   }, [searchParams])
 
+  // Backfill notif untuk sprint lama yang belum punya "Sprint Dimulai" notif
+  useEffect(() => {
+    if (!initialSprints.length) return
+    async function backfillSprintNotifs() {
+      const { data: existing } = await supabase
+        .from('kf_notifications')
+        .select('title')
+        .eq('workspace_id', workspaceId)
+        .eq('type', 'naskah')
+        .like('title', 'Sprint Dimulai%')
+      const existingTitles = new Set((existing || []).map((n: { title: string }) => n.title))
+      const missing = initialSprints.filter(s => !existingTitles.has(`Sprint Dimulai — ${s.nama}`))
+      if (!missing.length) return
+      await supabase.from('kf_notifications').insert(
+        missing.map(s => ({
+          workspace_id: workspaceId,
+          type: 'naskah',
+          title: `Sprint Dimulai — ${s.nama}`,
+          message: `Sprint ini sudah aktif. Buka Plan untuk mulai buat naskah.`,
+        }))
+      )
+    }
+    backfillSprintNotifs()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const [sprints, setSprints] = useState<Sprint[]>(initialSprints)
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [selectedSprintId, setSelectedSprintId] = useState<string | null>(initialSprints[0]?.id || null)
