@@ -12,10 +12,14 @@ export default async function TrackerPage() {
     .eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).single()
   if (!member) redirect('/login')
 
+  const wsId = member.workspace_id
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+
   const { data: metrics } = await supabase
     .from('kf_monthly_metrics').select('*')
-    .eq('workspace_id', member.workspace_id)
+    .eq('workspace_id', wsId)
     .order('year', { ascending: false })
 
-  return <TrackerModule initialMetrics={metrics || []} workspaceId={member.workspace_id} />
+  return <TrackerModule initialMetrics={metrics || []} workspaceId={wsId} />
 }

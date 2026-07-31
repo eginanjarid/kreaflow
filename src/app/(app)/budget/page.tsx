@@ -12,10 +12,14 @@ export default async function BudgetPage() {
     .eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).single()
   if (!member) redirect('/login')
 
+  const wsId = member.workspace_id
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+
   const { data: transactions } = await supabase
     .from('kf_transactions').select('*')
-    .eq('workspace_id', member.workspace_id)
+    .eq('workspace_id', wsId)
     .order('tanggal', { ascending: false })
 
-  return <BudgetModule initialTx={transactions || []} workspaceId={member.workspace_id} />
+  return <BudgetModule initialTx={transactions || []} workspaceId={wsId} />
 }

@@ -9,15 +9,15 @@ export async function POST(req: NextRequest) {
   const { workspaceId, updates } = await req.json()
   if (!workspaceId) return NextResponse.json({ error: 'workspaceId wajib diisi' }, { status: 400 })
 
-  // Verify user is a member of this workspace
+  // Verify user is owner or admin of this workspace
   const { data: member } = await supabaseUser
     .from('kf_workspace_members')
-    .select('workspace_id')
+    .select('role')
     .eq('user_id', user.id)
     .eq('workspace_id', workspaceId)
     .single()
 
-  if (!member) return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
+  if (!member || member.role === 'member') return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
 
   const supabase = createServiceClient()
   const { error } = await supabase.from('kf_workspaces').update(updates).eq('id', workspaceId)

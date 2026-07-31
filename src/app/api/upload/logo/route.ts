@@ -15,6 +15,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'File dan workspaceId wajib diisi' }, { status: 400 })
   }
 
+  const { data: member } = await supabaseUser.from('kf_workspace_members')
+    .select('workspace_id').eq('user_id', user.id).eq('workspace_id', workspaceId).single()
+  if (!member) return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
+
   if (!file.type.startsWith('image/')) {
     return NextResponse.json({ error: 'File harus berupa gambar' }, { status: 400 })
   }

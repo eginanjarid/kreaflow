@@ -18,6 +18,8 @@ export default async function LibraryPage() {
   if (!member) redirect('/login')
 
   const wsId = member.workspace_id
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
   const [{ data: ideas }, { data: products }, { data: pillars }, { data: tasks }, { data: workspace }] = await Promise.all([
     supabase.from('kf_content_ideas').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),

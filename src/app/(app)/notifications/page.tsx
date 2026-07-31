@@ -17,6 +17,8 @@ export default async function NotificationsPage() {
   if (!member) redirect('/login')
 
   const wsId = member.workspace_id
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
   const { data: notifications } = await supabase
     .from('kf_notifications')

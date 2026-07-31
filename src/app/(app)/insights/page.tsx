@@ -12,6 +12,9 @@ export default async function DashboardPage() {
   if (!member) redirect('/login')
 
   const wsId = member.workspace_id
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+
   const today = new Date().toISOString().slice(0, 10)
 
   const [

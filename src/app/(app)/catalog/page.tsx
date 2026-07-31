@@ -13,6 +13,9 @@ export default async function CatalogPage() {
   if (!member) redirect('/login')
 
   const wsId = member.workspace_id
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+
   const [{ data: products }, { data: workspace }] = await Promise.all([
     supabase.from('kf_products').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
     supabase.from('kf_workspaces').select('modes').eq('id', wsId).single(),
