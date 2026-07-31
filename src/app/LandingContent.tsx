@@ -269,7 +269,7 @@ const TYPING_PHRASES = [
 
 const PLATFORM_TABS = [
   {
-    label: 'Brand & Catalog', icon: '🏷️',
+    label: 'Brand & Catalog',
     items: [
       { name: 'Brand', text: 'Identitas, niche, content pillars, dan tone of voice di satu tempat.' },
       { name: 'Catalog', text: 'Database produk affiliate dan produk sendiri lengkap dengan komisi.' },
@@ -280,7 +280,7 @@ const PLATFORM_TABS = [
     screenData: [{ label: 'Niche', val: 'Skincare & Beauty' }, { label: 'Platform Utama', val: 'TikTok · Instagram' }, { label: 'Tone of Voice', val: 'Friendly & Honest' }],
   },
   {
-    label: 'Sprint & Plan', icon: '⚡',
+    label: 'Sprint & Plan',
     items: [
       { name: 'Sprint', text: 'Kanban board untuk manajemen produksi konten dari awal sampai selesai.' },
       { name: 'Plan', text: 'Buat naskah dan script konten terstruktur per platform dengan bantuan AI.' },
@@ -291,7 +291,7 @@ const PLATFORM_TABS = [
     screenData: [{ label: 'Plan', val: '3 konten' }, { label: 'Proses', val: '5 konten' }, { label: 'Selesai', val: '12 konten' }],
   },
   {
-    label: 'Library & Studio', icon: '📚',
+    label: 'Library & Studio',
     items: [
       { name: 'Library', text: 'Bank konten semua naskah, script, dan ide yang sudah dibuat.' },
       { name: 'Studio', text: 'Preview format visual untuk TikTok, Instagram Reels, dan YouTube Shorts.' },
@@ -302,7 +302,7 @@ const PLATFORM_TABS = [
     screenData: [{ label: 'Total Konten', val: '47 naskah' }, { label: 'Naskah Siap', val: '12 siap' }, { label: 'Platform', val: 'TikTok · IG' }],
   },
   {
-    label: 'Tracker & Insights', icon: '📊',
+    label: 'Tracker & Insights',
     items: [
       { name: 'Tracker', text: 'Input performa konten per platform dan pantau tren views, likes, reach.' },
       { name: 'Insights', text: 'Dashboard analitik dengan grafik performa bulanan per platform.' },
@@ -533,7 +533,11 @@ export default function LandingContent() {
           <div className="lp-platform-tabs">
             {PLATFORM_TABS.map((t, i) => (
               <div key={t.label} className={`lp-platform-tab${activeTab===i?' on':''}`} onClick={() => setActiveTab(i)}>
-                <span>{t.icon}</span> {t.label}
+                {i === 0 && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>}
+                {i === 1 && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
+                {i === 2 && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
+                {i === 3 && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>}
+                {t.label}
               </div>
             ))}
           </div>
@@ -737,29 +741,47 @@ export default function LandingContent() {
           ))}
         </div>
         <div style={{ maxWidth:900, margin:'16px auto 0', display:'flex', flexDirection:'column', gap:10 }}>
-          {[
-            { icon:'🗂️', name:'Add-on +1 Workspace', desc:'Tambah 1 workspace extra tanpa ganti paket. Berlangganan bulanan, bisa batal kapan saja.', price:'Rp49.000', unit:'/bulan', cta:'Mulai Berlangganan →', soon:false },
-            { icon:'📅', name:'Add-on Auto Schedule Post', desc:'Jadwalkan & posting otomatis ke TikTok, Instagram, dan YouTube Shorts langsung dari KreaFlow.', price:'Rp49.000', unit:'/bulan', cta:'Segera Hadir', soon:true },
-          ].map((addon, i) => (
-            <div key={i} className="lp-pricing-addon reveal" style={{ opacity: addon.soon ? 0.75 : 1 }}>
-              <div style={{ fontSize:'1.4rem', flexShrink:0 }}>{addon.icon}</div>
-              <div style={{ flex:1, minWidth:200 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:2 }}>
-                  <span style={{ fontWeight:700, color:'#2a3547', fontSize:'0.9rem' }}>{addon.name}</span>
-                  {addon.soon && <span style={{ fontSize:'0.62rem', fontWeight:800, color:'#d97706', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:20, padding:'1px 8px' }}>Segera Hadir</span>}
-                </div>
-                <div style={{ fontSize:'0.78rem', color:'#64748b' }}>{addon.desc}</div>
-              </div>
-              <div style={{ flexShrink:0, textAlign:'right' }}>
-                <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>{addon.price}</div>
-                <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>{addon.unit}</div>
-              </div>
-              {addon.soon
-                ? <div style={{ padding:'9px 18px', borderRadius:8, background:'#f1f5f9', color:'#94a3b8', fontSize:'0.85rem', fontWeight:700, flexShrink:0, cursor:'not-allowed' }}>Segera Hadir</div>
-                : <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0 }}>{addon.cta}</Link>
-              }
+          {/* Add-on: +1 Workspace */}
+          <div className="lp-pricing-addon reveal">
+            <div style={{ width:38, height:38, borderRadius:10, background:'#eff6ff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+              </svg>
             </div>
-          ))}
+            <div style={{ flex:1, minWidth:200 }}>
+              <div style={{ fontWeight:700, color:'#2a3547', fontSize:'0.9rem', marginBottom:2 }}>Add-on +1 Workspace</div>
+              <div style={{ fontSize:'0.78rem', color:'#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Berlangganan bulanan, bisa batal kapan saja.</div>
+            </div>
+            <div style={{ flexShrink:0, textAlign:'right' }}>
+              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp49.000</div>
+              <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>/bulan</div>
+            </div>
+            <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0, whiteSpace:'nowrap' }}>
+              Mulai Berlangganan →
+            </Link>
+          </div>
+
+          {/* Add-on: Auto Schedule Post */}
+          <div className="lp-pricing-addon reveal" style={{ opacity:0.78 }}>
+            <div style={{ width:38, height:38, borderRadius:10, background:'#fef3c7', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+              </svg>
+            </div>
+            <div style={{ flex:1, minWidth:200 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:2 }}>
+                <span style={{ fontWeight:700, color:'#2a3547', fontSize:'0.9rem' }}>Add-on Auto Schedule Post</span>
+                <span style={{ fontSize:'0.62rem', fontWeight:800, color:'#d97706', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:20, padding:'1px 8px', whiteSpace:'nowrap' }}>Segera Hadir</span>
+              </div>
+              <div style={{ fontSize:'0.78rem', color:'#64748b' }}>Jadwalkan &amp; posting otomatis ke TikTok, Instagram, dan YouTube Shorts langsung dari KreaFlow.</div>
+            </div>
+            <div style={{ flexShrink:0, textAlign:'right' }}>
+              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp49.000</div>
+              <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>/bulan</div>
+            </div>
+            <div style={{ padding:'9px 18px', borderRadius:8, background:'#f1f5f9', color:'#94a3b8', fontSize:'0.85rem', fontWeight:700, flexShrink:0, cursor:'not-allowed', whiteSpace:'nowrap' }}>Segera Hadir</div>
+          </div>
         </div>
         <p className="lp-pricing-note">Harga hanya tersedia selama masa launch · Dapat berubah kapan saja</p>
       </section>
