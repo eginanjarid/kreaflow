@@ -93,19 +93,27 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null }
 
-export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], sprintDrafts = [], pillars = [] }: {
+export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
   workspaceId: string
   brandProfile: BrandSnap
   products: Product[]
   modes: string[]
   tasks?: TaskSnap[]
-  sprintDrafts?: SprintDraft[]
+  queue?: QueueItem[]
   pillars?: { id: string; nama: string }[]
 }) {
   const isAffiliate = modes.includes('affiliate')
   const TABS = TABS_BASE
   const [tab, setTab] = useState('naskah')
+
+  // Derive sprintDrafts (for existing form-link logic) from queue
+  const sprintDrafts: SprintDraft[] = queue
+    .filter(q => q.status === 'Draft' && q.sprint_id)
+    .map(q => ({ id: q.id, judul: q.judul, product_id: q.product_id, sprint_id: q.sprint_id! }))
+
+  const [activeQueueId, setActiveQueueId] = useState<string | null>(null)
 
   // Naskah Generator state
   const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '' }
@@ -153,6 +161,21 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
 
   function setNF(key: keyof NaskahForm, val: string) { setNaskahForm(f => ({ ...f, [key]: val })) }
   function setAFF(key: keyof AffNaskahForm, val: string) { setAffForm(f => ({ ...f, [key]: val })) }
+
+  function selectQueueItem(item: QueueItem) {
+    setActiveQueueId(item.id)
+    if (item.status === 'Revisi' || !isAffiliate) {
+      // Creator: extract pillar from judul prefix
+      const pillarName = item.judul.split(' — ')[0]
+      setNaskahMode('creator')
+      setNF('pillar', pillarName)
+      if (item.product_id) setNF('product_id', item.product_id)
+    } else {
+      // Affiliate: fill product
+      setNaskahMode('affiliate')
+      if (item.product_id) setAFF('product_id', item.product_id)
+    }
+  }
 
   function buildNaskahPrompt(): string {
     const brand = brandProfile
@@ -522,6 +545,44 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           {!brandProfile?.niche && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#d97706' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Lengkapi modul <a href="/brand" style={{ color: '#d97706', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
+            </div>
+          )}
+
+          {/* ── Antrian Naskah ── */}
+          {queue.length > 0 && (
+            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>Antrian Naskah</span>
+                  <span style={{ background: '#1a73e8', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{queue.length}</span>
+                </div>
+                <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk isi form otomatis</span>
+              </div>
+              <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+                {queue.map(item => {
+                  const isRevisi = item.status === 'Revisi'
+                  const isActive = activeQueueId === item.id
+                  const pillarOrProd = item.judul.split(' — ')[0]
+                  return (
+                    <button key={item.id} type="button" onClick={() => selectQueueItem(item)}
+                      style={{ flexShrink: 0, width: 160, textAlign: 'left', background: isActive ? (isRevisi ? 'rgba(220,38,38,0.06)' : 'rgba(26,115,232,0.06)') : '#f9fafb', border: `1.5px solid ${isActive ? (isRevisi ? '#dc2626' : '#1a73e8') : '#f3f4f6'}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: isRevisi ? 'rgba(220,38,38,0.1)' : 'rgba(26,115,232,0.1)', color: isRevisi ? '#dc2626' : '#1a73e8' }}>
+                          {isRevisi ? 'REVISI' : 'DRAFT'}
+                        </span>
+                      </div>
+                      <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={pillarOrProd}>
+                        {pillarOrProd}
+                      </div>
+                      {item.sprint_nama && (
+                        <div style={{ fontSize: '0.68rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.sprint_nama}
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           )}
 
