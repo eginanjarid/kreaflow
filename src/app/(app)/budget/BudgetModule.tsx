@@ -14,7 +14,8 @@ type Transaction = {
 }
 
 const TIPE = ['Pemasukan', 'Pengeluaran']
-const KATEGORI_PEMASUKAN = ['Komisi Affiliate', 'Fee Endorsement', 'Ads Revenue', 'Penjualan Produk', 'Lainnya']
+const KATEGORI_PEMASUKAN_AFFILIATE = ['Komisi Affiliate', 'Fee Endorsement', 'Ads Revenue', 'Penjualan Produk', 'Lainnya']
+const KATEGORI_PEMASUKAN_CREATOR = ['Fee Endorsement', 'Ads Revenue', 'Penjualan Produk', 'Sponsor', 'Lainnya']
 const KATEGORI_PENGELUARAN = ['Iklan/Ads', 'Tools & Software', 'Konten Produksi', 'Gaji Freelancer', 'Internet', 'Peralatan', 'Lainnya']
 
 function formatRp(n: number) {
@@ -27,7 +28,8 @@ function emptyTx(wsId: string): Transaction {
   return { workspace_id: wsId, tanggal: new Date().toISOString().slice(0, 10), deskripsi: '', kategori: '', tipe: 'Pengeluaran', jumlah: '' }
 }
 
-export default function BudgetModule({ initialTx, workspaceId }: { initialTx: Transaction[]; workspaceId: string }) {
+export default function BudgetModule({ initialTx, workspaceId, isAffiliate = false }: { initialTx: Transaction[]; workspaceId: string; isAffiliate?: boolean }) {
+  const KATEGORI_PEMASUKAN = isAffiliate ? KATEGORI_PEMASUKAN_AFFILIATE : KATEGORI_PEMASUKAN_CREATOR
   const [transactions, setTransactions] = useState<Transaction[]>(initialTx)
   const [modal, setModal] = useState<{ open: boolean; tx: Transaction }>({ open: false, tx: emptyTx(workspaceId) })
   const [saving, setSaving] = useState(false)

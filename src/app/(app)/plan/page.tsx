@@ -22,13 +22,14 @@ export default async function PlanPage() {
     supabase.from('kf_campaigns').select('*').eq('workspace_id', wsId).order('tanggal_mulai', { ascending: false }),
     supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
-    supabase.from('kf_workspaces').select('modes').eq('id', wsId).single(),
+    supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
     // Sprint content items awaiting naskah (for linkage detection)
     supabase.from('kf_content_ideas').select('id,judul,product_id,sprint_id').eq('workspace_id', wsId).eq('status', 'Draft').not('sprint_id', 'is', null),
   ])
 
-  const modes = (workspace?.modes as string[] | null) ?? ['creator']
+  const brandType = (workspace?.brand_type as string | null) ?? 'creator'
+  const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
 
   return (
     <PlanModule
