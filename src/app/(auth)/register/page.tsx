@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const inputStyle = {
@@ -12,11 +12,16 @@ const inputStyle = {
 
 export default function RegisterPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [form, setForm] = useState({ nama: '', email: '', password: '', workspace: '' })
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [redirectTo, setRedirectTo] = useState('')
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    setRedirectTo(p.get('redirect') || '')
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,7 +44,6 @@ export default function RegisterPage() {
       const loginData = await loginRes.json()
       if (!loginRes.ok) throw new Error(loginData.error || 'Gagal masuk')
 
-      const redirectTo = searchParams.get('redirect')
       router.push(redirectTo || '/upgrade')
       router.refresh()
     } catch (err: unknown) {
