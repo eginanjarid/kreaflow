@@ -21,7 +21,7 @@ export default async function SprintsPage() {
 
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-  const [{ data: sprints }, { data: contents }, { data: products }, { data: membersRaw }, { data: tasks }, { data: authUsersData }, { data: accounts }] = await Promise.all([
+  const [{ data: sprints }, { data: contents }, { data: products }, { data: membersRaw }, { data: tasks }, { data: authUsersData }, { data: accounts }, { data: pillars }] = await Promise.all([
     supabase.from('kf_sprints').select('*').eq('workspace_id', wsId).order('start_date', { ascending: false }),
     supabase.from('kf_content_ideas').select('*').eq('workspace_id', wsId).not('sprint_id', 'is', null).order('created_at', { ascending: false }),
     supabase.from('kf_products').select('id, nama, platform_affiliate').eq('workspace_id', wsId).eq('is_active', true),
@@ -29,6 +29,7 @@ export default async function SprintsPage() {
     supabase.from('kf_tasks').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
     admin.auth.admin.listUsers(),
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('created_at'),
+    supabase.from('kf_content_pillars').select('id, nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
   ])
 
   const userMap = Object.fromEntries(
@@ -55,6 +56,7 @@ export default async function SprintsPage() {
         initialTasks={tasks || []}
         accounts={(accounts || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
         brandType={(wsData?.brand_type as string) || 'creator'}
+        pillars={(pillars || []).map(p => ({ id: p.id as string, nama: p.nama as string }))}
       />
     </Suspense>
   )

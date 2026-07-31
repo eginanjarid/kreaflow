@@ -191,7 +191,7 @@ const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 
 
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
-export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [], brandType = 'creator' }: {
+export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [], brandType = 'creator', pillars = [] }: {
   initialSprints: Sprint[]
   initialContents: ContentItem[]
   products: Product[]
@@ -200,6 +200,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   initialTasks: ManualTask[]
   accounts?: SosmedAkun[]
   brandType?: string
+  pillars?: { id: string; nama: string }[]
 }) {
   const supabase = createClient()
   const searchParams = useSearchParams()
@@ -231,6 +232,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; deadline: string }[]>([])
   const [addStepOpen, setAddStepOpen] = useState(false)
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number; mulai: string; interval: number; jam: string }[]>([{ product_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00' }])
+  // For creator: pillar slots (pillar_id maps to kf_content_pillars.id)
+  const [sprintPillars, setSprintPillars] = useState<{ pillar_id: string; jumlah: number; mulai: string; interval: number; jam: string }[]>([{ pillar_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00' }])
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -287,11 +290,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // ── Sprint create ─────────────────────────────────────────────────────────
   function openSprintModal() {
     const { start, end } = getWeekDates()
-    const tpl = 'affiliate'
+    const tpl = defaultTemplate
     setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', akun: '', template_type: tpl })
     initStepsFromTemplate(tpl)
     setAddStepOpen(false)
     setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
+    setSprintPillars([{ pillar_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
     setSprintModal(true)
   }
 
@@ -303,7 +307,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
       ? `${sprintForm.template_type === 'custom' ? 'custom' : sprintForm.template_type}:${stepIds.join(',')}`
       : sprintForm.template_type
 
-    const totalFromProducts = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
+    const activeSlots = isAffiliate ? sprintProducts : sprintPillars
+    const totalFromProducts = activeSlots.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
     const stepConfigData: StepConfig[] = sprintSteps.map(({ step, memberId, deadline }) => {
       const m = workspaceMembers.find(x => x.id === memberId)
       return { id: step.id, deadline, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
@@ -323,10 +328,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
     }).select('*').single()
 
     if (!error && sprint) {
-      // Auto-generate content items from all rows (product optional)
-      const rows = sprintProducts.filter(r => r.jumlah > 0)
+      // Auto-generate content items from all rows
+      const rows = activeSlots.filter(r => r.jumlah > 0)
       if (rows.length > 0) {
-        // Build per-step assign lookup: step.id → member display name
         const assignByCol: Record<string, string> = {}
         sprintSteps.forEach(({ step, memberId }) => {
           const col = STEP_ASSIGN_COL[step.id]
@@ -337,7 +341,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
         })
 
         const items = rows.flatMap(row => {
-          const produk = products.find(p => p.id === row.product_id)
+          // Affiliate: lookup product name. Creator: lookup pillar name.
+          let labelPrefix = ''
+          if (isAffiliate) {
+            const produk = products.find(p => p.id === (row as typeof sprintProducts[0]).product_id)
+            labelPrefix = produk ? produk.nama : ''
+          } else {
+            const pillar = pillars.find(p => p.id === (row as typeof sprintPillars[0]).pillar_id)
+            labelPrefix = pillar ? pillar.nama : ''
+          }
+
           const baseDateStr = row.mulai || sprintForm.start_date
           return Array.from({ length: row.jumlah }, (_, i) => {
             let tanggal_tayang: string | null = null
@@ -349,9 +362,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
             return {
               workspace_id: workspaceId,
               sprint_id: sprint.id,
-              judul: produk ? `${produk.nama} — Konten ${i + 1}` : `Konten ${i + 1}`,
+              judul: labelPrefix ? `${labelPrefix} — Konten ${i + 1}` : `Konten ${i + 1}`,
               status: 'Draft',
-              product_id: row.product_id || null,
+              product_id: isAffiliate ? ((row as typeof sprintProducts[0]).product_id || null) : null,
               platform: sprintForm.platform ? [sprintForm.platform] : [],
               tanggal_tayang,
               jam_tayang: row.jam || null,
@@ -993,15 +1006,18 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
               </div>
 
-              {/* ── Produk & Jumlah Konten ── */}
+              {/* ── Slot Konten (Pilar / Produk) ── */}
               <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Slot Konten</div>
-                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 1 }}>Produk opsional — bisa dikosongkan untuk konten kreator</div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 1 }}>
+                      {isAffiliate ? 'Tentukan produk & jumlah konten per produk' : 'Tentukan pilar konten & jumlah konten per pilar'}
+                    </div>
                   </div>
                   {(() => {
-                    const total = sprintProducts.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
+                    const slots = isAffiliate ? sprintProducts : sprintPillars
+                    const total = slots.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
                     return total > 0 && (
                       <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', padding: '3px 8px', borderRadius: 5 }}>
                         Total: {total} konten
@@ -1009,108 +1025,108 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     )
                   })()}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {sprintProducts.map((row, idx) => (
-                    <div key={idx} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                      {/* Baris 1: produk (affiliate only) + jumlah + hapus */}
-                      <div style={{ display: 'grid', gridTemplateColumns: `${isAffiliate ? '1fr ' : ''}60px 26px`, gap: 6, alignItems: 'center' }}>
-                        {isAffiliate && (
-                        <select
-                          value={row.product_id}
-                          onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
-                          style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
-                          <option value="">— Tanpa Produk —</option>
-                          {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-                        </select>
-                        )}
-                        <input
-                          type="number" min={1} max={99}
-                          value={row.jumlah}
-                          onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
-                          style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          ✕
-                        </button>
-                      </div>
-                      {/* Baris 2: jadwal posting */}
-                      <div className="kf-sprint-dates-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
-                        <div>
-                          <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
-                          <input
-                            type="date"
-                            value={row.mulai}
-                            onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
-                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
-                          />
+
+                {/* AFFILIATE SLOTS */}
+                {isAffiliate && (
+                  <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {sprintProducts.map((row, idx) => (
+                        <div key={idx} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'center' }}>
+                            <select value={row.product_id} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
+                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
+                              <option value="">— Tanpa Produk —</option>
+                              {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                            </select>
+                            <input type="number" min={1} max={99} value={row.jumlah} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
+                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }} />
+                            <button type="button" onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
+                              style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          </div>
+                          <div className="kf-sprint-dates-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
+                              <input type="date" value={row.mulai} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
+                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam</div>
+                              <input type="time" value={row.jam} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
+                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval</div>
+                              <select value={row.interval} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
+                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
+                                <option value={1}>Tiap 1 hari</option><option value={2}>Tiap 2 hari</option><option value={3}>Tiap 3 hari</option><option value={7}>Tiap 7 hari</option>
+                              </select></div>
+                          </div>
+                          {row.mulai && <div style={{ fontSize: '0.62rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
+                            {(() => { const dates = Array.from({ length: Math.min(row.jumlah, 4) }, (_, i) => { const d = new Date(row.mulai + 'T00:00:00'); d.setDate(d.getDate() + i * (row.interval || 1)); return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }); return `${dates.join(' · ')}${row.jumlah > 4 ? ` · +${row.jumlah - 4} lagi` : ''} @ ${row.jam}` })()}
+                          </div>}
                         </div>
-                        <div>
-                          <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam</div>
-                          <input
-                            type="time"
-                            value={row.jam}
-                            onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
-                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }}
-                          />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval</div>
-                          <select
-                            value={row.interval}
-                            onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
-                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
-                            <option value={1}>Tiap 1 hari</option>
-                            <option value={2}>Tiap 2 hari</option>
-                            <option value={3}>Tiap 3 hari</option>
-                            <option value={7}>Tiap 7 hari</option>
-                          </select>
-                        </div>
-                      </div>
-                      {/* Preview jadwal */}
-                      {row.mulai && (
-                        <div style={{ fontSize: '0.62rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
-                          {(() => {
-                            const dates = Array.from({ length: Math.min(row.jumlah, 4) }, (_, i) => {
-                              const d = new Date(row.mulai + 'T00:00:00')
-                              d.setDate(d.getDate() + i * (row.interval || 1))
-                              return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-                            })
-                            return `${dates.join(' · ')}${row.jumlah > 4 ? ` · +${row.jumlah - 4} lagi` : ''} @ ${row.jam}`
-                          })()}
-                        </div>
-                      )}
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                  <button
-                    type="button"
-                    onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
-                    style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>
-                    + Tambah Baris
-                  </button>
-                  {products.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setSprintProducts(prev => [
-                        ...prev,
-                        ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }))
-                      ])}
-                      style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
-                      + Tambahkan Semua Produk
-                    </button>
-                  )}
-                </div>
+                    <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
+                      <button type="button" onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
+                        style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Baris</button>
+                      {products.length > 0 && <button type="button" onClick={() => setSprintProducts(prev => [...prev, ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }))])}
+                        style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Produk</button>}
+                    </div>
+                  </>
+                )}
+
+                {/* CREATOR SLOTS — per pilar konten */}
+                {!isAffiliate && (
+                  <>
+                    {pillars.length === 0 && (
+                      <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#92400e' }}>
+                        Belum ada pilar konten. <a href="/brand?tab=pillars" style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Buat di Brand → Content Pillars →</a>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {sprintPillars.map((row, idx) => (
+                        <div key={idx} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'center' }}>
+                            <select value={row.pillar_id} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, pillar_id: e.target.value } : r))}
+                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
+                              <option value="">— Pilih Pilar Konten —</option>
+                              {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                            </select>
+                            <input type="number" min={1} max={99} value={row.jumlah} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
+                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }} />
+                            <button type="button" onClick={() => setSprintPillars(prev => prev.filter((_, i) => i !== idx))}
+                              style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          </div>
+                          <div className="kf-sprint-dates-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
+                              <input type="date" value={row.mulai} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
+                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam</div>
+                              <input type="time" value={row.jam} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
+                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval</div>
+                              <select value={row.interval} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
+                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
+                                <option value={1}>Tiap 1 hari</option><option value={2}>Tiap 2 hari</option><option value={3}>Tiap 3 hari</option><option value={7}>Tiap 7 hari</option>
+                              </select></div>
+                          </div>
+                          {row.mulai && <div style={{ fontSize: '0.62rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 5, padding: '5px 8px', lineHeight: 1.5 }}>
+                            {(() => { const dates = Array.from({ length: Math.min(row.jumlah, 4) }, (_, i) => { const d = new Date(row.mulai + 'T00:00:00'); d.setDate(d.getDate() + i * (row.interval || 1)); return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }); return `${dates.join(' · ')}${row.jumlah > 4 ? ` · +${row.jumlah - 4} lagi` : ''} @ ${row.jam}` })()}
+                          </div>}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
+                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
+                        style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Pilar</button>
+                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' })))}
+                        style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Pilar</button>}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={createSprint} disabled={savingSprint}
                   style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: savingSprint ? 'not-allowed' : 'pointer' }}>
-                  {savingSprint ? 'Membuat Sprint...' : `Buat Sprint (${sprintProducts.filter(r=>r.jumlah>0).reduce((s,r)=>s+r.jumlah,0)} konten)`}
+                  {savingSprint ? 'Membuat Sprint...' : `Buat Sprint (${(isAffiliate ? sprintProducts : sprintPillars).filter(r=>r.jumlah>0).reduce((s,r)=>s+r.jumlah,0)} konten)`}
                 </button>
               </div>
             </div>
