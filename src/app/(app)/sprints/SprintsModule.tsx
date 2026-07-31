@@ -904,8 +904,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Steps Pekerjaan</div>
-                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 1 }}>Hapus step yg gak diperlukan, tambah yg kurang, assign ke anggota tim</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Steps Pekerjaan</div>
+                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#7c3aed', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Deadline Internal Tim</span>
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set kapan setiap step harus selesai — untuk koordinasi tim produksi</div>
                   </div>
                   <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{sprintSteps.length} step</span>
                 </div>
@@ -1016,9 +1019,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Slot Konten</div>
-                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 1 }}>
-                      {isAffiliate ? 'Tentukan produk & jumlah konten per produk' : 'Tentukan pilar konten & jumlah konten per pilar'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Slot Konten</div>
+                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#1a73e8', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Jadwal Tayang ke Audiens</span>
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>
+                      {isAffiliate ? 'Tentukan produk, jumlah konten, dan kapan mulai posting' : 'Tentukan pilar konten, jumlah konten, dan kapan mulai posting'}
                     </div>
                   </div>
                   {(() => {
