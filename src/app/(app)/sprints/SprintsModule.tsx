@@ -1070,14 +1070,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <button type="button" onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
                               style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                           </div>
-                          <div className="kf-sprint-dates-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
-                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
-                              <input type="date" value={row.mulai} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
-                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
-                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam</div>
-                              <input type="time" value={row.jam} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
-                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
-                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                              <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
+                                <input type="date" value={row.mulai} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
+                                  style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                              <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam Posting</div>
+                                <input type="time" value={row.jam} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
+                                  style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                            </div>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval Posting</div>
                               <select value={row.interval} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
                                 style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
                                 <option value={1}>Tiap 1 hari</option><option value={2}>Tiap 2 hari</option><option value={3}>Tiap 3 hari</option><option value={7}>Tiap 7 hari</option>
@@ -1126,14 +1128,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <button type="button" onClick={() => setSprintPillars(prev => prev.filter((_, i) => i !== idx))}
                               style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                           </div>
-                          <div className="kf-sprint-dates-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 110px', gap: 6 }}>
-                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
-                              <input type="date" value={row.mulai} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
-                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
-                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam</div>
-                              <input type="time" value={row.jam} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
-                                style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
-                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                              <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
+                                <input type="date" value={row.mulai} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, mulai: e.target.value } : r))}
+                                  style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.mulai ? '#111827' : '#6b7280', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                              <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jam Posting</div>
+                                <input type="time" value={row.jam} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, jam: e.target.value } : r))}
+                                  style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', boxSizing: 'border-box' as const }} /></div>
+                            </div>
+                            <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Interval Posting</div>
                               <select value={row.interval} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, interval: Number(e.target.value) } : r))}
                                 style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
                                 <option value={1}>Tiap 1 hari</option><option value={2}>Tiap 2 hari</option><option value={3}>Tiap 3 hari</option><option value={7}>Tiap 7 hari</option>
