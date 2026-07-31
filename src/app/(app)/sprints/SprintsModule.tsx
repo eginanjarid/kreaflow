@@ -1032,14 +1032,20 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {sprintProducts.map((row, idx) => (
                         <div key={idx} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'center' }}>
-                            <select value={row.product_id} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
-                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
-                              <option value="">— Tanpa Produk —</option>
-                              {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-                            </select>
-                            <input type="number" min={1} max={99} value={row.jumlah} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
-                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }} />
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'flex-end' }}>
+                            <div>
+                              <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Produk</div>
+                              <select value={row.product_id} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
+                                style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
+                                <option value="">— Tanpa Produk —</option>
+                                {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                              </select>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jml Konten</div>
+                              <input type="number" min={1} max={99} value={row.jumlah} onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
+                                style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }} />
+                            </div>
                             <button type="button" onClick={() => setSprintProducts(prev => prev.filter((_, i) => i !== idx))}
                               style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                           </div>
@@ -1082,14 +1088,20 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {sprintPillars.map((row, idx) => (
                         <div key={idx} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'center' }}>
-                            <select value={row.pillar_id} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, pillar_id: e.target.value } : r))}
-                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
-                              <option value="">— Pilih Pilar Konten —</option>
-                              {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-                            </select>
-                            <input type="number" min={1} max={99} value={row.jumlah} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
-                              style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }} />
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'flex-end' }}>
+                            <div>
+                              <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Pilar Konten</div>
+                              <select value={row.pillar_id} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, pillar_id: e.target.value } : r))}
+                                style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: '#111827', fontSize: '0.8rem', outline: 'none', cursor: 'pointer', width: '100%' }}>
+                                <option value="">— Pilih Pilar —</option>
+                                {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                              </select>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Jml Konten</div>
+                              <input type="number" min={1} max={99} value={row.jumlah} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, jumlah: Math.max(1, Number(e.target.value)) } : r))}
+                                style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 4px', color: '#111827', fontSize: '0.8rem', outline: 'none', textAlign: 'center', width: '100%' }} />
+                            </div>
                             <button type="button" onClick={() => setSprintPillars(prev => prev.filter((_, i) => i !== idx))}
                               style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                           </div>
