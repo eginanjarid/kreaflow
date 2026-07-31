@@ -4,36 +4,7 @@ import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { STEP_ICON_MAP } from '@/components/ui/Icons'
 
-type PlatformPlan = {
-  id?: string
-  workspace_id: string
-  platform: string
-  is_active: boolean
-  tujuan: string
-  target_followers: number | string
-  target_reach: number | string
-  frekuensi_per_minggu: number | string
-  waktu_terbaik: string[]
-  tipe_konten_prioritas: string
-}
-
-type Campaign = {
-  id?: string
-  workspace_id: string
-  nama: string
-  platforms: string[]
-  tanggal_mulai: string
-  tanggal_selesai: string
-  tujuan: string
-  budget: number | string
-  status: string
-}
-
-const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'LinkedIn']
-const TUJUAN = ['Meningkatkan Penjualan', 'Brand Awareness', 'Engagement', 'Followers Growth']
 const TIPE_KONTEN = ['Video Pendek', 'Reels', 'Carousel', 'Story', 'Live', 'Long Video', 'Thread']
-const CAMPAIGN_STATUS = ['Planning', 'Active', 'Completed', 'Cancelled']
-const WAKTU = ['06:00', '07:00', '08:00', '09:00', '11:00', '12:00', '13:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00']
 
 type TaskSnap = { id: string; nama: string; due_date: string; percent_complete: number; priority: string }
 
@@ -75,18 +46,10 @@ type AffNaskahForm = {
 
 const TABS_BASE = [
   { id: 'naskah', label: 'Naskah Generator' },
-  { id: 'platforms', label: 'Platform Strategy' },
-  { id: 'campaigns', label: 'Campaign Planner' },
 ]
 
 function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
-}
-function emptyPlatform(wsId: string, platform: string): PlatformPlan {
-  return { workspace_id: wsId, platform, is_active: false, tujuan: '', target_followers: '', target_reach: '', frekuensi_per_minggu: '', waktu_terbaik: [], tipe_konten_prioritas: '' }
-}
-function emptyCampaign(wsId: string): Campaign {
-  return { workspace_id: wsId, nama: '', platforms: [], tanggal_mulai: '', tanggal_selesai: '', tujuan: '', budget: '', status: 'Planning' }
 }
 
 function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: string }) {
@@ -131,9 +94,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
 
-export default function PlanModule({ initialPlatforms, initialCampaigns, workspaceId, brandProfile, products, modes, tasks = [], sprintDrafts = [] }: {
-  initialPlatforms: PlatformPlan[]
-  initialCampaigns: Campaign[]
+export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], sprintDrafts = [] }: {
   workspaceId: string
   brandProfile: BrandSnap
   products: Product[]
@@ -144,15 +105,6 @@ export default function PlanModule({ initialPlatforms, initialCampaigns, workspa
   const isAffiliate = modes.includes('affiliate')
   const TABS = TABS_BASE
   const [tab, setTab] = useState('naskah')
-  const [platforms, setPlatforms] = useState<PlatformPlan[]>(
-    PLATFORMS.map(p => initialPlatforms.find(x => x.platform === p) || emptyPlatform(workspaceId, p))
-  )
-  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns)
-  const [saving, setSaving] = useState<string | null>(null)
-  const [savedPlatform, setSavedPlatform] = useState<string | null>(null)
-  const [modal, setModal] = useState<{ open: boolean; campaign: Campaign } | null>(null)
-  const [savingCampaign, setSavingCampaign] = useState(false)
-  const [error, setError] = useState('')
 
   // Naskah Generator state
   const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '' }
@@ -538,83 +490,12 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setTimeout(() => setPromptCopied(false), 2000)
   }
 
-  function setPlatformField(platform: string, key: keyof PlatformPlan, value: string | boolean | number | string[]) {
-    setPlatforms(prev => prev.map(p => p.platform === platform ? { ...p, [key]: value } : p))
-  }
-
-  function toggleWaktu(platform: string, time: string) {
-    const p = platforms.find(x => x.platform === platform)
-    if (!p) return
-    const curr = p.waktu_terbaik || []
-    setPlatformField(platform, 'waktu_terbaik', curr.includes(time) ? curr.filter(t => t !== time) : [...curr, time])
-  }
-
-  async function savePlatform(platform: string) {
-    setSaving(platform)
-    const supabase = createClient()
-    const p = platforms.find(x => x.platform === platform)!
-    const payload = {
-      ...p,
-      workspace_id: workspaceId,
-      target_followers: Number(p.target_followers) || 0,
-      target_reach: Number(p.target_reach) || 0,
-      frekuensi_per_minggu: Number(p.frekuensi_per_minggu) || 0,
-    }
-    if (p.id) {
-      await supabase.from('kf_plan_platforms').update(payload).eq('id', p.id)
-    } else {
-      const { data } = await supabase.from('kf_plan_platforms').insert(payload).select('id').single()
-      if (data) setPlatformField(platform, 'id', data.id)
-    }
-    setSaving(null)
-    setSavedPlatform(platform)
-    setTimeout(() => setSavedPlatform(null), 2000)
-  }
-
-  function openAddCampaign() { setModal({ open: true, campaign: emptyCampaign(workspaceId) }); setError('') }
-  function openEditCampaign(c: Campaign) { setModal({ open: true, campaign: { ...c } }); setError('') }
-  function closeModal() { setModal(null) }
-  function setCampField(key: keyof Campaign, value: string | string[] | number) { setModal(m => m ? { ...m, campaign: { ...m.campaign, [key]: value } } : m) }
-  function togglePlatform(p: string) {
-    if (!modal) return
-    const curr = modal.campaign.platforms
-    setCampField('platforms', curr.includes(p) ? curr.filter(x => x !== p) : [...curr, p])
-  }
-
-  async function saveCampaign(e: React.FormEvent) {
-    e.preventDefault()
-    if (!modal) return
-    setSavingCampaign(true)
-    setError('')
-    const supabase = createClient()
-    const c = { ...modal.campaign, workspace_id: workspaceId, budget: Number(modal.campaign.budget) || 0 }
-    if (c.id) {
-      const { error: err } = await supabase.from('kf_campaigns').update(c).eq('id', c.id)
-      if (err) { setError(err.message); setSavingCampaign(false); return }
-      setCampaigns(prev => prev.map(x => x.id === c.id ? c : x))
-    } else {
-      const { data, error: err } = await supabase.from('kf_campaigns').insert(c).select('id').single()
-      if (err) { setError(err.message); setSavingCampaign(false); return }
-      setCampaigns(prev => [{ ...c, id: data.id }, ...prev])
-    }
-    setSavingCampaign(false)
-    closeModal()
-  }
-
-  async function deleteCampaign(id: string) {
-    if (!confirm('Hapus campaign ini?')) return
-    const supabase = createClient()
-    await supabase.from('kf_campaigns').delete().eq('id', id)
-    setCampaigns(prev => prev.filter(x => x.id !== id))
-  }
-
-  const STATUS_COLOR: Record<string, string> = { Planning: '#1a73e8', Active: '#059669', Completed: '#1a73e8', Cancelled: '#6b7280' }
 
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Plan</h1>
-        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Strategi platform dan rencana campaign konten kamu</p>
+        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Buat naskah & skrip konten dengan bantuan AI</p>
       </div>
 
       {/* Tabs */}
@@ -1132,191 +1013,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         </div>
       )}
 
-      {/* Platform Strategy */}
-      {tab === 'platforms' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {platforms.map(p => (
-            <div key={p.platform} style={{ background: '#fff', border: `1px solid ${p.is_active ? 'rgba(26,115,232,0.2)' : '#f3f4f6'}`, borderRadius: 20, overflow: 'hidden' }}>
-              {/* Platform Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: p.is_active ? '1px solid #f3f4f6' : 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontWeight: 700, color: p.is_active ? '#111827' : '#6b7280', fontSize: '0.95rem' }}>{p.platform}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 4, color: p.is_active ? '#059669' : '#6b7280', background: p.is_active ? 'rgba(16,185,129,0.10)' : '#f3f4f6', fontWeight: 600 }}>
-                    {p.is_active ? 'Aktif' : 'Tidak Aktif'}
-                  </span>
-                </div>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                  <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{p.is_active ? 'Nonaktifkan' : 'Aktifkan'}</span>
-                  <div onClick={() => setPlatformField(p.platform, 'is_active', !p.is_active)}
-                    style={{ width: 36, height: 20, borderRadius: 10, background: p.is_active ? '#1a73e8' : '#e5e7eb', position: 'relative', cursor: 'pointer', transition: 'background 0.2s' }}>
-                    <div style={{ position: 'absolute', top: 3, left: p.is_active ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
-                  </div>
-                </label>
-              </div>
-
-              {p.is_active && (
-                <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Tujuan Platform</label>
-                      <select style={{ ...fieldStyle(), cursor: 'pointer', fontSize: '0.8rem' }} value={p.tujuan} onChange={e => setPlatformField(p.platform, 'tujuan', e.target.value)}>
-                        <option value="">Pilih tujuan</option>
-                        {TUJUAN.map(t => <option key={t} value={t}>{t}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Target Followers</label>
-                      <input type="number" style={fieldStyle({ fontSize: '0.8rem' })} value={p.target_followers} onChange={e => setPlatformField(p.platform, 'target_followers', e.target.value)} placeholder="10000" min="0" />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Target Reach/bulan</label>
-                      <input type="number" style={fieldStyle({ fontSize: '0.8rem' })} value={p.target_reach} onChange={e => setPlatformField(p.platform, 'target_reach', e.target.value)} placeholder="50000" min="0" />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Posting/minggu</label>
-                      <input type="number" style={fieldStyle({ fontSize: '0.8rem' })} value={p.frekuensi_per_minggu} onChange={e => setPlatformField(p.platform, 'frekuensi_per_minggu', e.target.value)} placeholder="5" min="1" max="21" />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Tipe Konten Prioritas</label>
-                      <select style={{ ...fieldStyle(), cursor: 'pointer', fontSize: '0.8rem' }} value={p.tipe_konten_prioritas} onChange={e => setPlatformField(p.platform, 'tipe_konten_prioritas', e.target.value)}>
-                        <option value="">Pilih tipe</option>
-                        {TIPE_KONTEN.map(t => <option key={t} value={t}>{t}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>Waktu Terbaik Posting</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {WAKTU.map(t => (
-                        <button key={t} type="button" onClick={() => toggleWaktu(p.platform, t)}
-                          style={{ padding: '4px 10px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 500, border: p.waktu_terbaik?.includes(t) ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: p.waktu_terbaik?.includes(t) ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: p.waktu_terbaik?.includes(t) ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button type="button" onClick={() => savePlatform(p.platform)} disabled={saving === p.platform}
-                      style={{ background: savedPlatform === p.platform ? '#166534' : '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}>
-                      {saving === p.platform ? 'Menyimpan...' : savedPlatform === p.platform ? '✓ Tersimpan' : 'Simpan'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Campaign Planner */}
-      {tab === 'campaigns' && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-            <button onClick={openAddCampaign} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-              + Tambah Campaign
-            </button>
-          </div>
-          {campaigns.length === 0 ? (
-            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
-              <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-              <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>Belum ada campaign</div>
-              <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>Rencanakan campaign promo, kolaborasi, atau event khusus</div>
-              <button onClick={openAddCampaign} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                + Buat Campaign Pertama
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {campaigns.map(c => (
-                <div key={c.id} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{c.nama}</span>
-                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: `${STATUS_COLOR[c.status]}18`, fontWeight: 600 }}>{c.status}</span>
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 6 }}>
-                        {c.tanggal_mulai} → {c.tanggal_selesai || '?'} · {c.tujuan}
-                      </div>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {(c.platforms || []).map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.10)' }}>{p}</span>)}
-                        {Number(c.budget) > 0 && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#dc2626', background: 'rgba(248,113,113,0.1)' }}>Budget: Rp {Number(c.budget).toLocaleString('id-ID')}</span>}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button onClick={() => openEditCampaign(c)} style={{ background: '#1a73e8', border: 'none', borderRadius: 7, padding: '5px 12px', color: '#fff', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>Edit</button>
-                      <button onClick={() => deleteCampaign(c.id!)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 7, padding: '5px 8px', color: '#9ca3af', fontSize: '0.75rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Campaign Modal */}
-      {modal?.open && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>{modal.campaign.id ? 'Edit Campaign' : 'Tambah Campaign'}</h2>
-              <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
-            </div>
-            <form onSubmit={saveCampaign} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Nama Campaign *</label>
-                <input style={fieldStyle()} value={modal.campaign.nama} onChange={e => setCampField('nama', e.target.value)} placeholder="Harbolnas, Ramadan, Kolaborasi Brand..." required />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Mulai</label>
-                  <input type="date" style={fieldStyle()} value={modal.campaign.tanggal_mulai} onChange={e => setCampField('tanggal_mulai', e.target.value)} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Selesai</label>
-                  <input type="date" style={fieldStyle()} value={modal.campaign.tanggal_selesai} onChange={e => setCampField('tanggal_selesai', e.target.value)} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Tujuan</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.campaign.tujuan ?? ''} onChange={e => setCampField('tujuan', e.target.value)}>
-                    <option value="">Pilih tujuan</option>
-                    {TUJUAN.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Status</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.campaign.status ?? 'Planning'} onChange={e => setCampField('status', e.target.value)}>
-                    {CAMPAIGN_STATUS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Budget (Rp)</label>
-                  <input type="number" style={fieldStyle()} value={modal.campaign.budget} onChange={e => setCampField('budget', e.target.value)} placeholder="0" min="0" />
-                </div>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>Platform</label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {PLATFORMS.map(p => (
-                    <button key={p} type="button" onClick={() => togglePlatform(p)}
-                      style={{ padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 500, border: modal.campaign.platforms.includes(p) ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: modal.campaign.platforms.includes(p) ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: modal.campaign.platforms.includes(p) ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={closeModal} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
-                <button type="submit" disabled={savingCampaign} style={{ background: savingCampaign ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: savingCampaign ? 'not-allowed' : 'pointer' }}>
-                  {savingCampaign ? 'Menyimpan...' : 'Simpan'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* AI Picker Modal — Affiliate */}
       {affAiModal && (
