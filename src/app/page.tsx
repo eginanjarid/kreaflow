@@ -311,7 +311,7 @@ export default async function LandingPage() {
           </div>
           <h1 className="lp-hero-h1">
             Workflow konten dari ide<br />
-            sampai publikasi, satu platform.
+            sampai publikasi dalam satu platform.
           </h1>
           <p className="lp-hero-sub">
             Brand, konten, jadwal, dan performa terhubung dalam satu alur kerja. Tidak perlu pindah-pindah tools lagi.
