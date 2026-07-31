@@ -131,8 +131,10 @@ function getTemplateColor(template_type: string): string {
 }
 
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
-const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
-const FORMATS = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
+const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
+const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
+const FORMATS_CREATOR = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Lainnya']
+const FORMATS_AFFILIATE = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
 const PRIORITIES = ['High', 'Medium', 'Low']
 const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
@@ -220,6 +222,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // Sprint create modal
   const isAffiliate = brandType === 'affiliate'
+  const PLATFORMS = isAffiliate ? PLATFORMS_AFFILIATE : PLATFORMS_CREATOR
+  const FORMATS = isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR
   const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
   // Creator: only "creator" template. Affiliate: affiliate + live.
   const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) =>
@@ -795,11 +799,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                  <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                    style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
-                    <option value="">Semua Produk</option>
-                    {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-                  </select>
+                  {isAffiliate && products.length > 0 && (
+                    <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
+                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
+                      <option value="">Semua Produk</option>
+                      {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                    </select>
+                  )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
                     style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
                   <button onClick={() => setReportOpen(true)}
@@ -1160,6 +1166,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <input style={fieldStyle()} value={addForm.judul} onChange={e => setAddForm(f => ({ ...f, judul: e.target.value }))} placeholder="cth: Review Serum Vit C — Drama Version" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {isAffiliate && (
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Produk</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.product_id} onChange={e => setAddForm(f => ({ ...f, product_id: e.target.value }))}>
@@ -1167,6 +1174,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                   </select>
                 </div>
+                )}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Format</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.format} onChange={e => setAddForm(f => ({ ...f, format: e.target.value }))}>
