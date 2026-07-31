@@ -30,6 +30,10 @@ export async function POST() {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
     const userName = (user.user_metadata?.nama as string) || user.email || 'KreaFlow User'
 
+    if (!process.env.XENDIT_SECRET_KEY) {
+      return NextResponse.json({ error: 'Pembayaran belum aktif. Hubungi admin di hello@kreaflow.id untuk aktivasi manual.' }, { status: 503 })
+    }
+
     const response = await fetch('https://api.xendit.co/v2/invoices', {
       method: 'POST',
       headers: {
