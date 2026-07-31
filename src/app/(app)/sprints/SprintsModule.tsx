@@ -394,6 +394,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
         })
         const { data: inserted } = await supabase.from('kf_content_ideas').insert(items).select('*')
         if (inserted) setContents(prev => [...inserted, ...prev])
+
+        // Notif: sprint dibuat, pekerjaan naskah siap dimulai
+        const totalItems = items.length
+        await supabase.from('kf_notifications').insert({
+          workspace_id: workspaceId,
+          type: 'naskah',
+          title: `Sprint Dimulai — ${autoNama}`,
+          message: `${totalItems} konten siap dikerjakan. Buka Plan untuk mulai buat naskah.`,
+        })
       }
       setSprints(prev => [sprint, ...prev])
       setSelectedSprintId(sprint.id)
