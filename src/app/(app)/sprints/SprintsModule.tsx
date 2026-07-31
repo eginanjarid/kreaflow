@@ -220,7 +220,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // Sprint create modal
   const isAffiliate = brandType === 'affiliate'
   const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
-  const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) => key !== (isAffiliate ? 'creator' : 'affiliate'))
+  // Creator: only "creator" template. Affiliate: affiliate + live.
+  const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) =>
+    isAffiliate ? key !== 'creator' : key === 'creator'
+  )
 
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: defaultTemplate })
@@ -869,10 +872,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {tpl.label}
                     </button>
                   ))}
-                  <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
-                    style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#374151' : '#6b7280', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
-                    Custom
-                  </button>
+                  {isAffiliate && (
+                    <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
+                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#374151' : '#6b7280', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
+                      Custom
+                    </button>
+                  )}
                 </div>
               </div>
 
