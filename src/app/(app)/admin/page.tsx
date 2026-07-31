@@ -8,7 +8,7 @@ const SUPER_ADMINS = ['eginanjarism@gmail.com']
 export default async function AdminPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !SUPER_ADMINS.includes(user.email!)) redirect('/brand')
+  if (!user || !SUPER_ADMINS.includes(user.email!)) redirect('/sprints')
 
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -78,18 +78,19 @@ export default async function AdminPage() {
   const weekAgo = new Date(now.getTime() - 7 * 86400000).toISOString()
   const monthAgo = new Date(now.getTime() - 30 * 86400000).toISOString()
 
+  const lifetimeCount = workspaceList.filter(w => w.plan === 'lifetime').length
+
   const stats = {
     total: users.length,
     today: users.filter(u => u.created_at.startsWith(today)).length,
     week: users.filter(u => u.created_at > weekAgo).length,
     month: users.filter(u => u.created_at > monthAgo).length,
     byPlan: {
-      free: users.filter(u => !u.plan || u.plan === 'free').length,
-      solo: users.filter(u => u.plan === 'solo').length,
-      pro: users.filter(u => u.plan === 'pro').length,
-      team: users.filter(u => u.plan === 'team').length,
+      free: workspaceList.filter(w => !w.plan || w.plan === 'free').length,
+      lifetime: lifetimeCount,
     },
     totalWorkspaces: workspaceList.length,
+    revenue: lifetimeCount * 149000,
   }
 
   return <AdminModule users={users} workspaces={workspaceList} stats={stats} />

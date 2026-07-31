@@ -38,12 +38,13 @@ type Stats = {
   today: number
   week: number
   month: number
-  byPlan: { free: number; solo: number; pro: number; team: number }
+  byPlan: { free: number; lifetime: number }
   totalWorkspaces: number
+  revenue: number
 }
 
-const PLANS = ['free', 'solo', 'pro', 'team']
-const PLAN_COLORS: Record<string, string> = { free: '#6b7280', solo: '#1a73e8', pro: '#1a73e8', team: '#059669' }
+const PLANS = ['free', 'lifetime']
+const PLAN_COLORS: Record<string, string> = { free: '#6b7280', lifetime: '#059669' }
 
 function PlanBadge({ plan }: { plan: string }) {
   const color = PLAN_COLORS[plan] || '#6b7280'
@@ -116,7 +117,7 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 10 }}>
         {[
           { label: 'Total User', value: stats.total, color: '#1a73e8' },
           { label: 'Hari Ini', value: stats.today, color: '#059669' },
@@ -129,6 +130,20 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
             <div style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
         ))}
+      </div>
+
+      {/* Revenue */}
+      <div style={{ background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', borderRadius: 12, padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, boxShadow: '0 4px 16px rgba(5,150,105,0.25)' }}>
+        <div>
+          <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Estimasi Revenue</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff' }}>
+            Rp{stats.revenue.toLocaleString('id-ID')}
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Lifetime Terjual</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff' }}>{stats.byPlan.lifetime} ws</div>
+        </div>
       </div>
 
       {/* Plan breakdown */}
