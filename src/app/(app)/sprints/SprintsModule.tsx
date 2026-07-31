@@ -943,28 +943,24 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           ✕
                         </button>
                       </div>
-                      {/* Row 2: assign + deadline */}
-                      <div className="kf-sprint-step-grid" style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr 130px' : '1fr', gap: 6 }}>
+                      {/* Row 2: assign + deadline — stacked */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                         {workspaceMembers.length > 0 && (
                           <select
                             value={memberId}
                             onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
-                            style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#374151', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#374151', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
                             <option value="">— Assign ke —</option>
                             {workspaceMembers.map(m => (
                               <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
                             ))}
                           </select>
                         )}
-                        <div style={{ position: 'relative' }}>
-                          <input type="date"
-                            value={deadline}
-                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, deadline: e.target.value } : x))}
-                            style={{ ...fieldStyle({ padding: '5px 8px', fontSize: '0.72rem', color: deadline ? '#d97706' : '#374151' }) }}
-                            placeholder="Deadline"
-                          />
-                          {!deadline && <span style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', fontSize: '0.68rem', color: '#6b7280', pointerEvents: 'none' }}>Deadline</span>}
-                        </div>
+                        <input type="date"
+                          value={deadline}
+                          onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, deadline: e.target.value } : x))}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: deadline ? '#d97706' : '#9ca3af', fontSize: '0.72rem', outline: 'none', boxSizing: 'border-box' as const }}
+                        />
                       </div>
                     </div>
                   ))}
