@@ -1,11 +1,22 @@
 # KreaFlow — Product Requirements Document
 
-**Last updated:** 25 Juli 2026  
+**Last updated:** 31 Juli 2026  
 **Domain:** kreaflow.id  
 **Stack:** Next.js 16.2.10 App Router + TypeScript + Supabase self-hosted + AI (OpenRouter)  
-**VPS:** 194.233.95.194 | PM2: `kreaflow` (id: 11) | Port: 2847  
+**VPS:** 194.233.95.194 | PM2: `kreaflow` (id: 15) | Port: 2847  
 **Deploy:** `git push vps main` → auto build + restart  
 **DB:** Supabase self-hosted `api-sf.tuasdigital.com`, semua tabel prefix `kf_`
+
+---
+
+## Pricing Model (Confirmed)
+
+| Plan | Harga | Member | Fitur |
+|---|---|---|---|
+| `free` | Gratis | 1 (owner only) | Semua fitur, tapi tidak bisa invite tim |
+| `lifetime` | Rp149.000 sekali bayar | 5 (owner + 4 anggota) | Full akses + invite tim |
+
+Payment via **Xendit Invoice API**. Webhook di `/api/payment/webhook`.
 
 ---
 
@@ -41,10 +52,13 @@ Tayang → Sprint Board column "Done ✓"
 #### 1. Brand
 Setup identitas workspace sekali. AI-powered.
 - Niche Finder, Micro-niche, Storytelling Builder, Smart Content Pillar, Bio Generator
-- **[BARU] Tab "📲 Akun Sosial"**: daftarkan akun sosmed (platform + handle + nama label)
+- Tab "📲 Akun Sosial": daftarkan akun sosmed (platform + handle + nama label)
   - Maksimal 10 akun per workspace
   - Menjadi sumber dropdown "Akun Posting" di Sprint modal
-- `kf_brand_profiles`, **`kf_accounts`** (id, workspace_id, platform, handle, nama)
+- `kf_brand_profiles`, `kf_accounts` (id, workspace_id, platform, handle, nama)
+- **Feature gating**: Brand wajib diisi (minimal `niche`) sebelum bisa akses Sprint/Plan/Studio/Calendar
+  - Redirect ke `/brand?setup=1` dengan banner peringatan jika belum isi
+  - Gate dilakukan di server component masing-masing halaman
 
 #### 2. Catalog
 Database produk affiliate.
@@ -80,8 +94,8 @@ Database produk affiliate.
 - **Laporan Tim** (tombol 📊 di sprint header):
   - Per step: member, deadline, selesai, tepat waktu, terlambat, pending+overdue
   - Tracking via `step_log` JSONB: `{ naskah_done_at, editing_done_at, ... }` dicatat saat ✓ diklik
-- `kf_sprints` (columns: workspace_id, nama, start_date, end_date, target_konten, platform, **akun**, template_type, step_config, status)
-- `kf_content_ideas` (sprint_id, status, product_id, assigned_naskah, assigned_produksi, assigned_schedule, **step_log** JSONB)
+- `kf_sprints` (columns: workspace_id, nama, start_date, end_date, target_konten, platform, akun, template_type, step_config, status)
+- `kf_content_ideas` (sprint_id, status, product_id, assigned_naskah, assigned_produksi, assigned_schedule, step_log JSONB)
 
 **Notification chain Sprint Board:**
 | Step selesai | Status baru | Notif ke |
@@ -136,15 +150,97 @@ Jadwal posting konten.
 - List view: badge produk ungu + waktu posting prominent
 - Edit/hapus jadwal manual
 - `kf_calendar_entries` (content_id, platform, scheduled_at, posted_at, posted_url, status)
-- ContentIdea includes `product_id`, `product_nama` (di-join saat fetch)
 
-#### 8. Settings
+#### 8. Budget
+Tracking pemasukan dan pengeluaran konten.
+- CRUD transaksi: tipe (Pemasukan/Pengeluaran), kategori, deskripsi, jumlah, tanggal
+- Summary cards: total pemasukan, pengeluaran, saldo bersih
+- Filter by tipe
+- `kf_transactions`
+- **Gap**: belum ada filter bulan/tahun, belum ada grafik tren
+
+#### 9. Tracker
+Input metrics performa bulanan per platform.
+- 9 metrics: impressi, reach, follower growth, likes, komentar, share, klik, konversi, cost campaign
+- Hitung CPR (cost per result) otomatis
+- Filter per platform
+- `kf_monthly_metrics`
+- **Gap**: belum ada grafik tren, data belum muncul di Insights/Dashboard
+
+#### 10. Insights (Dashboard)
+Dashboard overview harian workspace.
+- KPI cards: total konten, produk aktif, jadwal hari ini, saldo bersih
+- Sprint aktif + progress bar (todo/in progress/tayang)
+- Pipeline konten (bar visual: draft/in progress/tayang)
+- Konten terbaru (6 item)
+- Jadwal hari ini dari Calendar
+- Overdue tasks
+- Quick actions menu
+- Finance summary (ringkasan Budget)
+- **Gap**: data Tracker (social metrics) belum ditampilkan di sini
+
+#### 11. Settings
 - Workspace settings, team management, profile
 - Jabatan field per member (Copywriter, Editor, Videografer, dll)
 - Invite member via link
+- **Member limit enforcement (UI)**:
+  - Free plan: banner "Fitur tim terkunci" + tombol Upgrade
+  - Lifetime + full (5/5): banner merah "Slot anggota tim penuh"
+  - Lifetime + tersedia: form invite + counter "X slot tersisa"
 
-#### 9. Admin (Super Admin Only)
+#### 12. Admin (Super Admin — `eginanjarism@gmail.com`)
 Panel internal semua user/workspace.
+- Stats: Total User, Hari Ini, 7 Hari, 30 Hari, Total Workspace
+- **Revenue card**: estimasi revenue (lifetime workspace × Rp149.000) + jumlah lifetime terjual
+- Plan breakdown: free vs lifetime
+- User list: search, filter plan, ubah plan, reset password
+- Workspace list: search, lihat anggota tim, ubah plan per workspace
+- Plan values: `['free', 'lifetime']` (legacy solo/pro/team sudah dihapus)
+- Unauthorized → redirect `/sprints`
+
+#### 13. Upgrade (Payment)
+- `/upgrade` — pricing page dengan card Lifetime Deal Rp149.000
+  - Server component: redirect ke `/sprints` jika sudah lifetime
+  - Client component `UpgradeModule`: call `/api/payment/create-invoice` → redirect ke Xendit hosted invoice
+- `/api/payment/create-invoice` — POST: buat Xendit invoice, return `invoice_url`
+  - Reject jika workspace sudah lifetime
+  - `external_id`: `kreaflow-{workspace_id}-{timestamp}`
+- `/api/payment/webhook` — POST: terima callback Xendit
+  - Validasi `x-callback-token` vs `XENDIT_WEBHOOK_TOKEN`
+  - Proses hanya `status === 'PAID'`
+  - Update `kf_workspaces.plan = 'lifetime'`
+- `/payment/success` — static success page, link ke `/sprints`
+- Sidebar upgrade banner: tampil jika `plan !== 'lifetime'`
+  - Collapsed: icon arrow up
+  - Expanded: card "Upgrade ke Lifetime · Rp149.000 · bayar sekali"
+- **Member limit enforcement (API)**: `/api/team` POST cek jumlah member vs limit plan sebelum invite
+  - `free` → max 1 (owner only)
+  - `lifetime` → max 5
+
+#### 14. Halaman Publik
+- `/` — Landing page (marketing)
+  - Testimonial dengan foto avatar (i.pravatar.cc)
+  - FAQ accordion CSS-only (`<details>/<summary>`)
+  - Nav CTA "Mulai Sekarang", Hero CTA "Lihat Harga →"
+  - Footer: 5 kolom (KreaFlow, Produk, Bantuan, Legal, Sosial)
+  - Footer Sosial: TikTok, Instagram, YouTube @kreaflowid
+  - Authenticated user → redirect `/sprints`
+  - Mobile responsive: tabs overflow-x scroll, nav CTA white-space nowrap
+- `/privacy` — Kebijakan Privasi (10 seksi, UU PDP No. 27/2022)
+- `/terms` — Syarat & Ketentuan (11 seksi, refund policy 7 hari)
+
+---
+
+## Auth Flow
+
+| Event | Redirect |
+|---|---|
+| Login | `/sprints` |
+| Register | `/brand?setup=1` |
+| Akses Sprint/Plan/Studio/Calendar tanpa Brand | `/brand?setup=1` |
+| Unauthorized admin | `/sprints` |
+
+`src/proxy.ts` = middleware auth. Public routes: `/`, `/privacy`, `/terms`, `/payment/success`.
 
 ---
 
@@ -168,13 +264,14 @@ Sidebar badge: notifikasi unread di bell icon. `/notifications` page untuk list 
 ```sql
 -- Core
 kf_workspaces          (id, name, owner_id, plan, modes, created_at)
+                        -- plan: 'free' | 'lifetime'
 kf_workspace_members   (workspace_id, user_id, role, jabatan)
 kf_invites             (workspace_id, email, role, token, invited_by, accepted_at, expires_at)
 
 -- Brand
 kf_brand_profiles      (workspace_id, niche, micro_niche, premis, tone_of_voice,
                          target_audiens, platform_utama, affiliate_*, ...)
-kf_accounts            (workspace_id, platform, handle, nama, created_at)  -- NEW
+kf_accounts            (workspace_id, platform, handle, nama, created_at)
 
 -- Catalog
 kf_products            (workspace_id, nama, platform_affiliate, kategori, tipe_produk,
@@ -187,7 +284,7 @@ kf_content_ideas       (workspace_id, judul, format, platform[], status,
                          product_id, sprint_id,
                          assigned_riset, assigned_naskah, assigned_produksi, assigned_schedule,
                          tanggal_tayang, terjadwal_at, tayang_at,
-                         step_log JSONB,   -- { naskah_done_at, editing_done_at, ... }
+                         step_log JSONB,
                          created_at)
 
 -- Sprint
@@ -203,11 +300,17 @@ kf_tasks               (workspace_id, nama, platform, priority, start_date, due_
 kf_calendar_entries    (workspace_id, task_id, content_id, label, platform,
                          scheduled_at, posted_at, posted_url, status)
 
+-- Analytics
+kf_transactions        (workspace_id, tanggal, deskripsi, kategori, tipe, jumlah)
+kf_monthly_metrics     (workspace_id, platform, month, year,
+                         impressions, reach, follower_growth, shares, comments,
+                         likes, clicks, cost_of_campaign, conversions)
+
 -- Notifications
 kf_notifications       (workspace_id, type, title, message,
                          content_idea_id, task_id, is_read, created_at)
 
--- Plans
+-- Plans (legacy, masih ada)
 kf_plan_platforms      (workspace_id, platform, ...)
 kf_campaigns           (workspace_id, nama, tanggal_mulai, ...)
 ```
@@ -221,14 +324,26 @@ const TEMPLATES = {
   affiliate: { steps: [naskah, take_vid, editing, schedule] },
   creator:   { steps: [naskah, shooting, editing, thumbnail, schedule] },
   live:      { steps: [rundown, persiapan, live, schedule] },
-  custom:    { steps: [] }  // user define sendiri
+  custom:    { steps: [] }
 }
 
-// template_type encoding:
-// "affiliate"                          → pakai default steps dari TEMPLATES
-// "affiliate:naskah,take_vid,editing"  → custom steps (override)
-
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
+```
+
+---
+
+## Environment Variables (VPS: `/www/wwwroot/kreaflow/.env.local`)
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://api-sf.tuasdigital.com
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+NEXT_PUBLIC_APP_URL=https://kreaflow.id
+XENDIT_SECRET_KEY=           ← wajib diisi sebelum payment live
+XENDIT_WEBHOOK_TOKEN=        ← wajib diisi sebelum payment live
+OPENROUTER_API_KEY=          ← untuk fitur AI
+CRON_SECRET=
+WEBHOOK_SECRET=
 ```
 
 ---
@@ -242,58 +357,51 @@ src/
     plan/       PlanModule.tsx, page.tsx      — AI naskah + Sprint linkage
     library/    LibraryModule.tsx, page.tsx
     studio/     StudioModule.tsx, page.tsx
-    calendar/   CalendarModule.tsx, page.tsx  — Antrian posting + quick schedule
-    brand/      BrandModule.tsx, page.tsx     — +Akun Sosial tab
+    calendar/   CalendarModule.tsx, page.tsx
+    brand/      BrandModule.tsx, page.tsx
     catalog/    CatalogModule.tsx, page.tsx
-    settings/   SettingsModule.tsx, page.tsx  — +jabatan field
-    admin/      page.tsx
-    tasks/      page.tsx                      — redirect ke /sprints?tab=tasks
+    budget/     BudgetModule.tsx, page.tsx
+    tracker/    TrackerModule.tsx, page.tsx
+    insights/   page.tsx                      — Dashboard utama
+    settings/   SettingsModule.tsx, page.tsx
+    admin/      AdminModule.tsx, page.tsx
+    upgrade/    UpgradeModule.tsx, page.tsx
+  app/(auth)/
+    login/      page.tsx   — redirect ke /sprints setelah login
+    register/   page.tsx   — redirect ke /brand?setup=1 setelah register
   app/api/
-    team/route.ts   — POST invite, DELETE remove, PATCH role/jabatan
+    payment/create-invoice/route.ts  — Xendit invoice
+    payment/webhook/route.ts         — Xendit callback
+    team/route.ts                    — invite/remove/patch member + limit check
+    admin/route.ts                   — ubah plan + reset password
+  app/
+    privacy/    page.tsx
+    terms/      page.tsx
+    payment/success/page.tsx
+  lib/
+    workspace.ts   — getWorkspace() + getWorkspaceWithBrandGuard()
+  proxy.ts           — middleware auth + public route whitelist
   components/layout/
-    Sidebar.tsx     — nav + notif badge
-  lib/supabase/
-    client.ts   — browser client
-    server.ts   — server component client
+    Sidebar.tsx    — nav + notif badge + upgrade banner
 ```
 
 ---
 
-## Keputusan Bisnis (In Progress)
+## Backlog / Roadmap
 
-| Item | Status | Catatan |
-|---|---|---|
-| Payment gateway | Menimbang | Midtrans langsung vs Scalev |
-| Model pricing | Menimbang | Berlangganan bulanan vs sekali beli |
-| Plan limits enforcement | Belum | Tunggu keputusan harga final |
-| Onboarding wizard | Roadmap | Setelah fitur utama beres |
-| Feature gating (Brand+Catalog wajib diisi dulu) | Roadmap | Block akses Sprint/Plan jika Brand kosong |
-| Tutorial in-app | Roadmap | Panduan langkah demi langkah per modul |
-| Mobile responsiveness | Roadmap | Setelah tema & warna final |
-| AI bring-your-own-API | Roadmap (low priority) | User bawa API key sendiri |
-| Landing page update | Roadmap | Update setelah fitur beres |
+### 🔴 URGENT — Sebelum Iklan
+- [ ] Set `XENDIT_SECRET_KEY` + `XENDIT_WEBHOOK_TOKEN` di VPS → aktifkan payment
+- [ ] Setup Xendit webhook di dashboard: `https://kreaflow.id/api/payment/webhook`
 
-## Backlog Prioritas
+### 🟡 PRIORITAS BERIKUTNYA
+- [ ] **Insights fix**: tampilkan data Tracker (social metrics) di halaman Insights/Dashboard
+- [ ] **Budget filter bulan**: filter transaksi per bulan/tahun
+- [ ] **Tracker grafik**: visualisasi tren performa (line chart sederhana)
+- [ ] **Onboarding wizard**: panduan step-by-step untuk user baru
 
-### 🟡 PRIORITAS 1 — Notification Center
-Panel/halaman semua notif dengan deep link per type (riset→Plan, produksi→Studio, schedule→Calendar). Mark as read individual + all.
-
-### 🟡 PRIORITAS 2 — Insights
-Analytics konten per platform. Input manual: views, likes, comments, shares. Summary per bulan/platform/format. `kf_content_metrics`.
-
-### 🟡 PRIORITAS 3 — Budget
-Tracking biaya produksi per konten/sprint. ROI estimasi (affiliate revenue vs cost).
-
-### 🟡 PRIORITAS 4 — Feature Gating
-Cek apakah Brand sudah diisi sebelum akses Sprint/Plan/Studio/Calendar. Redirect ke Brand jika belum. Bisa dikombinasi dengan onboarding wizard.
-
----
-
-## Catatan Teknis
-
-- GDrive thumbnail: `https://drive.google.com/thumbnail?id=FILE_ID&sz=w400`
-- Admin client: `createClient as createAdmin` dari `@supabase/supabase-js` dengan `SUPABASE_SERVICE_ROLE_KEY`
-- Semua pages: server component fetch → pass ke client module
-- TypeScript strict — tidak ada `any`
-- Style: inline CSS (dark theme, bg #111, border #2a2a2a, accent #7C3AED/#A78BFA)
-- Notif routing: `content_idea_id` → /sprints (Sprint Board); `task_id` → /sprints (Tasks tab)
+### 🟢 ROADMAP (sesudah revenue masuk)
+- [ ] LP Builder + CAPI (Meta Conversions API) — sebagai fitur KreaFlow untuk user
+- [ ] Blog untuk kreaflow.id (SEO)
+- [ ] Pixel tracking + CRM leads untuk marketing kreaflow.id
+- [ ] AI bring-your-own-API key
+- [ ] Mobile app (PWA atau native)

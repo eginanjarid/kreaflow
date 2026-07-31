@@ -17,13 +17,15 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
 
   if (!member) redirect('/login')
 
-  const [{ data: profile }, { data: workspace }, { data: akun }] = await Promise.all([
+  const { data: wsCheck } = await supabase.from('kf_workspaces').select('plan, modes').eq('id', member.workspace_id).single()
+  if (wsCheck?.plan !== 'lifetime') redirect('/upgrade')
+
+  const [{ data: profile }, { data: akun }] = await Promise.all([
     supabase.from('kf_brand_profiles').select('*').eq('workspace_id', member.workspace_id).maybeSingle(),
-    supabase.from('kf_workspaces').select('modes').eq('id', member.workspace_id).single(),
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', member.workspace_id).order('created_at'),
   ])
 
-  const modes = (workspace?.modes as string[] | null) ?? ['creator']
+  const modes = (wsCheck?.modes as string[] | null) ?? ['creator']
   const { setup } = await searchParams
 
   return (

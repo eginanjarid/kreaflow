@@ -18,8 +18,22 @@ export async function getWorkspace() {
   return { supabase, user, wsId: member.workspace_id as string }
 }
 
-export async function getWorkspaceWithBrandGuard() {
+export async function getWorkspaceWithPlanGuard() {
   const { supabase, user, wsId } = await getWorkspace()
+
+  const { data: ws } = await supabase
+    .from('kf_workspaces')
+    .select('plan')
+    .eq('id', wsId)
+    .maybeSingle()
+
+  if (ws?.plan !== 'lifetime') redirect('/upgrade')
+
+  return { supabase, user, wsId }
+}
+
+export async function getWorkspaceWithBrandGuard() {
+  const { supabase, user, wsId } = await getWorkspaceWithPlanGuard()
 
   const { data: brand } = await supabase
     .from('kf_brand_profiles')

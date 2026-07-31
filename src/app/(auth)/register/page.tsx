@@ -31,7 +31,7 @@ export default function RegisterPage() {
       const loginData = await loginRes.json()
       if (!loginRes.ok) throw new Error(loginData.error || 'Gagal masuk')
 
-      router.push('/brand?setup=1')
+      router.push('/upgrade')
       router.refresh()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Gagal daftar')

@@ -14,6 +14,9 @@ export default async function CalendarPage() {
 
   const wsId = member.workspace_id
 
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+
   const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
   if (!brandCheck?.niche) redirect('/brand?setup=1')
 

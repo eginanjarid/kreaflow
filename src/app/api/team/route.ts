@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   // Check plan & member limit
   const { data: ws } = await admin.from('kf_workspaces').select('plan').eq('id', workspaceId).single()
   const plan = (ws as { plan: string } | null)?.plan || 'free'
-  const MAX_MEMBERS = plan === 'lifetime' ? 5 : 1
+  const MAX_MEMBERS = plan === 'lifetime' ? 6 : 0
 
   const { count: currentCount } = await admin
     .from('kf_workspace_members')

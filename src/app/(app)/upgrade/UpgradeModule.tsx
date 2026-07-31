@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const FEATURES = [
+  '1 owner + 5 karyawan (6 slot tim)',
   'Semua 10 modul lengkap',
-  'Unlimited workspace & brand',
-  'Unlimited konten & jadwal manual',
   'Sprint, Plan, Library, Studio, Calendar',
   'Tracker, Budget, Insights',
+  'Unlimited konten & jadwal',
   'Semua update fitur ke depan',
 ]
 
