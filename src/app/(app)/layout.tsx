@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { resolveWorkspaceId } from '@/lib/workspace'
 import AppShell from '@/components/layout/AppShell'
 
 const SUPER_ADMINS = ['eginanjarism@gmail.com']
@@ -9,19 +10,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: workspace } = await supabase
-    .from('kf_workspace_members')
-    .select('workspace_id, role, kf_workspaces(id, name, plan)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .single()
+  const wsId = await resolveWorkspaceId(supabase, user.id)
+  const { data: ws } = wsId
+    ? await supabase.from('kf_workspaces').select('id, name, plan').eq('id', wsId).single()
+    : { data: null }
 
   const isSuperAdmin = SUPER_ADMINS.includes(user.email!)
 
   return (
     <AppShell
-      workspace={(workspace?.kf_workspaces as unknown) as { id: string; name: string; plan: string } | null}
+      workspace={ws as { id: string; name: string; plan: string } | null}
       isSuperAdmin={isSuperAdmin}
       user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
     >
