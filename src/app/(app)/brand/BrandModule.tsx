@@ -381,7 +381,7 @@ export default function BrandModule({
     const dibutuhkan = profile.dibutuhkan || '[belum diisi]'
     const peluang = profile.peluang ? `Saya sudah punya gambaran: ${profile.peluang}` : 'Saya belum tahu — bantu saya temukan peluangnya.'
 
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
 
     return `Kamu adalah seorang Brand Architect yang spesialis membantu content creator Indonesia membangun positioning yang tajam, autentik, dan sustainable di era konten digital yang makin saturasi.
 
@@ -440,7 +440,7 @@ Tutup dengan 1 pertanyaan spesifik berdasarkan data di atas yang akan membuat re
 
   function buildHelperPrompt(): string {
     const suka = profile.suka || '[belum diisi]'
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
 
     return `Saya seorang calon content creator Indonesia yang baru memulai perjalanan membangun personal brand.
 
@@ -480,7 +480,7 @@ Tutup dengan pertanyaan yang membantu saya menggali lebih dalam salah satu dari 
     const niche = profile.niche || '[isi Niche Hunt dulu]'
     const kategori = profile.kategori || '-'
     const microNiche = profile.micro_niche || '-'
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
 
     return `Saya seorang content creator Indonesia yang sedang membangun personal brand.
 
@@ -535,7 +535,7 @@ Tutup dengan 1 pertanyaan yang membantu saya mengidentifikasi mana dari keempat 
     const kelemahan = profile.kelemahan || '[belum diisi]'
     const peluang = profile.peluang_brand || profile.peluang || '[belum diisi]'
     const tantangan = profile.tantangan || '[belum diisi]'
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
 
     return `Kamu adalah seorang Narrative Strategist yang spesialis membantu content creator Indonesia merumuskan origin story yang autentik, emosional, dan kuat untuk membangun koneksi dengan audiens.
 
@@ -589,7 +589,7 @@ Tutup dengan 1 pertanyaan yang membantu saya memilih variasi yang paling sesuai 
     const premis = profile.premis || '[isi Origin Story dulu]'
     const tone = profile.tone_of_voice || 'Friendly'
     const audiens = profile.target_audiens || '[belum diisi]'
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
 
     return `Kamu adalah seorang Content Strategist yang ahli membangun ekosistem konten yang konsisten dan strategis untuk content creator Indonesia.
 
@@ -639,7 +639,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
     const audiens = profile.target_audiens || '[belum diisi]'
     const kelebihan = profile.kelebihan || '[belum diisi]'
     const tone = profile.tone_of_voice || 'Friendly'
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
 
     return `Kamu adalah seorang copywriter sosial media yang spesialis membuat bio profil yang ringkas, menarik, dan mampu mengkonversi pengunjung jadi followers atau leads.
 
@@ -1076,7 +1076,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
               placeholder="Nama akun atau creator kamu"
             />
           </div>
-          <SingleSelect label="Platform Utama" options={PLATFORMS} value={profile.platform_utama} onChange={v => setField('platform_utama', v)} />
+          <MultiSelect label="Platform Utama" options={PLATFORMS} value={profile.platform_utama} onChange={v => setField('platform_utama', v)} />
           <MultiSelect label="Gaya Konten" options={GAYA} value={profile.gaya_konten} onChange={v => setField('gaya_konten', v)} />
           <MultiSelect label="Tipe Konten" options={TIPE} value={profile.tipe_konten} onChange={v => setField('tipe_konten', v)} />
           <MultiSelect label="Target Audiens" options={AUDIENS} value={profile.target_audiens} onChange={v => setField('target_audiens', v)} />
@@ -1251,27 +1251,46 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           )}
 
           {/* SWOT Fields */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            {[
-              { label: 'Kelebihan kamu', key: 'kelebihan' as keyof BrandProfile, placeholder: 'Apa yang jadi keunggulan kamu...' },
-              { label: 'Kelemahan kamu', key: 'kelemahan' as keyof BrandProfile, placeholder: 'Apa yang masih jadi tantangan...' },
-              { label: 'Peluang brand', key: 'peluang_brand' as keyof BrandProfile, placeholder: 'Peluang yang bisa dimanfaatkan...' },
-              { label: 'Tantangan', key: 'tantangan' as keyof BrandProfile, placeholder: 'Hambatan yang dihadapi...' },
-            ].map(({ label, key, placeholder }) => (
-              <div key={key}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>{label}</label>
-                <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={(profile[key] ?? '') as string} onChange={e => setField(key, e.target.value)} placeholder={placeholder} />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#1a73e8', color: '#fff', fontSize: '0.72rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
+              <div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111827' }}>Analisis Diri Kamu</div>
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Isi 4 aspek ini — data ini yang diolah AI untuk menulis Origin Story kamu</div>
               </div>
-            ))}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {[
+                { label: 'Kelebihan kamu', key: 'kelebihan' as keyof BrandProfile, placeholder: 'Apa yang jadi keunggulan kamu...' },
+                { label: 'Kelemahan kamu', key: 'kelemahan' as keyof BrandProfile, placeholder: 'Apa yang masih jadi tantangan...' },
+                { label: 'Peluang brand', key: 'peluang_brand' as keyof BrandProfile, placeholder: 'Peluang yang bisa dimanfaatkan...' },
+                { label: 'Tantangan', key: 'tantangan' as keyof BrandProfile, placeholder: 'Hambatan yang dihadapi...' },
+              ].map(({ label, key, placeholder }) => (
+                <div key={key}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>{label}</label>
+                  <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={(profile[key] ?? '') as string} onChange={e => setField(key, e.target.value)} placeholder={placeholder} />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <button
-            type="button"
-            disabled={!profile.kelebihan}
-            onClick={() => setAiModal({ prompt: buildStoryPrompt() })}
-            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8, alignSelf: 'flex-start' }}>
-            Generate dengan AI
-          </button>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ width: 22, height: 22, borderRadius: '50%', background: profile.kelebihan ? '#1a73e8' : '#d1d5db', color: '#fff', fontSize: '0.72rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
+              <div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111827' }}>Generate Origin Story</div>
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Copy prompt → paste ke Gemini/ChatGPT → ambil hasilnya ke bagian di bawah</div>
+              </div>
+            </div>
+            <button
+              type="button"
+              disabled={!profile.kelebihan}
+              onClick={() => setAiModal({ prompt: buildStoryPrompt() })}
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.kelebihan ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 8, opacity: profile.kelebihan ? 1 : 0.5 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Generate Prompt Origin Story
+            </button>
+          </div>
 
           {/* Premis CRUD */}
           <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
@@ -2126,7 +2145,7 @@ function ContentPillarsTab({ workspaceId, profile }: { workspaceId: string; prof
     const premis = profile.premis || '[isi Origin Story dulu]'
     const tone = profile.tone_of_voice || 'Friendly'
     const audiens = profile.target_audiens || '[belum diisi]'
-    const platform = profile.platform_utama || 'TikTok/Instagram'
+    const platform = profile.platform_utama ? profile.platform_utama.split(',').filter(Boolean).join('/') : 'TikTok/Instagram'
     const nama = profile.nama_akun || '[nama belum diisi]'
 
     return `Kamu adalah seorang Content Strategist yang ahli membangun ekosistem konten yang konsisten dan strategis untuk content creator Indonesia.
