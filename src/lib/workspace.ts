@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -9,6 +10,13 @@ export async function resolveWorkspaceId(supabase: any, userId: string): Promise
     .eq('user_id', userId)
     .order('created_at', { ascending: true })
   if (!rows?.length) return null
+
+  const cookieStore = await cookies()
+  const cookieWsId = cookieStore.get('selected_workspace_id')?.value
+  if (cookieWsId && rows.some((r: { workspace_id: string }) => r.workspace_id === cookieWsId)) {
+    return cookieWsId
+  }
+
   if (rows.length === 1) return rows[0].workspace_id as string
   const wsIds = rows.map((r: { workspace_id: string }) => r.workspace_id)
   const { data: wsData } = await supabase.from('kf_workspaces').select('id, plan').in('id', wsIds)
@@ -21,21 +29,8 @@ export async function getWorkspace() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: rows } = await supabase
-    .from('kf_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-  if (!rows?.length) redirect('/login')
-
-  let wsId = rows[0].workspace_id as string
-
-  if (rows.length > 1) {
-    const wsIds = rows.map(r => r.workspace_id as string)
-    const { data: wsData } = await supabase.from('kf_workspaces').select('id, plan').in('id', wsIds)
-    const lifetimeId = wsData?.find(w => w.plan === 'lifetime')?.id
-    if (lifetimeId) wsId = lifetimeId
-  }
+  const wsId = await resolveWorkspaceId(supabase, user.id)
+  if (!wsId) redirect('/login')
 
   return { supabase, user, wsId }
 }

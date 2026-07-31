@@ -4,18 +4,22 @@ import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import BottomNav from './BottomNav'
 
+type Workspace = { id: string; name: string; plan: string; brand_type: string }
+
 type Props = {
-  workspace: { id: string; name: string; plan: string } | null
+  workspace: Workspace | null
+  workspaces: Workspace[]
   isSuperAdmin: boolean
   user: { email: string; nama: string }
   children: React.ReactNode
 }
 
-export default function AppShell({ workspace, isSuperAdmin, user, children }: Props) {
+export default function AppShell({ workspace, workspaces, isSuperAdmin, user, children }: Props) {
   return (
     <div className="kf-app-shell">
       <Sidebar
         workspace={workspace}
+        workspaces={workspaces}
         isSuperAdmin={isSuperAdmin}
         className="app-sidebar"
       />
