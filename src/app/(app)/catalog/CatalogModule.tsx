@@ -165,7 +165,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
       <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Catalog</h1>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Produk fisik, digital, dan affiliate yang kamu promosikan</p>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>{isAffiliate ? 'Produk fisik, digital, dan affiliate yang kamu promosikan' : 'Produk fisik & digital yang kamu jual atau tawarkan'}</p>
         </div>
         <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
           + Tambah Produk

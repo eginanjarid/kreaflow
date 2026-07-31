@@ -15,14 +15,17 @@ export default async function CatalogPage() {
 
   const [{ data: products }, { data: workspace }] = await Promise.all([
     supabase.from('kf_products').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
-    supabase.from('kf_workspaces').select('modes').eq('id', wsId).single(),
+    supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
   ])
+
+  const brandType = (workspace?.brand_type as string | null) ?? 'creator'
+  const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
 
   return (
     <CatalogModule
       initialProducts={products || []}
       workspaceId={wsId}
-      modes={(workspace?.modes as string[]) || ['creator']}
+      modes={modes}
     />
   )
 }
