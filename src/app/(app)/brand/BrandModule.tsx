@@ -267,7 +267,7 @@ export default function BrandModule({
   const [profile, setProfile] = useState<BrandProfile>(initialProfile ? {
     ...defaultProfile,
     ...initialProfile,
-    color_palette: initialProfile.color_palette?.length ? initialProfile.color_palette : defaultProfile.color_palette,
+    color_palette: initialProfile.color_palette?.length ? initialProfile.color_palette : [],
     niche_options: (initialProfile as unknown as { niche_options?: NicheOption[] }).niche_options || [],
     premis_options: (initialProfile as unknown as { premis_options?: PremisOption[] }).premis_options || [],
     bio_options: (initialProfile as unknown as { bio_options?: BioOptions }).bio_options || {},
