@@ -64,7 +64,6 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
   const effectiveView = isMobile ? 'list' : view
   const [showTasks, setShowTasks] = useState(true)
-  const [queueOpen, setQueueOpen] = useState(true)
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
   const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platform: string } | null>(null)
   const [schedSaving, setSchedSaving] = useState(false)
@@ -244,52 +243,35 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
 
       {/* ── Antrian Posting ── */}
       {readyItems.length > 0 && (
-        <div style={{ background: '#f0fdf4', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
-          <button
-            onClick={() => setQueueOpen(o => !o)}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', background: 'transparent', border: 'none', cursor: 'pointer' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#059669' }}>Siap Dijadwalkan</span>
-              <span style={{ background: 'rgba(52,211,153,0.15)', color: '#059669', fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 10 }}>{readyItems.length} konten</span>
+        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', overflow: 'hidden', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>Siap Dijadwalkan</span>
+              <span style={{ background: '#059669', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{readyItems.length}</span>
             </div>
-            <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>{queueOpen ? '▲' : '▼'}</span>
-          </button>
-          {queueOpen && (
-            <div style={{ borderTop: '1px solid rgba(52,211,153,0.1)', padding: '8px 12px 12px' }}>
-              {readyItems.map(item => (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 6px', borderBottom: '1px solid #d1fae5' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
-                      {item.product_nama && (
-                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', borderRadius: 3, background: 'rgba(66,165,245,0.12)', color: '#1a73e8', whiteSpace: 'nowrap' }}>
-                          {item.product_nama}
-                        </span>
-                      )}
-                      {item.format && (
-                        <span style={{ fontSize: '0.62rem', padding: '1px 5px', borderRadius: 3, background: '#f3f4f6', color: '#6b7280', border: 'none' }}>{item.format}</span>
-                      )}
-                      {item.platform && item.platform.length > 0 && item.platform.map(p => (
-                        <span key={p} style={{ fontSize: '0.62rem', padding: '1px 5px', borderRadius: 3, background: '#f3f4f6', color: '#6b7280', border: 'none' }}>{p}</span>
-                      ))}
-                    </div>
-                    <div style={{ fontSize: '0.82rem', color: '#111827', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.judul}</div>
-                    {item.tanggal_tayang && (
-                      <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>
-                        Rencana: {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` pukul ${item.jam_tayang}` : ''}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => openSchedModal(item)}
-                    style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, color: '#059669', fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
-                  >
-                    + Jadwalkan
-                  </button>
+            <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk jadwalkan</span>
+          </div>
+          <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+            {readyItems.map(item => (
+              <button key={item.id} type="button" onClick={() => openSchedModal(item)}
+                style={{ flexShrink: 0, width: 172, textAlign: 'left', background: '#f9fafb', border: '1.5px solid #f3f4f6', borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(5,150,105,0.1)', color: '#059669' }}>SIAP TAYANG</span>
+                  {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
                 </div>
-              ))}
-            </div>
-          )}
+                <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
+                  {item.judul}
+                </div>
+                {item.tanggal_tayang ? (
+                  <div style={{ fontSize: '0.68rem', color: '#059669', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af' }}>Belum dijadwalkan</div>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

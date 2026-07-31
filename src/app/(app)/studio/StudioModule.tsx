@@ -360,6 +360,38 @@ export default function StudioModule({ initialContents, products, initialNotific
         </button>
       </div>
 
+      {/* ── Antrian Produksi ── */}
+      {antriCount > 0 && (
+        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', overflow: 'hidden', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>Antrian Produksi</span>
+              <span style={{ background: '#d97706', color: '#000', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{antriCount}</span>
+            </div>
+            <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk lihat naskah</span>
+          </div>
+          <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+            {contents.filter(c => STATUS_STAGE[c.status] === 'antrian').map(item => (
+              <button key={item.id} type="button" onClick={() => setTab('antrian')}
+                style={{ flexShrink: 0, width: 172, textAlign: 'left', background: '#f9fafb', border: '1.5px solid #f3f4f6', borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(217,119,6,0.1)', color: '#d97706' }}>NASKAH SIAP</span>
+                  {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
+                </div>
+                <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
+                  {item.judul}
+                </div>
+                {item.platform && item.platform.length > 0 && (
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {item.platform.join(', ')}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Tabs */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', marginBottom: 20, flexWrap: 'wrap', gap: '4px 0' }}>
         <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 0 }}>
