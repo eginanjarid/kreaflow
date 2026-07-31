@@ -15,6 +15,39 @@ export async function POST(req: NextRequest) {
   const { name, brand_type } = await req.json()
   if (!name || !brand_type) return NextResponse.json({ error: 'name dan brand_type wajib diisi' }, { status: 400 })
 
+  // Enforce workspace limit: find user's owned workspaces
+  const { data: memberRows } = await supabase
+    .from('kf_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .eq('role', 'owner')
+
+  const wsIds = memberRows?.map(r => r.workspace_id) || []
+  const wsCount = wsIds.length
+
+  if (wsIds.length > 0) {
+    const { data: ownedWs } = await supabase
+      .from('kf_workspaces')
+      .select('plan, max_workspaces')
+      .in('id', wsIds)
+
+    const lifetimeWs = ownedWs?.find(w => w.plan === 'lifetime')
+
+    if (!lifetimeWs) {
+      return NextResponse.json({ error: 'Akun belum diaktivasi. Silakan upgrade terlebih dahulu.', needUpgrade: true }, { status: 403 })
+    }
+
+    const maxWorkspaces = (lifetimeWs.max_workspaces as number) || 1
+    if (wsCount >= maxWorkspaces) {
+      return NextResponse.json({
+        error: `Batas workspace tercapai (${maxWorkspaces}). Upgrade paket atau beli add-on workspace.`,
+        limitReached: true,
+        maxWorkspaces,
+        current: wsCount,
+      }, { status: 403 })
+    }
+  }
+
   const modes = BRAND_TYPE_MODES[brand_type] || ['creator']
 
   const { data: ws, error } = await supabase

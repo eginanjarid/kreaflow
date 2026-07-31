@@ -6,14 +6,19 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+const BRAND_TYPE_MODES: Record<string, string[]> = {
+  creator: ['creator'],
+  affiliate: ['affiliate'],
+  business: ['creator'],
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { nama, email, password, workspace } = await req.json()
+    const { nama, email, password, workspace, brand_type = 'creator' } = await req.json()
     if (!nama || !email || !password || !workspace) {
       return NextResponse.json({ error: 'Semua field wajib diisi' }, { status: 400 })
     }
 
-    // Create auth user
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email, password,
       user_metadata: { nama },
@@ -22,15 +27,14 @@ export async function POST(req: NextRequest) {
     if (authError) return NextResponse.json({ error: authError.message }, { status: 400 })
 
     const userId = authData.user.id
+    const modes = BRAND_TYPE_MODES[brand_type] || ['creator']
 
-    // Create workspace
     const { data: ws, error: wsError } = await supabase
       .from('kf_workspaces')
-      .insert({ name: workspace, owner_id: userId, plan: 'free' })
+      .insert({ name: workspace, owner_id: userId, plan: 'free', brand_type, modes })
       .select('id').single()
     if (wsError) return NextResponse.json({ error: wsError.message }, { status: 500 })
 
-    // Add as owner member
     await supabase.from('kf_workspace_members').insert({
       workspace_id: ws.id, user_id: userId, role: 'owner'
     })

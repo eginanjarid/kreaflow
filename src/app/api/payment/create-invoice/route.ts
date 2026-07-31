@@ -1,32 +1,38 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { resolveWorkspaceId } from '@/lib/workspace'
 
-export async function POST() {
+const TIERS = {
+  starter: { amount: 99000, label: 'KreaFlow Starter — 1 Workspace', maxWorkspaces: 1 },
+  pro:     { amount: 199000, label: 'KreaFlow Pro — 3 Workspace', maxWorkspaces: 3 },
+  agency:  { amount: 399000, label: 'KreaFlow Agency — 10 Workspace', maxWorkspaces: 10 },
+  addon:   { amount: 49000, label: 'KreaFlow Add-on — +1 Workspace', maxWorkspaces: 1 },
+}
+
+export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { data: member } = await supabase
-      .from('kf_workspace_members')
-      .select('workspace_id')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .single()
-    if (!member) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
-
-    const { data: ws } = await supabase
-      .from('kf_workspaces')
-      .select('plan, name')
-      .eq('id', member.workspace_id)
-      .single()
-
-    if (ws?.plan === 'lifetime') {
-      return NextResponse.json({ error: 'Akun sudah aktif Lifetime' }, { status: 400 })
+    const body = await req.json().catch(() => ({}))
+    const tier = (body.tier as string) || 'starter'
+    if (!TIERS[tier as keyof typeof TIERS]) {
+      return NextResponse.json({ error: 'Tier tidak valid' }, { status: 400 })
     }
 
-    const externalId = `kreaflow-${member.workspace_id}-${Date.now()}`
+    const wsId = await resolveWorkspaceId(supabase, user.id)
+    if (!wsId) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
+
+    const { data: ws } = await supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).single()
+
+    // For addon, user must already have lifetime
+    if (tier === 'addon' && ws?.plan !== 'lifetime') {
+      return NextResponse.json({ error: 'Add-on hanya untuk akun yang sudah aktif' }, { status: 400 })
+    }
+
+    const cfg = TIERS[tier as keyof typeof TIERS]
+    const externalId = `kreaflow-${tier}-${wsId}-${Date.now()}`
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
     const userName = (user.user_metadata?.nama as string) || user.email || 'KreaFlow User'
 
@@ -42,22 +48,14 @@ export async function POST() {
       },
       body: JSON.stringify({
         external_id: externalId,
-        amount: 149000,
-        description: 'KreaFlow Lifetime Deal — akses selamanya ke semua fitur',
+        amount: cfg.amount,
+        description: cfg.label,
         invoice_duration: 86400,
-        customer: {
-          email: user.email,
-          given_names: userName,
-        },
+        customer: { email: user.email, given_names: userName },
         success_redirect_url: `${appUrl}/payment/success`,
         failure_redirect_url: `${appUrl}/upgrade?failed=1`,
         currency: 'IDR',
-        items: [{
-          name: 'KreaFlow Lifetime Deal',
-          quantity: 1,
-          price: 149000,
-          category: 'Software',
-        }],
+        items: [{ name: cfg.label, quantity: 1, price: cfg.amount, category: 'Software' }],
         fees: [],
       }),
     })

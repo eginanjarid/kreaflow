@@ -150,6 +150,9 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
       setCreateOpen(false)
       setCreateForm({ name: '', brand_type: 'creator' })
       router.refresh()
+    } else if (data.limitReached || data.needUpgrade) {
+      setCreateOpen(false)
+      router.push('/upgrade')
     } else {
       alert(data.error || 'Gagal membuat workspace')
     }
