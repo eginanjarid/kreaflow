@@ -256,7 +256,9 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
             <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Member Aktif</div>
-              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{members.length} member</div>
+              <div style={{ fontSize: '0.75rem', color: plan === 'lifetime' && members.length >= 5 ? '#dc2626' : '#6b7280', fontWeight: plan === 'lifetime' ? 600 : 400 }}>
+                {plan === 'lifetime' ? `${members.length}/5 slot` : `${members.length} member`}
+              </div>
             </div>
             {members.map(m => (
               <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #f3f4f6' }}>
@@ -317,9 +319,27 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           )}
 
           {/* Invite form */}
-          {canManageTeam && (
+          {canManageTeam && plan !== 'lifetime' && (
+            <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 14, padding: '16px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#92400e', marginBottom: 4 }}>Fitur tim terkunci</div>
+                <div style={{ fontSize: '0.8rem', color: '#92400e' }}>Upgrade ke Lifetime Deal untuk mengundang hingga 5 anggota tim.</div>
+              </div>
+              <a href="/upgrade" style={{ background: '#1a73e8', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: '0.8rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>Upgrade</a>
+            </div>
+          )}
+          {canManageTeam && plan === 'lifetime' && members.length >= 5 && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 14, padding: '14px 18px', marginBottom: 20 }}>
+              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#dc2626', marginBottom: 2 }}>Slot anggota tim penuh</div>
+              <div style={{ fontSize: '0.8rem', color: '#dc2626' }}>Maksimal 5 anggota per workspace sudah tercapai. Hapus member untuk menambah yang baru.</div>
+            </div>
+          )}
+          {canManageTeam && plan === 'lifetime' && members.length < 5 && (
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px' }}>
-              <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem', marginBottom: 14 }}>Undang Member Baru</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Undang Member Baru</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{5 - members.length} slot tersisa</div>
+              </div>
               <form onSubmit={sendInvite} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
                   <input

@@ -26,6 +26,23 @@ export async function POST(req: NextRequest) {
 
   const admin = adminClient()
 
+  // Check plan & member limit
+  const { data: ws } = await admin.from('kf_workspaces').select('plan').eq('id', workspaceId).single()
+  const plan = (ws as { plan: string } | null)?.plan || 'free'
+  const MAX_MEMBERS = plan === 'lifetime' ? 5 : 1
+
+  const { count: currentCount } = await admin
+    .from('kf_workspace_members')
+    .select('*', { count: 'exact', head: true })
+    .eq('workspace_id', workspaceId)
+
+  if ((currentCount || 0) >= MAX_MEMBERS) {
+    const msg = plan === 'lifetime'
+      ? `Batas maksimal ${MAX_MEMBERS} anggota tim sudah tercapai.`
+      : 'Upgrade ke Lifetime Deal untuk mengundang anggota tim.'
+    return NextResponse.json({ error: msg, limit: true }, { status: 403 })
+  }
+
   // Check if already member
   const { data: authUsers } = await admin.auth.admin.listUsers()
   const targetUser = authUsers?.users.find(u => u.email === email.toLowerCase().trim())
