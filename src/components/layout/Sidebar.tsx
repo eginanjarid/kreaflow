@@ -70,7 +70,9 @@ const BRAND_TYPES = [
 export default function Sidebar({ workspace, workspaces, isSuperAdmin, className }: Props) {
   const pathname = usePathname()
   const router = useRouter()
+  const [planCount, setPlanCount] = useState(0)
   const [studioCount, setStudioCount] = useState(0)
+  const [calendarCount, setCalendarCount] = useState(0)
   const [collapsed, setCollapsed] = useState(false)
   const [tooltip, setTooltip] = useState<{ label: string; top: number } | null>(null)
   const [wsOpen, setWsOpen] = useState(false)
@@ -105,15 +107,18 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
 
   useEffect(() => {
     const supabase = createClient()
-    async function fetchCount() {
-      const { count } = await supabase
-        .from('kf_content_ideas')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'Naskah Siap')
-      setStudioCount(count || 0)
+    async function fetchCounts() {
+      const [plan, studio, calendar] = await Promise.all([
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).in('status', ['Draft', 'Revisi']),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Naskah Siap'),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Siap Tayang'),
+      ])
+      setPlanCount(plan.count || 0)
+      setStudioCount(studio.count || 0)
+      setCalendarCount(calendar.count || 0)
     }
-    fetchCount()
-    const t = setInterval(fetchCount, 30000)
+    fetchCounts()
+    const t = setInterval(fetchCounts, 30000)
     return () => clearInterval(t)
   }, [])
 
@@ -321,11 +326,14 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
                     {item.label}
                   </span>
                 )}
-                {item.studio && studioCount > 0 && (
-                  collapsed
-                    ? <span style={{ position: 'absolute', top: 9, right: 9, width: 7, height: 7, borderRadius: '50%', background: '#f59e0b', border: '1.5px solid #fff' }} />
-                    : <span style={{ marginLeft: 'auto', minWidth: 18, height: 18, background: '#f59e0b', borderRadius: 9, fontSize: '0.6rem', fontWeight: 700, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', flexShrink: 0 }}>{studioCount}</span>
-                )}
+                {(() => {
+                  const count = item.key === 'plan' ? planCount : item.key === 'studio' ? studioCount : item.key === 'calendar' ? calendarCount : 0
+                  const dotColor = item.key === 'plan' ? '#1a73e8' : item.key === 'studio' ? '#f59e0b' : '#a78bfa'
+                  if (!count) return null
+                  return collapsed
+                    ? <span style={{ position: 'absolute', top: 9, right: 9, width: 7, height: 7, borderRadius: '50%', background: dotColor, border: '1.5px solid #fff' }} />
+                    : <span style={{ marginLeft: 'auto', minWidth: 18, height: 18, background: dotColor, borderRadius: 9, fontSize: '0.6rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px', flexShrink: 0 }}>{count > 99 ? '99+' : count}</span>
+                })()}
               </Link>
             )
           })}

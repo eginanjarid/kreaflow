@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 const MAIN_ITEMS = [
   {
@@ -54,6 +55,25 @@ const ADMIN_ITEM = { href: '/admin', label: 'Admin', icon: (c: string) => <svg w
 export default function BottomNav({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   const pathname = usePathname()
   const [moreOpen, setMoreOpen] = useState(false)
+  const [planCount, setPlanCount] = useState(0)
+  const [studioCount, setStudioCount] = useState(0)
+
+  useEffect(() => {
+    const supabase = createClient()
+    async function fetchCounts() {
+      const [plan, studio] = await Promise.all([
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).in('status', ['Draft', 'Revisi']),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Naskah Siap'),
+      ])
+      setPlanCount(plan.count || 0)
+      setStudioCount(studio.count || 0)
+    }
+    fetchCounts()
+    const t = setInterval(fetchCounts, 30000)
+    return () => clearInterval(t)
+  }, [])
+
+  const NAV_COUNTS: Record<string, number> = { '/plan': planCount, '/studio': studioCount }
 
   const allMore = isSuperAdmin ? [...MORE_ITEMS, ADMIN_ITEM] : MORE_ITEMS
   const moreActive = allMore.some(item => pathname.startsWith(item.href))
@@ -97,9 +117,16 @@ export default function BottomNav({ isSuperAdmin }: { isSuperAdmin: boolean }) {
         {MAIN_ITEMS.map(item => {
           const active = pathname.startsWith(item.href)
           const color = active ? '#1a73e8' : '#9ca3af'
+          const count = NAV_COUNTS[item.href] || 0
+          const dotColor = item.href === '/plan' ? '#1a73e8' : '#f59e0b'
           return (
-            <Link key={item.href} href={item.href} className={`kf-bottom-nav-item${active ? ' active' : ''}`}>
+            <Link key={item.href} href={item.href} className={`kf-bottom-nav-item${active ? ' active' : ''}`} style={{ position: 'relative' }}>
               {item.icon(color)}
+              {count > 0 && (
+                <span style={{ position: 'absolute', top: 4, right: '50%', transform: 'translateX(10px)', minWidth: 16, height: 16, background: dotColor, borderRadius: 8, fontSize: '0.55rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', border: '1.5px solid #fff' }}>
+                  {count > 99 ? '99+' : count}
+                </span>
+              )}
               <span>{item.label}</span>
             </Link>
           )
