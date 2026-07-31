@@ -94,13 +94,14 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
 
-export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], sprintDrafts = [] }: {
+export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], sprintDrafts = [], pillars = [] }: {
   workspaceId: string
   brandProfile: BrandSnap
   products: Product[]
   modes: string[]
   tasks?: TaskSnap[]
   sprintDrafts?: SprintDraft[]
+  pillars?: { id: string; nama: string }[]
 }) {
   const isAffiliate = modes.includes('affiliate')
   const TABS = TABS_BASE
@@ -448,7 +449,12 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (!generatedNaskah.trim()) return
     setSavedToLibrary(false)
     const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
-    const matchingDraft = naskahForm.product_id ? sprintDrafts.find(d => d.product_id === naskahForm.product_id) : null
+    // Match by product (affiliate creator) or by pillar (creator sprint)
+    const matchingDraft = naskahForm.product_id
+      ? sprintDrafts.find(d => d.product_id === naskahForm.product_id)
+      : naskahForm.pillar
+        ? sprintDrafts.find(d => !d.product_id && d.judul.startsWith(naskahForm.pillar))
+        : null
     if (matchingDraft) {
       setSprintLinkModal({ draft: matchingDraft, naskah: generatedNaskah, judul, productId: naskahForm.product_id, platform: naskahForm.platform, tipe: naskahForm.tipe_konten, mode: 'creator' })
       return
@@ -562,7 +568,21 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Pillar / Tema Konten</label>
-                  {brandProfile?.affiliate_content_pillars ? (
+                  {pillars.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                      {pillars.map(p => {
+                        const isSelected = naskahForm.pillar === p.nama
+                        const hasSprintSlot = sprintDrafts.some(d => !d.product_id && d.judul.startsWith(p.nama))
+                        return (
+                          <button key={p.id} type="button" onClick={() => setNF('pillar', isSelected ? '' : p.nama)}
+                            style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${isSelected ? '#059669' : 'transparent'}`, background: isSelected ? 'rgba(52,211,153,0.1)' : '#f3f4f6', color: isSelected ? '#059669' : '#374151', fontSize: '0.78rem', cursor: 'pointer', fontWeight: isSelected ? 600 : 400, display: 'flex', alignItems: 'center', gap: 5 }}>
+                            {p.nama}
+                            {hasSprintSlot && <span style={{ fontSize: '0.6rem', background: '#1a73e8', color: '#fff', borderRadius: 3, padding: '1px 5px', fontWeight: 700 }}>Sprint</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  ) : brandProfile?.affiliate_content_pillars ? (
                     <div style={{ marginBottom: 8 }}>
                       {brandProfile.affiliate_content_pillars.split('\n').filter(l => l.trim()).slice(0, 6).map((line, i) => {
                         const label = line.replace(/^\d+\.\s*/, '').split('—')[0].trim()
@@ -574,8 +594,24 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         )
                       })}
                     </div>
-                  ) : null}
+                  ) : (
+                    <div style={{ fontSize: '0.75rem', color: '#d97706', background: 'rgba(245,158,11,0.07)', borderRadius: 7, padding: '8px 12px', marginBottom: 8 }}>
+                      Belum ada pilar konten. <a href="/brand?tab=pillars" style={{ color: '#d97706', fontWeight: 700 }}>Buat di Brand → Content Pillars →</a>
+                    </div>
+                  )}
                   <input style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.pillar} onChange={e => setNF('pillar', e.target.value)} placeholder="atau ketik tema bebas..." />
+                  {(() => {
+                    const matchingDraft = naskahForm.pillar
+                      ? sprintDrafts.find(d => !d.product_id && d.judul.startsWith(naskahForm.pillar))
+                      : null
+                    if (!matchingDraft) return null
+                    return (
+                      <div style={{ marginTop: 8, background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 8, padding: '8px 12px', fontSize: '0.75rem', color: '#1a73e8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Slot sprint aktif: <strong>{matchingDraft.judul}</strong> — naskah ini bisa di-link saat disimpan
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 <div>

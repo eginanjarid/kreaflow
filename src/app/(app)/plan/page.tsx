@@ -17,12 +17,13 @@ export default async function PlanPage() {
   const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
   if (!brandCheck?.niche) redirect('/brand?setup=1')
 
-  const [{ data: brandProfile }, { data: products }, { data: workspace }, { data: tasks }, { data: sprintDrafts }] = await Promise.all([
+  const [{ data: brandProfile }, { data: products }, { data: workspace }, { data: tasks }, { data: sprintDrafts }, { data: pillars }] = await Promise.all([
     supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_content_ideas').select('id,judul,product_id,sprint_id').eq('workspace_id', wsId).eq('status', 'Draft').not('sprint_id', 'is', null),
+    supabase.from('kf_content_pillars').select('id,nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
   ])
 
   const brandType = (workspace?.brand_type as string | null) ?? 'creator'
@@ -35,6 +36,7 @@ export default async function PlanPage() {
       products={products || []}
       modes={modes}
       tasks={tasks || []}
+      pillars={(pillars || []).map(p => ({ id: p.id as string, nama: p.nama as string }))}
       sprintDrafts={(sprintDrafts || []).map(d => ({ id: d.id as string, judul: d.judul as string, product_id: (d.product_id as string | null) || '', sprint_id: d.sprint_id as string }))}
     />
   )
