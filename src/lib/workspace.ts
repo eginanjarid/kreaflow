@@ -1,21 +1,43 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function resolveWorkspaceId(supabase: any, userId: string): Promise<string | null> {
+  const { data: rows } = await supabase
+    .from('kf_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: true })
+  if (!rows?.length) return null
+  if (rows.length === 1) return rows[0].workspace_id as string
+  const wsIds = rows.map((r: { workspace_id: string }) => r.workspace_id)
+  const { data: wsData } = await supabase.from('kf_workspaces').select('id, plan').in('id', wsIds)
+  const lifetimeId = wsData?.find((w: { id: string; plan: string }) => w.plan === 'lifetime')?.id
+  return lifetimeId || rows[0].workspace_id as string
+}
+
 export async function getWorkspace() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: member } = await supabase
+  const { data: rows } = await supabase
     .from('kf_workspace_members')
     .select('workspace_id')
     .eq('user_id', user.id)
     .order('created_at', { ascending: true })
-    .limit(1)
-    .single()
-  if (!member) redirect('/login')
+  if (!rows?.length) redirect('/login')
 
-  return { supabase, user, wsId: member.workspace_id as string }
+  let wsId = rows[0].workspace_id as string
+
+  if (rows.length > 1) {
+    const wsIds = rows.map(r => r.workspace_id as string)
+    const { data: wsData } = await supabase.from('kf_workspaces').select('id, plan').in('id', wsIds)
+    const lifetimeId = wsData?.find(w => w.plan === 'lifetime')?.id
+    if (lifetimeId) wsId = lifetimeId
+  }
+
+  return { supabase, user, wsId }
 }
 
 export async function getWorkspaceWithPlanGuard() {

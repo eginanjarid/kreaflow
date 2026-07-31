@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
+import { resolveWorkspaceId } from '@/lib/workspace'
 import SettingsModule from './SettingsModule'
 
 export default async function SettingsPage() {
@@ -8,18 +9,13 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('kf_workspace_members')
-    .select('workspace_id, role, kf_workspaces(id, name, plan, modes)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .single()
+  const wsId = await resolveWorkspaceId(supabase, user.id)
+  if (!wsId) redirect('/login')
 
-  if (!member) redirect('/login')
-
-  const ws = (member.kf_workspaces as unknown) as { id: string; name: string; plan: string; modes: string[] } | null
-  const wsId = member.workspace_id
+  const [{ data: ws }, { data: myMembership }] = await Promise.all([
+    supabase.from('kf_workspaces').select('id, name, plan, modes').eq('id', wsId).single(),
+    supabase.from('kf_workspace_members').select('role').eq('user_id', user.id).eq('workspace_id', wsId).single(),
+  ])
 
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -49,7 +45,7 @@ export default async function SettingsPage() {
       userName={user.user_metadata?.nama || user.email!}
       plan={ws?.plan || 'Free'}
       modes={ws?.modes || ['creator']}
-      myRole={member.role as string}
+      myRole={(myMembership?.role as string) || 'member'}
       members={members}
       pendingInvites={(pendingInvites || []).map(i => ({ id: i.id, email: i.email, role: i.role as string, expires_at: i.expires_at as string }))}
       appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'}

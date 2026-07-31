@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { resolveWorkspaceId } from '@/lib/workspace'
 import BrandModule from './BrandModule'
 
 export default async function BrandPage({ searchParams }: { searchParams: Promise<{ setup?: string }> }) {
@@ -7,22 +8,15 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('kf_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .single()
+  const wsId = await resolveWorkspaceId(supabase, user.id)
+  if (!wsId) redirect('/login')
 
-  if (!member) redirect('/login')
-
-  const { data: wsCheck } = await supabase.from('kf_workspaces').select('plan, modes').eq('id', member.workspace_id).single()
+  const { data: wsCheck } = await supabase.from('kf_workspaces').select('plan, modes').eq('id', wsId).single()
   if (wsCheck?.plan !== 'lifetime') redirect('/upgrade')
 
   const [{ data: profile }, { data: akun }] = await Promise.all([
-    supabase.from('kf_brand_profiles').select('*').eq('workspace_id', member.workspace_id).maybeSingle(),
-    supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', member.workspace_id).order('created_at'),
+    supabase.from('kf_brand_profiles').select('*').eq('workspace_id', wsId).maybeSingle(),
+    supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('created_at'),
   ])
 
   const modes = (wsCheck?.modes as string[] | null) ?? ['creator']
@@ -40,7 +34,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
       )}
       <BrandModule
         initialProfile={profile}
-        workspaceId={member.workspace_id}
+        workspaceId={wsId}
         modes={modes}
         initialAkun={(akun || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
       />

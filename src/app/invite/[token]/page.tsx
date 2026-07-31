@@ -51,7 +51,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     // Mark invite accepted
     await admin.from('kf_invites').update({ accepted_at: new Date().toISOString() }).eq('token', token)
 
-    redirect('/brand')
+    redirect('/sprints')
   }
 
   // Not logged in — show join page

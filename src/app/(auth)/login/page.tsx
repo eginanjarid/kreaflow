@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 const inputStyle = {
@@ -12,6 +12,7 @@ const inputStyle = {
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
@@ -28,7 +29,8 @@ export default function LoginPage() {
     })
     const data = await res.json()
     if (!res.ok) { setError(data.error || 'Login gagal'); setLoading(false); return }
-    router.push('/sprints')
+    const redirectTo = searchParams.get('redirect')
+    router.push(redirectTo || '/sprints')
     router.refresh()
   }
 

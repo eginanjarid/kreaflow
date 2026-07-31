@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { resolveWorkspaceId } from '@/lib/workspace'
 import SprintsModule from './SprintsModule'
 
 export default async function SprintsPage() {
@@ -9,16 +10,8 @@ export default async function SprintsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('kf_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .single()
-  if (!member) redirect('/login')
-
-  const wsId = member.workspace_id
+  const wsId = await resolveWorkspaceId(supabase, user.id)
+  if (!wsId) redirect('/login')
 
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
