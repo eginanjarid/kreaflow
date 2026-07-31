@@ -591,27 +591,28 @@ export default function SprintsModule({ initialSprints, initialContents, product
     if (selectedSprintId === sprintId) setSelectedSprintId(sprints.find(s => s.id !== sprintId)?.id || null)
 
     const timeoutId = setTimeout(() => {
-      supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
-      supabase.from('kf_sprints').delete().eq('id', sprintId)
-      setDeleteUndo(null)
+      ;(async () => {
+        await supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
+        await supabase.from('kf_sprints').delete().eq('id', sprintId)
+        setDeleteUndo(null)
+      })()
     }, 5000)
 
     setDeleteUndo({ sprintId, sprintName, sprint, contents: sprintContentsToDelete, timeoutId })
   }
 
-  function confirmDeleteWithProgress() {
+  async function confirmDeleteWithProgress() {
     if (!deleteConfirmModal || !deleteConfirmChecked) return
-    const { sprintId, sprintName } = deleteConfirmModal
+    const { sprintId } = deleteConfirmModal
     const sprint = sprints.find(s => s.id === sprintId)
-    const sprintContentsToDelete = contents.filter(c => c.sprint_id === sprintId)
     if (!sprint) return
     setDeleteConfirmModal(null)
-    // Hapus langsung tanpa undo — user sudah konfirmasi
     setSprints(prev => prev.filter(s => s.id !== sprintId))
     setContents(prev => prev.filter(c => c.sprint_id !== sprintId))
     if (selectedSprintId === sprintId) setSelectedSprintId(sprints.find(s => s.id !== sprintId)?.id || null)
-    supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
-    supabase.from('kf_sprints').delete().eq('id', sprintId)
+    // Hapus content ideas dulu (FK), lalu sprint
+    await supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
+    await supabase.from('kf_sprints').delete().eq('id', sprintId)
   }
 
   function cancelDelete() {
