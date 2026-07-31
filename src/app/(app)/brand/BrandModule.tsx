@@ -801,24 +801,23 @@ Platform affiliate: ${platforms}
 YANG SAYA BUTUHKAN:
 
 ▸ CONTENT PILLARS (5-6 pillar)
-Format tabel: Nama Pillar | Tujuan | Frekuensi/minggu | Contoh judul konten
-Pastikan ada mix antara: konten educate, konten entertain, konten convert
+Tulis dalam format ini agar langsung bisa saya salin:
+1. [Nama Pillar] — [deskripsi singkat tujuan pillar ini]
+2. [Nama Pillar] — [deskripsi singkat]
+dst.
+Pastikan ada mix: educate / entertain / convert. Frekuensi posting per pillar per minggu.
 
-▸ HOOK FORMULA
-5 template hook (3 detik pertama video/caption) yang paling cocok untuk niche ini dengan contoh konkret
+▸ HOOK FORMULA (5 template)
+Template kalimat pembuka 3 detik pertama yang proven untuk niche ${kategori} di ${platforms}.
+Format per template:
+• Template: "[kalimat hook dengan placeholder]"
+  Contoh nyata: "[contoh yang langsung bisa dipakai]"
 
-▸ CONTENT CALENDAR TEMPLATE
-Contoh 1 minggu konten: Senin-Minggu, setiap hari 1 ide konten + format + CTA
-
-▸ VIRAL ANGLE
-3 angle konten yang berpotensi viral untuk niche ${kategori} di TikTok, berdasarkan tren 2024-2025
-
-▸ HASHTAG STRATEGY
-Set hashtag per pillar konten (mix: niche + broad + trending), maks 10 per post
+Naskah detail, kalender konten, dan strategi viral → lebih baik dikerjakan langsung di sesi konten planning terpisah.
 
 ---
 
-Output yang spesifik dan langsung bisa dieksekusi besok.`
+Output harus bisa langsung saya copy-paste ke 2 field: Content Pillars dan Hook Formula.`
   }
 
   function buildAffiliatePrompt(): string {
@@ -1694,15 +1693,18 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 1: Niche & Target ── */}
               {affStep === 'aff-niche' && sectionCard(<>
-                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Niche & Target Pembeli</div>
+                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Isi konteks kamu → Generate AI → simpan hasilnya ke field di bawah</div>
+                </div>
+
+                {/* Divider: INPUT */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Niche & Target Pembeli</div>
-                    <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Tentukan jenis akun, produk yang mau dijual, dan siapa yang beli</div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Isi Konteks Kamu</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Data ini jadi bahan AI untuk analisis niche yang pas buat kamu</div>
                   </div>
-                  <button type="button" onClick={() => setAiModal({ prompt: buildAffNichePrompt() })}
-                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    Generate dengan AI
-                  </button>
                 </div>
 
                 {/* Tipe akun */}
@@ -1776,13 +1778,6 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   </div>
                 </div>
 
-                {/* Target buyer */}
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Pembeli (Buyer Persona)</label>
-                  <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.affiliate_target_buyer} onChange={e => setField('affiliate_target_buyer', e.target.value)}
-                    placeholder={`cth: Ibu-ibu 25-40 tahun yang punya anak balita, aktif di TikTok, cari produk mainan edukatif yang aman dan harga terjangkau, sering belanja online di Shopee/Tokopedia`} />
-                </div>
-
                 {/* Platform */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Platform Affiliate yang Digunakan</label>
@@ -1800,6 +1795,34 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                       )
                     })}
                   </div>
+                </div>
+
+                {/* Divider: GENERATE */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate Analisis AI</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Copy prompt → paste ke AI → baca hasilnya</div>
+                  </div>
+                  <button type="button" onClick={() => setAiModal({ prompt: buildAffNichePrompt() })}
+                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                    Generate dengan AI
+                  </button>
+                </div>
+
+                {/* Divider: OUTPUT */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#d1fae5', border: '1px solid #34d399', color: '#059669', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
+                  <div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Dari hasil AI, paste buyer persona yang dipilih ke sini</div>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Pembeli (Buyer Persona) <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
+                  <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.affiliate_target_buyer} onChange={e => setField('affiliate_target_buyer', e.target.value)}
+                    placeholder={`Paste buyer persona dari hasil AI...\ncth: Ibu-ibu 25-40 tahun yang punya anak balita, aktif di TikTok, cari produk mainan edukatif yang aman dan harga terjangkau`} />
                 </div>
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1900,34 +1923,56 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 3: Konten Strategy ── */}
               {affStep === 'aff-konten' && sectionCard(<>
-                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Konten Strategy</div>
-                    <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Set preferensi dasar — eksekusi naskah & konten di modul Plan</div>
+                <div>
+                  <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Konten Strategy</div>
+                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Generate AI → simpan content pillars + hook formula → eksekusi naskah di modul Plan</div>
+                </div>
+
+                {/* Step 1: Generate */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate Strategi Konten</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat content pillars + hook formula khusus niche kamu</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffKontenPrompt() })}
-                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
                     Generate dengan AI
                   </button>
                 </div>
 
-                {/* CTA ke Plan */}
-                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderRadius: 20, border: '1px solid rgba(26,115,232,0.3)', background: 'rgba(26,115,232,0.06)', textDecoration: 'none' }}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8d1e0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: '#1a73e8', fontSize: '0.9rem', marginBottom: 4 }}>Eksekusi di modul Plan</div>
-                    <div style={{ fontSize: '0.78rem', color: '#6b7280', lineHeight: 1.6 }}>Naskah, hook, ide konten, jadwal posting — semua dikerjakan di Plan yang sudah baca data brand ini secara otomatis.</div>
+                {/* Step 2: Simpan hasil */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#d1fae5', border: '1px solid #34d399', color: '#059669', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
+                  <div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Paste bagian Content Pillars dan Hook Formula dari hasil AI ke field di bawah</div>
                   </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#42a5f5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </a>
+                </div>
 
-                {/* Content pillars — satu-satunya yang memang brand-level */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Content Pillars Akun</label>
-                  <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>Tema besar konten yang membentuk identitas akun — generate AI lalu paste di sini</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Content Pillars <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Tema besar konten yang membentuk identitas akun</div>
                   <textarea style={fieldStyle({ height: 110, resize: 'none' })} value={profile.affiliate_content_pillars} onChange={e => setField('affiliate_content_pillars', e.target.value)}
                     placeholder={'cth:\n1. Review Jujur — test produk sebelum rekomendasiin\n2. Deal Alert — info flash sale & promo\n3. Tutorial — cara pakai produk yang bener\n4. Perbandingan — A vs B, mana worth it?'} />
                 </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Hook Formula <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Template kalimat pembuka 3 detik pertama yang proven untuk niche kamu</div>
+                  <textarea style={fieldStyle({ height: 90, resize: 'none' })} value={profile.affiliate_hook_style} onChange={e => setField('affiliate_hook_style', e.target.value)}
+                    placeholder={'cth:\n• "Jangan beli [produk] sebelum tonton ini..."\n• "Aku test [produk] selama 30 hari, hasilnya..."\n• "Kalau budget kamu [Rp X], mending pilih yang ini..."'} />
+                </div>
+
+                {/* CTA ke Plan */}
+                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14, border: '1px solid rgba(26,115,232,0.25)', background: 'rgba(26,115,232,0.04)', textDecoration: 'none' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8d1e0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, color: '#1a73e8', fontSize: '0.85rem', marginBottom: 2 }}>Naskah & jadwal posting → modul Plan</div>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Hook spesifik per konten, skrip video, dan kalender dikerjakan di sana.</div>
+                  </div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#42a5f5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                </a>
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
@@ -1943,31 +1988,54 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
               {/* ── Step 4: Bio & Trust ── */}
               {affStep === 'aff-bio' && sectionCard(<>
-                <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Trust Builder</div>
-                    <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Bio yang convert + kalimat yang bikin audiens percaya rekomendasimu</div>
-                  </div>
-                  <button type="button" onClick={() => setAiModal({ prompt: buildAffiliatePrompt() })}
-                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    Generate dengan AI
-                  </button>
+                <div>
+                  <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Trust Builder</div>
+                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Ceritakan pengalamanmu → Generate AI → simpan hasilnya</div>
                 </div>
 
-                {/* Trust builder */}
+                {/* Step 1: INPUT — ceritakan konteks */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
+                  <div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Ceritakan Pengalamanmu</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Ini jadi bahan AI — semakin jujur dan spesifik, hasilnya makin bagus</div>
+                  </div>
+                </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kenapa Orang Harus Percaya Rekomendasimu?</label>
-                  <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>Pengalaman, track record, atau expertise yang kamu punya di niche ini</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Latar Belakang & Alasan Dipercaya</label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Pengalaman, track record, atau expertise kamu di niche ini — apa pun yang bikin kamu layak didengar</div>
                   <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.affiliate_trust_builder} onChange={e => setField('affiliate_trust_builder', e.target.value)}
                     placeholder="cth: Gua ibu 2 anak yang udah 3 tahun kuratasi mainan edukatif — semua produk yang gua rekomendasiin udah gua beliin dulu buat anak gua, bukan asal comot dari seller..." />
                 </div>
 
+                {/* Step 2: GENERATE */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate dengan AI</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat: trust statement, variasi bio, dan kalimat disclosure</div>
+                  </div>
+                  <button type="button" onClick={() => setAiModal({ prompt: buildAffiliatePrompt() })}
+                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                    Generate dengan AI
+                  </button>
+                </div>
+
+                {/* Step 3: OUTPUT */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#d1fae5', border: '1px solid #34d399', color: '#059669', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
+                  <div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Paste bio ke daftar variasi, pilih kalimat disclosure yang paling cocok</div>
+                  </div>
+                </div>
+
                 {/* Disclosure */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kalimat Disclosure Affiliate</label>
-                  <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>Transparansi ke audiens — justru ini yang bikin makin dipercaya</div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Kalimat Disclosure Affiliate <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Pilih 1 dari hasil AI — transparansi justru bikin audiens makin percaya</div>
                   <input style={fieldStyle({})} value={profile.affiliate_disclosure} onChange={e => setField('affiliate_disclosure', e.target.value)}
-                    placeholder="cth: Link di bio adalah affiliate link — gua dapet komisi kecil kalau kamu beli, tapi review gua tetap jujur dan berdasarkan pengalaman sendiri ✓" />
+                    placeholder="Paste kalimat disclosure dari hasil AI..." />
                 </div>
 
                 {/* Bio CRUD */}
