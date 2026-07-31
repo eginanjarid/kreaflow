@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { STEP_ICON_MAP } from '@/components/ui/Icons'
 
@@ -23,7 +23,7 @@ type Product = {
 
 type NaskahForm = {
   platform: string; tipe_konten: string; pillar: string; hook_angle: string
-  product_id: string; konteks: string
+  product_id: string; konteks: string; jumlah_varian: string
 }
 
 type AffNaskahForm = {
@@ -93,7 +93,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
-type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string | null; assigned_naskah: string | null; script: string | null }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string | null; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null }
 
 export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
   workspaceId: string
@@ -114,10 +114,18 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     .map(q => ({ id: q.id, judul: q.judul, product_id: q.product_id, sprint_id: q.sprint_id! }))
 
   const [activeQueueId, setActiveQueueId] = useState<string | null>(null)
-  const sprintLockedItem = activeQueueId ? queue.find(q => q.id === activeQueueId && q.sprint_id) ?? null : null
+  const [localQueue, setLocalQueue] = useState<QueueItem[]>(queue)
+  useEffect(() => { setLocalQueue(queue) }, [queue])
+  const sprintLockedItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId && q.sprint_id) ?? null : null
+
+  function removeFromQueue(id: string | null) {
+    if (!id) return
+    setLocalQueue(prev => prev.filter(q => q.id !== id))
+    setActiveQueueId(null)
+  }
 
   // Naskah Generator state
-  const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '' }
+  const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '', jumlah_varian: '3' }
   const [naskahMode, setNaskahMode] = useState<'creator' | 'affiliate'>(isAffiliate ? 'affiliate' : 'creator')
   const [naskahForm, setNaskahForm] = useState<NaskahForm>(emptyNaskah)
   const [aiModal, setAiModal] = useState<{ prompt: string; label?: string } | null>(null)
@@ -226,9 +234,11 @@ Deskripsi: ${selectedProduct.deskripsi || '-'}
       ? `\nTipe akun: ${brand.affiliate_tipe === 'store' ? 'Niche Store' : 'Personal Brand Affiliator'}\nPositioning: ${brand.affiliate_positioning || '-'}\nStyle promosi: ${brand.affiliate_promo_style || '-'}`
       : ''
 
-    return `Kamu adalah scriptwriter konten media sosial Indonesia yang spesialis membuat naskah yang hook kuat, natural, dan convert.
+    const varian = parseInt(naskahForm.jumlah_varian) || 3
 
-Buat naskah lengkap untuk 1 konten. Jawab dalam Bahasa Indonesia yang sesuai tone dan platform.
+    return `Kamu adalah scriptwriter konten media sosial Indonesia yang spesialis membuat naskah dengan hook kuat, natural, dan convert.
+
+Buat ${varian} varian naskah LENGKAP. Setiap varian harus BERBEDA secara hook, angle, dan pendekatan cerita — bukan parafrase.
 
 ---
 
@@ -242,35 +252,43 @@ SPESIFIKASI KONTEN
 Platform: ${platform}
 Format: ${tipe}
 Pillar konten: ${pillar}
-Hook angle: ${hookAngle}
+Hook angle yang diinginkan: ${hookAngle}
 Konteks tambahan: ${konteks}
 ${productSection}
 ---
 
-OUTPUT YANG DIBUTUHKAN:
+OUTPUT FORMAT — tulis persis seperti ini untuk SETIAP varian:
 
-▸ HOOK (3-5 detik pertama)
-3 variasi hook — pilih yang paling kuat. Format per variasi: [Visual] + [Teks/Voiceover]
+${'═'.repeat(50)}
+VARIAN [N] — [nama angle/hook]
+${'═'.repeat(50)}
 
-▸ BODY SCRIPT
-Naskah lengkap dengan timestamp (misal 0:03 - 0:15). Tulis persis seperti yang akan diucapkan/ditampilkan.
-${selectedProduct ? 'Sebutkan nama produk secara natural, bukan hard selling.' : ''}
+🎬 VISUAL HOOK (0:00–0:03)
+[Deskripsi visual pembuka — apa yang terlihat di layar]
 
-▸ CTA (Call to Action)
-2 variasi CTA yang natural untuk ${platform}
+🗣️ HOOK VERBAL
+[Kalimat pembuka yang diucapkan — harus bikin stop scroll]
 
-▸ CAPTION
-Caption siap posting dengan emoji yang sesuai tone
+📜 NASKAH LENGKAP
+[Script dengan timestamp. Tulis persis seperti yang akan diucapkan/ditampilkan.${selectedProduct ? ' Sebutkan produk secara natural, bukan hard selling.' : ''}]
 
-▸ HASHTAG
-10-15 hashtag relevan (mix: niche + broad + trending ${platform})
+📣 CTA
+[1 CTA yang natural untuk ${platform}]
 
-▸ TIPS EKSEKUSI
-2-3 tips teknis untuk membuat konten ini perform di ${platform} (durasi, transisi, dll)
+📝 CAPTION SIAP POSTING
+[Caption dengan emoji sesuai tone — langsung bisa dipaste]
+
+#️⃣ HASHTAG
+[10–15 hashtag: mix niche + broad + trending ${platform}]
 
 ---
 
-Tulis naskah yang terasa manusiawi, bukan seperti iklan.`
+Setelah semua varian, tambahkan:
+
+💡 TIPS EKSEKUSI
+2–3 tips teknis untuk ${platform} (durasi ideal, transisi, timing upload)
+
+Tulis naskah yang terasa seperti manusia, bukan iklan. Bahasa sehari-hari Indonesia.`
   }
 
   function buildUSPPrompt(): string {
@@ -433,7 +451,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
   async function _doInsertNaskah(
     naskah: string, judul: string, productId: string | null,
-    platform: string, tipe: string, mode: 'affiliate' | 'creator'
+    platform: string, tipe: string, mode: 'affiliate' | 'creator',
+    tanggal_tayang?: string | null, jam_tayang?: string | null
   ) {
     const supabase = createClient()
     const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
@@ -444,6 +463,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       script: naskah,
       status: 'Naskah Siap',
       product_id: productId || null,
+      tanggal_tayang: tanggal_tayang || null,
+      jam_tayang: jam_tayang || null,
     }).select('id').single()
     if (!err && inserted) {
       await supabase.from('kf_notifications').insert({
@@ -453,6 +474,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
         content_idea_id: inserted.id,
       })
+      removeFromQueue(activeQueueId)
       if (mode === 'affiliate') {
         setAffSavedToLibrary(true)
         setTimeout(() => setAffSavedToLibrary(false), 3000)
@@ -479,19 +501,20 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setAffSavedToLibrary(false)
     const selectedProduct = products.find(p => p.id === affForm.product_id)
     const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
+    const activeItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId) : null
     const matchingDraft = affForm.product_id ? sprintDrafts.find(d => d.product_id === affForm.product_id) : null
     if (matchingDraft) {
       setSprintLinkModal({ draft: matchingDraft, naskah: affNaskah, judul, productId: affForm.product_id, platform: affForm.platform, tipe: affForm.tipe_konten, mode: 'affiliate' })
       return
     }
-    await _doInsertNaskah(affNaskah, judul, affForm.product_id, affForm.platform, affForm.tipe_konten, 'affiliate')
+    await _doInsertNaskah(affNaskah, judul, affForm.product_id, affForm.platform, affForm.tipe_konten, 'affiliate', activeItem?.tanggal_tayang, activeItem?.jam_tayang)
   }
 
   async function saveToLibrary() {
     if (!generatedNaskah.trim()) return
     setSavedToLibrary(false)
     const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
-    // Match by product (affiliate creator) or by pillar (creator sprint)
+    const activeItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId) : null
     const matchingDraft = naskahForm.product_id
       ? sprintDrafts.find(d => d.product_id === naskahForm.product_id)
       : naskahForm.pillar
@@ -501,7 +524,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       setSprintLinkModal({ draft: matchingDraft, naskah: generatedNaskah, judul, productId: naskahForm.product_id, platform: naskahForm.platform, tipe: naskahForm.tipe_konten, mode: 'creator' })
       return
     }
-    await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator')
+    await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator', activeItem?.tanggal_tayang, activeItem?.jam_tayang)
   }
 
   async function confirmSprintUpdate() {
@@ -519,6 +542,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     })
     setSprintLinkSaving(false)
     setSprintLinkModal(null)
+    removeFromQueue(activeQueueId)
     if (mode === 'affiliate') { setAffSavedToLibrary(true); setTimeout(() => setAffSavedToLibrary(false), 3000) }
     else { setSavedToLibrary(true); setTimeout(() => setSavedToLibrary(false), 3000) }
   }
@@ -527,9 +551,10 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (!sprintLinkModal) return
     setSprintLinkSaving(true)
     const { naskah, judul, productId, platform, tipe, mode } = sprintLinkModal
+    const activeItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId) : null
     setSprintLinkModal(null)
     setSprintLinkSaving(false)
-    await _doInsertNaskah(naskah, judul, productId, platform, tipe, mode)
+    await _doInsertNaskah(naskah, judul, productId, platform, tipe, mode, activeItem?.tanggal_tayang, activeItem?.jam_tayang)
   }
 
   function copyPrompt(prompt: string) {
@@ -568,17 +593,17 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           )}
 
           {/* ── Antrian Naskah ── */}
-          {queue.length > 0 && (
+          {localQueue.length > 0 && (
             <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>Antrian Naskah</span>
-                  <span style={{ background: '#1a73e8', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{queue.length}</span>
+                  <span style={{ background: '#1a73e8', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{localQueue.length}</span>
                 </div>
                 <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk isi form otomatis</span>
               </div>
               <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-                {queue.map(item => {
+                {localQueue.map(item => {
                   const isRevisi = item.status === 'Revisi'
                   const isActive = activeQueueId === item.id
                   const pillarOrProd = item.judul.split(' — ')[0]
@@ -775,6 +800,12 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     {brandProfile.target_audiens && <div>Audiens: <span style={{ color: '#6b7280' }}>{brandProfile.target_audiens}</span></div>}
                   </div>
                 )}
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jumlah Varian Naskah</label>
+                  <input type="number" style={fieldStyle({ fontSize: '0.9rem', textAlign: 'center' as const })} value={naskahForm.jumlah_varian} onChange={e => setNF('jumlah_varian', e.target.value)} min="1" max="10" />
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 4 }}>Setiap varian punya hook, angle & story berbeda. Tiap varian langsung bisa di-copy-paste ke Library.</div>
+                </div>
 
                 <button type="button" onClick={() => setAiModal({ prompt: buildNaskahPrompt() })}
                   style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '12px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>

@@ -215,6 +215,22 @@ export default function SprintsModule({ initialSprints, initialContents, product
     if (searchParams.get('tab') === 'tasks') setActiveTab('tasks')
   }, [searchParams])
 
+  // Realtime: update kanban saat content idea status berubah dari modul lain (Plan, dll)
+  useEffect(() => {
+    const channel = supabase.channel('sprint-content-changes')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'kf_content_ideas',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, (payload) => {
+        const updated = payload.new as ContentItem
+        setContents(prev => prev.map(c => c.id === updated.id ? { ...c, ...updated } : c))
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [workspaceId])
+
   // Backfill notif untuk sprint lama yang belum punya "Sprint Dimulai" notif
   useEffect(() => {
     if (!initialSprints.length) return
