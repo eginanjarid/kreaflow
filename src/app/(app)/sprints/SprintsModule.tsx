@@ -263,7 +263,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [addStepOpen, setAddStepOpen] = useState(false)
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number; mulai: string; interval: number; jam: string }[]>([{ product_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00' }])
   // For creator: pillar slots (pillar_id maps to kf_content_pillars.id)
-  const [sprintPillars, setSprintPillars] = useState<{ pillar_id: string; jumlah: number; mulai: string; interval: number; jam: string }[]>([{ pillar_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00' }])
+  const [sprintPillars, setSprintPillars] = useState<{ pillar_id: string; jumlah: number; mulai: string; interval: number; jam: string; format: string }[]>([{ pillar_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00', format: '' }])
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -327,7 +327,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
     initStepsFromTemplate(tpl)
     setAddStepOpen(false)
     setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
-    setSprintPillars([{ pillar_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
+    setSprintPillars([{ pillar_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00', format: '' }])
     setSprintModal(true)
   }
 
@@ -413,6 +413,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               judul: labelPrefix ? `${labelPrefix} — Konten ${i + 1}` : `Konten ${i + 1}`,
               status: 'Draft',
               product_id: isAffiliate ? ((row as typeof sprintProducts[0]).product_id || null) : null,
+              format: !isAffiliate ? ((row as typeof sprintPillars[0]).format || null) : null,
               platform: sprintForm.platform ? [sprintForm.platform] : [],
               tanggal_tayang,
               jam_tayang: row.jam || null,
@@ -1205,6 +1206,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <button type="button" onClick={() => setSprintPillars(prev => prev.filter((_, i) => i !== idx))}
                               style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 26, height: 28, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                           </div>
+                          <div>
+                            <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Format Konten</div>
+                            <select value={row.format} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, format: e.target.value } : r))}
+                              style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.format ? '#111827' : '#9ca3af', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
+                              <option value="">— Format Konten —</option>
+                              {['Video Pendek', 'Reels', 'Carousel', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
+                            </select>
+                          </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                               <div><div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
@@ -1227,9 +1236,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       ))}
                     </div>
                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' }])}
+                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00', format: '' }])}
                         style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Pilar</button>
-                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' })))}
+                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00', format: '' })))}
                         style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Pilar</button>}
                     </div>
                   </>

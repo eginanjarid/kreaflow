@@ -93,7 +93,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
-type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string | null; assigned_naskah: string | null; script: string | null }
 
 export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
   workspaceId: string
@@ -114,6 +114,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     .map(q => ({ id: q.id, judul: q.judul, product_id: q.product_id, sprint_id: q.sprint_id! }))
 
   const [activeQueueId, setActiveQueueId] = useState<string | null>(null)
+  const sprintLockedItem = activeQueueId ? queue.find(q => q.id === activeQueueId && q.sprint_id) ?? null : null
 
   // Naskah Generator state
   const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '' }
@@ -163,17 +164,35 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
   function setAFF(key: keyof AffNaskahForm, val: string) { setAffForm(f => ({ ...f, [key]: val })) }
 
   function selectQueueItem(item: QueueItem) {
+    // Toggle deselect
+    if (activeQueueId === item.id) { setActiveQueueId(null); return }
     setActiveQueueId(item.id)
-    if (item.status === 'Revisi' || !isAffiliate) {
-      // Creator: extract pillar from judul prefix
-      const pillarName = item.judul.split(' — ')[0]
+    const pillarName = item.judul.split(' — ')[0]
+
+    if (!isAffiliate || item.status === 'Revisi') {
       setNaskahMode('creator')
       setNF('pillar', pillarName)
+      if (item.format) setNF('tipe_konten', item.format)
+      if (item.platform) setNF('platform', item.platform)
       if (item.product_id) setNF('product_id', item.product_id)
+      if (item.status === 'Revisi' && item.script) {
+        setGeneratedNaskah(`[REVISI — edit naskah lama di bawah ini]\n\n${item.script}`)
+      } else if (item.status !== 'Revisi') {
+        setGeneratedNaskah('')
+      }
     } else {
-      // Affiliate: fill product
       setNaskahMode('affiliate')
-      if (item.product_id) setAFF('product_id', item.product_id)
+      if (item.product_id) {
+        const prod = products.find(p => p.id === item.product_id)
+        setAffForm(f => ({ ...f, product_id: item.product_id, deskripsi_produk: prod?.deskripsi || f.deskripsi_produk, niche_produk: prod?.kategori || f.niche_produk }))
+      }
+      if (item.format) setAFF('tipe_konten', item.format)
+      if (item.platform) setAFF('platform', item.platform)
+      if ((item.status as string) === 'Revisi' && item.script) {
+        setAffNaskah(`[REVISI — edit naskah lama di bawah ini]\n\n${item.script}`)
+      } else if ((item.status as string) !== 'Revisi') {
+        setAffNaskah('')
+      }
     }
   }
 
@@ -565,11 +584,12 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   const pillarOrProd = item.judul.split(' — ')[0]
                   return (
                     <button key={item.id} type="button" onClick={() => selectQueueItem(item)}
-                      style={{ flexShrink: 0, width: 160, textAlign: 'left', background: isActive ? (isRevisi ? 'rgba(220,38,38,0.06)' : 'rgba(26,115,232,0.06)') : '#f9fafb', border: `1.5px solid ${isActive ? (isRevisi ? '#dc2626' : '#1a73e8') : '#f3f4f6'}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flexShrink: 0, width: 172, textAlign: 'left', background: isActive ? (isRevisi ? 'rgba(220,38,38,0.06)' : 'rgba(26,115,232,0.06)') : '#f9fafb', border: `1.5px solid ${isActive ? (isRevisi ? '#dc2626' : '#1a73e8') : '#f3f4f6'}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
                         <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: isRevisi ? 'rgba(220,38,38,0.1)' : 'rgba(26,115,232,0.1)', color: isRevisi ? '#dc2626' : '#1a73e8' }}>
                           {isRevisi ? 'REVISI' : 'DRAFT'}
                         </span>
+                        {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
                       </div>
                       <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={pillarOrProd}>
                         {pillarOrProd}
@@ -577,6 +597,11 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       {item.sprint_nama && (
                         <div style={{ fontSize: '0.68rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {item.sprint_nama}
+                        </div>
+                      )}
+                      {item.assigned_naskah && (
+                        <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 4, display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span>✍</span><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.assigned_naskah}</span>
                         </div>
                       )}
                     </button>
@@ -603,33 +628,59 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               {/* Form kiri */}
               <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div>
-                  <div style={{ fontWeight: 600, color: '#111827', marginBottom: 4 }}>Konfigurasi Naskah</div>
-                  <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>Isi detail konten → Generate → paste hasil AI di kanan</div>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Platform</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'LinkedIn'].map(pl => (
-                      <button key={pl} type="button" onClick={() => setNF('platform', pl)}
-                        style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${naskahForm.platform === pl ? '#1a73e8' : 'transparent'}`, background: naskahForm.platform === pl ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: naskahForm.platform === pl ? '#1a73e8' : '#6b7280', fontSize: '0.78rem', cursor: 'pointer', fontWeight: naskahForm.platform === pl ? 600 : 400 }}>
-                        {pl}
-                      </button>
-                    ))}
+                {/* Sprint Brief Banner */}
+                {sprintLockedItem ? (
+                  <div style={{ background: 'rgba(26,115,232,0.05)', border: '1px solid rgba(26,115,232,0.18)', borderRadius: 12, padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#1a73e8', letterSpacing: '0.05em' }}>BRIEF SPRINT — {sprintLockedItem.sprint_nama}</span>
+                      <button type="button" onClick={() => setActiveQueueId(null)} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.75rem', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#374151', background: '#f3f4f6', borderRadius: 6, padding: '3px 8px' }}>
+                        📌 {sprintLockedItem.judul.split(' — ')[0]}
+                      </span>
+                      {sprintLockedItem.format && <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#374151', background: '#f3f4f6', borderRadius: 6, padding: '3px 8px' }}>🎬 {sprintLockedItem.format}</span>}
+                      {sprintLockedItem.platform && <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#374151', background: '#f3f4f6', borderRadius: 6, padding: '3px 8px' }}>📱 {sprintLockedItem.platform}</span>}
+                      {sprintLockedItem.assigned_naskah && <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#374151', background: '#f3f4f6', borderRadius: 6, padding: '3px 8px' }}>✍ {sprintLockedItem.assigned_naskah}</span>}
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 8 }}>Pilar, format & platform sudah dikunci dari sprint. Kamu hanya perlu isi hook angle & konteks.</div>
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <div style={{ fontWeight: 600, color: '#111827', marginBottom: 4 }}>Konfigurasi Naskah</div>
+                    <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>Isi detail konten → Generate → paste hasil AI di kanan</div>
+                  </div>
+                )}
+
+                {!sprintLockedItem && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Platform</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'LinkedIn'].map(pl => (
+                        <button key={pl} type="button" onClick={() => setNF('platform', pl)}
+                          style={{ padding: '6px 12px', borderRadius: 7, border: `1px solid ${naskahForm.platform === pl ? '#1a73e8' : 'transparent'}`, background: naskahForm.platform === pl ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: naskahForm.platform === pl ? '#1a73e8' : '#6b7280', fontSize: '0.78rem', cursor: 'pointer', fontWeight: naskahForm.platform === pl ? 600 : 400 }}>
+                          {pl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!sprintLockedItem && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Format Konten</label>
+                    <select style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.tipe_konten} onChange={e => setNF('tipe_konten', e.target.value)}>
+                      {['Video Pendek', 'Reels', 'Carousel', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                )}
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Format Konten</label>
-                  <select style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.tipe_konten} onChange={e => setNF('tipe_konten', e.target.value)}>
-                    {['Video Pendek', 'Reels', 'Carousel', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Pillar / Tema Konten</label>
-                  {pillars.length > 0 ? (
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>
+                    Pillar / Tema Konten
+                    {sprintLockedItem && <span style={{ marginLeft: 6, fontSize: '0.62rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>DIKUNCI SPRINT</span>}
+                  </label>
+                  {pillars.length > 0 && !sprintLockedItem ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
                       {pillars.map(p => {
                         const isSelected = naskahForm.pillar === p.nama
@@ -660,19 +711,27 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       Belum ada pilar konten. <a href="/brand?tab=pillars" style={{ color: '#d97706', fontWeight: 700 }}>Buat di Brand → Content Pillars →</a>
                     </div>
                   )}
-                  <input style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.pillar} onChange={e => setNF('pillar', e.target.value)} placeholder="atau ketik tema bebas..." />
-                  {(() => {
-                    const matchingDraft = naskahForm.pillar
-                      ? sprintDrafts.find(d => !d.product_id && d.judul.startsWith(naskahForm.pillar))
-                      : null
-                    if (!matchingDraft) return null
-                    return (
-                      <div style={{ marginTop: 8, background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 8, padding: '8px 12px', fontSize: '0.75rem', color: '#1a73e8', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        Slot sprint aktif: <strong>{matchingDraft.judul}</strong> — naskah ini bisa di-link saat disimpan
-                      </div>
-                    )
-                  })()}
+                  {sprintLockedItem ? (
+                    <div style={{ background: '#f3f4f6', borderRadius: 10, padding: '10px 14px', fontSize: '0.875rem', color: '#374151', fontWeight: 500 }}>
+                      {naskahForm.pillar}
+                    </div>
+                  ) : (
+                    <>
+                      <input style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.pillar} onChange={e => setNF('pillar', e.target.value)} placeholder="atau ketik tema bebas..." />
+                      {(() => {
+                        const matchingDraft = naskahForm.pillar
+                          ? sprintDrafts.find(d => !d.product_id && d.judul.startsWith(naskahForm.pillar))
+                          : null
+                        if (!matchingDraft) return null
+                        return (
+                          <div style={{ marginTop: 8, background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 8, padding: '8px 12px', fontSize: '0.75rem', color: '#1a73e8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Slot sprint aktif: <strong>{matchingDraft.judul}</strong> — naskah ini bisa di-link saat disimpan
+                          </div>
+                        )
+                      })()}
+                    </>
+                  )}
                 </div>
 
                 <div>

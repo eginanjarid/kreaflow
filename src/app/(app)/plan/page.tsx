@@ -22,7 +22,7 @@ export default async function PlanPage() {
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
-    supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,kf_sprints(nama)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
+    supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,kf_sprints(nama)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
     supabase.from('kf_content_pillars').select('id,nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
   ])
 
@@ -44,6 +44,10 @@ export default async function PlanPage() {
         product_id: (d.product_id as string | null) || '',
         sprint_id: (d.sprint_id as string | null) || null,
         sprint_nama: (d.kf_sprints as unknown as { nama: string } | null)?.nama || null,
+        format: (d.format as string | null) || null,
+        platform: (d.platform as string[] | null)?.[0] || null,
+        assigned_naskah: (d.assigned_naskah as string | null) || null,
+        script: (d.script as string | null) || null,
       }))}
     />
   )
