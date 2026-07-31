@@ -76,6 +76,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
   const [wsOpen, setWsOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [createForm, setCreateForm] = useState({ name: '', brand_type: 'creator' })
+  const [createError, setCreateError] = useState('')
   const [creating, setCreating] = useState(false)
   const [switching, setSwitching] = useState(false)
   const wsRef = useRef<HTMLDivElement>(null)
@@ -139,6 +140,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
     e.preventDefault()
     if (!createForm.name.trim()) return
     setCreating(true)
+    setCreateError('')
     const res = await fetch('/api/workspace/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -149,12 +151,14 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
     if (res.ok) {
       setCreateOpen(false)
       setCreateForm({ name: '', brand_type: 'creator' })
+      setCreateError('')
       router.refresh()
-    } else if (data.limitReached || data.needUpgrade) {
-      setCreateOpen(false)
-      router.push('/upgrade')
+    } else if (data.needUpgrade) {
+      setCreateError('Akun belum aktif. Silakan upgrade terlebih dahulu.')
+    } else if (data.limitReached) {
+      setCreateError(`Batas workspace tercapai (${data.maxWorkspaces}). Upgrade paket untuk tambah lebih banyak.`)
     } else {
-      alert(data.error || 'Gagal membuat workspace')
+      setCreateError(data.error || 'Gagal membuat workspace')
     }
   }
 
@@ -262,7 +266,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
                   )
                 })}
                 <button
-                  onClick={() => { setWsOpen(false); setCreateOpen(true) }}
+                  onClick={() => { setWsOpen(false); setCreateOpen(true); setCreateError('') }}
                   style={{
                     width: '100%', padding: '9px 12px', background: 'transparent',
                     border: 'none', cursor: 'pointer', textAlign: 'left',
@@ -358,6 +362,14 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
           <div style={{ background: '#fff', borderRadius: 16, padding: '28px', width: '100%', maxWidth: 420, boxShadow: '0 16px 48px rgba(0,0,0,0.16)' }}>
             <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#2a3547', marginBottom: 4 }}>Buat Workspace Baru</div>
             <div style={{ fontSize: '0.8rem', color: '#9fa9ba', marginBottom: 20 }}>Setiap workspace punya brand & sprint sendiri.</div>
+            {createError && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '10px 14px', color: '#dc2626', fontSize: '0.82rem', fontWeight: 500, marginBottom: 4 }}>
+                {createError}
+                {(createError.includes('Batas') || createError.includes('belum aktif')) && (
+                  <a href="/upgrade" style={{ display: 'block', marginTop: 6, color: '#1a73e8', fontWeight: 700, fontSize: '0.78rem', textDecoration: 'none' }}>Lihat pilihan upgrade →</a>
+                )}
+              </div>
+            )}
             <form onSubmit={createWorkspace} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: 6 }}>Nama Workspace / Brand</label>
