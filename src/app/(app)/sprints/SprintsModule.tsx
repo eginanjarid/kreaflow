@@ -148,10 +148,11 @@ const BOARD_COLS = [
 function getColFromStatus(status: string): 'todo' | 'doing' | 'done' {
   if (status === 'Tayang') return 'done'
   if (status === 'Draft') return 'todo'
-  return 'doing'
+  return 'doing' // includes 'Revisi'
 }
 
 function isStepDone(status: string, doneAt: string): boolean {
+  if (status === 'Revisi') return false // semua step di-reset saat revisi
   return STATUS_ORDER.indexOf(status) >= STATUS_ORDER.indexOf(doneAt)
 }
 
@@ -284,6 +285,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [deleteUndo, setDeleteUndo] = useState<{
     sprintId: string; sprintName: string; sprint: Sprint; contents: ContentItem[]; timeoutId: ReturnType<typeof setTimeout>
   } | null>(null)
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ sprintId: string; sprintName: string; inProgressCount: number } | null>(null)
+  const [deleteConfirmChecked, setDeleteConfirmChecked] = useState(false)
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
@@ -564,6 +567,19 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const sprintContentsToDelete = contents.filter(c => c.sprint_id === sprintId)
     if (!sprint) return
 
+    // Kalau ada konten yang sudah in-progress, wajib konfirmasi dulu
+    const inProgress = sprintContentsToDelete.filter(c => c.status !== 'Draft')
+    if (inProgress.length > 0) {
+      setDeleteConfirmModal({ sprintId, sprintName, inProgressCount: inProgress.length })
+      setDeleteConfirmChecked(false)
+      return
+    }
+
+    // Semua masih Draft — lanjut dengan undo biasa
+    doDeleteSprint(sprintId, sprintName, sprint, sprintContentsToDelete)
+  }
+
+  function doDeleteSprint(sprintId: string, sprintName: string, sprint: Sprint, sprintContentsToDelete: ContentItem[]) {
     if (deleteUndo) {
       clearTimeout(deleteUndo.timeoutId)
       supabase.from('kf_content_ideas').delete().eq('sprint_id', deleteUndo.sprintId)
@@ -583,6 +599,21 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setDeleteUndo({ sprintId, sprintName, sprint, contents: sprintContentsToDelete, timeoutId })
   }
 
+  function confirmDeleteWithProgress() {
+    if (!deleteConfirmModal || !deleteConfirmChecked) return
+    const { sprintId, sprintName } = deleteConfirmModal
+    const sprint = sprints.find(s => s.id === sprintId)
+    const sprintContentsToDelete = contents.filter(c => c.sprint_id === sprintId)
+    if (!sprint) return
+    setDeleteConfirmModal(null)
+    // Hapus langsung tanpa undo — user sudah konfirmasi
+    setSprints(prev => prev.filter(s => s.id !== sprintId))
+    setContents(prev => prev.filter(c => c.sprint_id !== sprintId))
+    if (selectedSprintId === sprintId) setSelectedSprintId(sprints.find(s => s.id !== sprintId)?.id || null)
+    supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
+    supabase.from('kf_sprints').delete().eq('id', sprintId)
+  }
+
   function cancelDelete() {
     if (!deleteUndo) return
     clearTimeout(deleteUndo.timeoutId)
@@ -590,6 +621,21 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setContents(prev => [...prev, ...deleteUndo.contents])
     setSelectedSprintId(deleteUndo.sprintId)
     setDeleteUndo(null)
+  }
+
+  async function requestRevisi(item: ContentItem) {
+    await supabase.from('kf_content_ideas').update({
+      status: 'Revisi',
+      step_log: { ...(item.step_log || {}), revision_requested_at: new Date().toISOString() }
+    }).eq('id', item.id)
+    setContents(prev => prev.map(c => c.id === item.id ? { ...c, status: 'Revisi', step_log: { ...(c.step_log || {}), revision_requested_at: new Date().toISOString() } } : c))
+    if (detailItem?.id === item.id) setDetailItem(prev => prev ? { ...prev, status: 'Revisi' } : prev)
+    await supabase.from('kf_notifications').insert({
+      workspace_id: workspaceId,
+      type: 'naskah',
+      title: `Revisi — ${item.judul}`,
+      message: 'Konten dikembalikan untuk direvisi. Mulai ulang dari naskah atau produksi.',
+    })
   }
 
   // ── Manual tasks ──────────────────────────────────────────────────────────
@@ -1376,7 +1422,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </button>
               )}
               {detailItem.status === 'Tayang' && (
-                <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#059669' }}>✓ Sudah Tayang — Done</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ textAlign: 'center', padding: '8px', fontSize: '0.82rem', color: '#059669', fontWeight: 600 }}>✓ Sudah Tayang — Done</div>
+                  <button onClick={() => requestRevisi(detailItem)}
+                    style={{ width: '100%', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '9px', color: '#dc2626', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                    Minta Revisi
+                  </button>
+                </div>
+              )}
+              {detailItem.status === 'Revisi' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#dc2626', marginBottom: 3 }}>Sedang Direvisi</div>
+                    <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>Konten harus melewati semua step dari awal. Tidak bisa dikembalikan ke status sebelumnya.</div>
+                  </div>
+                  <button onClick={() => advanceStatus(detailItem, 'Naskah Siap')} disabled={savingAction}
+                    style={{ width: '100%', background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 8, padding: '9px', color: '#1a73e8', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
+                    Naskah Revisi Siap →
+                  </button>
+                </div>
               )}
               <button onClick={() => removeFromSprint(detailItem.id)}
                 style={{ width: '100%', background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
@@ -1514,6 +1578,45 @@ export default function SprintsModule({ initialSprints, initialContents, product
           </button>
         </div>
       )}
+
+      {/* ── Delete Confirm Modal (ada konten in-progress) ─────────────────── */}
+      {deleteConfirmModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '24px 24px', maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem', marginBottom: 4 }}>Hapus Sprint?</div>
+                <div style={{ fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.6 }}>
+                  Sprint <strong>"{deleteConfirmModal.sprintName}"</strong> memiliki <strong style={{ color: '#dc2626' }}>{deleteConfirmModal.inProgressCount} konten yang sedang dikerjakan</strong>. Semua konten akan dihapus permanen dan <strong>tidak bisa di-undo</strong>.
+                </div>
+              </div>
+            </div>
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: '0.78rem', color: '#991b1b', lineHeight: 1.5 }}>
+              Pastikan sudah backup atau export data penting sebelum melanjutkan.
+            </div>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 20 }}>
+              <input type="checkbox" checked={deleteConfirmChecked} onChange={e => setDeleteConfirmChecked(e.target.checked)}
+                style={{ marginTop: 2, accentColor: '#dc2626', width: 16, height: 16, flexShrink: 0 }} />
+              <span style={{ fontSize: '0.82rem', color: '#374151', lineHeight: 1.5 }}>
+                Saya mengerti semua konten akan dihapus permanen dan tidak bisa dikembalikan.
+              </span>
+            </label>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setDeleteConfirmModal(null)}
+                style={{ flex: 1, background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px', color: '#374151', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}>
+                Batal
+              </button>
+              <button onClick={confirmDeleteWithProgress} disabled={!deleteConfirmChecked}
+                style={{ flex: 1, background: deleteConfirmChecked ? '#dc2626' : '#f3f4f6', border: 'none', borderRadius: 8, padding: '10px', color: deleteConfirmChecked ? '#fff' : '#9ca3af', fontSize: '0.85rem', fontWeight: 700, cursor: deleteConfirmChecked ? 'pointer' : 'not-allowed', transition: 'all 0.15s' }}>
+                Hapus Permanen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1537,7 +1640,13 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
             <span style={{ fontSize: '0.7rem', fontWeight: 600, color: productColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{productName}</span>
           </div>
         )}
-        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827', lineHeight: 1.45, marginBottom: 10 }}>{item.judul}</div>
+        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827', lineHeight: 1.45, marginBottom: item.status === 'Revisi' ? 6 : 10 }}>{item.judul}</div>
+        {item.status === 'Revisi' && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 20, padding: '2px 9px', fontSize: '0.68rem', fontWeight: 700, color: '#dc2626', marginBottom: 8 }}>
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            Revisi
+          </div>
+        )}
       </div>
 
       {steps.length > 0 && (
