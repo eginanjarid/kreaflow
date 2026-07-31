@@ -705,7 +705,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     Pillar / Tema Konten
                     {sprintLockedItem && <span style={{ marginLeft: 6, fontSize: '0.62rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>DIKUNCI SPRINT</span>}
                   </label>
-                  {pillars.length > 0 && !sprintLockedItem ? (
+                  {!sprintLockedItem && (pillars.length > 0 ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
                       {pillars.map(p => {
                         const isSelected = naskahForm.pillar === p.nama
@@ -735,7 +735,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     <div style={{ fontSize: '0.75rem', color: '#d97706', background: 'rgba(245,158,11,0.07)', borderRadius: 7, padding: '8px 12px', marginBottom: 8 }}>
                       Belum ada pilar konten. <a href="/brand?tab=pillars" style={{ color: '#d97706', fontWeight: 700 }}>Buat di Brand → Content Pillars →</a>
                     </div>
-                  )}
+                  ))}
                   {sprintLockedItem ? (
                     <div style={{ background: '#f3f4f6', borderRadius: 10, padding: '10px 14px', fontSize: '0.875rem', color: '#374151', fontWeight: 500 }}>
                       {naskahForm.pillar}
