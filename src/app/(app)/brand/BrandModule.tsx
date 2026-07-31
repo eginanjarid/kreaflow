@@ -405,7 +405,7 @@ ${bisa}
 ③ DIBUTUHKAN — masalah nyata yang ada di sekitar dan ingin saya bantu selesaikan:
 ${dibutuhkan}
 
-④ MONETISASI — ${peluang}
+④ PELUANG PENGHASILAN — ${peluang}
 
 ---
 
@@ -554,7 +554,7 @@ Platform: ${platform}
 Analisis diri:
 ① KELEBIHAN: ${kelebihan}
 ② KELEMAHAN: ${kelemahan}
-③ PELUANG: ${peluang}
+③ PELUANG BRAND: ${peluang}
 ④ TANTANGAN: ${tantangan}
 
 ---
@@ -735,6 +735,7 @@ Sajikan dalam format yang mudah dibaca. Rekomendasikan 1 micro-niche terbaik di 
     const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
     const targetBuyer = profile.affiliate_target_buyer || '[belum diisi]'
     const positioning = profile.affiliate_positioning || '[belum dipilih]'
+    const positioningStatement = profile.affiliate_positioning_statement || ''
     const platforms = (profile.affiliate_platforms || []).join(', ') || 'TikTok Shop'
     return `Kamu adalah brand naming expert dan copywriter yang spesialis membuat identitas akun affiliate Indonesia yang mudah diingat, dipercaya, dan convert.
 
@@ -747,7 +748,7 @@ DATA AKUN
 Tipe: ${tipe}
 Kategori produk: ${kategori}
 Target pembeli: ${targetBuyer}
-Positioning: ${positioning}
+Tipe positioning: ${positioning}${positioningStatement ? `\nPositioning statement: ${positioningStatement}` : ''}
 Platform utama: ${platforms}
 
 ---
@@ -825,7 +826,9 @@ Output yang spesifik dan langsung bisa dieksekusi besok.`
     const niche = profile.niche || '[belum diisi]'
     const premis = profile.premis || '[belum diisi]'
     const positioning = profile.affiliate_positioning || '[belum dipilih]'
-    const promoStyle = profile.affiliate_promo_style || '[belum dipilih]'
+    const positioningStatement = profile.affiliate_positioning_statement || ''
+    const trustBuilder = profile.affiliate_trust_builder || '[belum diisi]'
+    const disclosure = profile.affiliate_disclosure || '[belum diisi]'
     const platforms = (profile.affiliate_platforms || []).join(', ') || '[belum dipilih]'
     const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
     const audiens = profile.target_audiens || '[belum diisi]'
@@ -841,29 +844,30 @@ DATA AFFILIATOR
 Nama: ${nama}
 Niche: ${niche}
 Premis brand: ${premis}
-Positioning yang dipilih: ${positioning}
-Style konten promosi: ${promoStyle}
+Tipe positioning: ${positioning}${positioningStatement ? `\nPositioning statement: ${positioningStatement}` : ''}
 Platform affiliate: ${platforms}
 Kategori produk fokus: ${kategori}
 Target audiens: ${audiens}
+Alasan dipercaya: ${trustBuilder}
+Kalimat disclosure saat ini: ${disclosure}
 
 ---
 
 YANG SAYA BUTUHKAN:
 
 ▸ TRUST STATEMENT
-3 versi kalimat "kenapa orang harus percaya rekomendasiku" — pendek (1 kalimat), medium (2-3 kalimat), panjang (1 paragraf). Fokus pada kredibilitas dan keaslian, bukan followers.
+3 versi kalimat "kenapa orang harus percaya rekomendasiku" — pendek (1 kalimat), medium (2-3 kalimat), panjang (1 paragraf). Bangun dari konteks "alasan dipercaya" di atas, bukan generik.
 
 ▸ BIO AFFILIATOR
 3 variasi bio profil khusus untuk affiliate (80-150 karakter) yang menonjolkan identitas sebagai trusted recommender, bukan penjual. Cocok untuk TikTok/Instagram.
 
 ▸ KALIMAT DISCLOSURE
-5 pilihan kalimat disclosure yang natural dan tidak kaku — yang bikin audience malah respect, bukan kabur. Beda gaya: santai, profesional, lucu, singkat, storytelling.
+5 pilihan kalimat disclosure yang natural dan tidak kaku — yang bikin audience malah respect, bukan kabur. Beda gaya: santai, profesional, lucu, singkat, storytelling. Jadikan kalimat disclosure saat ini sebagai referensi gaya.
 
 ▸ ANGLE KONTEN
-5 ide angle konten affiliate yang autentik untuk niche "${niche}" dengan style "${promoStyle}" — bukan sekadar "beli ini beli itu" tapi yang build trust sambil convert.
+5 ide angle konten affiliate yang autentik untuk niche "${niche}" dengan positioning "${positioning}" — bukan sekadar "beli ini beli itu" tapi yang build trust sambil convert.
 
-▸ POSITIONING STATEMENT
+▸ POSITIONING STATEMENT FINAL
 1 kalimat positioning yang bisa dijadikan tagline atau anchor identity:
 "Saya [nama] — [positioning statement yang jelas membedakan dari affiliator lain]"
 
@@ -1262,7 +1266,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {[
                 { label: 'Kelebihan kamu', key: 'kelebihan' as keyof BrandProfile, placeholder: 'Apa yang jadi keunggulan kamu...' },
-                { label: 'Kelemahan kamu', key: 'kelemahan' as keyof BrandProfile, placeholder: 'Apa yang masih jadi tantangan...' },
+                { label: 'Kelemahan kamu', key: 'kelemahan' as keyof BrandProfile, placeholder: 'Kekurangan atau kelemahan yang kamu miliki...' },
                 { label: 'Peluang brand', key: 'peluang_brand' as keyof BrandProfile, placeholder: 'Peluang yang bisa dimanfaatkan...' },
                 { label: 'Tantangan', key: 'tantangan' as keyof BrandProfile, placeholder: 'Hambatan yang dihadapi...' },
               ].map(({ label, key, placeholder }) => (
