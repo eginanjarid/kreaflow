@@ -13,7 +13,7 @@ export default async function SprintsPage() {
   const wsId = await resolveWorkspaceId(supabase, user.id)
   if (!wsId) redirect('/login')
 
-  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle()
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
   const { data: brand } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
@@ -54,6 +54,7 @@ export default async function SprintsPage() {
         workspaceMembers={workspaceMembers}
         initialTasks={tasks || []}
         accounts={(accounts || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
+        brandType={(wsData?.brand_type as string) || 'creator'}
       />
     </Suspense>
   )

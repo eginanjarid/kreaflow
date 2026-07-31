@@ -191,7 +191,7 @@ const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 
 
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
-export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [] }: {
+export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [], brandType = 'creator' }: {
   initialSprints: Sprint[]
   initialContents: ContentItem[]
   products: Product[]
@@ -199,6 +199,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   workspaceMembers: WorkspaceMember[]
   initialTasks: ManualTask[]
   accounts?: SosmedAkun[]
+  brandType?: string
 }) {
   const supabase = createClient()
   const searchParams = useSearchParams()
@@ -217,8 +218,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [filterProduct, setFilterProduct] = useState('')
 
   // Sprint create modal
+  const isAffiliate = brandType === 'affiliate'
+  const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
+  const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) => key !== (isAffiliate ? 'creator' : 'affiliate'))
+
   const [sprintModal, setSprintModal] = useState(false)
-  const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: 'affiliate' })
+  const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: defaultTemplate })
   // sprintSteps: ordered list of steps + assign + deadline
   const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; deadline: string }[]>([])
   const [addStepOpen, setAddStepOpen] = useState(false)
@@ -858,7 +863,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Jenis Konten</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {(Object.entries(TEMPLATES) as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
+                  {(visibleTemplates as [string, { label: string; color: string; steps: StepDef[] }][]).map(([key, tpl]) => (
                     <button key={key} type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: key })); initStepsFromTemplate(key) }}
                       style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === key ? tpl.color + '60' : '#e5eaf2'}`, background: sprintForm.template_type === key ? tpl.color + '12' : '#f1f5f9', color: sprintForm.template_type === key ? tpl.color : '#6b7280', fontSize: '0.75rem', fontWeight: sprintForm.template_type === key ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
                       {tpl.label}
@@ -1002,8 +1007,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {sprintProducts.map((row, idx) => (
                     <div key={idx} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
-                      {/* Baris 1: produk + jumlah + hapus */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 26px', gap: 6, alignItems: 'center' }}>
+                      {/* Baris 1: produk (affiliate only) + jumlah + hapus */}
+                      <div style={{ display: 'grid', gridTemplateColumns: `${isAffiliate ? '1fr ' : ''}60px 26px`, gap: 6, alignItems: 'center' }}>
+                        {isAffiliate && (
                         <select
                           value={row.product_id}
                           onChange={e => setSprintProducts(prev => prev.map((r, i) => i === idx ? { ...r, product_id: e.target.value } : r))}
@@ -1011,6 +1017,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <option value="">— Tanpa Produk —</option>
                           {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                         </select>
+                        )}
                         <input
                           type="number" min={1} max={99}
                           value={row.jumlah}
