@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 type BrandProfile = {
@@ -2135,13 +2135,38 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 }
 
 function ContentPillarsTab({ workspaceId, profile }: { workspaceId: string; profile: BrandProfile }) {
-  const [pillars, setPillars] = useState<Array<{ id?: string; nama: string; hashtags: string; urutan: number }>>([
-    { nama: '', hashtags: '', urutan: 1 }
+  const [pillars, setPillars] = useState<Array<{ id?: string; nama: string; fungsi: string; keterangan: string; hashtags: string; urutan: number }>>([
+    { nama: '', fungsi: '', keterangan: '', hashtags: '', urutan: 1 }
   ])
+  const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [aiModal, setAiModal] = useState<{ prompt: string } | null>(null)
   const [promptCopied, setPromptCopied] = useState(false)
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('kf_content_pillars')
+        .select('id, nama, fungsi, keterangan, hashtags, urutan')
+        .eq('workspace_id', workspaceId)
+        .order('urutan', { ascending: true })
+      if (data && data.length > 0) {
+        setPillars(data.map(p => ({
+          id: p.id,
+          nama: p.nama || '',
+          fungsi: p.fungsi || '',
+          keterangan: p.keterangan || '',
+          hashtags: Array.isArray(p.hashtags) ? p.hashtags.join(' ') : (p.hashtags || ''),
+          urutan: p.urutan,
+        })))
+      }
+      setLoaded(true)
+    }
+    load()
+  }, [workspaceId])
 
   function buildPillarsPromptLocal(): string {
     const niche = profile.niche || '[isi Niche Hunt dulu]'
@@ -2196,7 +2221,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
 
   function addPillar() {
     if (pillars.length >= 10) return
-    setPillars(p => [...p, { nama: '', hashtags: '', urutan: p.length + 1 }])
+    setPillars(p => [...p, { nama: '', fungsi: '', keterangan: '', hashtags: '', urutan: p.length + 1 }])
   }
 
   function removePillar(i: number) {
@@ -2212,6 +2237,8 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
       pillars.filter(p => p.nama).map(p => ({
         workspace_id: workspaceId,
         nama: p.nama,
+        fungsi: p.fungsi || '',
+        keterangan: p.keterangan || '',
         urutan: p.urutan,
         hashtags: p.hashtags.split(/\s+/).filter(Boolean),
       }))
@@ -2239,7 +2266,7 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
         <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Content Pillars</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Maksimal 10 pillar konten + hashtag set per pillar</div>
+            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Maksimal 10 pillar — nama, fungsi, keterangan, dan hashtag set</div>
           </div>
           <button
             type="button"
@@ -2250,28 +2277,60 @@ Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis 
           </button>
         </div>
 
-        {pillars.map((pillar, i) => (
-          <div key={i} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 10, padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 24, height: 24, borderRadius: 6, background: '#1a73e8', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+        {!loaded && (
+          <div style={{ textAlign: 'center', padding: '24px 0', color: '#9ca3af', fontSize: '0.82rem' }}>Memuat pillar...</div>
+        )}
+
+        {loaded && pillars.map((pillar, i) => (
+          <div key={i} style={{ background: '#f9fafb', border: '1px solid #f3f4f6', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Header: nomor + nama + hapus */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: '#1a73e8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                 {i + 1}
               </div>
               <input
-                style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 12px', color: '#111827', fontSize: '0.875rem', outline: 'none' }}
+                style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', color: '#111827', fontSize: '0.875rem', fontWeight: 600, outline: 'none' }}
                 value={pillar.nama}
                 onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, nama: e.target.value } : x))}
-                placeholder={`Nama pillar ${i + 1}...`}
+                placeholder={`Nama pillar ${i + 1}... (cth: Edukasi Niche, Behind The Scene)`}
               />
               {pillars.length > 1 && (
-                <button type="button" onClick={() => removePillar(i)} style={{ background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '1.1rem', padding: '0 4px' }}>×</button>
+                <button type="button" onClick={() => removePillar(i)} style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 7, width: 28, height: 28, color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
               )}
             </div>
-            <textarea
-              style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 12px', color: '#6b7280', fontSize: '0.8rem', outline: 'none', height: 64, resize: 'none', boxSizing: 'border-box' }}
-              value={pillar.hashtags}
-              onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, hashtags: e.target.value } : x))}
-              placeholder="#hashtag1 #hashtag2 #hashtag3 (max 30 hashtag)"
-            />
+            {/* Fungsi + Keterangan side by side */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Fungsi Pillar</div>
+                <textarea
+                  style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', color: '#374151', fontSize: '0.8rem', outline: 'none', height: 72, resize: 'none', boxSizing: 'border-box' }}
+                  value={pillar.fungsi}
+                  onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, fungsi: e.target.value } : x))}
+                  placeholder="Peran pillar ini dalam strategi brand... (cth: Membangun kepercayaan lewat edukasi)"
+                />
+              </div>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Keterangan Konten</div>
+                <textarea
+                  style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', color: '#374151', fontSize: '0.8rem', outline: 'none', height: 72, resize: 'none', boxSizing: 'border-box' }}
+                  value={pillar.keterangan}
+                  onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, keterangan: e.target.value } : x))}
+                  placeholder="Jenis konten yang masuk pillar ini... (cth: Tips, tutorial, how-to yang bisa langsung dipraktikkan)"
+                />
+              </div>
+            </div>
+            {/* Hashtag */}
+            <div>
+              <div style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Hashtag Set</div>
+              <textarea
+                style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', color: '#374151', fontSize: '0.8rem', outline: 'none', height: 52, resize: 'none', boxSizing: 'border-box' }}
+                value={pillar.hashtags}
+                onChange={e => setPillars(p => p.map((x, idx) => idx === i ? { ...x, hashtags: e.target.value } : x))}
+                placeholder="#hashtag1 #hashtag2 #hashtag3 (pisah spasi, maks 30)"
+              />
+            </div>
           </div>
         ))}
 
