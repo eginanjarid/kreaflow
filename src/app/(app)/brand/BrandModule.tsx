@@ -2198,25 +2198,25 @@ Premis brand: ${premis}
 YANG SAYA BUTUHKAN:
 
 ▸ 5–7 CONTENT PILLAR UTAMA
-Untuk setiap pillar, berikan:
-- Nama pillar (2-4 kata, berkarakter, bukan generik seperti "Edukasi" saja)
-- Fungsi pillar ini dalam membangun personal branding saya
-- 3 contoh judul konten spesifik yang bisa langsung dibuat di ${platform}
-- Tipe konten yang paling cocok (Reels, Carousel, Live, dll)
-- 5 hashtag relevan untuk pillar ini
-
 Pastikan 5 pilar dasar ini tercakup tapi disesuaikan dengan niche saya:
 Edukasi / Hiburan / Bukti Sosial / Cerita Personal / Promosi
 
+Untuk SETIAP pillar, tulis dalam format persis ini agar mudah saya salin:
+
+PILLAR [nomor]: [Nama Pillar — 2-4 kata, berkarakter, bukan generik]
+FUNGSI: [1 kalimat — peran strategis pillar ini dalam membangun personal brand saya. Bukan deskripsi konten, tapi dampaknya ke audiens dan brand.]
+KETERANGAN KONTEN: [2-3 kalimat — jenis konten apa yang masuk di sini, angle yang dipakai, dan kenapa relevan untuk target audiens saya di ${platform}.]
+HASHTAG: [8-10 hashtag relevan, pisah spasi, campuran niche + broad + mikro]
+
 ▸ 2–3 PILLAR BONUS
-Pillar tambahan yang relevan dengan micro-niche dan bisa membedakan saya dari kreator lain.
+Pillar tambahan spesifik micro-niche yang belum umum dipakai kreator lain. Format sama seperti di atas.
 
 ▸ STRATEGI ROTASI
-Rekomendasikan pola posting mingguan — pillar mana diposting hari apa dan kenapa.
+Pola posting mingguan — pillar mana di hari apa dan kenapa. Sesuaikan frekuensi realistis 3-5x seminggu.
 
 ---
 
-Tutup dengan pertanyaan yang membantu saya memilih pillar yang paling realistis untuk dikerjakan konsisten.`
+Tutup dengan 1 pertanyaan yang membantu saya memilih pillar mana yang paling realistis untuk dieksekusi konsisten mulai minggu ini.`
   }
 
   function addPillar() {
