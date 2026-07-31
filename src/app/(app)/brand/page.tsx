@@ -11,7 +11,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
   const wsId = await resolveWorkspaceId(supabase, user.id)
   if (!wsId) redirect('/login')
 
-  const { data: wsCheck } = await supabase.from('kf_workspaces').select('plan, modes').eq('id', wsId).single()
+  const { data: wsCheck } = await supabase.from('kf_workspaces').select('plan, modes, brand_type').eq('id', wsId).single()
   if (wsCheck?.plan !== 'lifetime') redirect('/upgrade')
 
   const [{ data: profile }, { data: akun }] = await Promise.all([
@@ -19,7 +19,9 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('created_at'),
   ])
 
-  const modes = (wsCheck?.modes as string[] | null) ?? ['creator']
+  // Derive modes from brand_type (source of truth) — don't trust stale modes column
+  const brandType = (wsCheck?.brand_type as string | null) ?? 'creator'
+  const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
   const { setup } = await searchParams
 
   return (
