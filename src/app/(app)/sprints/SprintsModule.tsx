@@ -293,9 +293,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // ── Sprint create ─────────────────────────────────────────────────────────
   function openSprintModal() {
-    const { start, end } = getWeekDates()
+    const { start } = getWeekDates()
     const tpl = defaultTemplate
-    setSprintForm({ nama: `Sprint ${fmtDate(start)} – ${fmtDate(end)}`, start_date: start, end_date: end, target_konten: 35, platform: '', akun: '', template_type: tpl })
+    setSprintForm({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: tpl })
     initStepsFromTemplate(tpl)
     setAddStepOpen(false)
     setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
@@ -303,8 +303,24 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSprintModal(true)
   }
 
+  // Auto-calculate sprint date range from slot posting dates
+  function calcSprintDates() {
+    const slots = isAffiliate ? sprintProducts : sprintPillars
+    const dates = slots.map(r => r.mulai).filter(Boolean).sort()
+    if (!dates.length) return { start: '', end: '' }
+    const start = dates[0]
+    const lastSlot = slots.find(r => r.mulai === dates[dates.length - 1])
+    const lastDate = new Date(dates[dates.length - 1] + 'T00:00:00')
+    lastDate.setDate(lastDate.getDate() + ((lastSlot?.jumlah || 1) - 1) * ((lastSlot?.interval || 1)))
+    return { start, end: lastDate.toISOString().split('T')[0] }
+  }
+
   async function createSprint() {
-    if (!sprintForm.nama.trim() || !sprintForm.start_date) return
+    const { start: calcStart, end: calcEnd } = calcSprintDates()
+    const autoNama = !sprintForm.nama.trim() && calcStart && calcEnd
+      ? `Sprint ${fmtDate(calcStart)} – ${fmtDate(calcEnd)}`
+      : sprintForm.nama.trim()
+    if (!autoNama) return
     setSavingSprint(true)
     const stepIds = sprintSteps.map(s => s.step.id)
     const tplType = stepIds.length > 0
@@ -320,9 +336,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
     const { data: sprint, error } = await supabase.from('kf_sprints').insert({
       workspace_id: workspaceId,
-      nama: sprintForm.nama.trim(),
-      start_date: sprintForm.start_date,
-      end_date: sprintForm.end_date,
+      nama: autoNama,
+      start_date: calcStart || new Date().toISOString().split('T')[0],
+      end_date: calcEnd || new Date().toISOString().split('T')[0],
       target_konten: totalFromProducts > 0 ? totalFromProducts : sprintForm.target_konten,
       platform: sprintForm.platform || null,
       akun: sprintForm.akun.trim() || null,
@@ -355,7 +371,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             labelPrefix = pillar ? pillar.nama : ''
           }
 
-          const baseDateStr = row.mulai || sprintForm.start_date
+          const baseDateStr = row.mulai || new Date().toISOString().split('T')[0]
           return Array.from({ length: row.jumlah }, (_, i) => {
             let tanggal_tayang: string | null = null
             if (baseDateStr) {
@@ -981,18 +997,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Nama Sprint *</label>
-                <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint 20-26 Jul" />
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Nama Sprint</label>
+                <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder={(() => { const { start, end } = calcSprintDates(); return start && end ? `Sprint ${fmtDate(start)} – ${fmtDate(end)}` : 'cth: Sprint 20-26 Jul' })()} />
+                <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 4 }}>Kosongkan untuk auto-generate dari tanggal konten</div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Mulai</label>
-                  <input type="date" style={fieldStyle()} value={sprintForm.start_date} onChange={e => setSprintForm(f => ({ ...f, start_date: e.target.value }))} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
-                  <input type="date" style={fieldStyle()} value={sprintForm.end_date} onChange={e => setSprintForm(f => ({ ...f, end_date: e.target.value }))} />
-                </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Platform</label>
                   <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
@@ -1081,9 +1090,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       ))}
                     </div>
                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                      <button type="button" onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
+                      <button type="button" onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' }])}
                         style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Baris</button>
-                      {products.length > 0 && <button type="button" onClick={() => setSprintProducts(prev => [...prev, ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }))])}
+                      {products.length > 0 && <button type="button" onClick={() => setSprintProducts(prev => [...prev, ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' }))])}
                         style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Produk</button>}
                     </div>
                   </>
@@ -1137,9 +1146,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       ))}
                     </div>
                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' }])}
+                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' }])}
                         style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Pilar</button>
-                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: sprintForm.start_date, interval: 1, jam: '18:00' })))}
+                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' })))}
                         style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Pilar</button>}
                     </div>
                   </>
