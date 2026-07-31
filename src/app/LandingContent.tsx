@@ -325,7 +325,7 @@ const FAQS = [
   { q: 'Apa perbedaan Starter, Pro, dan Agency?', a: 'Perbedaan utamanya ada di jumlah workspace dan anggota tim. Starter cocok untuk 1 brand, Pro untuk yang punya 3 brand/klien, Agency untuk agensi dengan banyak brand. Semua paket dapat akses ke semua modul.' },
   { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga ini hanya tersedia selama masa launch.' },
   { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa. Tersedia add-on +1 workspace seharga Rp49.000/bulan. Berlangganan bulanan dan bisa dibatalkan kapan saja. Atau upgrade ke paket lebih tinggi untuk dapat lebih banyak workspace sekaligus.' },
-  { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule sedang dalam pengembangan dan akan segera hadir. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
+  { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule Post sedang dalam pengembangan dan akan segera hadir sebagai add-on Rp49.000/bulan. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
 ]
 
 export default function LandingContent() {
@@ -736,18 +736,30 @@ export default function LandingContent() {
             </div>
           ))}
         </div>
-        <div className="lp-pricing-addon reveal">
-          <div style={{ flex:1, minWidth:200 }}>
-            <div style={{ fontWeight:700, color:'#2a3547', fontSize:'0.9rem', marginBottom:2 }}>Add-on +1 Workspace</div>
-            <div style={{ fontSize:'0.78rem', color:'#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Berlangganan bulanan, bisa batal kapan saja.</div>
-          </div>
-          <div style={{ flexShrink:0, textAlign:'right' }}>
-            <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp49.000</div>
-            <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>/bulan</div>
-          </div>
-          <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0, transition:'all 0.15s' }}>
-            Mulai Berlangganan →
-          </Link>
+        <div style={{ maxWidth:900, margin:'16px auto 0', display:'flex', flexDirection:'column', gap:10 }}>
+          {[
+            { icon:'🗂️', name:'Add-on +1 Workspace', desc:'Tambah 1 workspace extra tanpa ganti paket. Berlangganan bulanan, bisa batal kapan saja.', price:'Rp49.000', unit:'/bulan', cta:'Mulai Berlangganan →', soon:false },
+            { icon:'📅', name:'Add-on Auto Schedule Post', desc:'Jadwalkan & posting otomatis ke TikTok, Instagram, dan YouTube Shorts langsung dari KreaFlow.', price:'Rp49.000', unit:'/bulan', cta:'Segera Hadir', soon:true },
+          ].map((addon, i) => (
+            <div key={i} className="lp-pricing-addon reveal" style={{ opacity: addon.soon ? 0.75 : 1 }}>
+              <div style={{ fontSize:'1.4rem', flexShrink:0 }}>{addon.icon}</div>
+              <div style={{ flex:1, minWidth:200 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:2 }}>
+                  <span style={{ fontWeight:700, color:'#2a3547', fontSize:'0.9rem' }}>{addon.name}</span>
+                  {addon.soon && <span style={{ fontSize:'0.62rem', fontWeight:800, color:'#d97706', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:20, padding:'1px 8px' }}>Segera Hadir</span>}
+                </div>
+                <div style={{ fontSize:'0.78rem', color:'#64748b' }}>{addon.desc}</div>
+              </div>
+              <div style={{ flexShrink:0, textAlign:'right' }}>
+                <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>{addon.price}</div>
+                <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>{addon.unit}</div>
+              </div>
+              {addon.soon
+                ? <div style={{ padding:'9px 18px', borderRadius:8, background:'#f1f5f9', color:'#94a3b8', fontSize:'0.85rem', fontWeight:700, flexShrink:0, cursor:'not-allowed' }}>Segera Hadir</div>
+                : <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0 }}>{addon.cta}</Link>
+              }
+            </div>
+          ))}
         </div>
         <p className="lp-pricing-note">Harga hanya tersedia selama masa launch · Dapat berubah kapan saja</p>
       </section>
