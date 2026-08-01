@@ -22,7 +22,7 @@ export default async function StudioPage() {
       .from('kf_content_ideas')
       .select('*')
       .eq('workspace_id', wsId)
-      .in('status', ['Naskah Siap', 'Produksi', 'Siap Tayang'])
+      .in('status', ['Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang'])
       .order('created_at', { ascending: false }),
     supabase
       .from('kf_products')

@@ -20,7 +20,7 @@ type Tab = 'antrian' | 'dikerjakan' | 'selesai'
 type ViewMode = 'cards' | 'ig' | 'feed'
 type IGTab = 'grid' | 'reels' | 'tagged'
 
-const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai' }
+const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai', 'Terjadwal': 'selesai', 'Tayang': 'selesai' }
 const STATUS_COLOR: Record<string, string> = { Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
 const STATUS_BG: Record<string, string> = { Draft: '#f3f4f6', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
 const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
@@ -324,7 +324,7 @@ export default function StudioModule({ initialContents, products, initialNotific
         setContents(prev => {
           const exists = prev.find(c => c.id === updated.id)
           if (exists) {
-            if (['Naskah Siap', 'Produksi', 'Siap Tayang'].includes(updated.status)) {
+            if (['Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang'].includes(updated.status)) {
               return prev.map(c => c.id === updated.id ? { ...c, ...updated } : c)
             }
             return prev.filter(c => c.id !== updated.id)
