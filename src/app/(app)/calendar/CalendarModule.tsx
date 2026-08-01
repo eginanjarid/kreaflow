@@ -29,6 +29,7 @@ type ReadyItem = {
 }
 type TaskSnap = { id: string; nama: string; platform: string | null; due_date: string; percent_complete: number; priority: string; stage?: string | null; assigned_to?: string | null }
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
+type ImportantDate = { id: string; workspace_id: string | null; nama: string; tanggal: string; tipe: string; warna: string; deskripsi: string | null; is_repeating: boolean }
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
@@ -47,7 +48,7 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId, accounts = [] }: {
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId, accounts = [], importantDates: initialImportantDates = [] }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
@@ -55,6 +56,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   readyQueue?: ReadyItem[]
   autoContentId?: string
   accounts?: SosmedAkun[]
+  importantDates?: ImportantDate[]
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -74,6 +76,10 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [schedError, setSchedError] = useState('')
 
   const todayDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  const [importantDates, setImportantDates] = useState<ImportantDate[]>(initialImportantDates)
+  const [dateModal, setDateModal] = useState<{ open: boolean; item: Partial<ImportantDate> } | null>(null)
+  const [dateSaving, setDateSaving] = useState(false)
+  const [showImportantDates, setShowImportantDates] = useState(true)
 
   // Calendar grid
   const calDays = useMemo(() => {
@@ -229,6 +235,40 @@ function prevMonth() {
     setSchedSaving(false)
   }
 
+  function importantDatesForDay(day: number) {
+    if (!showImportantDates) return []
+    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    return importantDates.filter(d => {
+      if (d.is_repeating) {
+        return d.tanggal.slice(5) === dateStr.slice(5) // same MM-DD
+      }
+      return d.tanggal === dateStr
+    })
+  }
+
+  async function saveImportantDate() {
+    if (!dateModal?.item.nama || !dateModal?.item.tanggal) return
+    setDateSaving(true)
+    const supabase = createClient()
+    const payload = { workspace_id: workspaceId, nama: dateModal.item.nama, tanggal: dateModal.item.tanggal, tipe: dateModal.item.tipe || 'brand_moment', warna: dateModal.item.warna || '#f59e0b', deskripsi: dateModal.item.deskripsi || null, is_repeating: dateModal.item.is_repeating || false }
+    if (dateModal.item.id) {
+      await supabase.from('kf_important_dates').update(payload).eq('id', dateModal.item.id)
+      setImportantDates(prev => prev.map(d => d.id === dateModal.item.id ? { ...d, ...payload } : d))
+    } else {
+      const { data } = await supabase.from('kf_important_dates').insert(payload).select('id').single()
+      if (data) setImportantDates(prev => [...prev, { id: data.id, ...payload }])
+    }
+    setDateSaving(false)
+    setDateModal(null)
+  }
+
+  async function deleteImportantDate(id: string) {
+    if (!confirm('Hapus tanggal penting ini?')) return
+    const supabase = createClient()
+    await supabase.from('kf_important_dates').delete().eq('id', id)
+    setImportantDates(prev => prev.filter(d => d.id !== id))
+  }
+
   const ideaMap = Object.fromEntries(ideas.map(i => [i.id, i]))
   const monthEntries = entries.filter(e => {
     const d = parseLocal(e.scheduled_at)
@@ -253,6 +293,14 @@ function prevMonth() {
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Jadwal posting konten kamu</p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <button onClick={() => setShowImportantDates(s => !s)}
+            style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showImportantDates ? 'rgba(239,68,68,0.3)' : '#e5e7eb'}`, background: showImportantDates ? 'rgba(239,68,68,0.06)' : '#f3f4f6', color: showImportantDates ? '#ef4444' : '#6b7280', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
+            Tgl Penting {showImportantDates ? 'ON' : 'OFF'}
+          </button>
+          <button onClick={() => setDateModal({ open: true, item: { tipe: 'brand_moment', warna: '#f59e0b', is_repeating: false } })}
+            style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.06)', color: '#d97706', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
+            + Tgl Penting
+          </button>
           {tasks.length > 0 && (
             <button onClick={() => setShowTasks(s => !s)}
               style={{ padding: '8px 12px', borderRadius: 8, border: `1px solid ${showTasks ? 'rgba(251,191,36,0.4)' : '#e5e7eb'}`, background: showTasks ? 'rgba(251,191,36,0.08)' : '#f3f4f6', color: showTasks ? '#d97706' : '#6b7280', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
@@ -336,6 +384,7 @@ function prevMonth() {
             {calDays.map((day, idx) => {
               const dayEntries = day ? entriesForDay(day) : []
               const dayTasks = day ? tasksForDay(day) : []
+              const dayImportant = day ? importantDatesForDay(day) : []
               const dateStr = day ? `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : ''
               const isToday = dateStr === todayStr
               const totalItems = dayEntries.length + dayTasks.length
@@ -345,12 +394,20 @@ function prevMonth() {
                 <div key={idx}
                   style={{
                     minHeight: 88, padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #f3f4f6' : 'none', borderBottom: '1px solid #f3f4f6',
-                    background: day ? 'transparent' : '#f9fafb', cursor: 'default',
+                    background: dayImportant.length > 0 ? `${dayImportant[0].warna}08` : day ? 'transparent' : '#f9fafb', cursor: 'default',
                   }}>
                   {day && (
                     <>
-                      <div style={{ fontSize: '0.78rem', fontWeight: isToday ? 700 : 400, color: isToday ? '#fff' : idx % 7 === 0 ? '#ef4444' : '#374151', width: 22, height: 22, borderRadius: '50%', background: isToday ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
-                        {day}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 4 }}>
+                        <div style={{ fontSize: '0.78rem', fontWeight: isToday ? 700 : 400, color: isToday ? '#fff' : idx % 7 === 0 ? '#ef4444' : '#374151', width: 22, height: 22, borderRadius: '50%', background: isToday ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {day}
+                        </div>
+                        {dayImportant.map(d => (
+                          <div key={d.id} title={d.nama + (d.deskripsi ? ` — ${d.deskripsi}` : '')}
+                            style={{ fontSize: '0.52rem', padding: '1px 4px', borderRadius: 3, background: d.warna + '20', border: `1px solid ${d.warna}40`, color: d.warna, fontWeight: 700, maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, cursor: 'default' }}>
+                            {d.nama.split(' ').slice(0, 2).join(' ')}
+                          </div>
+                        ))}
                       </div>
                       {dayEntries.slice(0, MAX_SHOW).map(e => {
                         shown++
@@ -627,6 +684,74 @@ function prevMonth() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tanggal Penting Modal ──────────────────────────────────────────── */}
+      {dateModal?.open && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 110, padding: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 24, width: '100%', maxWidth: 420 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+              <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827' }}>{dateModal.item.id ? 'Edit' : 'Tambah'} Tanggal Penting</div>
+              <button onClick={() => setDateModal(null)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 4 }}>Nama</div>
+                <input value={dateModal.item.nama || ''} onChange={e => setDateModal(m => m ? { ...m, item: { ...m.item, nama: e.target.value } } : m)}
+                  style={fieldStyle()} placeholder="e.g. Harbolnas 12.12, Hari Ulang Tahun Brand" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 4 }}>Tanggal</div>
+                  <input type="date" value={dateModal.item.tanggal || ''} onChange={e => setDateModal(m => m ? { ...m, item: { ...m.item, tanggal: e.target.value } } : m)} style={fieldStyle()} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 4 }}>Tipe</div>
+                  <select value={dateModal.item.tipe || 'brand_moment'} onChange={e => setDateModal(m => m ? { ...m, item: { ...m.item, tipe: e.target.value } } : m)} style={fieldStyle({ cursor: 'pointer' })}>
+                    <option value="libur_nasional">Libur Nasional</option>
+                    <option value="hari_besar">Hari Besar</option>
+                    <option value="campaign">Campaign</option>
+                    <option value="brand_moment">Brand Moment</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 4 }}>Warna</div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['#ef4444','#f59e0b','#10b981','#1a73e8','#8b5cf6','#ec4899'].map(c => (
+                      <button key={c} type="button" onClick={() => setDateModal(m => m ? { ...m, item: { ...m.item, warna: c } } : m)}
+                        style={{ width: 24, height: 24, borderRadius: '50%', background: c, border: dateModal.item.warna === c ? '3px solid #111827' : '2px solid transparent', cursor: 'pointer' }} />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 4 }}>Ulangi Tiap Tahun</div>
+                  <button type="button" onClick={() => setDateModal(m => m ? { ...m, item: { ...m.item, is_repeating: !m.item.is_repeating } } : m)}
+                    style={{ padding: '8px 14px', borderRadius: 8, border: `1px solid ${dateModal.item.is_repeating ? '#10b981' : '#e5e7eb'}`, background: dateModal.item.is_repeating ? 'rgba(16,185,129,0.08)' : '#f3f4f6', color: dateModal.item.is_repeating ? '#10b981' : '#6b7280', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    {dateModal.item.is_repeating ? 'Ya (Repeat)' : 'Tidak'}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 4 }}>Deskripsi (opsional)</div>
+                <input value={dateModal.item.deskripsi || ''} onChange={e => setDateModal(m => m ? { ...m, item: { ...m.item, deskripsi: e.target.value } } : m)}
+                  style={fieldStyle()} placeholder="Catatan singkat..." />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'flex-end' }}>
+              {dateModal.item.id && (
+                <button onClick={() => { deleteImportantDate(dateModal.item.id!); setDateModal(null) }}
+                  style={{ background: 'transparent', border: '1px solid #fca5a5', borderRadius: 8, padding: '9px 16px', color: '#ef4444', fontSize: '0.85rem', cursor: 'pointer' }}>Hapus</button>
+              )}
+              <button onClick={() => setDateModal(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
+              <button onClick={saveImportantDate} disabled={dateSaving || !dateModal.item.nama || !dateModal.item.tanggal}
+                style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', opacity: (!dateModal.item.nama || !dateModal.item.tanggal) ? 0.5 : 1 }}>
+                {dateSaving ? 'Menyimpan...' : 'Simpan'}
+              </button>
+            </div>
           </div>
         </div>
       )}
