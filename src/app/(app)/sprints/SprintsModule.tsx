@@ -143,6 +143,12 @@ function getTemplateColor(template_type: string): string {
 }
 
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
+const WEEKLY_DAYS = [
+  { idx: 1, label: 'Senin' }, { idx: 2, label: 'Selasa' }, { idx: 3, label: 'Rabu' },
+  { idx: 4, label: 'Kamis' }, { idx: 5, label: 'Jumat' }, { idx: 6, label: 'Sabtu' }, { idx: 0, label: 'Minggu' },
+]
+type DayPattern = { active: boolean; format: string; pillar_id: string; jam: string }
+const defaultDayPattern = (): DayPattern => ({ active: false, format: '', pillar_id: '', jam: '18:00' })
 const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
 const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
 const FORMATS_CREATOR = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Thread/Caption', 'Lainnya']
@@ -314,6 +320,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number; mulai: string; interval: number; jam: string }[]>([{ product_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00' }])
   // For creator: pillar slots (pillar_id maps to kf_content_pillars.id)
   const [sprintPillars, setSprintPillars] = useState<{ pillar_id: string; jumlah: number; mulai: string; interval: number; jam: string; format: string }[]>([{ pillar_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00', format: '' }])
+  // Weekly pattern mode
+  const [slotMode, setSlotMode] = useState<'slots' | 'weekly'>('slots')
+  const [weeklyRange, setWeeklyRange] = useState({ start: '', end: '' })
+  const [weeklyPattern, setWeeklyPattern] = useState<Record<number, DayPattern>>({
+    0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(),
+    3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern(),
+  })
   const [savingSprint, setSavingSprint] = useState(false)
 
   // Content add modal
@@ -384,11 +397,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setAddStepOpen(false)
     setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
     setSprintPillars([{ pillar_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00', format: '' }])
+    setSlotMode('slots')
+    setWeeklyRange({ start: '', end: '' })
+    setWeeklyPattern({ 0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(), 3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern() })
     setSprintModal(true)
   }
 
   // Auto-calculate sprint date range from slot posting dates
   function calcSprintDates() {
+    if (slotMode === 'weekly') return { start: weeklyRange.start, end: weeklyRange.end }
     const slots = isAffiliate ? sprintProducts : sprintPillars
     const dates = slots.map(r => r.mulai).filter(Boolean).sort()
     if (!dates.length) return { start: '', end: '' }
@@ -432,20 +449,47 @@ export default function SprintsModule({ initialSprints, initialContents, product
     }).select('*').single()
 
     if (!error && sprint) {
-      // Auto-generate content items from all rows
-      const rows = activeSlots.filter(r => r.jumlah > 0)
-      if (rows.length > 0) {
-        const assignByCol: Record<string, string> = {}
-        sprintSteps.forEach(({ step, memberId }) => {
-          const col = STEP_ASSIGN_COL[step.id]
-          if (col && memberId) {
-            const m = workspaceMembers.find(x => x.id === memberId)
-            if (m) assignByCol[col] = m.nama || m.email
-          }
-        })
+      const assignByCol: Record<string, string> = {}
+      sprintSteps.forEach(({ step, memberId }) => {
+        const col = STEP_ASSIGN_COL[step.id]
+        if (col && memberId) {
+          const m = workspaceMembers.find(x => x.id === memberId)
+          if (m) assignByCol[col] = m.nama || m.email
+        }
+      })
 
-        const items = rows.flatMap(row => {
-          // Affiliate: lookup product name. Creator: lookup pillar name.
+      let items: object[] = []
+
+      if (slotMode === 'weekly' && weeklyRange.start && weeklyRange.end) {
+        // Generate from weekly pattern
+        const cur = new Date(weeklyRange.start + 'T00:00:00')
+        const endD = new Date(weeklyRange.end + 'T00:00:00')
+        const counterPerDay: Record<number, number> = {}
+        while (cur <= endD) {
+          const dayIdx = cur.getDay()
+          const dp = weeklyPattern[dayIdx]
+          if (dp.active && dp.format) {
+            counterPerDay[dayIdx] = (counterPerDay[dayIdx] || 0) + 1
+            const pillar = pillars.find(p => p.id === dp.pillar_id)
+            const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
+            items.push({
+              workspace_id: workspaceId,
+              sprint_id: sprint.id,
+              judul: pillar ? `${pillar.nama} — ${dp.format} ${counterPerDay[dayIdx]}` : `${dp.format} ${counterPerDay[dayIdx]}`,
+              status: 'Draft',
+              format: dp.format,
+              platform: CONTENT_TYPE_PLATFORMS[dp.format] || (sprintForm.platform ? [sprintForm.platform] : []),
+              tanggal_tayang: dateStr,
+              jam_tayang: dp.jam || null,
+              ...assignByCol,
+            })
+          }
+          cur.setDate(cur.getDate() + 1)
+        }
+      } else {
+        // Generate from slot rows
+        const rows = activeSlots.filter(r => r.jumlah > 0)
+        items = rows.flatMap(row => {
           let labelPrefix = ''
           if (isAffiliate) {
             const produk = products.find(p => p.id === (row as typeof sprintProducts[0]).product_id)
@@ -454,15 +498,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
             const pillar = pillars.find(p => p.id === (row as typeof sprintPillars[0]).pillar_id)
             labelPrefix = pillar ? pillar.nama : ''
           }
-
           const baseDateStr = row.mulai || localToday()
           return Array.from({ length: row.jumlah }, (_, i) => {
-            let tanggal_tayang: string | null = null
-            if (baseDateStr) {
-              const d = new Date(baseDateStr + 'T00:00:00')
-              d.setDate(d.getDate() + i * (row.interval || 1))
-              tanggal_tayang = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-            }
+            const d = new Date(baseDateStr + 'T00:00:00')
+            d.setDate(d.getDate() + i * (row.interval || 1))
+            const tanggal_tayang = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
             return {
               workspace_id: workspaceId,
               sprint_id: sprint.id,
@@ -481,16 +521,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
             }
           })
         })
+      }
+
+      if (items.length > 0) {
         const { data: inserted } = await supabase.from('kf_content_ideas').insert(items).select('*')
         if (inserted) setContents(prev => [...inserted, ...prev])
-
-        // Notif: sprint dibuat, pekerjaan naskah siap dimulai
-        const totalItems = items.length
         await supabase.from('kf_notifications').insert({
           workspace_id: workspaceId,
           type: 'naskah',
           title: `Sprint Dimulai — ${autoNama}`,
-          message: `${totalItems} konten siap dikerjakan. Buka Plan untuk mulai buat naskah.`,
+          message: `${items.length} konten siap dikerjakan. Buka Plan untuk mulai buat naskah.`,
         })
       }
       setSprints(prev => [sprint, ...prev])
@@ -1244,26 +1284,104 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Slot Konten</div>
-                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#1a73e8', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Jadwal Tayang ke Audiens</span>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Jadwal Konten</div>
                     </div>
                     <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>
-                      {isAffiliate ? 'Tentukan produk, jumlah konten, dan kapan mulai posting' : 'Tentukan pilar konten, jumlah konten, dan kapan mulai posting'}
+                      {slotMode === 'weekly' ? 'Set format per hari dalam seminggu — auto-generate konten sesuai pola' : isAffiliate ? 'Tentukan produk, jumlah konten, dan kapan mulai posting' : 'Tentukan pilar konten, jumlah konten, dan kapan mulai posting'}
                     </div>
                   </div>
-                  {(() => {
-                    const slots = isAffiliate ? sprintProducts : sprintPillars
-                    const total = slots.filter(r => r.jumlah > 0).reduce((s, r) => s + r.jumlah, 0)
-                    return total > 0 && (
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', padding: '3px 8px', borderRadius: 5 }}>
-                        Total: {total} konten
-                      </span>
-                    )
-                  })()}
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <button type="button" onClick={() => setSlotMode('slots')}
+                      style={{ fontSize: '0.68rem', padding: '3px 10px', borderRadius: 6, border: `1px solid ${slotMode === 'slots' ? '#1a73e8' : '#e5e7eb'}`, background: slotMode === 'slots' ? 'rgba(26,115,232,0.1)' : '#f8fafc', color: slotMode === 'slots' ? '#1a73e8' : '#6b7280', fontWeight: slotMode === 'slots' ? 700 : 400, cursor: 'pointer' }}>
+                      Slot
+                    </button>
+                    <button type="button" onClick={() => setSlotMode('weekly')}
+                      style={{ fontSize: '0.68rem', padding: '3px 10px', borderRadius: 6, border: `1px solid ${slotMode === 'weekly' ? '#1a73e8' : '#e5e7eb'}`, background: slotMode === 'weekly' ? 'rgba(26,115,232,0.1)' : '#f8fafc', color: slotMode === 'weekly' ? '#1a73e8' : '#6b7280', fontWeight: slotMode === 'weekly' ? 700 : 400, cursor: 'pointer' }}>
+                      Weekly Pattern
+                    </button>
+                  </div>
                 </div>
 
+                {/* WEEKLY PATTERN */}
+                {slotMode === 'weekly' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Sprint</div>
+                        <input type="date" value={weeklyRange.start} onChange={e => setWeeklyRange(r => ({ ...r, start: e.target.value }))}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Selesai Sprint</div>
+                        <input type="date" value={weeklyRange.end} onChange={e => setWeeklyRange(r => ({ ...r, end: e.target.value }))}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                    </div>
+                    {weeklyRange.start && weeklyRange.end && (
+                      <div style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 6, padding: '5px 8px' }}>
+                        {(() => {
+                          const ms = new Date(weeklyRange.end + 'T00:00:00').getTime() - new Date(weeklyRange.start + 'T00:00:00').getTime()
+                          const days = Math.round(ms / 86400000) + 1
+                          const activeDays = WEEKLY_DAYS.filter(d => weeklyPattern[d.idx].active && weeklyPattern[d.idx].format)
+                          const total = activeDays.length > 0 ? Math.floor(days / 7) * activeDays.length + activeDays.filter(d => {
+                            const startDay = new Date(weeklyRange.start + 'T00:00:00').getDay()
+                            const endDay = new Date(weeklyRange.end + 'T00:00:00').getDay()
+                            const rem = days % 7
+                            if (rem === 0) return false
+                            // Simplified estimate
+                            return true
+                          }).length : 0
+                          return `Durasi ${days} hari · ${activeDays.length} hari aktif/minggu · ≈${Math.floor(days / 7) * activeDays.length + activeDays.length} konten`
+                        })()}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {WEEKLY_DAYS.map(({ idx, label }) => {
+                        const dp = weeklyPattern[idx]
+                        return (
+                          <div key={idx} style={{ background: dp.active ? '#f0f9ff' : '#f8fafc', border: `1px solid ${dp.active ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, borderRadius: 8, padding: '8px 10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <button type="button"
+                                onClick={() => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], active: !p[idx].active } }))}
+                                style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${dp.active ? '#1a73e8' : '#d1d5db'}`, background: dp.active ? '#1a73e8' : 'transparent', flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {dp.active && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                              </button>
+                              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dp.active ? '#111827' : '#9ca3af', width: 52, flexShrink: 0 }}>{label}</span>
+                              {dp.active && (
+                                <>
+                                  <select value={dp.format} onChange={e => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], format: e.target.value } }))}
+                                    style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                    <option value="">— Format —</option>
+                                    {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
+                                  </select>
+                                  {!isAffiliate && pillars.length > 0 && (
+                                    <select value={dp.pillar_id} onChange={e => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], pillar_id: e.target.value } }))}
+                                      style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                      <option value="">— Pilar —</option>
+                                      {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                                    </select>
+                                  )}
+                                  <input type="time" value={dp.jam} onChange={e => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], jam: e.target.value } }))}
+                                    style={{ width: 72, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none' }} />
+                                </>
+                              )}
+                            </div>
+                            {dp.active && dp.format && CONTENT_TYPE_PLATFORMS[dp.format] && (
+                              <div style={{ display: 'flex', gap: 3, marginTop: 5, marginLeft: 26, flexWrap: 'wrap' }}>
+                                {CONTENT_TYPE_PLATFORMS[dp.format].map(p => (
+                                  <span key={p} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', color: '#1a73e8', fontWeight: 600 }}>{p}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* AFFILIATE SLOTS */}
-                {isAffiliate && (
+                {slotMode === 'slots' && isAffiliate && (
                   <>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {sprintProducts.map((row, idx) => (
@@ -1316,7 +1434,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 )}
 
                 {/* CREATOR SLOTS — per pilar konten */}
-                {!isAffiliate && (
+                {slotMode === 'slots' && !isAffiliate && (
                   <>
                     {pillars.length === 0 && (
                       <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#92400e' }}>
