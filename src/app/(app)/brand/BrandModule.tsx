@@ -714,47 +714,36 @@ Tutup dengan pertanyaan untuk membantu saya memilih yang paling sesuai karakter.
     const tipe = profile.affiliate_tipe === 'store' ? 'Niche Store (akun khusus produk, bukan personal)' : 'Personal Brand Affiliator'
     const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
     const platforms = (profile.affiliate_platforms || []).join(', ') || 'TikTok Shop'
-    return `Kamu adalah affiliate marketing strategist yang spesialis membantu seller dan affiliator Indonesia memilih niche produk yang menguntungkan.
-
-Jawab seluruhnya dalam Bahasa Indonesia. Output harus spesifik, actionable, dan relevan untuk pasar Indonesia 2024-2025.
-
----
+    return `Kamu adalah affiliate marketing strategist spesialis pasar Indonesia 2026.
 
 DATA AFFILIATOR
-
 Tipe akun: ${tipe}
-Kategori produk yang diminati: ${kategori}
-Platform affiliate: ${platforms}
+Kategori: ${kategori}
+Platform: ${platforms}
+
+Jawab dalam Bahasa Indonesia. Berikan HANYA 3 output berikut — tidak lebih, tidak kurang:
 
 ---
 
-YANG SAYA BUTUHKAN:
-
-▸ ANALISIS NICHE
-Untuk setiap kategori yang saya pilih, berikan:
-- Potensi pasar di Indonesia (besar/sedang/kecil)
-- Tingkat persaingan (ketat/sedang/longgar)
-- Rata-rata komisi affiliate (%)
-- Produk best seller di kategori tersebut
-- Musim/timing terbaik untuk promosi
-
-▸ REKOMENDASI MICRO-NICHE
-3 micro-niche spesifik yang paling potensial dari kategori yang saya pilih, dengan alasan dan contoh produk konkret
-
-▸ TARGET BUYER PERSONA
-Untuk micro-niche terbaik, buatkan profil buyer persona yang detail:
-- Demografi (usia, gender, lokasi, income)
-- Pain points utama
-- Trigger untuk membeli
-- Platform yang paling sering dipakai
-- Waktu aktif online
-
-▸ COMPETITIVE EDGE
-Apa yang bisa membuat akun affiliate saya berbeda dari yang sudah ada di niche ini?
+① MICRO-NICHE TERBAIK
+Tulis 1 kalimat: micro-niche paling potensial dari kategori di atas untuk ${platforms} di 2026.
+Format: "[Nama micro-niche] — [alasan singkat 1 kalimat]"
 
 ---
 
-Sajikan dalam format yang mudah dibaca. Rekomendasikan 1 micro-niche terbaik di akhir dengan alasan kuat.`
+② BUYER PERSONA
+Tulis 2–3 kalimat ringkas profil pembeli ideal untuk micro-niche tersebut.
+Sertakan: usia, gender, lokasi, income, pain point utama, trigger beli, jam aktif di ${platforms}.
+
+---
+
+③ COMPETITIVE EDGE
+Tulis 2–3 kalimat: apa yang bisa membedakan akun ${tipe} ini dari kompetitor di niche yang sama di ${platforms}.
+Fokus pada angle yang bisa langsung dieksekusi lewat konten.
+
+---
+
+Jangan tambahkan penjelasan panjang, analisis pasar, atau tabel. Langsung ke poinnya.`
   }
 
   function buildAffIdentityPrompt(): string {
