@@ -1319,6 +1319,31 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {/* WEEKLY PATTERN */}
                 {slotMode === 'weekly' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {/* Set Seminggu shortcut */}
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <input type="date" id="weekly-seed-date"
+                        style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none' }} />
+                      <button type="button" onClick={() => {
+                        const input = document.getElementById('weekly-seed-date') as HTMLInputElement
+                        if (!input?.value) return
+                        const seed = new Date(input.value + 'T00:00:00')
+                        const sunday = new Date(seed)
+                        sunday.setDate(seed.getDate() - seed.getDay())
+                        setWeeklyPattern(prev => {
+                          const next = { ...prev }
+                          for (let i = 0; i < 7; i++) {
+                            const d = new Date(sunday)
+                            d.setDate(sunday.getDate() + i)
+                            const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+                            next[i] = { ...next[i], date: dateStr }
+                          }
+                          return next
+                        })
+                      }}
+                        style={{ background: '#1a73e8', border: 'none', borderRadius: 6, padding: '6px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' as const }}>
+                        Set Seminggu
+                      </button>
+                    </div>
                     {(() => {
                       const readyDays = WEEKLY_DAYS.filter(d => weeklyPattern[d.idx].active && weeklyPattern[d.idx].date && weeklyPattern[d.idx].slots.some(s => s.format))
                       const totalSlots = readyDays.reduce((sum, d) => sum + weeklyPattern[d.idx].slots.filter(s => s.format).length, 0)
