@@ -2,7 +2,7 @@
 
 import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -189,10 +189,12 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
     const stepLogUpdate = item.sprint_id
       ? { step_log: { ...(item.step_log || {}), editing_done_at: now } }
       : {}
-    await supabase.from('kf_content_ideas').update({ canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, ...stepLogUpdate }).eq('id', item.id)
+    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, ...stepLogUpdate }
+    await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
     await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
     setMarking(false)
+    onUpdate({ ...item, ...payload })
     onClose()
     router.refresh()
   }
@@ -312,6 +314,25 @@ export default function StudioModule({ initialContents, products, initialNotific
   const [previewReels, setPreviewReels] = useState<ContentItem | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [showNotif, setShowNotif] = useState(false)
+
+  useEffect(() => {
+    const channel = supabase.channel('studio-content-changes')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'kf_content_ideas', filter: `workspace_id=eq.${workspaceId}` }, payload => {
+        const updated = payload.new as ContentItem
+        setContents(prev => {
+          const exists = prev.find(c => c.id === updated.id)
+          if (exists) {
+            if (['Naskah Siap', 'Produksi', 'Siap Tayang'].includes(updated.status)) {
+              return prev.map(c => c.id === updated.id ? { ...c, ...updated } : c)
+            }
+            return prev.filter(c => c.id !== updated.id)
+          }
+          return prev
+        })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [workspaceId])
 
   const filtered = contents.filter(c => STATUS_STAGE[c.status] === tab)
   const unread = notifications.filter(n => !n.is_read).length
