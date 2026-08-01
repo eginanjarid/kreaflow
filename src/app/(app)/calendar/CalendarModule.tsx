@@ -37,6 +37,9 @@ const STATUS_COLOR: Record<string, string> = { Planned: '#1a73e8', Ready: '#d977
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 const DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
+// Supabase returns timestamptz as "2024-08-05T18:00:00+00:00" — strip tz so JS parses as local time
+function parseLocal(s: string) { return new Date(s.slice(0, 19)) }
+
 function emptyEntry(wsId: string, date?: string): Entry {
   return { workspace_id: wsId, content_id: null, platform: '', scheduled_at: date ? `${date}T09:00` : '', posted_at: null, posted_url: null, status: 'Planned' }
 }
@@ -83,8 +86,10 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   }, [viewYear, viewMonth])
 
   function entriesForDay(day: number) {
-    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    return entries.filter(e => e.scheduled_at?.startsWith(dateStr))
+    return entries.filter(e => {
+      const d = parseLocal(e.scheduled_at)
+      return d.getFullYear() === viewYear && d.getMonth() === viewMonth && d.getDate() === day
+    })
   }
 
   function tasksForDay(day: number) {
@@ -226,14 +231,14 @@ function prevMonth() {
 
   const ideaMap = Object.fromEntries(ideas.map(i => [i.id, i]))
   const monthEntries = entries.filter(e => {
-    const d = new Date(e.scheduled_at)
+    const d = parseLocal(e.scheduled_at)
     return d.getFullYear() === viewYear && d.getMonth() === viewMonth
   }).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
 
   const monthTasks = showTasks ? tasks.filter(t => {
     if (!t.due_date) return false
     if (t.percent_complete === 100) return false
-    const d = new Date(t.due_date)
+    const d = new Date(t.due_date + 'T00:00:00')
     return d.getFullYear() === viewYear && d.getMonth() === viewMonth
   }).sort((a, b) => a.due_date.localeCompare(b.due_date)) : []
 
@@ -352,7 +357,7 @@ function prevMonth() {
                         const idea = e.content_id ? ideaMap[e.content_id] : null
                         const displayName = e.label || idea?.judul || '(konten)'
                         const productLabel = idea?.product_nama ? `${idea.product_nama.split(' ')[0]} · ` : ''
-                        const timeStr = e.scheduled_at ? new Date(e.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
+                        const timeStr = e.scheduled_at ? parseLocal(e.scheduled_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
                         return (
                           <div key={e.id} onClick={ev => { ev.stopPropagation(); openEdit(e) }}
                             style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 4, marginBottom: 2, background: `${STATUS_COLOR[e.status] || '#6b7280'}18`, borderLeft: `2px solid ${STATUS_COLOR[e.status] || '#6b7280'}`, color: STATUS_COLOR[e.status] || '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
@@ -422,7 +427,7 @@ function prevMonth() {
             )
           })}
           {monthEntries.map(e => {
-            const d = new Date(e.scheduled_at)
+            const d = parseLocal(e.scheduled_at)
             const idea = e.content_id ? ideaMap[e.content_id] : null
             const isSprint = !!e.task_id
             const displayName = e.label || idea?.judul || '(konten tidak terhubung)'
