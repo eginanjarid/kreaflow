@@ -54,6 +54,7 @@ type ManualTask = {
   due_date: string | null
   percent_complete: number
   notes: string | null
+  assigned_to: string | null
 }
 
 // ── Sprint templates ──────────────────────────────────────────────────────────
@@ -667,7 +668,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // ── Manual tasks ──────────────────────────────────────────────────────────
   function emptyTask(): ManualTask {
-    return { workspace_id: workspaceId, nama: '', platform: '', priority: 'Medium', start_date: '', due_date: '', percent_complete: 0, notes: '' }
+    return { workspace_id: workspaceId, nama: '', platform: null, priority: 'Medium', start_date: null, due_date: null, percent_complete: 0, notes: null, assigned_to: null }
   }
   async function saveTask() {
     if (!taskModal || !taskModal.task.nama.trim()) return
@@ -680,6 +681,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       due_date: raw.due_date || null,
       platform: raw.platform || null,
       notes: raw.notes || null,
+      assigned_to: raw.assigned_to || null,
     }
     if (t.id) {
       await supabase.from('kf_tasks').update(t).eq('id', t.id)
@@ -760,6 +762,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>{t.nama}</div>
                     <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                       {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
+                      {t.assigned_to && <span style={{ fontSize: '0.65rem', padding: '1px 7px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600 }}>👤 {t.assigned_to}</span>}
                       {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#dc2626' : '#6b7280' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
                       {t.notes && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{t.notes}</span>}
                     </div>
@@ -814,6 +817,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <input type="date" style={fieldStyle()} value={taskModal.task.due_date ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, due_date: e.target.value } } : m)} />
                   </div>
                 </div>
+                {workspaceMembers.length > 0 && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Assign ke</label>
+                    <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={taskModal.task.assigned_to ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, assigned_to: e.target.value || null } } : m)}>
+                      <option value="">— Pilih anggota —</option>
+                      {workspaceMembers.map(m => (
+                        <option key={m.id} value={m.nama || m.email}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Catatan</label>
                   <input style={fieldStyle()} value={taskModal.task.notes ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, notes: e.target.value } } : m)} placeholder="Detail..." />
