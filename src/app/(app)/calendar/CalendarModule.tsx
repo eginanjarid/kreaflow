@@ -28,6 +28,7 @@ type ReadyItem = {
   tanggal_tayang: string | null; jam_tayang: string | null
 }
 type TaskSnap = { id: string; nama: string; platform: string | null; due_date: string; percent_complete: number; priority: string; stage?: string | null; assigned_to?: string | null }
+type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
@@ -43,13 +44,14 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId }: {
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId, accounts = [] }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
   tasks?: TaskSnap[]
   readyQueue?: ReadyItem[]
   autoContentId?: string
+  accounts?: SosmedAkun[]
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -64,6 +66,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const [showTasks, setShowTasks] = useState(true)
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
   const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platforms: string[] } | null>(null)
+  // selectedAkunIds: akun yang dipilih untuk scheduling (id dari kf_accounts)
   const [schedSaving, setSchedSaving] = useState(false)
   const [schedError, setSchedError] = useState('')
 
@@ -175,7 +178,12 @@ function prevMonth() {
   }
 
   function openSchedModal(item: ReadyItem) {
-    const defaultPlatforms = (item.platform && item.platform.length > 0) ? item.platform : []
+    // Default: pilih platform yang sudah ada akunnya
+    const contentPlatforms = item.platform || []
+    const registeredPlatforms = accounts.map(a => a.platform)
+    const defaultPlatforms = contentPlatforms.length > 0
+      ? contentPlatforms.filter(p => registeredPlatforms.includes(p))
+      : registeredPlatforms
     const defaultDate = item.tanggal_tayang || todayDateStr
     const defaultTime = item.jam_tayang || '09:00'
     setSchedModal({ item, date: defaultDate, time: defaultTime, platforms: defaultPlatforms })
@@ -485,29 +493,45 @@ function prevMonth() {
                 <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Jam Posting</label>
                 <input type="time" style={fieldStyle()} value={schedModal.time} onChange={e => setSchedModal(s => s ? { ...s, time: e.target.value } : s)} />
               </div>
-              {/* Platform multi-select */}
+              {/* Akun / Platform multi-select */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <label style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 500 }}>Platform * <span style={{ fontWeight: 400, color: '#9ca3af' }}>(bisa pilih lebih dari 1)</span></label>
+                  <label style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 500 }}>Posting ke Akun *</label>
                   {schedModal.platforms.length > 0 && (
                     <span style={{ fontSize: '0.65rem', color: '#059669', fontWeight: 700 }}>{schedModal.platforms.length} dipilih</span>
                   )}
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {(schedModal.item.platform && schedModal.item.platform.length > 0 ? schedModal.item.platform : PLATFORMS).map(p => {
+                    const akun = accounts.find(a => a.platform === p)
                     const checked = schedModal.platforms.includes(p)
+                    const hasAkun = !!akun
                     return (
                       <button key={p} type="button"
-                        onClick={() => setSchedModal(s => {
-                          if (!s) return s
-                          const next = checked ? s.platforms.filter(x => x !== p) : [...s.platforms, p]
-                          return { ...s, platforms: next }
-                        })}
-                        style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 10, border: `1.5px solid ${checked ? '#1a73e8' : '#e5e7eb'}`, background: checked ? 'rgba(26,115,232,0.08)' : '#f8fafc', color: checked ? '#1a73e8' : '#6b7280', fontSize: '0.78rem', fontWeight: checked ? 700 : 400, cursor: 'pointer' }}>
-                        <div style={{ width: 14, height: 14, borderRadius: 3, border: `2px solid ${checked ? '#1a73e8' : '#d1d5db'}`, background: checked ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          {checked && <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        onClick={() => {
+                          if (!hasAkun) return
+                          setSchedModal(s => {
+                            if (!s) return s
+                            const next = checked ? s.platforms.filter(x => x !== p) : [...s.platforms, p]
+                            return { ...s, platforms: next }
+                          })
+                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${checked ? '#1a73e8' : hasAkun ? '#e5e7eb' : '#f3f4f6'}`, background: checked ? 'rgba(26,115,232,0.06)' : hasAkun ? '#fafafa' : '#f9fafb', cursor: hasAkun ? 'pointer' : 'default', textAlign: 'left' }}>
+                        <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? '#1a73e8' : hasAkun ? '#d1d5db' : '#e5e7eb'}`, background: checked ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {checked && <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                         </div>
-                        {p}
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.78rem', fontWeight: checked ? 700 : 500, color: hasAkun ? (checked ? '#1a73e8' : '#111827') : '#9ca3af' }}>
+                            {p}
+                            {hasAkun && <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: 6 }}>· @{akun.handle}</span>}
+                          </div>
+                          {!hasAkun && (
+                            <div style={{ fontSize: '0.65rem', color: '#d97706', marginTop: 1 }}>
+                              Belum ada akun — <a href="/brand" style={{ color: '#1a73e8', textDecoration: 'none' }}>daftarkan di Brand →</a>
+                            </div>
+                          )}
+                        </div>
+                        {hasAkun && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 6, background: '#f3f4f6', color: '#6b7280' }}>{akun.nama}</span>}
                       </button>
                     )
                   })}

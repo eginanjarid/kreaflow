@@ -17,12 +17,13 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
   if (!brandCheck?.niche) redirect('/brand?setup=1')
 
-  const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }] = await Promise.all([
+  const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }] = await Promise.all([
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId),
     supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority,stage,assigned_to').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_products').select('id, nama').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
+    supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('platform'),
   ])
 
   const productMap = Object.fromEntries((products || []).map(p => [p.id as string, p.nama as string]))
@@ -53,6 +54,13 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   }))
 
 
+  const accountList = (accounts || []).map(a => ({
+    id: a.id as string,
+    platform: a.platform as string,
+    handle: a.handle as string,
+    nama: a.nama as string,
+  }))
+
   return (
     <CalendarModule
       initialEntries={entries || []}
@@ -61,6 +69,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
       tasks={tasks || []}
       readyQueue={readyQueue}
       autoContentId={autoContentId}
+      accounts={accountList}
     />
   )
 }
