@@ -42,6 +42,7 @@ export const STEP_ICON_MAP: Record<string, React.ReactNode> = {
   editing:    <IScissors size={14} />,
   schedule:   <ICalendar size={14} />,
   caption:    <IPen size={14} />,
+  desain:     <IPalette size={14} />,
   topik:      <IList size={14} />,
   persiapan:  <IGear size={14} />,
   promo:      <IMegaphone size={14} />,
