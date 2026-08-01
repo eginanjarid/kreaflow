@@ -91,7 +91,6 @@ const AFFILIATE_TABS = [
   { id: 'overview',      label: 'Brand Score' },
   { id: 'aff-niche',     label: 'Profil & Target' },
   { id: 'aff-identity',  label: 'Identitas Akun' },
-  { id: 'aff-konten',    label: 'Konten Strategy' },
   { id: 'aff-bio',       label: 'Bio & Trust' },
   { id: 'akun',          label: 'Akun Sosial' },
   { id: 'visual',        label: 'Brand Visual' },
@@ -139,8 +138,6 @@ const AFFILIATE_FREQ_CHECKS = [
   { key: 'affiliate_target_buyer',   label: 'Target Pembeli',     tab: 'aff-niche' },
   { key: 'affiliate_positioning',    label: 'Positioning',        tab: 'aff-identity' },
   { key: 'affiliate_tagline',        label: 'Tagline Akun',       tab: 'aff-identity' },
-  { key: 'affiliate_content_pillars',label: 'Content Pillars',    tab: 'aff-konten' },
-  { key: 'affiliate_hook_style',     label: 'Hook Formula',       tab: 'aff-konten' },
   { key: 'affiliate_trust_builder',  label: 'Trust Builder',      tab: 'aff-bio' },
   { key: 'affiliate_disclosure',     label: 'Disclosure',         tab: 'aff-bio' },
   { key: 'color_palette',            label: 'Brand Visual',       tab: 'visual' },
@@ -330,7 +327,6 @@ export default function BrandModule({
     switch (tabId) {
       case 'aff-niche':     return !!(p.affiliate_micro_niche || p.affiliate_target_buyer || p.affiliate_competitive_edge)
       case 'aff-identity':  return !!(p.affiliate_tagline || p.affiliate_positioning_statement || (p.affiliate_nama_options || []).length > 0)
-      case 'aff-konten':    return !!(p.affiliate_content_pillars)
       case 'aff-bio':       return !!(p.affiliate_trust_builder || p.affiliate_disclosure || (p.affiliate_bio_options || []).length > 0)
       case 'overview':      return !!initialProfile?.id
       case 'niche':         return !!(p.niche || p.suka || p.bisa)
@@ -809,44 +805,6 @@ Pilih juga 1 tipe positioning yang paling cocok dari: Honest Reviewer / Deal Hun
 ---
 
 Jangan tambahkan penjelasan panjang, tips tambahan, atau tabel. Langsung ke outputnya.`
-  }
-
-  function buildAffKontenPrompt(): string {
-    const tipe = profile.affiliate_tipe === 'store' ? 'Niche Store (akun khusus produk, bukan personal)' : 'Personal Brand Affiliator'
-    const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
-    const microNiche = profile.affiliate_micro_niche || '[belum diisi]'
-    const targetBuyer = profile.affiliate_target_buyer || '[belum diisi]'
-    const namaUtama = (profile.affiliate_nama_options || []).find(n => n.is_primary)?.nama || '[belum dipilih]'
-    const positioning = profile.affiliate_positioning || '[belum dipilih]'
-    const platforms = (profile.affiliate_platforms || []).join(', ') || 'TikTok Shop'
-    return `Kamu adalah content strategist spesialis akun affiliate Indonesia 2026.
-
-DATA AKUN
-Nama akun: ${namaUtama}
-Tipe: ${tipe}
-Kategori: ${kategori}
-Micro-niche: ${microNiche}
-Target pembeli: ${targetBuyer}
-Positioning: ${positioning}
-Platform: ${platforms}
-
-Jawab dalam Bahasa Indonesia. Berikan HANYA 1 output berikut — tidak lebih, tidak kurang:
-
----
-
-① CONTENT PILLARS (5 pillar)
-Format — langsung bisa copy-paste:
-1. [Nama Pillar] — [deskripsi singkat 1 kalimat, tujuan pillar ini]
-2. [Nama Pillar] — [deskripsi singkat]
-3. [Nama Pillar] — [deskripsi singkat]
-4. [Nama Pillar] — [deskripsi singkat]
-5. [Nama Pillar] — [deskripsi singkat]
-
-Pastikan ada mix: educate / entertain / convert. Sesuaikan dengan micro-niche dan target pembeli di atas.
-
----
-
-Hook formula, naskah, dan kalender posting → dikerjakan di modul Plan. Jangan tambahkan itu di sini.`
   }
 
   function buildAffiliatePrompt(): string {
@@ -1960,70 +1918,13 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     <button type="button" onClick={() => changeTab('aff-niche')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
-                  <button type="button" onClick={() => changeTab('aff-konten')}
-                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                    Lanjut: Konten Strategy →
-                  </button>
-                </div>
-              </>)}
-
-        {/* ── Affiliate: Konten Strategy ── */}
-        {tab === 'aff-konten' && sectionCard(<>
-                <div>
-                  <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Konten Strategy</div>
-                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Generate AI → simpan content pillars → eksekusi naskah di modul Plan</div>
-                </div>
-
-                {/* Step 1: Generate */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate Strategi Konten</div>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat content pillars khusus niche kamu</div>
-                  </div>
-                  <button type="button" onClick={() => setAiModal({ prompt: buildAffKontenPrompt() })}
-                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-                    Generate dengan AI
-                  </button>
-                </div>
-
-                {/* Step 2: Simpan hasil */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#d1fae5', border: '1px solid #34d399', color: '#059669', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
-                  <div>
-                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI</div>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Paste Content Pillars dari hasil AI ke field di bawah</div>
-                  </div>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Content Pillars <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
-                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Tema besar konten yang membentuk identitas akun</div>
-                  <textarea style={fieldStyle({ height: 110, resize: 'none' })} value={profile.affiliate_content_pillars} onChange={e => setField('affiliate_content_pillars', e.target.value)}
-                    placeholder={'cth:\n1. Review Jujur — test produk sebelum rekomendasiin\n2. Deal Alert — info flash sale & promo\n3. Tutorial — cara pakai produk yang bener\n4. Perbandingan — A vs B, mana worth it?'} />
-                </div>
-
-                {/* CTA ke Plan */}
-                <a href="/plan" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 14, border: '1px solid rgba(26,115,232,0.25)', background: 'rgba(26,115,232,0.04)', textDecoration: 'none' }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8d1e0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: '#1a73e8', fontSize: '0.85rem', marginBottom: 2 }}>Naskah & jadwal posting → modul Plan</div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Hook spesifik per konten, skrip video, dan kalender dikerjakan di sana.</div>
-                  </div>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#42a5f5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </a>
-
-                <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => changeTab('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
-                    <SaveButton loading={saving} saved={saved} />
-                  </div>
                   <button type="button" onClick={() => changeTab('aff-bio')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Bio & Trust →
                   </button>
                 </div>
               </>)}
+
 
         {/* ── Affiliate: Bio & Trust ── */}
         {tab === 'aff-bio' && sectionCard(<>
@@ -2113,7 +2014,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <button type="button" onClick={() => changeTab('aff-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                  <button type="button" onClick={() => changeTab('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                   <SaveButton loading={saving} saved={saved} />
                 </div>
               </>)}
