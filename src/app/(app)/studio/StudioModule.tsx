@@ -372,7 +372,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           </div>
           <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {contents.filter(c => STATUS_STAGE[c.status] === 'antrian').map(item => (
-              <button key={item.id} type="button" onClick={() => setTab('antrian')}
+              <button key={item.id} type="button" onClick={() => { setTab('antrian'); setSelectedItem(item) }}
                 style={{ flexShrink: 0, width: 172, textAlign: 'left', background: '#f9fafb', border: '1.5px solid #f3f4f6', borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
                   <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(217,119,6,0.1)', color: '#d97706' }}>NASKAH SIAP</span>
