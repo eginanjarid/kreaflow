@@ -20,6 +20,7 @@ type Entry = {
 type ContentIdea = {
   id: string; judul: string; format: string; platform: string[]
   product_id: string | null; product_nama: string | null
+  tanggal_tayang: string | null; jam_tayang: string | null
 }
 type ReadyItem = {
   id: string; judul: string; format: string | null; platform: string[] | null
@@ -42,12 +43,13 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [] }: {
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
   tasks?: TaskSnap[]
   readyQueue?: ReadyItem[]
+  autoContentId?: string
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -102,7 +104,39 @@ function prevMonth() {
   }
   function openEdit(e: Entry) { setModal({ open: true, entry: { ...e } }); setError('') }
   function closeModal() { setModal(null) }
-  function setField(key: keyof Entry, value: string) { setModal(m => m ? { ...m, entry: { ...m.entry, [key]: value } } : m) }
+  function setField(key: keyof Entry, value: string) {
+    setModal(m => {
+      if (!m) return m
+      const newEntry: Entry = { ...m.entry, [key]: value }
+      if (key === 'content_id' && value) {
+        const idea = ideas.find(i => i.id === value)
+        if (idea?.tanggal_tayang) {
+          newEntry.scheduled_at = `${idea.tanggal_tayang}T${idea.jam_tayang || '09:00'}`
+        }
+      }
+      return { ...m, entry: newEntry }
+    })
+  }
+
+  useEffect(() => {
+    if (!autoContentId) return
+    const ready = readyItems.find(r => r.id === autoContentId)
+    if (ready) {
+      openSchedModal(ready)
+      return
+    }
+    const idea = ideas.find(i => i.id === autoContentId)
+    if (!idea) return
+    const date = idea.tanggal_tayang || todayDateStr
+    const time = idea.jam_tayang || '09:00'
+    setModal({ open: true, entry: { ...emptyEntry(workspaceId, date), content_id: autoContentId, scheduled_at: `${date}T${time}` } })
+    if (idea.tanggal_tayang) {
+      const d = new Date(idea.tanggal_tayang + 'T00:00:00')
+      setViewYear(d.getFullYear())
+      setViewMonth(d.getMonth())
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoContentId])
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()

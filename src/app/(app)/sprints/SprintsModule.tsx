@@ -1464,7 +1464,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           <span style={{ fontSize: '0.82rem', color: done ? '#059669' : '#111827', fontWeight: done ? 400 : 600, textDecoration: done ? 'line-through' : 'none' }}>{step.nama}</span>
                         </div>
                         {!done && (
-                          <Link href={step.href} onClick={() => setDetailItem(null)}
+                          <Link
+                            href={step.id === 'schedule' ? `/calendar?content=${detailItem.id}` : step.href}
+                            onClick={() => setDetailItem(null)}
                             style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, textDecoration: 'none', padding: '3px 8px', borderRadius: 5, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>
                             Buka →
                           </Link>
