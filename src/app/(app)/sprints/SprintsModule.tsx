@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-type StepConfig = { id: string; deadline: string; memberName: string }
+type StepConfig = { id: string; daysBefore: number; memberName: string }
 
 type Sprint = {
   id: string
@@ -116,6 +116,13 @@ const MASTER_STEPS: StepDef[] = [
   { id: 'schedule',  nama: 'Schedule',    icon: 'calendar',   doneAt: 'Terjadwal',   href: '/calendar' },
   { id: 'live',      nama: 'Live',        icon: 'live',       doneAt: 'Terjadwal',   href: '/studio' },
 ]
+
+const DEFAULT_DAYS_BEFORE: Record<string, number> = {
+  naskah: 5, caption: 5, rundown: 5,
+  desain: 3, take_vid: 3, shooting: 3,
+  editing: 1, thumbnail: 1, review: 1,
+  schedule: 1, live: 0,
+}
 
 function parseTemplateType(template_type: string): { key: string; stepIds: string[] | null } {
   if (!template_type) return { key: 'affiliate', stepIds: null }
@@ -333,8 +340,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: defaultTemplate })
   const [selectedAkunIds, setSelectedAkunIds] = useState<string[]>([])
-  // sprintSteps: ordered list of steps + assign + deadline
-  const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; deadline: string }[]>([])
+  // sprintSteps: ordered list of steps + assign + daysBefore (D-N relative deadline)
+  const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; daysBefore: number }[]>([])
   const [addStepOpen, setAddStepOpen] = useState(false)
   const [sprintProducts, setSprintProducts] = useState<{ product_id: string; jumlah: number; mulai: string; interval: number; jam: string }[]>([{ product_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00' }])  // kept for affiliate legacy
   // For creator: pillar slots (pillar_id maps to kf_content_pillars.id)
@@ -381,7 +388,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
   type StepWithMeta = StepDef & { deadline?: string; memberName?: string }
   const stepsWithMeta: StepWithMeta[] = steps.map(s => {
     const cfg = selectedSprint?.step_config?.find(c => c.id === s.id)
-    return { ...s, deadline: cfg?.deadline || '', memberName: cfg?.memberName || '' }
+    let deadline = ''
+    if (cfg !== undefined && detailItem?.tanggal_tayang) {
+      const d = new Date(detailItem.tanggal_tayang + 'T00:00:00')
+      d.setDate(d.getDate() - (cfg.daysBefore ?? 0))
+      deadline = d.toISOString().slice(0, 10)
+    }
+    return { ...s, deadline, memberName: cfg?.memberName || '' }
   })
 
   const productColorMap = useMemo(() => {
@@ -403,7 +416,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   function initStepsFromTemplate(tpl: string) {
     const base = tpl === 'custom' ? [] : (TEMPLATES[tpl]?.steps || TEMPLATES.affiliate.steps)
-    setSprintSteps(base.map(s => ({ step: s, memberId: '', deadline: '' })))
+    setSprintSteps(base.map(s => ({ step: s, memberId: '', daysBefore: DEFAULT_DAYS_BEFORE[s.id] ?? 1 })))
   }
 
   // ── Sprint create ─────────────────────────────────────────────────────────
@@ -463,9 +476,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
       ? `${sprintForm.template_type === 'custom' ? 'custom' : sprintForm.template_type}:${stepIds.join(',')}`
       : sprintForm.template_type
 
-    const stepConfigData: StepConfig[] = sprintSteps.map(({ step, memberId, deadline }) => {
+    const stepConfigData: StepConfig[] = sprintSteps.map(({ step, memberId, daysBefore }) => {
       const m = workspaceMembers.find(x => x.id === memberId)
-      return { id: step.id, deadline, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
+      return { id: step.id, daysBefore, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
     })
 
     const { data: sprint, error } = await supabase.from('kf_sprints').insert({
@@ -1172,7 +1185,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
                 {/* Step rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {sprintSteps.map(({ step, memberId, deadline }, idx) => (
+                  {sprintSteps.map(({ step, memberId, daysBefore }, idx) => (
                     <div key={`${step.id}-${idx}`} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px' }}>
                       {/* Row 1: number + name + delete */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
@@ -1184,8 +1197,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           ✕
                         </button>
                       </div>
-                      {/* Row 2: assign + deadline — side by side equal width */}
-                      <div style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr 1fr' : '1fr', gap: 6 }}>
+                      {/* Row 2: assign + D-N deadline — side by side */}
+                      <div style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr auto' : '1fr', gap: 6 }}>
                         {workspaceMembers.length > 0 && (
                           <select
                             value={memberId}
@@ -1197,11 +1210,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             ))}
                           </select>
                         )}
-                        <input type="date"
-                          value={deadline}
-                          onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, deadline: e.target.value } : x))}
-                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: deadline ? '#d97706' : '#9ca3af', fontSize: '0.72rem', outline: 'none', boxSizing: 'border-box' as const }}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '4px 8px', flexShrink: 0 }}>
+                          <span style={{ fontSize: '0.7rem', color: '#92400e', fontWeight: 700, flexShrink: 0 }}>D-</span>
+                          <input type="number" min={0} max={30}
+                            value={daysBefore}
+                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, parseInt(e.target.value) || 0) } : x))}
+                            style={{ width: 36, background: 'transparent', border: 'none', color: '#d97706', fontSize: '0.82rem', fontWeight: 700, outline: 'none', textAlign: 'center' }}
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1220,7 +1236,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {MASTER_STEPS.filter(ms => !sprintSteps.some(ss => ss.step.id === ms.id)).map(ms => (
                         <button key={ms.id} type="button"
-                          onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '', deadline: '' }]); setAddStepOpen(false) }}
+                          onClick={() => { setSprintSteps(prev => [...prev, { step: ms, memberId: '', daysBefore: DEFAULT_DAYS_BEFORE[ms.id] ?? 1 }]); setAddStepOpen(false) }}
                           style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#111827', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
                           <span style={{ color: '#6b7280', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[ms.id] || null}</span> {ms.nama}
                         </button>
@@ -1660,7 +1676,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         type StepReport = {
           step: StepDef
           memberName: string
-          deadline: string
+          daysBefore: number | null
           total: number
           done: number
           onTime: number
@@ -1671,13 +1687,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         const report: StepReport[] = reportSteps.map(step => {
           const cfg = stepCfgMap[step.id]
-          const deadline = cfg?.deadline || ''
+          const daysBefore = cfg?.daysBefore ?? null
           const memberName = cfg?.memberName || '—'
-          const dlDate = deadline ? new Date(deadline) : null
 
           let done = 0, onTime = 0, late = 0, pending = 0, overdue = 0
           sprintContents.forEach(item => {
             const stepDone = isStepDone(item.status, step.doneAt)
+            const dlDate = (daysBefore !== null && item.tanggal_tayang)
+              ? (() => { const d = new Date(item.tanggal_tayang! + 'T00:00:00'); d.setDate(d.getDate() - daysBefore); return d })()
+              : null
             if (stepDone) {
               done++
               const doneAt = item.step_log?.[`${step.id}_done_at`]
@@ -1685,14 +1703,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 if (new Date(doneAt) <= dlDate) onTime++
                 else late++
               } else {
-                onTime++ // done but no deadline set → count as ok
+                onTime++
               }
             } else {
               pending++
               if (dlDate && now > dlDate) overdue++
             }
           })
-          return { step, memberName, deadline, total: sprintContents.length, done, onTime, late, pending, overdue }
+          return { step, memberName, daysBefore, total: sprintContents.length, done, onTime, late, pending, overdue }
         })
 
         return (
@@ -1708,8 +1726,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {report.map(r => {
                   const pct = r.total > 0 ? Math.round(r.done / r.total * 100) : 0
-                  const hasDeadline = !!r.deadline
-                  const dlOverdue = hasDeadline && now > new Date(r.deadline) && r.done < r.total
+                  const hasDeadline = r.daysBefore !== null
+                  const dlOverdue = hasDeadline && r.overdue > 0 && r.done < r.total
                   return (
                     <div key={r.step.id} style={{ background: '#fff', border: `1px solid ${dlOverdue ? 'rgba(248,113,113,0.3)' : '#e5eaf2'}`, borderRadius: 10, padding: '14px 16px' }}>
                       {/* Step header */}
@@ -1720,8 +1738,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.85rem' }}>{r.step.nama}</div>
                             <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 1 }}>
                               {r.memberName}
-                              {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#dc2626' : '#374151' }}>
-                                · Deadline: {new Date(r.deadline + (r.deadline.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                              {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#dc2626' : '#d97706', fontWeight: 600 }}>
+                                · D-{r.daysBefore}
                                 {dlOverdue && <> · <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:'inline', verticalAlign:'middle' }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Overdue</>}
                               </span>}
                             </div>
