@@ -1222,7 +1222,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             const v = parseInt(e.target.value.replace(/\D/g, '')) || 0
                             setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, Math.min(30, v)) } : x))
                           }}
-                          style={{ width: 32, textAlign: 'center', color: '#d97706', fontWeight: 800, fontSize: '0.9rem', border: 'none', background: 'transparent', outline: 'none' }}
+                          style={{ width: 44, textAlign: 'center', color: '#111827', fontWeight: 700, fontSize: '0.9rem', border: '1px solid #fcd34d', borderRadius: 5, background: '#fff', outline: 'none', padding: '2px 4px' }}
                         />
                         <button type="button"
                           onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
