@@ -17,8 +17,9 @@ type ContentItem = {
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
 type Tab = 'antrian' | 'dikerjakan' | 'selesai'
-type ViewMode = 'cards' | 'ig' | 'feed'
+type ViewMode = 'cards' | 'platform'
 type IGTab = 'grid' | 'reels' | 'tagged'
+type PlatformTab = 'ig' | 'tiktok' | 'youtube'
 
 const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai', 'Terjadwal': 'selesai', 'Tayang': 'selesai' }
 const STATUS_COLOR: Record<string, string> = { Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
@@ -59,6 +60,9 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
   const caption = [item.hook, item.body, item.cta].filter(Boolean).join('\n\n') || item.judul
   const hashtags = (item.hashtags || []).join(' ')
   const fakeLikes = Math.floor(Math.random() * 900) + 100
+  const isCarousel = (item.format || '').toLowerCase().includes('carousel')
+  const SLIDE_COUNT = isCarousel ? 3 : 1
+  const [slideIdx, setSlideIdx] = useState(0)
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }} onClick={onClose}>
@@ -66,16 +70,48 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827' }}>{handle}</div>
-            <div style={{ fontSize: '0.68rem', color: '#6b7280' }}>Original audio</div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9' }}>{handle}</div>
+            <div style={{ fontSize: '0.68rem', color: '#9ca3af' }}>Original audio</div>
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
-          <span style={{ color: '#6b7280', fontSize: '1.1rem', cursor: 'pointer' }}>···</span>
+          <span style={{ fontSize: '0.75rem', color: '#60a5fa', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
+          <span style={{ color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer' }}>···</span>
         </div>
-        <div style={{ width: '100%', aspectRatio: '4/5', background: '#fff', position: 'relative', overflow: 'hidden' }}>
-          {thumb ? <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder item={item} />}
+        {/* Image / Carousel */}
+        <div style={{ width: '100%', aspectRatio: '4/5', background: '#1a1a1a', position: 'relative', overflow: 'hidden' }}>
+          {slideIdx === 0 ? (
+            thumb ? <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder item={item} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', background: '#2a2a2a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>Slide {slideIdx + 1}</span>
+            </div>
+          )}
+          {/* Slide counter */}
+          {isCarousel && (
+            <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', borderRadius: 20, padding: '2px 8px', fontSize: '0.68rem', color: '#fff', fontWeight: 600 }}>
+              {slideIdx + 1} / {SLIDE_COUNT}
+            </div>
+          )}
+          {/* Prev arrow */}
+          {isCarousel && slideIdx > 0 && (
+            <button onClick={e => { e.stopPropagation(); setSlideIdx(i => i - 1) }}
+              style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.55)', border: 'none', borderRadius: '50%', width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+          )}
+          {/* Next arrow */}
+          {isCarousel && slideIdx < SLIDE_COUNT - 1 && (
+            <button onClick={e => { e.stopPropagation(); setSlideIdx(i => i + 1) }}
+              style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.55)', border: 'none', borderRadius: '50%', width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          )}
+          {/* Dots */}
           <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
+            {Array.from({ length: SLIDE_COUNT }).map((_, i) => (
+              <div key={i} onClick={e => { e.stopPropagation(); setSlideIdx(i) }}
+                style={{ width: isCarousel ? 5 : 6, height: isCarousel ? 5 : 6, borderRadius: '50%', background: i === slideIdx ? '#fff' : 'rgba(255,255,255,0.4)', cursor: isCarousel ? 'pointer' : 'default', transition: 'background 0.15s' }} />
+            ))}
           </div>
         </div>
         <div style={{ padding: '10px 14px 6px', display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -311,6 +347,7 @@ export default function StudioModule({ initialContents, products, initialNotific
   const [tab, setTab] = useState<Tab>('antrian')
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
   const [igTab, setIgTab] = useState<IGTab>('grid')
+  const [platformTab, setPlatformTab] = useState<PlatformTab>('ig')
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null)
   const [previewPost, setPreviewPost] = useState<ContentItem | null>(null)
   const [previewReels, setPreviewReels] = useState<ContentItem | null>(null)
@@ -398,8 +435,7 @@ export default function StudioModule({ initialContents, products, initialNotific
         <div style={{ display: 'flex', gap: 4, paddingBottom: 2 }}>
           {([
             { mode: 'cards' as ViewMode, label: 'Daftar' },
-            { mode: 'ig' as ViewMode, label: 'IG Grid' },
-            { mode: 'feed' as ViewMode, label: 'Feed' },
+            { mode: 'platform' as ViewMode, label: 'Preview Platform' },
           ]).map(v => (
             <button key={v.mode} onClick={() => setViewMode(v.mode)}
               style={{ padding: '5px 12px', borderRadius: 8, fontSize: '0.78rem', border: viewMode === v.mode ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: viewMode === v.mode ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: viewMode === v.mode ? '#1a73e8' : '#6b7280', cursor: 'pointer', fontWeight: 600 }}>
@@ -424,8 +460,25 @@ export default function StudioModule({ initialContents, products, initialNotific
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
           {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
         </div>
-      ) : viewMode === 'ig' ? (
-        /* IG Profile Mockup */
+      ) : viewMode === 'platform' ? (
+        /* Platform Preview */
+        <div>
+          {/* Platform tabs */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+            {([
+              { key: 'ig' as PlatformTab, label: 'Instagram', color: '#e1306c' },
+              { key: 'tiktok' as PlatformTab, label: 'TikTok', color: '#010101' },
+              { key: 'youtube' as PlatformTab, label: 'YouTube', color: '#ff0000' },
+            ] as { key: PlatformTab; label: string; color: string }[]).map(p => (
+              <button key={p.key} onClick={() => setPlatformTab(p.key)}
+                style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 600, border: platformTab === p.key ? `1.5px solid ${p.color}` : '1px solid #e5e7eb', background: platformTab === p.key ? `${p.color}12` : '#f8fafc', color: platformTab === p.key ? p.color : '#6b7280', cursor: 'pointer', transition: 'all 0.15s' }}>
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* ─── INSTAGRAM ─── */}
+          {platformTab === 'ig' && (
         <div style={{ maxWidth: 480, margin: '0 auto', background: '#fff', borderRadius: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
           {/* Top bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px' }}>
@@ -507,31 +560,103 @@ export default function StudioModule({ initialContents, products, initialNotific
             )
           })()}
         </div>
-      ) : (
-        /* Feed 4:5 portrait */
-        <div>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#69C9D0', display: 'inline-block' }} />
-            Feed Preview 4:5 — IG portrait / TikTok foto
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3, maxWidth: 440, background: '#f0f5f9', padding: 3, borderRadius: 4 }}>
-            {filtered.map(c => {
-              const thumb = getThumbnail(c)
-              return (
-                <div key={c.id} style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', cursor: 'pointer', background: '#fff' }}
-                  onMouseEnter={() => setHoveredId(c.id)} onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => setPreviewPost(c)}>
-                  {thumb ? <img src={thumb} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
-                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.72)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 10, gap: 6, opacity: hoveredId === c.id ? 1 : 0, transition: 'opacity 0.2s' }}>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#111827', textAlign: 'center', lineHeight: 1.3 }}>{(c.judul || '(Tanpa judul)').slice(0, 40)}</div>
-                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#6b7280', background: STATUS_BG[c.status] || '#f3f4f6', fontWeight: 600 }}>{c.status}</span>
-                    {c.canva_url && <a href={c.canva_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.62rem', color: '#1a73e8', textDecoration: 'underline' }}>Canva ↗</a>}
+          )}
+
+          {/* ─── TIKTOK ─── */}
+          {platformTab === 'tiktok' && (
+            <div style={{ maxWidth: 400, margin: '0 auto' }}>
+              {/* TikTok header */}
+              <div style={{ background: '#010101', borderRadius: '16px 16px 0 0', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <svg width="70" height="20" viewBox="0 0 70 20"><text y="16" fontSize="16" fontWeight="800" fill="#fff" fontFamily="system-ui">TikTok</text></svg>
+                <span style={{ color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}>@{handle}</span>
+              </div>
+              {/* Profile row */}
+              <div style={{ background: '#010101', padding: '0 16px 14px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#1a1a1a', border: '2px solid #ff0050', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.3rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem' }}>@{handle}</div>
+                  <div style={{ display: 'flex', gap: 14, marginTop: 4 }}>
+                    {[['Video', filtered.length], ['Suka', '12.3K']].map(([k, v]) => (
+                      <div key={k as string} style={{ textAlign: 'center' }}>
+                        <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}>{v}</div>
+                        <div style={{ color: '#9ca3af', fontSize: '0.65rem' }}>{k}</div>
+                      </div>
+                    ))}
                   </div>
-                  {hoveredId !== c.id && <div style={{ position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#6b7280', boxShadow: '0 0 4px rgba(0,0,0,0.5)' }} />}
                 </div>
-              )
-            })}
-          </div>
+                <button style={{ background: '#ff0050', border: 'none', borderRadius: 4, padding: '7px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>Ikuti</button>
+              </div>
+              {/* 2-col 9:16 grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: '#010101', padding: '2px 0 12px' }}>
+                {filtered.map(c => {
+                  const t = getThumbnail(c)
+                  const isVid = VIDEO_FORMATS.includes(c.format)
+                  const fakeLike = `${Math.floor(Math.random() * 9) + 1}.${Math.floor(Math.random() * 9)}K`
+                  return (
+                    <div key={c.id} style={{ position: 'relative', aspectRatio: '9/16', overflow: 'hidden', cursor: 'pointer', background: '#1a1a1a' }}
+                      onMouseEnter={() => setHoveredId(c.id)} onMouseLeave={() => setHoveredId(null)}
+                      onClick={() => isVid ? setPreviewReels(c) : setPreviewPost(c)}>
+                      {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 6px 6px', background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
+                        <div style={{ fontSize: '0.55rem', color: '#fff', lineHeight: 1.3, marginBottom: 3 }}>{(c.judul || '').slice(0, 28)}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                          <span style={{ fontSize: '0.5rem', color: '#fff' }}>{fakeLike}</span>
+                        </div>
+                      </div>
+                      <div style={{ position: 'absolute', top: 4, right: 4, width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#6b7280' }} />
+                    </div>
+                  )
+                })}
+                {filtered.length === 0 && (
+                  <div style={{ gridColumn: '1/-1', padding: '40px 20px', textAlign: 'center', color: '#4b5563', fontSize: '0.78rem' }}>Belum ada konten</div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ─── YOUTUBE ─── */}
+          {platformTab === 'youtube' && (
+            <div style={{ maxWidth: 560, margin: '0 auto' }}>
+              {/* YT header */}
+              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '14px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.1rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{workspaceName}</div>
+                  <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>@{handle} · {filtered.length} video</div>
+                </div>
+                <button style={{ marginLeft: 'auto', background: '#111827', border: 'none', borderRadius: 20, padding: '7px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>Subscribe</button>
+              </div>
+              {/* Video list */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {filtered.map(c => {
+                  const t = getThumbnail(c)
+                  const fakeViews = `${Math.floor(Math.random() * 90) + 10}K`
+                  return (
+                    <div key={c.id} style={{ display: 'flex', gap: 10, cursor: 'pointer', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                      onClick={() => setSelectedItem(c)}>
+                      <div style={{ width: 160, height: 90, flexShrink: 0, background: '#f3f4f6', position: 'relative', overflow: 'hidden' }}>
+                        {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
+                        <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.8)', borderRadius: 3, padding: '1px 5px', fontSize: '0.58rem', color: '#fff', fontWeight: 600 }}>
+                          {c.format || 'Video'}
+                        </div>
+                      </div>
+                      <div style={{ flex: 1, padding: '10px 12px 10px 0' }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827', lineHeight: 1.35, marginBottom: 4 }}>{c.judul || '(Tanpa judul)'}</div>
+                        <div style={{ fontSize: '0.68rem', color: '#6b7280' }}>{handle} · {fakeViews} views</div>
+                        <div style={{ marginTop: 5 }}>
+                          <span style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#6b7280', background: STATUS_BG[c.status] || '#f3f4f6', fontWeight: 600 }}>{c.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                {filtered.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280', fontSize: '0.82rem' }}>Belum ada konten</div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
