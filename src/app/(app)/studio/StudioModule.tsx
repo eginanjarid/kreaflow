@@ -306,6 +306,8 @@ export default function StudioModule({ initialContents, products, initialNotific
   const supabase = createClient()
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
+  useEffect(() => { setContents(initialContents) }, [initialContents])
+  useEffect(() => { setNotifications(initialNotifications) }, [initialNotifications])
   const [tab, setTab] = useState<Tab>('antrian')
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
   const [igTab, setIgTab] = useState<IGTab>('grid')
@@ -411,8 +413,12 @@ export default function StudioModule({ initialContents, products, initialNotific
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
           <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5"/></svg></div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Tidak ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
-          {tab === 'antrian' && <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Setelah copywriter simpan naskah di Plan, konten akan muncul di sini</div>}
+          <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Belum ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
+          <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>
+            {tab === 'antrian' && 'Setelah copywriter simpan naskah di Plan, konten akan muncul di sini'}
+            {tab === 'dikerjakan' && 'Buka konten di Antrian → klik "Simpan Progress" untuk memindahkannya ke sini'}
+            {tab === 'selesai' && 'Buka konten di Antrian atau Dikerjakan → klik "Tandai Selesai" untuk memindahkannya ke sini'}
+          </div>
         </div>
       ) : viewMode === 'cards' ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
