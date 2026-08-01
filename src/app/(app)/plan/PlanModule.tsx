@@ -606,21 +606,34 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 {localQueue.map(item => {
                   const isRevisi = item.status === 'Revisi'
                   const isActive = activeQueueId === item.id
-                  const pillarOrProd = item.judul.split(' — ')[0]
+                  const parts = item.judul.split(' — ')
+                  const pillarName = parts[0]
+                  const contentLabel = parts[1] || null
                   return (
                     <button key={item.id} type="button" onClick={() => selectQueueItem(item)}
-                      style={{ flexShrink: 0, width: 172, textAlign: 'left', background: isActive ? (isRevisi ? 'rgba(220,38,38,0.06)' : 'rgba(26,115,232,0.06)') : '#f9fafb', border: `1.5px solid ${isActive ? (isRevisi ? '#dc2626' : '#1a73e8') : '#f3f4f6'}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                      style={{ flexShrink: 0, width: 180, textAlign: 'left', background: isActive ? (isRevisi ? 'rgba(220,38,38,0.06)' : 'rgba(26,115,232,0.06)') : '#f9fafb', border: `1.5px solid ${isActive ? (isRevisi ? '#dc2626' : '#1a73e8') : '#f3f4f6'}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
                         <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: isRevisi ? 'rgba(220,38,38,0.1)' : 'rgba(26,115,232,0.1)', color: isRevisi ? '#dc2626' : '#1a73e8' }}>
                           {isRevisi ? 'REVISI' : 'DRAFT'}
                         </span>
                         {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
                       </div>
-                      <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={pillarOrProd}>
-                        {pillarOrProd}
+                      <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.8rem', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
+                        {pillarName}
                       </div>
+                      {contentLabel && (
+                        <div style={{ fontSize: '0.72rem', color: '#1a73e8', fontWeight: 600, marginBottom: 3 }}>
+                          {contentLabel}
+                        </div>
+                      )}
+                      {item.tanggal_tayang && (
+                        <div style={{ fontSize: '0.65rem', color: '#059669', fontWeight: 600, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span>📅</span>
+                          <span>{new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}</span>
+                        </div>
+                      )}
                       {item.sprint_nama && (
-                        <div style={{ fontSize: '0.68rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: '0.65rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {item.sprint_nama}
                         </div>
                       )}
