@@ -48,12 +48,12 @@ type ManualTask = {
   id?: string
   workspace_id: string
   nama: string
-  platform: string
+  platform: string | null
   priority: string
-  start_date: string
-  due_date: string
+  start_date: string | null
+  due_date: string | null
   percent_complete: number
-  notes: string
+  notes: string | null
 }
 
 // ── Sprint templates ──────────────────────────────────────────────────────────
