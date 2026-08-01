@@ -114,6 +114,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     .map(q => ({ id: q.id, judul: q.judul, product_id: q.product_id, sprint_id: q.sprint_id! }))
 
   const [activeQueueId, setActiveQueueId] = useState<string | null>(null)
+  const [freeMode, setFreeMode] = useState(false)
   const [localQueue, setLocalQueue] = useState<QueueItem[]>(queue)
   useEffect(() => { setLocalQueue(queue) }, [queue])
   const sprintLockedItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId && q.sprint_id) ?? null : null
@@ -122,6 +123,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     if (!id) return
     setLocalQueue(prev => prev.filter(q => q.id !== id))
     setActiveQueueId(null)
+    setFreeMode(false)
   }
 
   // Naskah Generator state
@@ -175,6 +177,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     // Toggle deselect
     if (activeQueueId === item.id) { setActiveQueueId(null); return }
     setActiveQueueId(item.id)
+    setFreeMode(false)
     const pillarName = item.judul.split(' — ')[0]
 
     if (!isAffiliate || item.status === 'Revisi') {
@@ -649,6 +652,24 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             </div>
           )}
 
+          {/* ── Empty state: antrian ada tapi belum dipilih & bukan free mode ── */}
+          {localQueue.length > 0 && !activeQueueId && !freeMode ? (
+            <div style={{ background: '#f9fafb', border: '1.5px dashed #e5e7eb', borderRadius: 16, padding: '36px 24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '1.5rem', marginBottom: 12 }}>☝️</div>
+              <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.95rem', marginBottom: 6 }}>Pilih konten dari antrian di atas</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 20 }}>Klik salah satu kartu antrian untuk auto-isi form sesuai brief sprint</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+                <div style={{ height: 1, width: 40, background: '#e5e7eb' }} />
+                <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>atau</span>
+                <div style={{ height: 1, width: 40, background: '#e5e7eb' }} />
+              </div>
+              <button type="button" onClick={() => { setFreeMode(true); setActiveQueueId(null) }}
+                style={{ marginTop: 16, background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 24px', color: '#374151', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                Buat Naskah Bebas
+              </button>
+            </div>
+          ) : (
+          <>
           {/* Mode switcher — hanya tampil kalau isAffiliate */}
           {isAffiliate && (
             <div style={{ display: 'flex', gap: 0, background: '#f3f4f6', border: 'none', borderRadius: 10, overflow: 'hidden', alignSelf: 'flex-start' }}>
@@ -1210,6 +1231,8 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               </div>{/* END RIGHT column */}
             </div>
           )}
+          </>
+          )}{/* END empty-state ternary */}
         </div>
       )}
 
