@@ -148,9 +148,9 @@ const WEEKLY_DAYS = [
   { idx: 4, label: 'Kamis' }, { idx: 5, label: 'Jumat' }, { idx: 6, label: 'Sabtu' }, { idx: 0, label: 'Minggu' },
 ]
 type DaySlot = { format: string; pillar_id: string; jam: string }
-type DayPattern = { active: boolean; slots: DaySlot[] }
+type DayPattern = { active: boolean; date: string; slots: DaySlot[] }
 const defaultSlot = (): DaySlot => ({ format: '', pillar_id: '', jam: '18:00' })
-const defaultDayPattern = (): DayPattern => ({ active: false, slots: [defaultSlot()] })
+const defaultDayPattern = (): DayPattern => ({ active: false, date: '', slots: [defaultSlot()] })
 const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
 const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
 const FORMATS_CREATOR = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Thread/Caption', 'Lainnya']
@@ -336,7 +336,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintPillars, setSprintPillars] = useState<{ pillar_id: string; jumlah: number; mulai: string; interval: number; jam: string; format: string }[]>([{ pillar_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00', format: '' }])
   // Weekly pattern mode
   const [slotMode, setSlotMode] = useState<'slots' | 'weekly'>('slots')
-  const [weeklyRange, setWeeklyRange] = useState({ start: '', end: '' })
   const [weeklyPattern, setWeeklyPattern] = useState<Record<number, DayPattern>>({
     0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(),
     3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern(),
@@ -412,7 +411,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
     setSprintPillars([{ pillar_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00', format: '' }])
     setSlotMode('slots')
-    setWeeklyRange({ start: '', end: '' })
     setWeeklyPattern({ 0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(), 3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern() })
     // Auto-select all registered accounts (mirror posting)
     setSelectedAkunIds(accounts.map(a => a.id))
@@ -424,7 +422,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // Auto-calculate sprint date range from slot posting dates
   function calcSprintDates() {
-    if (slotMode === 'weekly') return { start: weeklyRange.start, end: weeklyRange.end }
+    if (slotMode === 'weekly') {
+      const dates = Object.values(weeklyPattern).filter(dp => dp.active && dp.date).map(dp => dp.date).sort()
+      return { start: dates[0] || '', end: dates[dates.length - 1] || '' }
+    }
     const slots = isAffiliate ? sprintProducts : sprintPillars
     const dates = slots.map(r => r.mulai).filter(Boolean).sort()
     if (!dates.length) return { start: '', end: '' }
@@ -481,34 +482,26 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
       let items: object[] = []
 
-      if (slotMode === 'weekly' && weeklyRange.start && weeklyRange.end) {
-        // Generate from weekly pattern
-        const cur = new Date(weeklyRange.start + 'T00:00:00')
-        const endD = new Date(weeklyRange.end + 'T00:00:00')
-        const counterPerDay: Record<number, number> = {}
-        while (cur <= endD) {
-          const dayIdx = cur.getDay()
-          const dp = weeklyPattern[dayIdx]
-          if (dp.active) {
-            const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
-            dp.slots.filter(s => s.format).forEach(slot => {
-              counterPerDay[dayIdx] = (counterPerDay[dayIdx] || 0) + 1
-              const pillar = pillars.find(p => p.id === slot.pillar_id)
-              items.push({
-                workspace_id: workspaceId,
-                sprint_id: sprint.id,
-                judul: pillar ? `${pillar.nama} — ${slot.format} ${counterPerDay[dayIdx]}` : `${slot.format} ${counterPerDay[dayIdx]}`,
-                status: 'Draft',
-                format: slot.format,
-                platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
-                tanggal_tayang: dateStr,
-                jam_tayang: slot.jam || null,
-                ...assignByCol,
-              })
+      if (slotMode === 'weekly') {
+        // Generate from weekly pattern — each active day with a date produces its slots
+        WEEKLY_DAYS.forEach(({ idx }) => {
+          const dp = weeklyPattern[idx]
+          if (!dp.active || !dp.date) return
+          dp.slots.filter(s => s.format).forEach((slot, si) => {
+            const pillar = pillars.find(p => p.id === slot.pillar_id)
+            items.push({
+              workspace_id: workspaceId,
+              sprint_id: sprint.id,
+              judul: pillar ? `${pillar.nama} — ${slot.format} ${si + 1}` : `${slot.format} ${si + 1}`,
+              status: 'Draft',
+              format: slot.format,
+              platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
+              tanggal_tayang: dp.date,
+              jam_tayang: slot.jam || null,
+              ...assignByCol,
             })
-          }
-          cur.setDate(cur.getDate() + 1)
-        }
+          })
+        })
       } else {
         // Generate from slot rows
         const rows = activeSlots.filter(r => r.jumlah > 0)
@@ -1326,31 +1319,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {/* WEEKLY PATTERN */}
                 {slotMode === 'weekly' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                      <div>
-                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Dari Tanggal</div>
-                        <input type="date" value={weeklyRange.start} onChange={e => setWeeklyRange(r => ({ ...r, start: e.target.value }))}
-                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Sampai Tanggal</div>
-                        <input type="date" value={weeklyRange.end} onChange={e => setWeeklyRange(r => ({ ...r, end: e.target.value }))}
-                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
-                      </div>
-                    </div>
-                    {weeklyRange.start && weeklyRange.end && (
-                      <div style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 6, padding: '5px 8px' }}>
-                        {(() => {
-                          const ms = new Date(weeklyRange.end + 'T00:00:00').getTime() - new Date(weeklyRange.start + 'T00:00:00').getTime()
-                          const days = Math.round(ms / 86400000) + 1
-                          const activeDays = WEEKLY_DAYS.filter(d => weeklyPattern[d.idx].active && weeklyPattern[d.idx].slots.some(s => s.format))
-                          const slotsPerWeek = activeDays.reduce((sum, d) => sum + weeklyPattern[d.idx].slots.filter(s => s.format).length, 0)
-                          const weeks = Math.floor(days / 7)
-                          const estTotal = weeks * slotsPerWeek + (activeDays.length > 0 ? slotsPerWeek : 0)
-                          return `Durasi ${days} hari · ${activeDays.length} hari aktif/minggu · ≈${weeks * slotsPerWeek} konten`
-                        })()}
-                      </div>
-                    )}
+                    {(() => {
+                      const readyDays = WEEKLY_DAYS.filter(d => weeklyPattern[d.idx].active && weeklyPattern[d.idx].date && weeklyPattern[d.idx].slots.some(s => s.format))
+                      const totalSlots = readyDays.reduce((sum, d) => sum + weeklyPattern[d.idx].slots.filter(s => s.format).length, 0)
+                      return readyDays.length > 0 ? (
+                        <div style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 6, padding: '5px 8px' }}>
+                          {readyDays.length} hari aktif · {totalSlots} konten akan di-generate
+                        </div>
+                      ) : null
+                    })()}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {WEEKLY_DAYS.map(({ idx, label }) => {
                         const dp = weeklyPattern[idx]
@@ -1364,8 +1341,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                 {dp.active && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                               </button>
                               <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dp.active ? '#111827' : '#9ca3af', width: 52, flexShrink: 0 }}>{label}</span>
-                              {dp.active && dp.slots.length > 0 && (
-                                <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{dp.slots.filter(s => s.format).length} konten</span>
+                              {dp.active && (
+                                <input type="date" value={dp.date} onChange={e => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], date: e.target.value } }))}
+                                  style={{ flex: 1, background: '#fff', border: `1px solid ${dp.date ? 'rgba(26,115,232,0.3)' : '#e5e7eb'}`, borderRadius: 6, padding: '3px 6px', fontSize: '0.72rem', outline: 'none', color: dp.date ? '#111827' : '#9ca3af' }} />
+                              )}
+                              {dp.active && dp.slots.filter(s => s.format).length > 0 && (
+                                <span style={{ fontSize: '0.62rem', color: '#6b7280', flexShrink: 0 }}>{dp.slots.filter(s => s.format).length} konten</span>
                               )}
                             </div>
                             {/* Slots per day */}
