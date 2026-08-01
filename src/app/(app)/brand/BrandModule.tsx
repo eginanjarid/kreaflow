@@ -327,6 +327,7 @@ export default function BrandModule({
   }
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  function changeTab(id: string) { setTab(id); setSaved(false) }
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState('')
   const [aiModal, setAiModal] = useState<{ prompt: string } | null>(null)
@@ -795,49 +796,41 @@ Jangan tambahkan penjelasan panjang, tips tambahan, atau tabel. Langsung ke outp
   }
 
   function buildAffKontenPrompt(): string {
-    const tipe = profile.affiliate_tipe === 'store' ? 'Niche Store' : 'Personal Brand Affiliator'
+    const tipe = profile.affiliate_tipe === 'store' ? 'Niche Store (akun khusus produk, bukan personal)' : 'Personal Brand Affiliator'
     const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
+    const microNiche = profile.affiliate_micro_niche || '[belum diisi]'
     const targetBuyer = profile.affiliate_target_buyer || '[belum diisi]'
-    const positioning = profile.affiliate_positioning || '[belum dipilih]'
     const namaUtama = (profile.affiliate_nama_options || []).find(n => n.is_primary)?.nama || '[belum dipilih]'
+    const positioning = profile.affiliate_positioning || '[belum dipilih]'
     const platforms = (profile.affiliate_platforms || []).join(', ') || 'TikTok Shop'
-    return `Kamu adalah content strategist yang spesialis membantu akun affiliate Indonesia membangun konten yang build trust sekaligus convert penjualan.
-
-Jawab seluruhnya dalam Bahasa Indonesia. Fokus pada TikTok sebagai platform utama jika tidak disebutkan lain.
-
----
+    return `Kamu adalah content strategist spesialis akun affiliate Indonesia 2026.
 
 DATA AKUN
-
 Nama akun: ${namaUtama}
 Tipe: ${tipe}
-Kategori produk: ${kategori}
+Kategori: ${kategori}
+Micro-niche: ${microNiche}
 Target pembeli: ${targetBuyer}
 Positioning: ${positioning}
-Platform affiliate: ${platforms}
+Platform: ${platforms}
+
+Jawab dalam Bahasa Indonesia. Berikan HANYA 1 output berikut — tidak lebih, tidak kurang:
 
 ---
 
-YANG SAYA BUTUHKAN:
-
-▸ CONTENT PILLARS (5-6 pillar)
-Tulis dalam format ini agar langsung bisa saya salin:
-1. [Nama Pillar] — [deskripsi singkat tujuan pillar ini]
+① CONTENT PILLARS (5 pillar)
+Format — langsung bisa copy-paste:
+1. [Nama Pillar] — [deskripsi singkat 1 kalimat, tujuan pillar ini]
 2. [Nama Pillar] — [deskripsi singkat]
-dst.
-Pastikan ada mix: educate / entertain / convert. Frekuensi posting per pillar per minggu.
+3. [Nama Pillar] — [deskripsi singkat]
+4. [Nama Pillar] — [deskripsi singkat]
+5. [Nama Pillar] — [deskripsi singkat]
 
-▸ HOOK FORMULA (5 template)
-Template kalimat pembuka 3 detik pertama yang proven untuk niche ${kategori} di ${platforms}.
-Format per template:
-• Template: "[kalimat hook dengan placeholder]"
-  Contoh nyata: "[contoh yang langsung bisa dipakai]"
-
-Naskah detail, kalender konten, dan strategi viral → lebih baik dikerjakan langsung di sesi konten planning terpisah.
+Pastikan ada mix: educate / entertain / convert. Sesuaikan dengan micro-niche dan target pembeli di atas.
 
 ---
 
-Output harus bisa langsung saya copy-paste ke 2 field: Content Pillars dan Hook Formula.`
+Hook formula, naskah, dan kalender posting → dikerjakan di modul Plan. Jangan tambahkan itu di sini.`
   }
 
   function buildAffiliatePrompt(): string {
@@ -950,7 +943,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
           {TABS.map(t => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => changeTab(t.id)}
               style={{
                 padding: '10px 16px', background: 'transparent', border: 'none',
                 borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent',
@@ -1864,7 +1857,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <SaveButton loading={saving} saved={saved} />
-                  <button type="button" onClick={() => setTab('aff-identity')}
+                  <button type="button" onClick={() => changeTab('aff-identity')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Identitas Akun →
                   </button>
@@ -1948,10 +1941,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => setTab('aff-niche')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                    <button type="button" onClick={() => changeTab('aff-niche')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
-                  <button type="button" onClick={() => setTab('aff-konten')}
+                  <button type="button" onClick={() => changeTab('aff-konten')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Konten Strategy →
                   </button>
@@ -1962,7 +1955,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         {tab === 'aff-konten' && sectionCard(<>
                 <div>
                   <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Konten Strategy</div>
-                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Generate AI → simpan content pillars + hook formula → eksekusi naskah di modul Plan</div>
+                  <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Generate AI → simpan content pillars → eksekusi naskah di modul Plan</div>
                 </div>
 
                 {/* Step 1: Generate */}
@@ -1970,7 +1963,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate Strategi Konten</div>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat content pillars + hook formula khusus niche kamu</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat content pillars khusus niche kamu</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffKontenPrompt() })}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
@@ -1983,7 +1976,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#d1fae5', border: '1px solid #34d399', color: '#059669', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
                   <div>
                     <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI</div>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Paste bagian Content Pillars dan Hook Formula dari hasil AI ke field di bawah</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Paste Content Pillars dari hasil AI ke field di bawah</div>
                   </div>
                 </div>
 
@@ -1992,13 +1985,6 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                   <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Tema besar konten yang membentuk identitas akun</div>
                   <textarea style={fieldStyle({ height: 110, resize: 'none' })} value={profile.affiliate_content_pillars} onChange={e => setField('affiliate_content_pillars', e.target.value)}
                     placeholder={'cth:\n1. Review Jujur — test produk sebelum rekomendasiin\n2. Deal Alert — info flash sale & promo\n3. Tutorial — cara pakai produk yang bener\n4. Perbandingan — A vs B, mana worth it?'} />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Hook Formula <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
-                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Template kalimat pembuka 3 detik pertama yang proven untuk niche kamu</div>
-                  <textarea style={fieldStyle({ height: 90, resize: 'none' })} value={profile.affiliate_hook_style} onChange={e => setField('affiliate_hook_style', e.target.value)}
-                    placeholder={'cth:\n• "Jangan beli [produk] sebelum tonton ini..."\n• "Aku test [produk] selama 30 hari, hasilnya..."\n• "Kalau budget kamu [Rp X], mending pilih yang ini..."'} />
                 </div>
 
                 {/* CTA ke Plan */}
@@ -2013,10 +1999,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => setTab('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                    <button type="button" onClick={() => changeTab('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
-                  <button type="button" onClick={() => setTab('aff-bio')}
+                  <button type="button" onClick={() => changeTab('aff-bio')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Bio & Trust →
                   </button>
@@ -2111,7 +2097,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <button type="button" onClick={() => setTab('aff-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                  <button type="button" onClick={() => changeTab('aff-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                   <SaveButton loading={saving} saved={saved} />
                 </div>
               </>)}
