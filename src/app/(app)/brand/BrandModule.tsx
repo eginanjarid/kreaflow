@@ -74,16 +74,25 @@ type BioOption = { id: string; teks: string; is_primary: boolean }
 type BioOptions = { tiktok?: BioOption[]; instagram?: BioOption[]; youtube?: BioOption[]; linkedin?: BioOption[]; facebook?: BioOption[] }
 type AffNamaOption = { id: string; nama: string; alasan: string; is_primary: boolean }
 
-const TABS_BASE = [
-  { id: 'overview', label: 'Frekuensi', affiliateOnly: false },
-  { id: 'identity', label: 'Account Identity', affiliateOnly: false },
-  { id: 'niche', label: 'Niche Hunt', affiliateOnly: false },
-  { id: 'story', label: 'Origin Story', affiliateOnly: false },
-  { id: 'pillars', label: 'Content Pillars', affiliateOnly: false },
-  { id: 'bio', label: 'Bio Studio', affiliateOnly: false },
-  { id: 'visual', label: 'Brand Identity', affiliateOnly: false },
-  { id: 'akun', label: 'Akun Sosial', affiliateOnly: false },
-  { id: 'affiliate', label: 'Affiliator Brand', affiliateOnly: true },
+const CREATOR_TABS = [
+  { id: 'overview',  label: 'Frekuensi' },
+  { id: 'identity',  label: 'Account Identity' },
+  { id: 'niche',     label: 'Niche Hunt' },
+  { id: 'story',     label: 'Origin Story' },
+  { id: 'pillars',   label: 'Content Pillars' },
+  { id: 'bio',       label: 'Bio Studio' },
+  { id: 'visual',    label: 'Brand Identity' },
+  { id: 'akun',      label: 'Akun Sosial' },
+]
+
+const AFFILIATE_TABS = [
+  { id: 'overview',      label: 'Brand Score' },
+  { id: 'aff-niche',     label: 'Profil & Target' },
+  { id: 'aff-identity',  label: 'Identitas Akun' },
+  { id: 'aff-konten',    label: 'Konten Strategy' },
+  { id: 'aff-bio',       label: 'Bio & Trust' },
+  { id: 'akun',          label: 'Akun Sosial' },
+  { id: 'visual',        label: 'Brand Visual' },
 ]
 
 const PLATFORMS_SOSMED = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Twitter/X', 'LinkedIn']
@@ -118,6 +127,20 @@ const FREQ_CHECKS = [
   { key: 'premis', label: 'Origin Story / Premis', tab: 'story' },
   { key: 'bio_instagram', label: 'Bio Sosmed (minimal 1)', tab: 'bio' },
   { key: 'color_palette', label: 'Color Palette Brand', tab: 'visual' },
+] as const
+
+const AFFILIATE_FREQ_CHECKS = [
+  { key: 'affiliate_tipe',           label: 'Tipe Akun',          tab: 'aff-niche' },
+  { key: 'affiliate_kategori_fokus', label: 'Kategori Fokus',     tab: 'aff-niche' },
+  { key: 'affiliate_platforms',      label: 'Platform Affiliate', tab: 'aff-niche' },
+  { key: 'affiliate_target_buyer',   label: 'Target Pembeli',     tab: 'aff-niche' },
+  { key: 'affiliate_positioning',    label: 'Positioning',        tab: 'aff-identity' },
+  { key: 'affiliate_tagline',        label: 'Tagline Akun',       tab: 'aff-identity' },
+  { key: 'affiliate_content_pillars',label: 'Content Pillars',    tab: 'aff-konten' },
+  { key: 'affiliate_hook_style',     label: 'Hook Formula',       tab: 'aff-konten' },
+  { key: 'affiliate_trust_builder',  label: 'Trust Builder',      tab: 'aff-bio' },
+  { key: 'affiliate_disclosure',     label: 'Disclosure',         tab: 'aff-bio' },
+  { key: 'color_palette',            label: 'Brand Visual',       tab: 'visual' },
 ] as const
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
@@ -231,8 +254,8 @@ export default function BrandModule({
   initialAkun?: SosmedAkun[]
 }) {
   const isAffiliate = modes.includes('affiliate')
-  const TABS = TABS_BASE.filter(t => !t.affiliateOnly || isAffiliate)
-  const [tab, setTab] = useState('overview')
+  const TABS = isAffiliate ? AFFILIATE_TABS : CREATOR_TABS
+  const [tab, setTab] = useState(isAffiliate ? 'aff-niche' : 'overview')
   const [akunList, setAkunList] = useState<SosmedAkun[]>(initialAkun)
   const [akunForm, setAkunForm] = useState({ platform: 'TikTok', handle: '', nama: '' })
   const [savingAkun, setSavingAkun] = useState(false)
@@ -306,7 +329,6 @@ export default function BrandModule({
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoError, setLogoError] = useState('')
   const logoFileRef = useRef<HTMLInputElement>(null)
-  const [affStep, setAffStep] = useState('aff-niche')
 
   async function uploadLogo(file: File) {
     if (!file.type.startsWith('image/')) { setLogoError('File harus berupa gambar'); return }
@@ -900,17 +922,18 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
     </div>
   )
 
-  // Frekuensi level calc
+  // Brand score / Frekuensi level calc
   const hasBio = !!(profile.bio_tiktok || profile.bio_instagram || profile.bio_youtube || profile.bio_linkedin || profile.bio_facebook)
   const hasColorPalette = (profile.color_palette?.length ?? 0) > 0
-  const freqChecked = FREQ_CHECKS.map(c => {
-    if (c.key === 'bio_instagram') return hasBio
+  const ACTIVE_FREQ_CHECKS = isAffiliate ? AFFILIATE_FREQ_CHECKS : FREQ_CHECKS
+  const freqChecked = ACTIVE_FREQ_CHECKS.map(c => {
+    if (!isAffiliate && c.key === 'bio_instagram') return hasBio
     if (c.key === 'color_palette') return hasColorPalette
     const val = profile[c.key as keyof BrandProfile]
     return typeof val === 'string' ? val.trim().length > 0 : Array.isArray(val) ? val.length > 0 : false
   })
   const freqDone = freqChecked.filter(Boolean).length
-  const freqTotal = FREQ_CHECKS.length
+  const freqTotal = ACTIVE_FREQ_CHECKS.length
   const freqPct = Math.round((freqDone / freqTotal) * 100)
   const freqLevelIdx = freqPct >= 90 ? 5 : freqPct >= 70 ? 4 : freqPct >= 50 ? 3 : freqPct >= 30 ? 2 : freqPct >= 10 ? 1 : 0
   const freqLevel = FREQ_LEVELS[freqLevelIdx]
@@ -1027,10 +1050,11 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
             {/* Right: Checklist */}
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
-              <div style={{ fontSize: '0.82rem', color: '#111827', fontWeight: 700, marginBottom: 16 }}>Sinyal yang perlu dikuatkan</div>
+              <div style={{ fontSize: '0.82rem', color: '#111827', fontWeight: 700, marginBottom: 16 }}>{isAffiliate ? 'Profil yang perlu dilengkapi' : 'Sinyal yang perlu dikuatkan'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-                {FREQ_CHECKS.map((check, i) => {
+                {ACTIVE_FREQ_CHECKS.map((check, i) => {
                   const done = freqChecked[i]
+                  const tabLabel = TABS.find(t => t.id === check.tab)?.label || check.tab
                   return (
                     <button key={check.key} type="button" onClick={() => setTab(check.tab)}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, background: done ? 'rgba(52,211,153,0.05)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}>
@@ -1038,7 +1062,7 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                         {done && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </div>
                       <span style={{ fontSize: '0.82rem', color: done ? '#374151' : '#6b7280', textDecoration: done ? 'line-through' : 'none', fontWeight: done ? 400 : 500 }}>{check.label}</span>
-                      {!done && <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: '#6b7280', flexShrink: 0 }}>→ {check.tab === 'identity' ? 'Identity' : check.tab === 'niche' ? 'Niche' : check.tab === 'story' ? 'Story' : check.tab === 'bio' ? 'Bio' : 'Visual'}</span>}
+                      {!done && <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: '#6b7280', flexShrink: 0 }}>→ {tabLabel}</span>}
                     </button>
                   )
                 })}
@@ -1671,28 +1695,8 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
         </>)}
 
         {/* Affiliator Brand Tab — full flow with sub-steps */}
-        {tab === 'affiliate' && (() => {
-          const affSteps = [
-            { id: 'aff-niche', label: 'Niche & Target' },
-            { id: 'aff-identity', label: 'Identitas Akun' },
-            { id: 'aff-konten', label: 'Konten Strategy' },
-            { id: 'aff-bio', label: 'Bio & Trust' },
-          ]
-          return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {/* Sub-step tabs */}
-              <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 0, borderBottom: '1px solid #f3f4f6', marginBottom: 24 }}>
-                {affSteps.map((s, i) => (
-                  <button key={s.id} type="button" onClick={() => setAffStep(s.id)}
-                    style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: affStep === s.id ? '2px solid #34d399' : '2px solid transparent', color: affStep === s.id ? '#059669' : '#6b7280', fontSize: '0.82rem', fontWeight: affStep === s.id ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: affStep === s.id ? 'rgba(52,211,153,0.15)' : '#f3f4f6', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, color: affStep === s.id ? '#059669' : '#6b7280', flexShrink: 0 }}>{i + 1}</span>
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* ── Step 1: Niche & Target ── */}
-              {affStep === 'aff-niche' && sectionCard(<>
+        {/* ── Affiliate: Profil & Target ── */}
+        {tab === 'aff-niche' && sectionCard(<>
                 <div>
                   <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Niche & Target Pembeli</div>
                   <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Isi konteks kamu → Generate AI → simpan hasilnya ke field di bawah</div>
@@ -1827,15 +1831,15 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <SaveButton loading={saving} saved={saved} />
-                  <button type="button" onClick={() => setAffStep('aff-identity')}
+                  <button type="button" onClick={() => setTab('aff-identity')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Identitas Akun →
                   </button>
                 </div>
               </>)}
 
-              {/* ── Step 2: Identitas Akun ── */}
-              {affStep === 'aff-identity' && sectionCard(<>
+        {/* ── Affiliate: Identitas Akun ── */}
+        {tab === 'aff-identity' && sectionCard(<>
                 <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Identitas Akun</div>
@@ -1911,18 +1915,18 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => setAffStep('aff-niche')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                    <button type="button" onClick={() => setTab('aff-niche')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
-                  <button type="button" onClick={() => setAffStep('aff-konten')}
+                  <button type="button" onClick={() => setTab('aff-konten')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Konten Strategy →
                   </button>
                 </div>
               </>)}
 
-              {/* ── Step 3: Konten Strategy ── */}
-              {affStep === 'aff-konten' && sectionCard(<>
+        {/* ── Affiliate: Konten Strategy ── */}
+        {tab === 'aff-konten' && sectionCard(<>
                 <div>
                   <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Konten Strategy</div>
                   <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Generate AI → simpan content pillars + hook formula → eksekusi naskah di modul Plan</div>
@@ -1976,18 +1980,18 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => setAffStep('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                    <button type="button" onClick={() => setTab('aff-identity')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
-                  <button type="button" onClick={() => setAffStep('aff-bio')}
+                  <button type="button" onClick={() => setTab('aff-bio')}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Bio & Trust →
                   </button>
                 </div>
               </>)}
 
-              {/* ── Step 4: Bio & Trust ── */}
-              {affStep === 'aff-bio' && sectionCard(<>
+        {/* ── Affiliate: Bio & Trust ── */}
+        {tab === 'aff-bio' && sectionCard(<>
                 <div>
                   <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Trust Builder</div>
                   <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Ceritakan pengalamanmu → Generate AI → simpan hasilnya</div>
@@ -2074,13 +2078,10 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 </div>
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <button type="button" onClick={() => setAffStep('aff-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                  <button type="button" onClick={() => setTab('aff-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
                   <SaveButton loading={saving} saved={saved} />
                 </div>
               </>)}
-            </div>
-          )
-        })()}
       </form>
 
       {/* Content Pillars — own form, must be outside outer form */}
