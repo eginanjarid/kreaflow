@@ -1209,22 +1209,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           ))}
                         </select>
                       )}
-                      {/* Row 3: deadline picker — "Selesai N hari sebelum tayang" */}
+                      {/* Row 3: deadline picker */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '5px 10px' }}>
                         <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>Selesai</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: '#fff', border: '1px solid #fcd34d', borderRadius: 5, overflow: 'hidden', flexShrink: 0 }}>
-                          <button type="button"
-                            onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
-                            style={{ background: 'none', border: 'none', borderRight: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, padding: '0 6px', lineHeight: '24px' }}>−</button>
-                          <input type="number" min={0} max={30}
-                            value={daysBefore}
-                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, parseInt(e.target.value) || 0) } : x))}
-                            style={{ width: 28, background: 'transparent', border: 'none', color: '#d97706', fontSize: '0.82rem', fontWeight: 700, outline: 'none', textAlign: 'center', lineHeight: '24px' }}
-                          />
-                          <button type="button"
-                            onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
-                            style={{ background: 'none', border: 'none', borderLeft: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, padding: '0 6px', lineHeight: '24px' }}>+</button>
-                        </div>
+                        <button type="button"
+                          onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
+                          style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+                        <span style={{ minWidth: 20, textAlign: 'center', color: '#d97706', fontWeight: 800, fontSize: '0.9rem' }}>{daysBefore}</span>
+                        <button type="button"
+                          onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
+                          style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
                         <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>hari sebelum tayang</span>
                       </div>
                     </div>
