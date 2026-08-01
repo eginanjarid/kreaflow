@@ -746,47 +746,52 @@ Jangan tambahkan penjelasan panjang, analisis pasar, atau tabel. Langsung ke poi
   }
 
   function buildAffIdentityPrompt(): string {
-    const tipe = profile.affiliate_tipe === 'store' ? 'Niche Store' : 'Personal Brand Affiliator'
+    const tipe = profile.affiliate_tipe === 'store' ? 'Niche Store (akun khusus produk, bukan personal)' : 'Personal Brand Affiliator'
     const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
+    const microNiche = profile.affiliate_micro_niche || '[belum diisi]'
     const targetBuyer = profile.affiliate_target_buyer || '[belum diisi]'
-    const positioning = profile.affiliate_positioning || '[belum dipilih]'
-    const positioningStatement = profile.affiliate_positioning_statement || ''
+    const competitiveEdge = profile.affiliate_competitive_edge || '[belum diisi]'
     const platforms = (profile.affiliate_platforms || []).join(', ') || 'TikTok Shop'
-    return `Kamu adalah brand naming expert dan copywriter yang spesialis membuat identitas akun affiliate Indonesia yang mudah diingat, dipercaya, dan convert.
-
-Jawab seluruhnya dalam Bahasa Indonesia kecuali nama akun (boleh mix English).
-
----
+    return `Kamu adalah brand identity strategist spesialis akun affiliate Indonesia 2026.
 
 DATA AKUN
-
 Tipe: ${tipe}
-Kategori produk: ${kategori}
+Kategori: ${kategori}
+Micro-niche: ${microNiche}
 Target pembeli: ${targetBuyer}
-Tipe positioning: ${positioning}${positioningStatement ? `\nPositioning statement: ${positioningStatement}` : ''}
-Platform utama: ${platforms}
+Competitive edge: ${competitiveEdge}
+Platform: ${platforms}
+
+Jawab dalam Bahasa Indonesia. Berikan HANYA 3 output berikut — tidak lebih, tidak kurang:
 
 ---
 
-YANG SAYA BUTUHKAN:
+① REKOMENDASI NAMA AKUN (5 pilihan)
+Format setiap nama — satu per baris:
+[Nama Akun] — [alasan singkat 1 kalimat kenapa cocok untuk niche ini]
 
-▸ NAMA AKUN (10 pilihan)
-Format tabel: Nama | Tipe (brand/kata kunci/kombinasi) | Kenapa bagus | Available di TikTok? (prediksi)
-Kriteria: mudah diingat, relate ke niche, bisa jadi "brand", tidak terlalu generik
-Variasi: beberapa pakai .id, beberapa singkat, beberapa deskriptif
-
-▸ TAGLINE (5 pilihan)
-Kalimat singkat 1-2 baris untuk bio. Harus langsung jelas akunnya tentang apa + value proposition-nya.
-
-▸ POSITIONING STATEMENT
-3 versi positioning statement (pendek/medium/panjang) yang jelas membedakan akun ini dari kompetitor
-
-▸ USERNAME FORMULA
-Pola penamaan yang bisa dipakai jika nama utama sudah dipakai orang lain (misal: tambah underscore, angka, dll)
+Kriteria: mudah diingat, relate ke niche, bisa jadi brand jangka panjang. Boleh mix English/Indonesian.
 
 ---
 
-Rekomendasi top 3 nama terbaik di akhir dengan alasan spesifik.`
+② TAGLINE AKUN (3 pilihan)
+Format:
+• [tagline 1]
+• [tagline 2]
+• [tagline 3]
+
+1 kalimat max per tagline. Harus langsung jelas akunnya tentang apa + kenapa harus di-follow.
+
+---
+
+③ POSITIONING STATEMENT
+Tulis 1 kalimat positioning yang jelas membedakan akun ini dari akun affiliate lain di niche yang sama.
+Format: "Satu-satunya akun [niche] yang [cara unik kamu] — bukan [cara kompetitor]"
+Pilih juga 1 tipe positioning yang paling cocok dari: Honest Reviewer / Deal Hunter / Niche Expert / Lifestyle Curator / Tutorial Creator / Comparison Expert / Budget Finder / Premium Curator
+
+---
+
+Jangan tambahkan penjelasan panjang, tips tambahan, atau tabel. Langsung ke outputnya.`
   }
 
   function buildAffKontenPrompt(): string {
