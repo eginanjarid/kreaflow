@@ -1328,12 +1328,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                       <div>
-                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Sprint</div>
+                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Dari Tanggal</div>
                         <input type="date" value={weeklyRange.start} onChange={e => setWeeklyRange(r => ({ ...r, start: e.target.value }))}
                           style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Selesai Sprint</div>
+                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Sampai Tanggal</div>
                         <input type="date" value={weeklyRange.end} onChange={e => setWeeklyRange(r => ({ ...r, end: e.target.value }))}
                           style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
                       </div>
