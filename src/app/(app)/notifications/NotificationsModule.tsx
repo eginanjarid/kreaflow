@@ -21,6 +21,7 @@ const TYPE_CONFIG: Record<string, { color: string; bg: string; label: string; ic
   naskah:   { color: '#d97706', bg: 'rgba(251,191,36,0.1)',  label: 'Naskah',   icon: 'pen', href: '/plan' },
   produksi: { color: '#f97316', bg: 'rgba(249,115,22,0.1)',  label: 'Produksi', icon: 'palette', href: '/studio' },
   schedule: { color: '#a78bfa', bg: 'rgba(66,165,245,0.1)', label: 'Schedule', icon: 'calendar', href: '/calendar' },
+  deadline: { color: '#dc2626', bg: 'rgba(220,38,38,0.08)',  label: 'Deadline', icon: 'clock',    href: '/sprints' },
 }
 
 function relativeTime(ts: string) {

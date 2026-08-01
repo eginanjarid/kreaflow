@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-type StepConfig = { id: string; daysBefore: number; memberName: string }
+type StepConfig = { id: string; daysBefore: number; memberName: string; memberId?: string }
 
 type Sprint = {
   id: string
@@ -478,7 +478,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
     const stepConfigData: StepConfig[] = sprintSteps.map(({ step, memberId, daysBefore }) => {
       const m = workspaceMembers.find(x => x.id === memberId)
-      return { id: step.id, daysBefore, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
+      return { id: step.id, daysBefore, memberId: memberId || undefined, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
     })
 
     const { data: sprint, error } = await supabase.from('kf_sprints').insert({
@@ -1178,7 +1178,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Steps Pekerjaan</div>
                       <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#7c3aed', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Deadline Internal Tim</span>
                     </div>
-                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set kapan setiap step harus selesai — untuk koordinasi tim produksi</div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set <strong>D-N</strong> = berapa hari sebelum tanggal tayang step harus selesai</div>
                   </div>
                   <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{sprintSteps.length} step</span>
                 </div>
@@ -1210,13 +1210,21 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             ))}
                           </select>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '4px 8px', flexShrink: 0 }}>
-                          <span style={{ fontSize: '0.7rem', color: '#92400e', fontWeight: 700, flexShrink: 0 }}>D-</span>
-                          <input type="number" min={0} max={30}
-                            value={daysBefore}
-                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, parseInt(e.target.value) || 0) } : x))}
-                            style={{ width: 36, background: 'transparent', border: 'none', color: '#d97706', fontSize: '0.82rem', fontWeight: 700, outline: 'none', textAlign: 'center' }}
-                          />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
+                          <button type="button"
+                            onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
+                            style={{ background: 'none', border: 'none', borderRight: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '1rem', fontWeight: 700, padding: '0 7px', lineHeight: '30px', flexShrink: 0 }}>−</button>
+                          <div style={{ display: 'flex', alignItems: 'center', padding: '0 5px', gap: 1 }}>
+                            <span style={{ fontSize: '0.7rem', color: '#92400e', fontWeight: 700 }}>D-</span>
+                            <input type="number" min={0} max={30}
+                              value={daysBefore}
+                              onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, parseInt(e.target.value) || 0) } : x))}
+                              style={{ width: 22, background: 'transparent', border: 'none', color: '#d97706', fontSize: '0.82rem', fontWeight: 700, outline: 'none', textAlign: 'center' }}
+                            />
+                          </div>
+                          <button type="button"
+                            onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
+                            style={{ background: 'none', border: 'none', borderLeft: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '1rem', fontWeight: 700, padding: '0 7px', lineHeight: '30px', flexShrink: 0 }}>+</button>
                         </div>
                       </div>
                     </div>
