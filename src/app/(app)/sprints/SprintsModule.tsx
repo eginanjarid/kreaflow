@@ -324,6 +324,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: defaultTemplate })
+  const [selectedAkunIds, setSelectedAkunIds] = useState<string[]>([])
   // sprintSteps: ordered list of steps + assign + deadline
   const [sprintSteps, setSprintSteps] = useState<{ step: StepDef; memberId: string; deadline: string }[]>([])
   const [addStepOpen, setAddStepOpen] = useState(false)
@@ -410,7 +411,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSlotMode('slots')
     setWeeklyRange({ start: '', end: '' })
     setWeeklyPattern({ 0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(), 3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern() })
-    // Auto-fill akun jika hanya 1
+    // Auto-select all registered accounts (mirror posting)
+    setSelectedAkunIds(accounts.map(a => a.id))
     if (accounts.length === 1) {
       setSprintForm(f => ({ ...f, akun: `${accounts[0].nama} (@${accounts[0].handle})` }))
     }
@@ -456,7 +458,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
       end_date: calcEnd || localToday(),
       target_konten: totalFromProducts > 0 ? totalFromProducts : sprintForm.target_konten,
       platform: sprintForm.platform || null,
-      akun: sprintForm.akun.trim() || null,
+      akun: accounts.length > 1
+        ? (selectedAkunIds.length > 0 ? selectedAkunIds.map(id => { const a = accounts.find(x => x.id === id); return a ? `${a.platform} @${a.handle}` : '' }).filter(Boolean).join(', ') : null)
+        : (sprintForm.akun.trim() || null),
       template_type: tplType,
       step_config: stepConfigData,
       status: 'active',
@@ -1269,10 +1273,27 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     <span style={{ fontSize: '0.62rem', color: '#059669', fontWeight: 700, background: '#d1fae5', padding: '2px 7px', borderRadius: 6 }}>Auto</span>
                   </div>
                 ) : (
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))}>
-                    <option value="">Pilih akun utama</option>
-                    {accounts.map(a => <option key={a.id} value={`${a.nama} (@${a.handle})`}>{a.platform} · {a.nama} (@{a.handle})</option>)}
-                  </select>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    {accounts.map(a => {
+                      const checked = selectedAkunIds.includes(a.id)
+                      return (
+                        <button key={a.id} type="button" onClick={() => setSelectedAkunIds(prev => checked ? prev.filter(id => id !== a.id) : [...prev, a.id])}
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, background: checked ? '#f0f9ff' : '#f8fafc', border: `1px solid ${checked ? 'rgba(26,115,232,0.25)' : '#e5e7eb'}`, borderRadius: 8, padding: '9px 12px', cursor: 'pointer', textAlign: 'left' }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? '#1a73e8' : '#d1d5db'}`, background: checked ? '#1a73e8' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {checked && <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: checked ? '#111827' : '#6b7280' }}>{a.platform} · @{a.handle}</div>
+                            <div style={{ fontSize: '0.67rem', color: '#9ca3af', marginTop: 1 }}>{a.nama}</div>
+                          </div>
+                          {checked && <span style={{ fontSize: '0.6rem', color: '#059669', fontWeight: 700, background: '#d1fae5', padding: '2px 6px', borderRadius: 5 }}>Mirror</span>}
+                        </button>
+                      )
+                    })}
+                    {selectedAkunIds.length === 0 && (
+                      <div style={{ fontSize: '0.72rem', color: '#ef4444', marginTop: 2 }}>Pilih minimal 1 akun posting.</div>
+                    )}
+                  </div>
                 )}
               </div>
 
