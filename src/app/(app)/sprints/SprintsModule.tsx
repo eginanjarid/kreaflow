@@ -312,6 +312,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
     isAffiliate ? key !== 'creator' : key === 'creator'
   )
 
+  const registeredPlatforms = accounts.map(a => a.platform)
+  // Derive platforms dari format, filter hanya yg ada akunnya. Fallback ke semua jika belum ada akun sama sekali.
+  function activePlatformsFor(fmt: string): string[] {
+    const all = CONTENT_TYPE_PLATFORMS[fmt] || []
+    if (registeredPlatforms.length === 0) return all
+    return all.filter(p => registeredPlatforms.includes(p))
+  }
+
   const [sprintModal, setSprintModal] = useState(false)
   const [sprintForm, setSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35, platform: '', akun: '', template_type: defaultTemplate })
   // sprintSteps: ordered list of steps + assign + deadline
@@ -478,7 +486,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               judul: pillar ? `${pillar.nama} — ${dp.format} ${counterPerDay[dayIdx]}` : `${dp.format} ${counterPerDay[dayIdx]}`,
               status: 'Draft',
               format: dp.format,
-              platform: CONTENT_TYPE_PLATFORMS[dp.format] || (sprintForm.platform ? [sprintForm.platform] : []),
+              platform: activePlatformsFor(dp.format).length > 0 ? activePlatformsFor(dp.format) : (sprintForm.platform ? [sprintForm.platform] : []),
               tanggal_tayang: dateStr,
               jam_tayang: dp.jam || null,
               ...assignByCol,
@@ -512,7 +520,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               format: !isAffiliate ? ((row as typeof sprintPillars[0]).format || null) : null,
               platform: (() => {
                 const fmt = !isAffiliate ? ((row as typeof sprintPillars[0]).format || '') : ''
-                if (fmt && CONTENT_TYPE_PLATFORMS[fmt]) return CONTENT_TYPE_PLATFORMS[fmt]
+                if (fmt) { const active = activePlatformsFor(fmt); if (active.length > 0) return active }
                 return sprintForm.platform ? [sprintForm.platform] : []
               })(),
               tanggal_tayang,
@@ -1241,19 +1249,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Platform</label>
                   {(() => {
-                    const derived = Array.from(new Set(
+                    const allDerived = Array.from(new Set(
                       (isAffiliate ? sprintProducts : sprintPillars)
                         .flatMap(r => {
                           const fmt = (r as typeof sprintPillars[0]).format || ''
                           return (fmt && CONTENT_TYPE_PLATFORMS[fmt]) ? CONTENT_TYPE_PLATFORMS[fmt] : []
                         })
                     ))
-                    if (derived.length > 0) return (
+                    if (allDerived.length > 0) return (
                       <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: 5, minHeight: 38, alignItems: 'center' }}>
-                        {derived.map(p => (
-                          <span key={p} style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 10, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.25)', color: '#1a73e8', fontWeight: 600 }}>{p}</span>
-                        ))}
-                        <span style={{ fontSize: '0.65rem', color: '#9ca3af', marginLeft: 2 }}>dari format</span>
+                        {allDerived.map(p => {
+                          const hasAkun = registeredPlatforms.length === 0 || registeredPlatforms.includes(p)
+                          return (
+                            <span key={p} style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 10, background: hasAkun ? 'rgba(26,115,232,0.1)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.25)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: hasAkun ? 600 : 400 }}>
+                              {p}{!hasAkun ? ' (belum ada akun)' : ''}
+                            </span>
+                          )
+                        })}
                       </div>
                     )
                     return (
@@ -1368,9 +1380,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             </div>
                             {dp.active && dp.format && CONTENT_TYPE_PLATFORMS[dp.format] && (
                               <div style={{ display: 'flex', gap: 3, marginTop: 5, marginLeft: 26, flexWrap: 'wrap' }}>
-                                {CONTENT_TYPE_PLATFORMS[dp.format].map(p => (
-                                  <span key={p} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', color: '#1a73e8', fontWeight: 600 }}>{p}</span>
-                                ))}
+                                {CONTENT_TYPE_PLATFORMS[dp.format].map(p => {
+                                  const hasAkun = registeredPlatforms.length === 0 || registeredPlatforms.includes(p)
+                                  return (
+                                    <span key={p} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>
+                                      {p}{!hasAkun && ' ✕'}
+                                    </span>
+                                  )
+                                })}
                               </div>
                             )}
                           </div>
@@ -1470,9 +1487,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             </select>
                             {row.format && CONTENT_TYPE_PLATFORMS[row.format] && (
                               <div style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
-                                {CONTENT_TYPE_PLATFORMS[row.format].map(p => (
-                                  <span key={p} style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 10, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', color: '#1a73e8', fontWeight: 600 }}>{p}</span>
-                                ))}
+                                {CONTENT_TYPE_PLATFORMS[row.format].map(p => {
+                                  const hasAkun = registeredPlatforms.length === 0 || registeredPlatforms.includes(p)
+                                  return (
+                                    <span key={p} style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 10, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>
+                                      {p}{!hasAkun && ' ✕'}
+                                    </span>
+                                  )
+                                })}
                               </div>
                             )}
                           </div>
