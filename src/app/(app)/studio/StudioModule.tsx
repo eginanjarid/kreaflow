@@ -658,7 +658,7 @@ export default function StudioModule({ initialContents, products, initialNotific
             </div>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Modals */}
       {selectedItem && <NaskahModal item={selectedItem} products={products} onClose={() => setSelectedItem(null)} onUpdate={handleUpdate} />}
