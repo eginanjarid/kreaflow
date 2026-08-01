@@ -326,8 +326,8 @@ export default function BrandModule({
     setSaved(false)
   }
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  function changeTab(id: string) { setTab(id); setSaved(false) }
+  const [saved, setSaved] = useState(!!initialProfile?.id)
+  function changeTab(id: string) { setTab(id) }
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState('')
   const [aiModal, setAiModal] = useState<{ prompt: string } | null>(null)
@@ -2250,6 +2250,7 @@ function ContentPillarsTab({ workspaceId, profile }: { workspaceId: string; prof
           hashtags: Array.isArray(p.hashtags) ? p.hashtags.join(' ') : (p.hashtags || ''),
           urutan: p.urutan,
         })))
+        setSaved(true)
       }
       setLoaded(true)
     }
