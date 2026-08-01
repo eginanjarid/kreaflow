@@ -1813,10 +1813,23 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                     <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate Analisis AI</div>
                     <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Copy prompt → paste ke AI → baca hasilnya</div>
                   </div>
-                  <button type="button" onClick={() => setAiModal({ prompt: buildAffNichePrompt() })}
-                    style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-                    Generate dengan AI
-                  </button>
+                  {(() => {
+                    const canGenerate = (profile.affiliate_kategori_fokus || []).length > 0 && (profile.affiliate_platforms || []).length > 0
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                        <button type="button" onClick={() => canGenerate && setAiModal({ prompt: buildAffNichePrompt() })}
+                          disabled={!canGenerate}
+                          style={{ background: canGenerate ? '#059669' : '#d1d5db', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: canGenerate ? 'pointer' : 'not-allowed', flexShrink: 0 }}>
+                          Generate dengan AI
+                        </button>
+                        {!canGenerate && (
+                          <span style={{ fontSize: '0.68rem', color: '#f59e0b', fontWeight: 500 }}>
+                            {(profile.affiliate_kategori_fokus || []).length === 0 ? '← Pilih kategori dulu' : '← Pilih platform dulu'}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {/* Divider: OUTPUT */}
