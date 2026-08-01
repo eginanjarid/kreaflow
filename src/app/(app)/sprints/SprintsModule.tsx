@@ -1197,35 +1197,35 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           ✕
                         </button>
                       </div>
-                      {/* Row 2: assign + D-N deadline — side by side */}
-                      <div style={{ display: 'grid', gridTemplateColumns: workspaceMembers.length > 0 ? '1fr auto' : '1fr', gap: 6 }}>
-                        {workspaceMembers.length > 0 && (
-                          <select
-                            value={memberId}
-                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
-                            style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#374151', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
-                            <option value="">— Assign ke —</option>
-                            {workspaceMembers.map(m => (
-                              <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
-                            ))}
-                          </select>
-                        )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
+                      {/* Row 2: assign member */}
+                      {workspaceMembers.length > 0 && (
+                        <select
+                          value={memberId}
+                          onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#374151', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const, marginBottom: 6 }}>
+                          <option value="">— Assign ke —</option>
+                          {workspaceMembers.map(m => (
+                            <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
+                          ))}
+                        </select>
+                      )}
+                      {/* Row 3: deadline picker — "Selesai N hari sebelum tayang" */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '5px 10px' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>Selesai</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: '#fff', border: '1px solid #fcd34d', borderRadius: 5, overflow: 'hidden', flexShrink: 0 }}>
                           <button type="button"
                             onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
-                            style={{ background: 'none', border: 'none', borderRight: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '1rem', fontWeight: 700, padding: '0 7px', lineHeight: '30px', flexShrink: 0 }}>−</button>
-                          <div style={{ display: 'flex', alignItems: 'center', padding: '0 5px', gap: 1 }}>
-                            <span style={{ fontSize: '0.7rem', color: '#92400e', fontWeight: 700 }}>D-</span>
-                            <input type="number" min={0} max={30}
-                              value={daysBefore}
-                              onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, parseInt(e.target.value) || 0) } : x))}
-                              style={{ width: 22, background: 'transparent', border: 'none', color: '#d97706', fontSize: '0.82rem', fontWeight: 700, outline: 'none', textAlign: 'center' }}
-                            />
-                          </div>
+                            style={{ background: 'none', border: 'none', borderRight: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, padding: '0 6px', lineHeight: '24px' }}>−</button>
+                          <input type="number" min={0} max={30}
+                            value={daysBefore}
+                            onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, parseInt(e.target.value) || 0) } : x))}
+                            style={{ width: 28, background: 'transparent', border: 'none', color: '#d97706', fontSize: '0.82rem', fontWeight: 700, outline: 'none', textAlign: 'center', lineHeight: '24px' }}
+                          />
                           <button type="button"
                             onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
-                            style={{ background: 'none', border: 'none', borderLeft: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '1rem', fontWeight: 700, padding: '0 7px', lineHeight: '30px', flexShrink: 0 }}>+</button>
+                            style={{ background: 'none', border: 'none', borderLeft: '1px solid #fcd34d', color: '#d97706', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, padding: '0 6px', lineHeight: '24px' }}>+</button>
                         </div>
+                        <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>hari sebelum tayang</span>
                       </div>
                     </div>
                   ))}
