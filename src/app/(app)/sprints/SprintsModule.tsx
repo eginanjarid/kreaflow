@@ -315,11 +315,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
   )
 
   const registeredPlatforms = accounts.map(a => a.platform)
-  // Derive platforms dari format, filter hanya yg ada akunnya. Fallback ke semua jika belum ada akun sama sekali.
-  function activePlatformsFor(fmt: string): string[] {
+  // Derive platforms dari format, filter by akun yg dipilih di Sprint (atau semua jika belum ada akun).
+  function activePlatformsFor(fmt: string, forSelectedOnly = false): string[] {
     const all = CONTENT_TYPE_PLATFORMS[fmt] || []
     if (registeredPlatforms.length === 0) return all
-    return all.filter(p => registeredPlatforms.includes(p))
+    const filterSet = forSelectedOnly && selectedAkunIds.length > 0
+      ? accounts.filter(a => selectedAkunIds.includes(a.id)).map(a => a.platform)
+      : registeredPlatforms
+    return all.filter(p => filterSet.includes(p))
   }
 
   const [sprintModal, setSprintModal] = useState(false)
@@ -497,7 +500,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 judul: pillar ? `${pillar.nama} — ${slot.format} ${counterPerDay[dayIdx]}` : `${slot.format} ${counterPerDay[dayIdx]}`,
                 status: 'Draft',
                 format: slot.format,
-                platform: activePlatformsFor(slot.format).length > 0 ? activePlatformsFor(slot.format) : (sprintForm.platform ? [sprintForm.platform] : []),
+                platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
                 tanggal_tayang: dateStr,
                 jam_tayang: slot.jam || null,
                 ...assignByCol,
@@ -532,7 +535,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               format: !isAffiliate ? ((row as typeof sprintPillars[0]).format || null) : null,
               platform: (() => {
                 const fmt = !isAffiliate ? ((row as typeof sprintPillars[0]).format || '') : ''
-                if (fmt) { const active = activePlatformsFor(fmt); if (active.length > 0) return active }
+                if (fmt) { const active = activePlatformsFor(fmt, true); if (active.length > 0) return active }
                 return sprintForm.platform ? [sprintForm.platform] : []
               })(),
               tanggal_tayang,
@@ -1406,7 +1409,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                     {slot.format && CONTENT_TYPE_PLATFORMS[slot.format] && (
                                       <div style={{ display: 'flex', gap: 3, marginTop: 3, marginLeft: 19, flexWrap: 'wrap' }}>
                                         {CONTENT_TYPE_PLATFORMS[slot.format].map(plt => {
-                                          const hasAkun = registeredPlatforms.length === 0 || registeredPlatforms.includes(plt)
+                                          const selectedPlatforms = selectedAkunIds.length > 0 ? accounts.filter(a => selectedAkunIds.includes(a.id)).map(a => a.platform) : registeredPlatforms
+                                          const hasAkun = selectedPlatforms.length === 0 || selectedPlatforms.includes(plt)
                                           return (
                                             <span key={plt} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>
                                               {plt}{!hasAkun && ' ✕'}
@@ -1523,7 +1527,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             {row.format && CONTENT_TYPE_PLATFORMS[row.format] && (
                               <div style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
                                 {CONTENT_TYPE_PLATFORMS[row.format].map(p => {
-                                  const hasAkun = registeredPlatforms.length === 0 || registeredPlatforms.includes(p)
+                                  const selectedPlatforms = selectedAkunIds.length > 0 ? accounts.filter(a => selectedAkunIds.includes(a.id)).map(a => a.platform) : registeredPlatforms
+                                  const hasAkun = selectedPlatforms.length === 0 || selectedPlatforms.includes(p)
                                   return (
                                     <span key={p} style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 10, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>
                                       {p}{!hasAkun && ' ✕'}

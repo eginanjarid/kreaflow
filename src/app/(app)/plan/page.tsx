@@ -45,7 +45,7 @@ export default async function PlanPage() {
         sprint_id: (d.sprint_id as string | null) || null,
         sprint_nama: (d.kf_sprints as unknown as { nama: string } | null)?.nama || null,
         format: (d.format as string | null) || null,
-        platform: (d.platform as string[] | null)?.[0] || null,
+        platform: (d.platform as string[] | null) || [],
         assigned_naskah: (d.assigned_naskah as string | null) || null,
         script: (d.script as string | null) || null,
         tanggal_tayang: (d.tanggal_tayang as string | null) || null,

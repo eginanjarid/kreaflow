@@ -93,7 +93,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
-type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string | null; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null }
 
 export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
   workspaceId: string
@@ -181,7 +181,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
       setNaskahMode('creator')
       setNF('pillar', pillarName)
       if (item.format) setNF('tipe_konten', item.format)
-      if (item.platform) setNF('platform', item.platform)
+      if (item.platform.length > 0) setNF('platform', item.platform[0])
       if (item.product_id) setNF('product_id', item.product_id)
       if (item.status === 'Revisi' && item.script) {
         setGeneratedNaskah(`[REVISI — edit naskah lama di bawah ini]\n\n${item.script}`)
@@ -195,7 +195,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
         setAffForm(f => ({ ...f, product_id: item.product_id, deskripsi_produk: prod?.deskripsi || f.deskripsi_produk, niche_produk: prod?.kategori || f.niche_produk }))
       }
       if (item.format) setAFF('tipe_konten', item.format)
-      if (item.platform) setAFF('platform', item.platform)
+      if (item.platform.length > 0) setAFF('platform', item.platform[0])
       if ((item.status as string) === 'Revisi' && item.script) {
         setAffNaskah(`[REVISI — edit naskah lama di bawah ini]\n\n${item.script}`)
       } else if ((item.status as string) !== 'Revisi') {
@@ -752,10 +752,12 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
                         {sprintLockedItem.format}
                       </span>}
-                      {sprintLockedItem.platform && <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#374151', background: '#f3f4f6', borderRadius: 6, padding: '3px 8px' }}>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                        {sprintLockedItem.platform}
-                      </span>}
+                      {sprintLockedItem.platform.map(p => (
+                        <span key={p} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 6, padding: '3px 8px' }}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                          {p}
+                        </span>
+                      ))}
                       {sprintLockedItem.assigned_naskah && <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#374151', background: '#f3f4f6', borderRadius: 6, padding: '3px 8px' }}>
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         {sprintLockedItem.assigned_naskah}
