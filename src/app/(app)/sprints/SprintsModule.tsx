@@ -271,15 +271,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [selectedSprintId, setSelectedSprintId] = useState<string | null>(initialSprints[0]?.id || null)
   const [search, setSearch] = useState('')
   const [filterProduct, setFilterProduct] = useState('')
+  const [filterPillar, setFilterPillar] = useState('')
 
   // Sprint create modal
   const isAffiliate = brandType === 'affiliate'
   const PLATFORMS = isAffiliate ? PLATFORMS_AFFILIATE : PLATFORMS_CREATOR
   const FORMATS = isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR
   const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
-  // Creator: only "creator" template. Affiliate: affiliate + live.
+  // Creator: creator + carousel + live. Affiliate: affiliate + carousel + live.
   const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) =>
-    isAffiliate ? key !== 'creator' : key === 'creator'
+    isAffiliate ? key !== 'creator' : key !== 'affiliate'
   )
 
   const [sprintModal, setSprintModal] = useState(false)
@@ -316,6 +317,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
+  // Unique pillar names derived from judul for creator filter
+  const sprintPillarNames = useMemo(() => {
+    const names = sprintContents.map(c => c.judul.split(' — ')[0]).filter(Boolean)
+    return [...new Set(names)]
+  }, [sprintContents])
   const steps = selectedSprint ? getTemplateSteps(selectedSprint.template_type) : []
   // Merge step_config (deadline + memberName) into steps for display
   type StepWithMeta = StepDef & { deadline?: string; memberName?: string }
@@ -332,6 +338,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const filtered = sprintContents.filter(c => {
     if (filterProduct && c.product_id !== filterProduct) return false
+    if (filterPillar && !c.judul.startsWith(filterPillar + ' —')) return false
     if (search && !c.judul.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
@@ -893,7 +900,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const tplColor = getTemplateColor(s.template_type)
               const pct = sc.length > 0 ? Math.round(done / sc.length * 100) : 0
               return (
-                <div key={s.id} onClick={() => setSelectedSprintId(s.id)}
+                <div key={s.id} onClick={() => { setSelectedSprintId(s.id); setFilterPillar(''); setFilterProduct('') }}
                   className="kf-sprint-item"
                   style={{ position: 'relative', padding: '10px 12px', borderRadius: 10, marginBottom: 2, cursor: 'pointer', background: active ? 'rgba(26,115,232,0.07)' : 'transparent', borderLeft: `3px solid ${active ? '#1a73e8' : 'transparent'}`, transition: 'background 0.15s' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
@@ -973,6 +980,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
                       <option value="">Semua Produk</option>
                       {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                    </select>
+                  )}
+                  {!isAffiliate && sprintPillarNames.length > 1 && (
+                    <select value={filterPillar} onChange={e => setFilterPillar(e.target.value)}
+                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterPillar ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
+                      <option value="">Semua Pilar</option>
+                      {sprintPillarNames.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                   )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
