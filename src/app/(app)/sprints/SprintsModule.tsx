@@ -143,14 +143,11 @@ function getTemplateColor(template_type: string): string {
 }
 
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
-const WEEKLY_DAYS = [
-  { idx: 1, label: 'Senin' }, { idx: 2, label: 'Selasa' }, { idx: 3, label: 'Rabu' },
-  { idx: 4, label: 'Kamis' }, { idx: 5, label: 'Jumat' }, { idx: 6, label: 'Sabtu' }, { idx: 0, label: 'Minggu' },
-]
+const DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
 type DaySlot = { format: string; pillar_id: string; jam: string }
-type DayPattern = { active: boolean; date: string; slots: DaySlot[] }
+type DayPattern = { active: boolean; slots: DaySlot[] }
 const defaultSlot = (): DaySlot => ({ format: '', pillar_id: '', jam: '18:00' })
-const defaultDayPattern = (): DayPattern => ({ active: false, date: '', slots: [defaultSlot()] })
+const defaultDayPattern = (): DayPattern => ({ active: false, slots: [defaultSlot()] })
 const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
 const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
 const FORMATS_CREATOR = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Thread/Caption', 'Lainnya']
@@ -336,6 +333,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [sprintPillars, setSprintPillars] = useState<{ pillar_id: string; jumlah: number; mulai: string; interval: number; jam: string; format: string }[]>([{ pillar_id: '', jumlah: 7, mulai: '', interval: 1, jam: '18:00', format: '' }])
   // Weekly pattern mode
   const [slotMode, setSlotMode] = useState<'slots' | 'weekly'>('slots')
+  const [weeklyStart, setWeeklyStart] = useState('')
+  const [weeklyEnd, setWeeklyEnd] = useState('')
   const [weeklyPattern, setWeeklyPattern] = useState<Record<number, DayPattern>>({
     0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(),
     3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern(),
@@ -411,6 +410,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSprintProducts([{ product_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00' }])
     setSprintPillars([{ pillar_id: '', jumlah: 7, mulai: start, interval: 1, jam: '18:00', format: '' }])
     setSlotMode('slots')
+    setWeeklyStart('')
+    setWeeklyEnd('')
     setWeeklyPattern({ 0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(), 3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern() })
     // Auto-select all registered accounts (mirror posting)
     setSelectedAkunIds(accounts.map(a => a.id))
@@ -423,8 +424,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   // Auto-calculate sprint date range from slot posting dates
   function calcSprintDates() {
     if (slotMode === 'weekly') {
-      const dates = Object.values(weeklyPattern).filter(dp => dp.active && dp.date).map(dp => dp.date).sort()
-      return { start: dates[0] || '', end: dates[dates.length - 1] || '' }
+      return { start: weeklyStart, end: weeklyEnd || weeklyStart }
     }
     const slots = isAffiliate ? sprintProducts : sprintPillars
     const dates = slots.map(r => r.mulai).filter(Boolean).sort()
@@ -482,26 +482,33 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
       let items: object[] = []
 
-      if (slotMode === 'weekly') {
-        // Generate from weekly pattern — each active day with a date produces its slots
-        WEEKLY_DAYS.forEach(({ idx }) => {
-          const dp = weeklyPattern[idx]
-          if (!dp.active || !dp.date) return
-          dp.slots.filter(s => s.format).forEach((slot, si) => {
-            const pillar = pillars.find(p => p.id === slot.pillar_id)
-            items.push({
-              workspace_id: workspaceId,
-              sprint_id: sprint.id,
-              judul: pillar ? `${pillar.nama} — ${slot.format} ${si + 1}` : `${slot.format} ${si + 1}`,
-              status: 'Draft',
-              format: slot.format,
-              platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
-              tanggal_tayang: dp.date,
-              jam_tayang: slot.jam || null,
-              ...assignByCol,
+      if (slotMode === 'weekly' && weeklyStart) {
+        const cur = new Date(weeklyStart + 'T00:00:00')
+        const endD = new Date((weeklyEnd || weeklyStart) + 'T00:00:00')
+        const counterPerDay: Record<number, number> = {}
+        while (cur <= endD) {
+          const dayIdx = cur.getDay()
+          const dp = weeklyPattern[dayIdx]
+          if (dp.active) {
+            const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
+            dp.slots.filter(s => s.format).forEach(slot => {
+              counterPerDay[dayIdx] = (counterPerDay[dayIdx] || 0) + 1
+              const pillar = pillars.find(p => p.id === slot.pillar_id)
+              items.push({
+                workspace_id: workspaceId,
+                sprint_id: sprint.id,
+                judul: pillar ? `${pillar.nama} — ${slot.format} ${counterPerDay[dayIdx]}` : `${slot.format} ${counterPerDay[dayIdx]}`,
+                status: 'Draft',
+                format: slot.format,
+                platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
+                tanggal_tayang: dateStr,
+                jam_tayang: slot.jam || null,
+                ...assignByCol,
+              })
             })
-          })
-        })
+          }
+          cur.setDate(cur.getDate() + 1)
+        }
       } else {
         // Generate from slot rows
         const rows = activeSlots.filter(r => r.jumlah > 0)
@@ -1319,126 +1326,126 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {/* WEEKLY PATTERN */}
                 {slotMode === 'weekly' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {/* Set Seminggu shortcut */}
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <input type="date" id="weekly-seed-date"
-                        style={{ flex: 1, background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none' }} />
-                      <button type="button" onClick={() => {
-                        const input = document.getElementById('weekly-seed-date') as HTMLInputElement
-                        if (!input?.value) return
-                        const seed = new Date(input.value + 'T00:00:00')
-                        const sunday = new Date(seed)
-                        sunday.setDate(seed.getDate() - seed.getDay())
-                        setWeeklyPattern(prev => {
-                          const next = { ...prev }
-                          for (let i = 0; i < 7; i++) {
-                            const d = new Date(sunday)
-                            d.setDate(sunday.getDate() + i)
-                            const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-                            next[i] = { ...next[i], date: dateStr }
-                          }
-                          return next
-                        })
-                      }}
-                        style={{ background: '#1a73e8', border: 'none', borderRadius: 6, padding: '6px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' as const }}>
-                        Set Seminggu
-                      </button>
+                    {/* Tanggal mulai + Set Seminggu */}
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
+                        <input type="date" value={weeklyStart}
+                          onChange={e => {
+                            const val = e.target.value
+                            setWeeklyStart(val)
+                            if (!weeklyEnd) {
+                              const end = new Date(val + 'T00:00:00')
+                              end.setDate(end.getDate() + 6)
+                              setWeeklyEnd(`${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`)
+                            }
+                          }}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Sampai Tanggal</div>
+                        <input type="date" value={weeklyEnd} onChange={e => setWeeklyEnd(e.target.value)}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
                     </div>
-                    {(() => {
-                      const readyDays = WEEKLY_DAYS.filter(d => weeklyPattern[d.idx].active && weeklyPattern[d.idx].date && weeklyPattern[d.idx].slots.some(s => s.format))
-                      const totalSlots = readyDays.reduce((sum, d) => sum + weeklyPattern[d.idx].slots.filter(s => s.format).length, 0)
-                      return readyDays.length > 0 ? (
-                        <div style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f0f5f9', borderRadius: 6, padding: '5px 8px' }}>
-                          {readyDays.length} hari aktif · {totalSlots} konten akan di-generate
+                    {/* Summary */}
+                    {weeklyStart && (() => {
+                      const activeDays = Object.values(weeklyPattern).filter(dp => dp.active && dp.slots.some(s => s.format))
+                      const totalSlots = activeDays.reduce((sum, dp) => sum + dp.slots.filter(s => s.format).length, 0)
+                      if (!activeDays.length || !totalSlots) return null
+                      const days = weeklyEnd ? Math.round((new Date(weeklyEnd + 'T00:00:00').getTime() - new Date(weeklyStart + 'T00:00:00').getTime()) / 86400000) + 1 : 7
+                      const weeks = Math.max(1, Math.ceil(days / 7))
+                      return (
+                        <div style={{ fontSize: '0.65rem', color: '#059669', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 6, padding: '5px 8px' }}>
+                          {activeDays.length} hari aktif/minggu · {weeks} minggu · ≈{weeks * totalSlots} konten
                         </div>
-                      ) : null
+                      )
                     })()}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {WEEKLY_DAYS.map(({ idx, label }) => {
-                        const dp = weeklyPattern[idx]
-                        return (
-                          <div key={idx} style={{ background: dp.active ? '#f0f9ff' : '#f8fafc', border: `1px solid ${dp.active ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, borderRadius: 8, padding: '8px 10px' }}>
-                            {/* Day header row */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <button type="button"
-                                onClick={() => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], active: !p[idx].active } }))}
-                                style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${dp.active ? '#1a73e8' : '#d1d5db'}`, background: dp.active ? '#1a73e8' : 'transparent', flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {dp.active && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                              </button>
-                              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dp.active ? '#111827' : '#9ca3af', width: 52, flexShrink: 0 }}>{label}</span>
+                    {/* Day rows — dynamic order from weeklyStart */}
+                    {weeklyStart && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {Array.from({ length: 7 }, (_, i) => {
+                          const d = new Date(weeklyStart + 'T00:00:00')
+                          d.setDate(d.getDate() + i)
+                          const idx = d.getDay()
+                          const dateLabel = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
+                          const dp = weeklyPattern[idx]
+                          return (
+                            <div key={i} style={{ background: dp.active ? '#f0f9ff' : '#f8fafc', border: `1px solid ${dp.active ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, borderRadius: 8, padding: '8px 10px' }}>
+                              {/* Day header */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <button type="button"
+                                  onClick={() => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], active: !p[idx].active } }))}
+                                  style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${dp.active ? '#1a73e8' : '#d1d5db'}`, background: dp.active ? '#1a73e8' : 'transparent', flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  {dp.active && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                                </button>
+                                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dp.active ? '#111827' : '#9ca3af', flexShrink: 0 }}>{DAY_NAMES[idx]}</span>
+                                <span style={{ fontSize: '0.68rem', color: dp.active ? '#1a73e8' : '#d1d5db', fontWeight: 600 }}>{dateLabel}</span>
+                                {dp.active && dp.slots.filter(s => s.format).length > 0 && (
+                                  <span style={{ fontSize: '0.62rem', color: '#6b7280', marginLeft: 'auto' }}>{dp.slots.filter(s => s.format).length} konten</span>
+                                )}
+                              </div>
+                              {/* Slots */}
                               {dp.active && (
-                                <input type="date" value={dp.date} onChange={e => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], date: e.target.value } }))}
-                                  style={{ flex: 1, background: '#fff', border: `1px solid ${dp.date ? 'rgba(26,115,232,0.3)' : '#e5e7eb'}`, borderRadius: 6, padding: '3px 6px', fontSize: '0.72rem', outline: 'none', color: dp.date ? '#111827' : '#9ca3af' }} />
-                              )}
-                              {dp.active && dp.slots.filter(s => s.format).length > 0 && (
-                                <span style={{ fontSize: '0.62rem', color: '#6b7280', flexShrink: 0 }}>{dp.slots.filter(s => s.format).length} konten</span>
-                              )}
-                            </div>
-                            {/* Slots per day */}
-                            {dp.active && (
-                              <div style={{ marginLeft: 26, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 5 }}>
-                                {dp.slots.map((slot, si) => (
-                                  <div key={si}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                      <span style={{ fontSize: '0.62rem', color: '#9ca3af', width: 14, flexShrink: 0 }}>{si + 1}.</span>
-                                      <select value={slot.format} onChange={e => setWeeklyPattern(p => {
-                                        const slots = p[idx].slots.map((s, i) => i === si ? { ...s, format: e.target.value } : s)
-                                        return { ...p, [idx]: { ...p[idx], slots } }
-                                      })}
-                                        style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
-                                        <option value="">— Format —</option>
-                                        {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
-                                      </select>
-                                      {!isAffiliate && pillars.length > 0 && (
-                                        <select value={slot.pillar_id} onChange={e => setWeeklyPattern(p => {
-                                          const slots = p[idx].slots.map((s, i) => i === si ? { ...s, pillar_id: e.target.value } : s)
+                                <div style={{ marginLeft: 26, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                                  {dp.slots.map((slot, si) => (
+                                    <div key={si}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                        <span style={{ fontSize: '0.62rem', color: '#9ca3af', width: 14, flexShrink: 0 }}>{si + 1}.</span>
+                                        <select value={slot.format} onChange={e => setWeeklyPattern(p => {
+                                          const slots = p[idx].slots.map((s, j) => j === si ? { ...s, format: e.target.value } : s)
                                           return { ...p, [idx]: { ...p[idx], slots } }
-                                        })}
-                                          style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
-                                          <option value="">— Pilar —</option>
-                                          {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                                        })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                          <option value="">— Format —</option>
+                                          {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
                                         </select>
-                                      )}
-                                      <input type="time" value={slot.jam} onChange={e => setWeeklyPattern(p => {
-                                        const slots = p[idx].slots.map((s, i) => i === si ? { ...s, jam: e.target.value } : s)
-                                        return { ...p, [idx]: { ...p[idx], slots } }
-                                      })}
-                                        style={{ width: 72, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none' }} />
-                                      {dp.slots.length > 1 && (
-                                        <button type="button" onClick={() => setWeeklyPattern(p => {
-                                          const slots = p[idx].slots.filter((_, i) => i !== si)
+                                        {!isAffiliate && pillars.length > 0 && (
+                                          <select value={slot.pillar_id} onChange={e => setWeeklyPattern(p => {
+                                            const slots = p[idx].slots.map((s, j) => j === si ? { ...s, pillar_id: e.target.value } : s)
+                                            return { ...p, [idx]: { ...p[idx], slots } }
+                                          })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                            <option value="">— Pilar —</option>
+                                            {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                                          </select>
+                                        )}
+                                        <input type="time" value={slot.jam} onChange={e => setWeeklyPattern(p => {
+                                          const slots = p[idx].slots.map((s, j) => j === si ? { ...s, jam: e.target.value } : s)
                                           return { ...p, [idx]: { ...p[idx], slots } }
-                                        })}
-                                          style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.75rem', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>✕</button>
+                                        })} style={{ width: 72, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none' }} />
+                                        {dp.slots.length > 1 && (
+                                          <button type="button" onClick={() => setWeeklyPattern(p => {
+                                            const slots = p[idx].slots.filter((_, j) => j !== si)
+                                            return { ...p, [idx]: { ...p[idx], slots } }
+                                          })} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.75rem', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                                        )}
+                                      </div>
+                                      {slot.format && CONTENT_TYPE_PLATFORMS[slot.format] && (
+                                        <div style={{ display: 'flex', gap: 3, marginTop: 3, marginLeft: 19, flexWrap: 'wrap' }}>
+                                          {CONTENT_TYPE_PLATFORMS[slot.format].map(plt => {
+                                            const selPlt = selectedAkunIds.length > 0 ? accounts.filter(a => selectedAkunIds.includes(a.id)).map(a => a.platform) : registeredPlatforms
+                                            const hasAkun = selPlt.length === 0 || selPlt.includes(plt)
+                                            return <span key={plt} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>{plt}{!hasAkun && ' ✕'}</span>
+                                          })}
+                                        </div>
                                       )}
                                     </div>
-                                    {slot.format && CONTENT_TYPE_PLATFORMS[slot.format] && (
-                                      <div style={{ display: 'flex', gap: 3, marginTop: 3, marginLeft: 19, flexWrap: 'wrap' }}>
-                                        {CONTENT_TYPE_PLATFORMS[slot.format].map(plt => {
-                                          const selectedPlatforms = selectedAkunIds.length > 0 ? accounts.filter(a => selectedAkunIds.includes(a.id)).map(a => a.platform) : registeredPlatforms
-                                          const hasAkun = selectedPlatforms.length === 0 || selectedPlatforms.includes(plt)
-                                          return (
-                                            <span key={plt} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>
-                                              {plt}{!hasAkun && ' ✕'}
-                                            </span>
-                                          )
-                                        })}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                                <button type="button" onClick={() => setWeeklyPattern(p => ({
-                                  ...p, [idx]: { ...p[idx], slots: [...p[idx].slots, defaultSlot()] }
-                                }))}
-                                  style={{ alignSelf: 'flex-start', background: 'transparent', border: '1px dashed #d1d5db', borderRadius: 6, padding: '3px 8px', fontSize: '0.68rem', color: '#6b7280', cursor: 'pointer', marginTop: 2 }}>
-                                  + Tambah Slot
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
+                                  ))}
+                                  <button type="button" onClick={() => setWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], slots: [...p[idx].slots, defaultSlot()] } }))}
+                                    style={{ alignSelf: 'flex-start', background: 'transparent', border: '1px dashed #d1d5db', borderRadius: 6, padding: '3px 8px', fontSize: '0.68rem', color: '#6b7280', cursor: 'pointer', marginTop: 2 }}>
+                                    + Tambah Slot
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                    {!weeklyStart && (
+                      <div style={{ textAlign: 'center', padding: '16px 0', color: '#9ca3af', fontSize: '0.75rem' }}>
+                        Pilih tanggal mulai posting untuk set pola mingguan
+                      </div>
+                    )}
                   </div>
                 )}
 
