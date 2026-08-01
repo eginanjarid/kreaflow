@@ -703,8 +703,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setTasks(prev => prev.filter(x => x.id !== id))
   }
 
-  const tasksTodo = tasks.filter(t => t.percent_complete < 100)
-  const tasksDone = tasks.filter(t => t.percent_complete === 100)
+  const tasksTodo  = tasks.filter(t => t.percent_complete === 0)
+  const tasksDoing = tasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
+  const tasksDone  = tasks.filter(t => t.percent_complete === 100)
+
+  async function advanceTaskCol(t: ManualTask, direction: 'forward' | 'back') {
+    const next = direction === 'forward'
+      ? t.percent_complete === 0 ? 50 : 100
+      : t.percent_complete === 100 ? 50 : 0
+    await supabase.from('kf_tasks').update({ percent_complete: next }).eq('id', t.id!)
+    setTasks(prev => prev.map(x => x.id === t.id ? { ...x, percent_complete: next } : x))
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
@@ -724,74 +733,89 @@ export default function SprintsModule({ initialSprints, initialContents, product
           <button key={tab.key} onClick={() => setActiveTab(tab.key as 'board' | 'tasks')}
             style={{ padding: '13px 16px', background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab.key ? '#1a73e8' : 'transparent'}`, color: activeTab === tab.key ? '#111827' : '#6b7280', fontSize: '0.875rem', fontWeight: activeTab === tab.key ? 600 : 400, cursor: 'pointer', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 6 }}>
             {tab.label}
-            {tab.key === 'tasks' && tasksTodo.length > 0 && (
-              <span style={{ fontSize: '0.65rem', fontWeight: 700, background: '#ef4444', color: '#fff', borderRadius: 20, padding: '1px 7px' }}>{tasksTodo.length}</span>
+            {tab.key === 'tasks' && (tasksTodo.length + tasksDoing.length) > 0 && (
+              <span style={{ fontSize: '0.65rem', fontWeight: 700, background: '#ef4444', color: '#fff', borderRadius: 20, padding: '1px 7px' }}>{tasksTodo.length + tasksDoing.length}</span>
             )}
           </button>
         ))}
       </div>
 
     {activeTab === 'tasks' ? (
-      // ── TASKS TAB ──────────────────────────────────────────────────────────
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 0', maxWidth: 720 }}>
-        <div className="kf-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      // ── TASKS KANBAN ───────────────────────────────────────────────────────
+      <div style={{ display: 'flex', flex: 1, flexDirection: 'column', overflow: 'hidden', background: '#f5f6fa' }}>
+        {/* Header */}
+        <div style={{ padding: '12px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
-            <div style={{ fontWeight: 800, color: '#111827', fontSize: '1.1rem' }}>Tasks</div>
-            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: 2 }}>Checklist manual — non-konten (beli alat, meeting, dll)</div>
+            <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>Tasks</span>
+            <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 10 }}>Non-konten · beli alat, meeting, admin, dll</span>
           </div>
           <button onClick={() => setTaskModal({ open: true, task: emptyTask() })}
-            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
             + Task
           </button>
         </div>
 
-        {tasks.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
-            <div style={{ marginBottom: 10, color: '#059669' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-            <div style={{ fontWeight: 600, color: '#6b7280' }}>Belum ada task manual</div>
-          </div>
-        )}
-        {tasksTodo.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Belum Selesai ({tasksTodo.length})</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {tasksTodo.map(t => (
-                <div key={t.id} className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)' }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 5, border: '1.5px solid #d1d5db', background: 'transparent', cursor: 'pointer', flexShrink: 0, marginTop: 2 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>{t.nama}</div>
-                    <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
-                      {t.priority && <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 600 }}>{t.priority}</span>}
-                      {t.assigned_to && <span style={{ fontSize: '0.65rem', padding: '1px 7px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600 }}>👤 {t.assigned_to}</span>}
-                      {t.due_date && <span style={{ fontSize: '0.65rem', color: new Date(t.due_date) < new Date() ? '#dc2626' : '#6b7280' }}>Due {new Date(t.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
-                      {t.notes && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{t.notes}</span>}
+        {/* 3-col kanban */}
+        <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
+          {([
+            { id: 'todo',    label: 'Todo',       accent: '#94a3b8', items: tasksTodo },
+            { id: 'doing',   label: 'Dikerjakan', accent: '#f59e0b', items: tasksDoing },
+            { id: 'done',    label: 'Selesai',    accent: '#10b981', items: tasksDone },
+          ] as { id: string; label: string; accent: string; items: ManualTask[] }[]).map(col => (
+            <div key={col.id} style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.06)', borderTop: `3px solid ${col.accent}` }}>
+              {/* Col header */}
+              <div style={{ padding: '13px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{col.label}</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9ca3af', background: '#f3f4f6', borderRadius: 20, padding: '2px 9px' }}>{col.items.length}</span>
+              </div>
+              {/* Cards */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 10px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {col.items.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '32px 12px', color: '#d1d5db', fontSize: '0.78rem' }}>Kosong</div>
+                )}
+                {col.items.map(t => {
+                  const isOverdue = t.due_date && t.due_date < new Date().toISOString().split('T')[0] && col.id !== 'done'
+                  return (
+                    <div key={t.id} className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '11px 12px', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)', opacity: col.id === 'done' ? 0.6 : 1 }}>
+                      {/* Task name */}
+                      <div style={{ fontWeight: 600, color: col.id === 'done' ? '#6b7280' : '#111827', fontSize: '0.85rem', marginBottom: 7, textDecoration: col.id === 'done' ? 'line-through' : 'none' }}>{t.nama}</div>
+                      {/* Badges */}
+                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
+                        {t.priority && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 700 }}>{t.priority}</span>}
+                        {t.assigned_to && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600 }}>👤 {t.assigned_to}</span>}
+                        {t.due_date && <span style={{ fontSize: '0.62rem', color: isOverdue ? '#dc2626' : '#6b7280', fontWeight: isOverdue ? 700 : 400 }}>{isOverdue ? '⚠ ' : ''}Due {new Date(t.due_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
+                      </div>
+                      {t.notes && <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.notes}</div>}
+                      {/* Actions */}
+                      <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                        {col.id !== 'done' && (
+                          <button onClick={() => advanceTaskCol(t, 'forward')}
+                            style={{ flex: 1, background: col.id === 'todo' ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${col.id === 'todo' ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}`, borderRadius: 6, padding: '4px 0', color: col.id === 'todo' ? '#d97706' : '#059669', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}>
+                            {col.id === 'todo' ? '▶ Mulai' : '✓ Selesai'}
+                          </button>
+                        )}
+                        {col.id === 'done' && (
+                          <button onClick={() => advanceTaskCol(t, 'back')}
+                            style={{ flex: 1, background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 0', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer' }}>
+                            ↩ Reopen
+                          </button>
+                        )}
+                        <button onClick={() => setTaskModal({ open: true, task: { ...t } })}
+                          style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer' }}>
+                          ✎
+                        </button>
+                        <button onClick={() => deleteTask(t.id!)}
+                          style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 7px', color: '#9ca3af', fontSize: '0.7rem', cursor: 'pointer' }}>
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <button onClick={() => setTaskModal({ open: true, task: { ...t } })} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 10px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>Edit</button>
-                    <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
-                  </div>
-                </div>
-              ))}
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )}
-        {tasksDone.length > 0 && (
-          <div style={{ opacity: 0.45 }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Selesai ({tasksDone.length})</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {tasksDone.map(t => (
-                <div key={t.id} style={{ background: '#fff', borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 0 0 1px rgba(0,0,0,0.06)' }}>
-                  <button onClick={() => toggleTask(t.id!, t.percent_complete)} style={{ width: 18, height: 18, borderRadius: 4, border: '2px solid #1a73e8', background: '#1a73e8', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </button>
-                  <span style={{ flex: 1, color: '#6b7280', fontSize: '0.875rem', textDecoration: 'line-through' }}>{t.nama}</span>
-                  <button onClick={() => deleteTask(t.id!)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>✕</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
 
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
