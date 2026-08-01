@@ -370,7 +370,10 @@ function prevMonth() {
                       {isOverdue ? 'OVERDUE' : 'DEADLINE'}
                     </span>
                     <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: `${PRIORITY_COLOR[t.priority] || '#6b7280'}15`, color: PRIORITY_COLOR[t.priority] || '#6b7280', fontWeight: 600 }}>{t.priority}</span>
-                    {t.assigned_to && <span style={{ fontSize: '0.62rem', color: '#1a73e8' }}>👤 {t.assigned_to}</span>}
+                    {t.assigned_to && <span style={{ fontSize: '0.62rem', color: '#1a73e8', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      {t.assigned_to}
+                    </span>}
                   </div>
                   <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem', marginBottom: 2 }}>{t.nama}</div>
                 </div>

@@ -792,8 +792,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Badges */}
                       <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
                         {t.priority && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 700 }}>{t.priority}</span>}
-                        {t.assigned_to && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600 }}>👤 {t.assigned_to}</span>}
-                        {t.due_date && <span style={{ fontSize: '0.62rem', color: isOverdue ? '#dc2626' : '#6b7280', fontWeight: isOverdue ? 700 : 400 }}>{isOverdue ? '⚠ ' : ''}Due {new Date(t.due_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
+                        {t.assigned_to && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          {t.assigned_to}
+                        </span>}
+                        {t.due_date && <span style={{ fontSize: '0.62rem', color: isOverdue ? '#dc2626' : '#6b7280', fontWeight: isOverdue ? 700 : 400, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          {isOverdue && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
+                          Due {new Date(t.due_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                        </span>}
                       </div>
                       {t.notes && <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.notes}</div>}
                       {/* Actions */}
@@ -1620,7 +1626,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                               {r.memberName}
                               {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#dc2626' : '#374151' }}>
                                 · Deadline: {new Date(r.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                                {dlOverdue && ' ⚠ Overdue'}
+                                {dlOverdue && <> · <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:'inline', verticalAlign:'middle' }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Overdue</>}
                               </span>}
                             </div>
                           </div>
@@ -1634,7 +1640,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {/* Stats row */}
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(134,239,172,0.1)', color: '#059669' }}>
-                          ✓ {r.done} selesai
+                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg> {r.done} selesai
                         </span>
                         {hasDeadline && r.done > 0 && (
                           <>
@@ -1643,7 +1649,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             </span>
                             {r.late > 0 && (
                               <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: 5, background: 'rgba(248,113,113,0.08)', color: '#dc2626' }}>
-                                ⚠ {r.late} terlambat
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> {r.late} terlambat
                               </span>
                             )}
                           </>
