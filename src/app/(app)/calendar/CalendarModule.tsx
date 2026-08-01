@@ -225,9 +225,6 @@ function prevMonth() {
               ))}
             </div>
           )}
-          <button onClick={() => openAdd()} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 18px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-            + Jadwalkan
-          </button>
         </div>
       </div>
 
@@ -301,14 +298,11 @@ function prevMonth() {
               const MAX_SHOW = 3
               let shown = 0
               return (
-                <div key={idx} onClick={() => day && openAdd(day)}
+                <div key={idx}
                   style={{
                     minHeight: 88, padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #f3f4f6' : 'none', borderBottom: '1px solid #f3f4f6',
-                    background: day ? 'transparent' : '#f9fafb', cursor: day ? 'pointer' : 'default',
-                    transition: 'background 0.1s',
-                  }}
-                  onMouseEnter={e => { if (day) e.currentTarget.style.background = '#f9fafb' }}
-                  onMouseLeave={e => { if (day) e.currentTarget.style.background = 'transparent' }}>
+                    background: day ? 'transparent' : '#f9fafb', cursor: 'default',
+                  }}>
                   {day && (
                     <>
                       <div style={{ fontSize: '0.78rem', fontWeight: isToday ? 700 : 400, color: isToday ? '#fff' : idx % 7 === 0 ? '#ef4444' : '#374151', width: 22, height: 22, borderRadius: '50%', background: isToday ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
@@ -358,9 +352,7 @@ function prevMonth() {
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
               <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
               <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>Belum ada jadwal bulan ini</div>
-              <button onClick={() => openAdd()} style={{ marginTop: 8, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                + Jadwalkan Konten
-              </button>
+              <div style={{ fontSize: '0.82rem', color: '#9ca3af' }}>Jadwalkan konten dari antrian "Siap Dijadwalkan" di atas</div>
             </div>
           ) : monthEntries.map(e => {
             const d = new Date(e.scheduled_at)

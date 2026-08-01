@@ -550,9 +550,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Library</h1>
           <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Bank konten — hook, body, CTA, dan script siap pakai</p>
         </div>
-        <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-          + Tambah Konten
-        </button>
       </div>
 
       {/* Stats */}
@@ -589,12 +586,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
           <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
           <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>{ideas.length === 0 ? 'Library kosong' : 'Tidak ada konten'}</div>
-          <div style={{ fontSize: '0.85rem', marginBottom: 20 }}>{ideas.length === 0 ? 'Mulai tambahkan ide konten kamu' : 'Coba filter lain'}</div>
-          {ideas.length === 0 && (
-            <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-              + Buat Konten Pertama
-            </button>
-          )}
+          <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>{ideas.length === 0 ? 'Naskah akan muncul di sini setelah copywriter simpan dari modul Plan' : 'Coba filter lain'}</div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
