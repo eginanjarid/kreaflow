@@ -173,12 +173,16 @@ function getWeekDates() {
   const day = now.getDay()
   const mon = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1))
   const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
-  const fmt = (d: Date) => d.toISOString().split('T')[0]
+  const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   return { start: fmt(mon), end: fmt(sun) }
 }
 
 function fmtDate(d: string) {
   return new Date(d + (d.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+}
+function localToday() {
+  const t = new Date()
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
 }
 
 function fieldStyle(extra?: object) {
@@ -376,7 +380,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const lastSlot = slots.find(r => r.mulai === dates[dates.length - 1])
     const lastDate = new Date(dates[dates.length - 1] + 'T00:00:00')
     lastDate.setDate(lastDate.getDate() + ((lastSlot?.jumlah || 1) - 1) * ((lastSlot?.interval || 1)))
-    return { start, end: lastDate.toISOString().split('T')[0] }
+    return { start, end: `${lastDate.getFullYear()}-${String(lastDate.getMonth() + 1).padStart(2, '0')}-${String(lastDate.getDate()).padStart(2, '0')}` }
   }
 
   async function createSprint() {
@@ -401,8 +405,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const { data: sprint, error } = await supabase.from('kf_sprints').insert({
       workspace_id: workspaceId,
       nama: autoNama,
-      start_date: calcStart || new Date().toISOString().split('T')[0],
-      end_date: calcEnd || new Date().toISOString().split('T')[0],
+      start_date: calcStart || localToday(),
+      end_date: calcEnd || localToday(),
       target_konten: totalFromProducts > 0 ? totalFromProducts : sprintForm.target_konten,
       platform: sprintForm.platform || null,
       akun: sprintForm.akun.trim() || null,
@@ -435,13 +439,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
             labelPrefix = pillar ? pillar.nama : ''
           }
 
-          const baseDateStr = row.mulai || new Date().toISOString().split('T')[0]
+          const baseDateStr = row.mulai || localToday()
           return Array.from({ length: row.jumlah }, (_, i) => {
             let tanggal_tayang: string | null = null
             if (baseDateStr) {
               const d = new Date(baseDateStr + 'T00:00:00')
               d.setDate(d.getDate() + i * (row.interval || 1))
-              tanggal_tayang = d.toISOString().split('T')[0]
+              tanggal_tayang = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
             }
             return {
               workspace_id: workspaceId,
@@ -784,7 +788,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ textAlign: 'center', padding: '32px 12px', color: '#d1d5db', fontSize: '0.78rem' }}>Kosong</div>
                 )}
                 {col.items.map(t => {
-                  const isOverdue = t.due_date && t.due_date < new Date().toISOString().split('T')[0] && col.id !== 'done'
+                  const isOverdue = t.due_date && t.due_date < localToday() && col.id !== 'done'
                   return (
                     <div key={t.id} className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '11px 12px', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)', opacity: col.id === 'done' ? 0.6 : 1 }}>
                       {/* Task name */}
@@ -903,7 +907,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const sc = contents.filter(c => c.sprint_id === s.id)
               const done = sc.filter(c => c.status === 'Tayang').length
               const active = s.id === selectedSprintId
-              const today = new Date().toISOString().split('T')[0]
+              const today = localToday()
               const isCurrent = s.start_date <= today && s.end_date >= today
               const tplLabel = getTemplateLabel(s.template_type)
               const tplColor = getTemplateColor(s.template_type)
@@ -1264,9 +1268,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       ))}
                     </div>
                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                      <button type="button" onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' }])}
+                      <button type="button" onClick={() => setSprintProducts(prev => [...prev, { product_id: '', jumlah: 7, mulai: localToday(), interval: 1, jam: '18:00' }])}
                         style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Baris</button>
-                      {products.length > 0 && <button type="button" onClick={() => setSprintProducts(prev => [...prev, ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00' }))])}
+                      {products.length > 0 && <button type="button" onClick={() => setSprintProducts(prev => [...prev, ...products.map(p => ({ product_id: p.id, jumlah: 7, mulai: localToday(), interval: 1, jam: '18:00' }))])}
                         style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Produk</button>}
                     </div>
                   </>
@@ -1330,9 +1334,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       ))}
                     </div>
                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00', format: '' }])}
+                      <button type="button" onClick={() => setSprintPillars(prev => [...prev, { pillar_id: '', jumlah: 7, mulai: localToday(), interval: 1, jam: '18:00', format: '' }])}
                         style={{ flex: 1, background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer' }}>+ Tambah Pilar</button>
-                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: new Date().toISOString().split('T')[0], interval: 1, jam: '18:00', format: '' })))}
+                      {pillars.length > 0 && <button type="button" onClick={() => setSprintPillars(pillars.map(p => ({ pillar_id: p.id, jumlah: 7, mulai: localToday(), interval: 1, jam: '18:00', format: '' })))}
                         style={{ flex: 1, background: 'rgba(26,115,232,0.08)', border: '1px dashed rgba(26,115,232,0.3)', borderRadius: 7, padding: '6px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>+ Semua Pilar</button>}
                     </div>
                   </>
