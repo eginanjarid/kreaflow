@@ -145,8 +145,24 @@ function getTemplateColor(template_type: string): string {
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
 const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
-const FORMATS_CREATOR = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Lainnya']
-const FORMATS_AFFILIATE = ['Reels', 'Feed/Carousel', 'Story', 'Video Pendek', 'Shorts', 'TikTok Video', 'Live', 'Lainnya']
+const FORMATS_CREATOR = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Thread/Caption', 'Lainnya']
+const FORMATS_AFFILIATE = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Live', 'Lainnya']
+
+// Format → platforms yang relevan (auto-derive saat buat content idea)
+const CONTENT_TYPE_PLATFORMS: Record<string, string[]> = {
+  'Video Pendek':   ['TikTok', 'Instagram', 'YouTube'],
+  'Reels':          ['Instagram', 'YouTube'],
+  'Carousel':       ['Instagram', 'Facebook'],
+  'Single Post':    ['Instagram', 'Facebook'],
+  'Story':          ['Instagram', 'Facebook'],
+  'Long Video':     ['YouTube'],
+  'Thread/Caption': ['Twitter/X', 'Threads'],
+  'Live':           ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
+  'Live Script':    ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
+  'TikTok Video':   ['TikTok'],
+  'Shorts':         ['YouTube'],
+  'Feed/Carousel':  ['Instagram', 'Facebook'],
+}
 const PRIORITIES = ['High', 'Medium', 'Low']
 const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
@@ -454,7 +470,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
               status: 'Draft',
               product_id: isAffiliate ? ((row as typeof sprintProducts[0]).product_id || null) : null,
               format: !isAffiliate ? ((row as typeof sprintPillars[0]).format || null) : null,
-              platform: sprintForm.platform ? [sprintForm.platform] : [],
+              platform: (() => {
+                const fmt = !isAffiliate ? ((row as typeof sprintPillars[0]).format || '') : ''
+                if (fmt && CONTENT_TYPE_PLATFORMS[fmt]) return CONTENT_TYPE_PLATFORMS[fmt]
+                return sprintForm.platform ? [sprintForm.platform] : []
+              })(),
               tanggal_tayang,
               jam_tayang: row.jam || null,
               ...assignByCol,
@@ -1309,8 +1329,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <select value={row.format} onChange={e => setSprintPillars(prev => prev.map((r, i) => i === idx ? { ...r, format: e.target.value } : r))}
                               style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', color: row.format ? '#111827' : '#9ca3af', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const }}>
                               <option value="">— Format Konten —</option>
-                              {['Video Pendek', 'Reels', 'Carousel', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
+                              {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
+                            {row.format && CONTENT_TYPE_PLATFORMS[row.format] && (
+                              <div style={{ display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap' }}>
+                                {CONTENT_TYPE_PLATFORMS[row.format].map(p => (
+                                  <span key={p} style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 10, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', color: '#1a73e8', fontWeight: 600 }}>{p}</span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>

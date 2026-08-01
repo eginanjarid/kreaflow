@@ -113,6 +113,9 @@ function prevMonth() {
         if (idea?.tanggal_tayang) {
           newEntry.scheduled_at = `${idea.tanggal_tayang}T${idea.jam_tayang || '09:00'}`
         }
+        if (idea?.platform && idea.platform.length === 1) {
+          newEntry.platform = idea.platform[0]
+        }
       }
       return { ...m, entry: newEntry }
     })
@@ -489,9 +492,20 @@ function prevMonth() {
               {/* Platform */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
+                {schedModal.item.platform && schedModal.item.platform.length > 1 && (
+                  <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
+                    {schedModal.item.platform.map(p => (
+                      <button key={p} type="button"
+                        onClick={() => setSchedModal(s => s ? { ...s, platform: p } : s)}
+                        style={{ fontSize: '0.7rem', padding: '3px 10px', borderRadius: 12, border: `1px solid ${schedModal.platform === p ? '#1a73e8' : '#e5e7eb'}`, background: schedModal.platform === p ? 'rgba(26,115,232,0.1)' : '#f3f4f6', color: schedModal.platform === p ? '#1a73e8' : '#6b7280', fontWeight: schedModal.platform === p ? 700 : 400, cursor: 'pointer' }}>
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={schedModal.platform} onChange={e => setSchedModal(s => s ? { ...s, platform: e.target.value } : s)} required>
                   <option value="">Pilih platform</option>
-                  {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+                  {(schedModal.item.platform && schedModal.item.platform.length > 0 ? schedModal.item.platform : PLATFORMS).map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
               {schedError && (
@@ -540,10 +554,16 @@ function prevMonth() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.entry.platform ?? ''} onChange={e => setField('platform', e.target.value)} required>
-                    <option value="">Pilih platform</option>
-                    {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
+                  {(() => {
+                    const selectedPlatforms = modal.entry.content_id ? (ideaMap[modal.entry.content_id]?.platform || []) : []
+                    const platformOptions = selectedPlatforms.length > 0 ? selectedPlatforms : PLATFORMS
+                    return (
+                      <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={modal.entry.platform ?? ''} onChange={e => setField('platform', e.target.value)} required>
+                        <option value="">Pilih platform</option>
+                        {platformOptions.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    )
+                  })()}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Status</label>
