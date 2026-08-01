@@ -175,7 +175,7 @@ function prevMonth() {
   }
 
   function openSchedModal(item: ReadyItem) {
-    const defaultPlatform = (item.platform && item.platform.length === 1) ? item.platform[0] : ''
+    const defaultPlatform = (item.platform && item.platform.length > 0) ? item.platform[0] : ''
     const defaultDate = item.tanggal_tayang || todayDateStr
     const defaultTime = item.jam_tayang || '09:00'
     setSchedModal({ item, date: defaultDate, time: defaultTime, platform: defaultPlatform })

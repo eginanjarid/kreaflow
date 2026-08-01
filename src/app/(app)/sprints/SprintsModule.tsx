@@ -1200,10 +1200,29 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Platform</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
-                    <option value="">Semua Platform</option>
-                    {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
+                  {(() => {
+                    const derived = Array.from(new Set(
+                      (isAffiliate ? sprintProducts : sprintPillars)
+                        .flatMap(r => {
+                          const fmt = (r as typeof sprintPillars[0]).format || ''
+                          return (fmt && CONTENT_TYPE_PLATFORMS[fmt]) ? CONTENT_TYPE_PLATFORMS[fmt] : []
+                        })
+                    ))
+                    if (derived.length > 0) return (
+                      <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: 5, minHeight: 38, alignItems: 'center' }}>
+                        {derived.map(p => (
+                          <span key={p} style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 10, background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.25)', color: '#1a73e8', fontWeight: 600 }}>{p}</span>
+                        ))}
+                        <span style={{ fontSize: '0.65rem', color: '#9ca3af', marginLeft: 2 }}>dari format</span>
+                      </div>
+                    )
+                    return (
+                      <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
+                        <option value="">Semua Platform</option>
+                        {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    )
+                  })()}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
