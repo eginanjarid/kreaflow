@@ -398,7 +398,6 @@ export default function BrandModule({
     }
     setSaving(false)
     setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
   }
 
   function buildNichePrompt(): string {
@@ -2343,7 +2342,6 @@ Tutup dengan 1 pertanyaan yang membantu saya memilih pillar mana yang paling rea
     )
     setSaving(false)
     setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
   }
 
   return (
