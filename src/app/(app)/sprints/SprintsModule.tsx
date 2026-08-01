@@ -278,9 +278,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const PLATFORMS = isAffiliate ? PLATFORMS_AFFILIATE : PLATFORMS_CREATOR
   const FORMATS = isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR
   const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
-  // Creator: creator + live. Affiliate: affiliate + carousel + live.
+  // Creator: creator only. Affiliate: affiliate + carousel + live.
   const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) =>
-    isAffiliate ? key !== 'creator' : (key === 'creator' || key === 'live')
+    isAffiliate ? key !== 'creator' : key === 'creator'
   )
 
   const [sprintModal, setSprintModal] = useState(false)
