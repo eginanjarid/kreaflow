@@ -1947,7 +1947,7 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
                   <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#059669', color: '#fff', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Generate dengan AI</div>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat: trust statement, variasi bio, dan kalimat disclosure</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>AI akan buat: 3 variasi bio + 3 pilihan kalimat disclosure</div>
                   </div>
                   <button type="button" onClick={() => setAiModal({ prompt: buildAffiliatePrompt() })}
                     style={{ background: '#059669', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
