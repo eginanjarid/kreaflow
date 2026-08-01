@@ -63,7 +63,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const effectiveView = isMobile ? 'list' : view
   const [showTasks, setShowTasks] = useState(true)
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
-  const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platform: string } | null>(null)
+  const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platforms: string[] } | null>(null)
   const [schedSaving, setSchedSaving] = useState(false)
   const [schedError, setSchedError] = useState('')
 
@@ -175,16 +175,17 @@ function prevMonth() {
   }
 
   function openSchedModal(item: ReadyItem) {
-    const defaultPlatform = (item.platform && item.platform.length > 0) ? item.platform[0] : ''
+    const defaultPlatforms = (item.platform && item.platform.length > 0) ? item.platform : []
     const defaultDate = item.tanggal_tayang || todayDateStr
     const defaultTime = item.jam_tayang || '09:00'
-    setSchedModal({ item, date: defaultDate, time: defaultTime, platform: defaultPlatform })
+    setSchedModal({ item, date: defaultDate, time: defaultTime, platforms: defaultPlatforms })
     setSchedError('')
   }
 
   async function confirmSchedule() {
     if (!schedModal) return
-    const { item, date, time, platform } = schedModal
+    const { item, date, time, platforms } = schedModal
+    if (platforms.length === 0) { setSchedError('Pilih minimal 1 platform.'); return }
     const scheduled_at = `${date}T${time}`
     if (new Date(scheduled_at) < new Date()) {
       setSchedError('Jadwal tidak boleh di masa lalu. Pilih tanggal dan waktu yang akan datang.')
@@ -193,27 +194,22 @@ function prevMonth() {
     setSchedSaving(true)
     setSchedError('')
     const supabase = createClient()
-    const { data: entry } = await supabase.from('kf_calendar_entries').insert({
-      workspace_id: workspaceId,
-      content_id: item.id,
-      platform,
-      scheduled_at,
-      status: 'Planned',
-      posted_at: null,
-      posted_url: null,
-    }).select('id').single()
+    // Create one entry per platform
+    const { data: newEntries } = await supabase.from('kf_calendar_entries').insert(
+      platforms.map(p => ({ workspace_id: workspaceId, content_id: item.id, platform: p, scheduled_at, status: 'Planned', posted_at: null, posted_url: null }))
+    ).select('id, platform')
     await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date }).eq('id', item.id)
     if (item.sprint_id) {
       await supabase.from('kf_notifications').insert({
         workspace_id: workspaceId,
         type: 'schedule',
         title: `Terjadwal — ${item.judul}`,
-        message: `Konten dijadwalkan posting ${date} pukul ${time}${platform ? ' di ' + platform : ''}. Sprint progress bertambah!`,
+        message: `Konten dijadwalkan posting ${date} pukul ${time} di ${platforms.join(', ')}. Sprint progress bertambah!`,
         content_idea_id: item.id,
       })
     }
-    if (entry) {
-      setEntries(prev => [...prev, { id: entry.id, workspace_id: workspaceId, content_id: item.id, platform, scheduled_at, posted_at: null, posted_url: null, status: 'Planned' }])
+    if (newEntries) {
+      setEntries(prev => [...prev, ...newEntries.map(e => ({ id: e.id, workspace_id: workspaceId, content_id: item.id, platform: e.platform, scheduled_at, posted_at: null, posted_url: null, status: 'Planned' }))])
     }
     setReadyItems(prev => prev.filter(r => r.id !== item.id))
     setSchedModal(null)
@@ -489,24 +485,33 @@ function prevMonth() {
                 <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Jam Posting</label>
                 <input type="time" style={fieldStyle()} value={schedModal.time} onChange={e => setSchedModal(s => s ? { ...s, time: e.target.value } : s)} />
               </div>
-              {/* Platform */}
+              {/* Platform multi-select */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
-                {schedModal.item.platform && schedModal.item.platform.length > 1 && (
-                  <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
-                    {schedModal.item.platform.map(p => (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <label style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 500 }}>Platform * <span style={{ fontWeight: 400, color: '#9ca3af' }}>(bisa pilih lebih dari 1)</span></label>
+                  {schedModal.platforms.length > 0 && (
+                    <span style={{ fontSize: '0.65rem', color: '#059669', fontWeight: 700 }}>{schedModal.platforms.length} dipilih</span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {(schedModal.item.platform && schedModal.item.platform.length > 0 ? schedModal.item.platform : PLATFORMS).map(p => {
+                    const checked = schedModal.platforms.includes(p)
+                    return (
                       <button key={p} type="button"
-                        onClick={() => setSchedModal(s => s ? { ...s, platform: p } : s)}
-                        style={{ fontSize: '0.7rem', padding: '3px 10px', borderRadius: 12, border: `1px solid ${schedModal.platform === p ? '#1a73e8' : '#e5e7eb'}`, background: schedModal.platform === p ? 'rgba(26,115,232,0.1)' : '#f3f4f6', color: schedModal.platform === p ? '#1a73e8' : '#6b7280', fontWeight: schedModal.platform === p ? 700 : 400, cursor: 'pointer' }}>
+                        onClick={() => setSchedModal(s => {
+                          if (!s) return s
+                          const next = checked ? s.platforms.filter(x => x !== p) : [...s.platforms, p]
+                          return { ...s, platforms: next }
+                        })}
+                        style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 10, border: `1.5px solid ${checked ? '#1a73e8' : '#e5e7eb'}`, background: checked ? 'rgba(26,115,232,0.08)' : '#f8fafc', color: checked ? '#1a73e8' : '#6b7280', fontSize: '0.78rem', fontWeight: checked ? 700 : 400, cursor: 'pointer' }}>
+                        <div style={{ width: 14, height: 14, borderRadius: 3, border: `2px solid ${checked ? '#1a73e8' : '#d1d5db'}`, background: checked ? '#1a73e8' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {checked && <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        </div>
                         {p}
                       </button>
-                    ))}
-                  </div>
-                )}
-                <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={schedModal.platform} onChange={e => setSchedModal(s => s ? { ...s, platform: e.target.value } : s)} required>
-                  <option value="">Pilih platform</option>
-                  {(schedModal.item.platform && schedModal.item.platform.length > 0 ? schedModal.item.platform : PLATFORMS).map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+                    )
+                  })}
+                </div>
               </div>
               {schedError && (
                 <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: '0.8rem', color: '#dc2626' }}>
@@ -517,8 +522,8 @@ function prevMonth() {
                 <button onClick={() => { setSchedModal(null); setSchedError('') }} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 18px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button
                   onClick={confirmSchedule}
-                  disabled={schedSaving || !schedModal.platform || !schedModal.date}
-                  style={{ background: schedSaving ? '#15803d' : '#059669', border: 'none', borderRadius: 10, padding: '10px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: (schedSaving || !schedModal.platform) ? 'not-allowed' : 'pointer', opacity: (!schedModal.platform || !schedModal.date) ? 0.5 : 1 }}>
+                  disabled={schedSaving || schedModal.platforms.length === 0 || !schedModal.date}
+                  style={{ background: schedSaving ? '#15803d' : '#059669', border: 'none', borderRadius: 10, padding: '10px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: (schedSaving || schedModal.platforms.length === 0) ? 'not-allowed' : 'pointer', opacity: (schedModal.platforms.length === 0 || !schedModal.date) ? 0.5 : 1 }}>
                   {schedSaving ? 'Menjadwalkan...' : 'Jadwalkan'}
                 </button>
               </div>
