@@ -672,7 +672,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
   async function saveTask() {
     if (!taskModal || !taskModal.task.nama.trim()) return
     setSavingTask(true)
-    const t = { ...taskModal.task, workspace_id: workspaceId }
+    const raw = taskModal.task
+    const t = {
+      ...raw,
+      workspace_id: workspaceId,
+      start_date: raw.start_date || null,
+      due_date: raw.due_date || null,
+      platform: raw.platform || null,
+      notes: raw.notes || null,
+    }
     if (t.id) {
       await supabase.from('kf_tasks').update(t).eq('id', t.id)
       setTasks(prev => prev.map(x => x.id === t.id ? t : x))
