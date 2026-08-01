@@ -326,8 +326,24 @@ export default function BrandModule({
     setSaved(false)
   }
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(!!initialProfile?.id)
-  function changeTab(id: string) { setTab(id) }
+  function tabHasContent(tabId: string, p: BrandProfile): boolean {
+    switch (tabId) {
+      case 'aff-niche':     return !!(p.affiliate_micro_niche || p.affiliate_target_buyer || p.affiliate_competitive_edge)
+      case 'aff-identity':  return !!(p.affiliate_tagline || p.affiliate_positioning_statement || (p.affiliate_nama_options || []).length > 0)
+      case 'aff-konten':    return !!(p.affiliate_content_pillars)
+      case 'aff-bio':       return !!(p.affiliate_trust_builder || p.affiliate_disclosure || (p.affiliate_bio_options || []).length > 0)
+      case 'overview':      return !!initialProfile?.id
+      case 'niche':         return !!(p.niche || p.suka || p.bisa)
+      case 'story':         return !!(p.premis)
+      case 'bio':           return Object.values(p.bio_options || {}).some(arr => (arr as unknown[]).length > 0)
+      case 'identity':      return !!(p.nama_akun)
+      case 'visual':        return !!(p.color_palette?.length)
+      default:              return !!initialProfile?.id
+    }
+  }
+  const initialTab = isAffiliate ? 'aff-niche' : 'overview'
+  const [saved, setSaved] = useState(() => tabHasContent(initialTab, profile))
+  function changeTab(id: string) { setTab(id); setSaved(tabHasContent(id, profile)) }
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState('')
   const [aiModal, setAiModal] = useState<{ prompt: string } | null>(null)
