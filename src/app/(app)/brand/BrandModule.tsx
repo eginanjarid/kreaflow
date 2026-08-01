@@ -808,58 +808,52 @@ Jangan tambahkan penjelasan panjang, tips tambahan, atau tabel. Langsung ke outp
   }
 
   function buildAffiliatePrompt(): string {
-    const nama = profile.nama_akun || '[nama belum diisi]'
-    const niche = profile.niche || '[belum diisi]'
-    const premis = profile.premis || '[belum diisi]'
+    const namaUtama = (profile.affiliate_nama_options || []).find(n => n.is_primary)?.nama || '[nama belum dipilih]'
+    const microNiche = profile.affiliate_micro_niche || '[belum diisi]'
+    const targetBuyer = profile.affiliate_target_buyer || '[belum diisi]'
     const positioning = profile.affiliate_positioning || '[belum dipilih]'
-    const positioningStatement = profile.affiliate_positioning_statement || ''
+    const positioningStatement = profile.affiliate_positioning_statement || '[belum diisi]'
     const trustBuilder = profile.affiliate_trust_builder || '[belum diisi]'
-    const disclosure = profile.affiliate_disclosure || '[belum diisi]'
     const platforms = (profile.affiliate_platforms || []).join(', ') || '[belum dipilih]'
     const kategori = (profile.affiliate_kategori_fokus || []).join(', ') || '[belum dipilih]'
-    const audiens = profile.target_audiens || '[belum diisi]'
 
-    return `Kamu adalah seorang brand strategist yang spesialis membantu affiliate marketer Indonesia membangun identitas sebagai trusted recommender — bukan hard seller.
-
-Jawab seluruhnya dalam Bahasa Indonesia. Output harus konkret dan langsung bisa dipakai.
-
----
+    return `Kamu adalah brand copywriter spesialis affiliate Indonesia 2026.
 
 DATA AFFILIATOR
+Nama akun: ${namaUtama}
+Micro-niche: ${microNiche}
+Kategori: ${kategori}
+Target pembeli: ${targetBuyer}
+Positioning: ${positioning}
+Positioning statement: ${positioningStatement}
+Platform: ${platforms}
+Latar belakang & alasan dipercaya: ${trustBuilder}
 
-Nama: ${nama}
-Niche: ${niche}
-Premis brand: ${premis}
-Tipe positioning: ${positioning}${positioningStatement ? `\nPositioning statement: ${positioningStatement}` : ''}
-Platform affiliate: ${platforms}
-Kategori produk fokus: ${kategori}
-Target audiens: ${audiens}
-Alasan dipercaya: ${trustBuilder}
-Kalimat disclosure saat ini: ${disclosure}
-
----
-
-YANG SAYA BUTUHKAN:
-
-▸ TRUST STATEMENT
-3 versi kalimat "kenapa orang harus percaya rekomendasiku" — pendek (1 kalimat), medium (2-3 kalimat), panjang (1 paragraf). Bangun dari konteks "alasan dipercaya" di atas, bukan generik.
-
-▸ BIO AFFILIATOR
-3 variasi bio profil khusus untuk affiliate (80-150 karakter) yang menonjolkan identitas sebagai trusted recommender, bukan penjual. Cocok untuk TikTok/Instagram.
-
-▸ KALIMAT DISCLOSURE
-5 pilihan kalimat disclosure yang natural dan tidak kaku — yang bikin audience malah respect, bukan kabur. Beda gaya: santai, profesional, lucu, singkat, storytelling. Jadikan kalimat disclosure saat ini sebagai referensi gaya.
-
-▸ ANGLE KONTEN
-5 ide angle konten affiliate yang autentik untuk niche "${niche}" dengan positioning "${positioning}" — bukan sekadar "beli ini beli itu" tapi yang build trust sambil convert.
-
-▸ POSITIONING STATEMENT FINAL
-1 kalimat positioning yang bisa dijadikan tagline atau anchor identity:
-"Saya [nama] — [positioning statement yang jelas membedakan dari affiliator lain]"
+Jawab dalam Bahasa Indonesia. Berikan HANYA 2 output berikut — tidak lebih, tidak kurang:
 
 ---
 
-Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.`
+① BIO AKUN (3 variasi)
+Format — satu per baris, langsung bisa copy-paste ke form bio:
+Bio 1: [maks 150 karakter, tonjolkan niche + trusted recommender angle]
+Bio 2: [maks 150 karakter, variasi gaya berbeda]
+Bio 3: [maks 150 karakter, variasi gaya berbeda]
+
+Cocok untuk TikTok/Instagram. Jangan pakai hashtag.
+
+---
+
+② KALIMAT DISCLOSURE (3 pilihan)
+Format:
+Pilihan 1 (Santai): [1-2 kalimat, natural, tidak kaku]
+Pilihan 2 (Singkat): [1 kalimat maksimal]
+Pilihan 3 (Storytelling): [2-3 kalimat, bangun dari alasan dipercaya di atas]
+
+Yang bikin audiens respect, bukan kabur. Natural dan sesuai karakter akun ini.
+
+---
+
+Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan lain. Langsung ke outputnya.\`
   }
 
   async function callAI(prompt: string, fields: (keyof BrandProfile)[]) {
