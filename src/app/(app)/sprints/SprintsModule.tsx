@@ -81,6 +81,15 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
       { id: 'schedule', nama: 'Schedule',    icon: 'calendar', doneAt: 'Terjadwal',   href: '/calendar' },
     ],
   },
+  carousel: {
+    label: 'Konten Carousel',
+    color: '#a855f7',
+    steps: [
+      { id: 'naskah',   nama: 'Copywriting', icon: 'naskah',   doneAt: 'Naskah Siap', href: '/plan' },
+      { id: 'editing',  nama: 'Desain Slide', icon: 'scissors', doneAt: 'Siap Tayang', href: '/studio' },
+      { id: 'schedule', nama: 'Schedule',     icon: 'calendar', doneAt: 'Terjadwal',   href: '/calendar' },
+    ],
+  },
   live: {
     label: 'Live Streaming',
     color: '#dc2626',

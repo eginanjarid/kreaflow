@@ -235,14 +235,9 @@ Deskripsi: ${selectedProduct.deskripsi || '-'}
       : ''
 
     const varian = parseInt(naskahForm.jumlah_varian) || 3
+    const isCarousel = tipe === 'Carousel'
 
-    return `Kamu adalah scriptwriter konten media sosial Indonesia yang spesialis membuat naskah dengan hook kuat, natural, dan convert.
-
-Buat ${varian} varian naskah LENGKAP. Setiap varian harus BERBEDA secara hook, angle, dan pendekatan cerita — bukan parafrase.
-
----
-
-DATA BRAND
+    const brandBlock = `DATA BRAND
 Niche: ${niche}
 Premis: ${premis}
 Tone of voice: ${tone}
@@ -254,7 +249,59 @@ Format: ${tipe}
 Pillar konten: ${pillar}
 Hook angle yang diinginkan: ${hookAngle}
 Konteks tambahan: ${konteks}
-${productSection}
+${productSection}`
+
+    if (isCarousel) {
+      const slideCount = Math.max(varian, 4)
+      return `Kamu adalah copywriter konten carousel media sosial Indonesia yang ahli membuat slide yang stop-scroll dan mudah di-swipe sampai habis.
+
+Buat 1 carousel LENGKAP dengan ${slideCount} slide. Setiap slide harus ringkas (maks 15 kata headline, 2–3 kalimat copy) tapi powerful.
+
+---
+
+${brandBlock}
+---
+
+OUTPUT FORMAT — tulis persis seperti ini untuk SETIAP slide:
+
+${'═'.repeat(50)}
+SLIDE [N] — [FUNGSI SLIDE]
+${'═'.repeat(50)}
+
+📌 HEADLINE
+[Teks utama slide — bold, singkat, langsung ke poin]
+
+✍️ COPY
+[2–3 kalimat pendukung — sesuai tone brand]
+
+🎨 ARAHAN VISUAL
+[Deskripsi desain: warna dominan, elemen grafis, mood, layout]
+
+---
+
+Struktur slide yang WAJIB diikuti:
+• Slide 1 = HOOK — bikin orang berhenti scroll, timbulkan rasa penasaran
+• Slide 2 hingga ${slideCount - 1} = ISI — poin per poin, satu poin satu slide
+• Slide ${slideCount} = CTA — ajakan yang jelas dan natural${selectedProduct ? `, promosikan ${selectedProduct.nama} secara natural` : ''}
+
+Setelah semua slide, tambahkan:
+
+📝 CAPTION SIAP POSTING
+[Caption dengan emoji sesuai tone + ajakan swipe — langsung bisa dipaste]
+
+#️⃣ HASHTAG
+[10–15 hashtag: mix niche + broad + trending ${platform}]
+
+Tulis copy yang terasa natural, bukan template kaku. Bahasa sehari-hari Indonesia.`
+    }
+
+    return `Kamu adalah scriptwriter konten media sosial Indonesia yang spesialis membuat naskah dengan hook kuat, natural, dan convert.
+
+Buat ${varian} varian naskah LENGKAP. Setiap varian harus BERBEDA secara hook, angle, dan pendekatan cerita — bukan parafrase.
+
+---
+
+${brandBlock}
 ---
 
 OUTPUT FORMAT — tulis persis seperti ini untuk SETIAP varian:
@@ -833,9 +880,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 )}
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jumlah Varian Naskah</label>
-                  <input type="number" style={fieldStyle({ fontSize: '0.9rem', textAlign: 'center' as const })} value={naskahForm.jumlah_varian} onChange={e => setNF('jumlah_varian', e.target.value)} min="1" max="10" />
-                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 4 }}>Setiap varian punya hook, angle & story berbeda. Tiap varian langsung bisa di-copy-paste ke Library.</div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>
+                    {naskahForm.tipe_konten === 'Carousel' ? 'Jumlah Slide' : 'Jumlah Varian Naskah'}
+                  </label>
+                  <input type="number" style={fieldStyle({ fontSize: '0.9rem', textAlign: 'center' as const })} value={naskahForm.jumlah_varian} onChange={e => setNF('jumlah_varian', e.target.value)} min="1" max="20" />
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 4 }}>
+                    {naskahForm.tipe_konten === 'Carousel' ? 'Jumlah slide carousel. Min 4: 1 hook + isi + 1 CTA. Rekomendasi: 7–10.' : 'Setiap varian punya hook, angle & story berbeda. Tiap varian langsung bisa di-copy-paste ke Library.'}
+                  </div>
                 </div>
 
                 <button type="button" onClick={() => setAiModal({ prompt: buildNaskahPrompt() })}
