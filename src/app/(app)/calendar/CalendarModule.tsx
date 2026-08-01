@@ -26,9 +26,10 @@ type ReadyItem = {
   product_id: string | null; product_nama: string | null; sprint_id: string | null
   tanggal_tayang: string | null; jam_tayang: string | null
 }
-type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string; stage?: string | null }
+type TaskSnap = { id: string; nama: string; platform: string | null; due_date: string; percent_complete: number; priority: string; stage?: string | null; assigned_to?: string | null }
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
+const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
 const STATUSES = ['Planned', 'Ready', 'Posted', 'Cancelled']
 const STATUS_COLOR: Record<string, string> = { Planned: '#1a73e8', Ready: '#d97706', Posted: '#059669', Cancelled: '#6b7280' }
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
@@ -84,8 +85,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   function tasksForDay(day: number) {
     if (!showTasks) return []
     const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    const linkedTaskIds = new Set(entries.filter(e => e.task_id).map(e => e.task_id))
-    return tasks.filter(t => t.due_date === dateStr && !linkedTaskIds.has(t.id) && t.stage === 'schedule')
+    return tasks.filter(t => t.due_date === dateStr && t.percent_complete < 100)
   }
 
 function prevMonth() {
@@ -189,11 +189,9 @@ function prevMonth() {
     return d.getFullYear() === viewYear && d.getMonth() === viewMonth
   }).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))
 
-  const linkedTaskIds = new Set(entries.filter(e => e.task_id).map(e => e.task_id))
   const monthTasks = showTasks ? tasks.filter(t => {
     if (!t.due_date) return false
-    if (linkedTaskIds.has(t.id)) return false
-    if (t.stage !== 'schedule') return false
+    if (t.percent_complete === 100) return false
     const d = new Date(t.due_date)
     return d.getFullYear() === viewYear && d.getMonth() === viewMonth
   }).sort((a, b) => a.due_date.localeCompare(b.due_date)) : []
@@ -348,13 +346,38 @@ function prevMonth() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {monthEntries.length === 0 ? (
+          {monthEntries.length === 0 && monthTasks.length === 0 ? (
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
               <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
               <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>Belum ada jadwal bulan ini</div>
               <div style={{ fontSize: '0.82rem', color: '#9ca3af' }}>Jadwalkan konten dari antrian "Siap Dijadwalkan" di atas</div>
             </div>
-          ) : monthEntries.map(e => {
+          ) : null}
+          {showTasks && monthTasks.map(t => {
+            const d = new Date(t.due_date + 'T00:00:00')
+            const isOverdue = t.due_date < todayStr
+            const taskColor = isOverdue ? '#dc2626' : '#d97706'
+            return (
+              <div key={t.id} style={{ background: '#fff', border: `1px solid ${taskColor}30`, borderRadius: 10, padding: '12px 18px', display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                <div style={{ width: 48, textAlign: 'center', flexShrink: 0 }}>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 700, color: isOverdue ? '#dc2626' : '#111827' }}>{d.getDate()}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#6b7280' }}>{MONTHS[d.getMonth()].slice(0, 3)}</div>
+                </div>
+                <div style={{ width: 1, alignSelf: 'stretch', minHeight: 44, background: taskColor, flexShrink: 0, opacity: 0.5 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 3, background: `${taskColor}15`, color: taskColor, border: `1px solid ${taskColor}30` }}>
+                      {isOverdue ? 'OVERDUE' : 'DEADLINE'}
+                    </span>
+                    <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: `${PRIORITY_COLOR[t.priority] || '#6b7280'}15`, color: PRIORITY_COLOR[t.priority] || '#6b7280', fontWeight: 600 }}>{t.priority}</span>
+                    {t.assigned_to && <span style={{ fontSize: '0.62rem', color: '#1a73e8' }}>👤 {t.assigned_to}</span>}
+                  </div>
+                  <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem', marginBottom: 2 }}>{t.nama}</div>
+                </div>
+              </div>
+            )
+          })}
+          {monthEntries.map(e => {
             const d = new Date(e.scheduled_at)
             const idea = e.content_id ? ideaMap[e.content_id] : null
             const isSprint = !!e.task_id
