@@ -853,7 +853,7 @@ Yang bikin audiens respect, bukan kabur. Natural dan sesuai karakter akun ini.
 
 ---
 
-Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan lain. Langsung ke outputnya.\`
+Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan lain. Langsung ke outputnya.`
   }
 
   async function callAI(prompt: string, fields: (keyof BrandProfile)[]) {
