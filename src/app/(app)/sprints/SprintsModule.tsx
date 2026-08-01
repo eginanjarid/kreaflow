@@ -1216,13 +1216,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
                           style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
                         <input
-                          type="number" min={0} max={30}
+                          type="text" inputMode="numeric" pattern="[0-9]*"
                           value={daysBefore}
-                          onChange={e => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, Math.min(30, parseInt(e.target.value) || 0)) } : x))}
-                          style={{ width: 32, textAlign: 'center', color: '#d97706', fontWeight: 800, fontSize: '0.9rem', border: 'none', background: 'transparent', outline: 'none',
-                            // hide browser spinners
-                            MozAppearance: 'textfield' } as React.CSSProperties}
-                          className="no-spinner"
+                          onChange={e => {
+                            const v = parseInt(e.target.value.replace(/\D/g, '')) || 0
+                            setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, Math.min(30, v)) } : x))
+                          }}
+                          style={{ width: 32, textAlign: 'center', color: '#d97706', fontWeight: 800, fontSize: '0.9rem', border: 'none', background: 'transparent', outline: 'none' }}
                         />
                         <button type="button"
                           onClick={() => setSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
