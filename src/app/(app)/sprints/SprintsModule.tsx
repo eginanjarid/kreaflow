@@ -408,6 +408,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSlotMode('slots')
     setWeeklyRange({ start: '', end: '' })
     setWeeklyPattern({ 0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(), 3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern() })
+    // Auto-fill akun jika hanya 1
+    if (accounts.length === 1) {
+      setSprintForm(f => ({ ...f, akun: `${accounts[0].nama} (@${accounts[0].handle})` }))
+    }
     setSprintModal(true)
   }
 
@@ -1245,50 +1249,27 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <input style={fieldStyle()} value={sprintForm.nama} onChange={e => setSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder={(() => { const { start, end } = calcSprintDates(); return start && end ? `Sprint ${fmtDate(start)} – ${fmtDate(end)}` : 'cth: Sprint 20-26 Jul' })()} />
                 <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 4 }}>Kosongkan untuk auto-generate dari tanggal konten</div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Platform</label>
-                  {(() => {
-                    const allDerived = Array.from(new Set(
-                      (isAffiliate ? sprintProducts : sprintPillars)
-                        .flatMap(r => {
-                          const fmt = (r as typeof sprintPillars[0]).format || ''
-                          return (fmt && CONTENT_TYPE_PLATFORMS[fmt]) ? CONTENT_TYPE_PLATFORMS[fmt] : []
-                        })
-                    ))
-                    if (allDerived.length > 0) return (
-                      <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: 5, minHeight: 38, alignItems: 'center' }}>
-                        {allDerived.map(p => {
-                          const hasAkun = registeredPlatforms.length === 0 || registeredPlatforms.includes(p)
-                          return (
-                            <span key={p} style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 10, background: hasAkun ? 'rgba(26,115,232,0.1)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.25)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: hasAkun ? 600 : 400 }}>
-                              {p}{!hasAkun ? ' (belum ada akun)' : ''}
-                            </span>
-                          )
-                        })}
-                      </div>
-                    )
-                    return (
-                      <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.platform} onChange={e => setSprintForm(f => ({ ...f, platform: e.target.value }))}>
-                        <option value="">Semua Platform</option>
-                        {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                      </select>
-                    )
-                  })()}
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
-                  {accounts.length > 0 ? (
-                    <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))}>
-                      <option value="">Pilih akun</option>
-                      {accounts.map(a => <option key={a.id} value={`${a.nama} (@${a.handle})`}>{a.platform} · {a.nama} (@{a.handle})</option>)}
-                    </select>
-                  ) : (
-                    <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#6b7280' }}>
-                      Belum ada akun. <a href="/brand?tab=akun" style={{ color: '#1a73e8', textDecoration: 'none' }}>Daftarkan dulu di Brand → Akun Sosial →</a>
+              {/* Akun Posting — auto jika 1 akun, dropdown jika >1, warning jika 0 */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
+                {accounts.length === 0 ? (
+                  <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#92400e' }}>
+                    Belum ada akun. <a href="/brand" style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Daftarkan dulu di Brand → Akun Sosial →</a>
+                  </div>
+                ) : accounts.length === 1 ? (
+                  <div style={{ background: '#f0f9ff', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827' }}>{accounts[0].platform} · @{accounts[0].handle}</div>
+                      <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 1 }}>{accounts[0].nama}</div>
                     </div>
-                  )}
-                </div>
+                    <span style={{ fontSize: '0.62rem', color: '#059669', fontWeight: 700, background: '#d1fae5', padding: '2px 7px', borderRadius: 6 }}>Auto</span>
+                  </div>
+                ) : (
+                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={sprintForm.akun} onChange={e => setSprintForm(f => ({ ...f, akun: e.target.value }))}>
+                    <option value="">Pilih akun utama</option>
+                    {accounts.map(a => <option key={a.id} value={`${a.nama} (@${a.handle})`}>{a.platform} · {a.nama} (@{a.handle})</option>)}
+                  </select>
+                )}
               </div>
 
               {/* ── Slot Konten (Pilar / Produk) ── */}
