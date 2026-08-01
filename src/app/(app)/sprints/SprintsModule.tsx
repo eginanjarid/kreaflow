@@ -77,7 +77,7 @@ const TEMPLATES: Record<string, { label: string; color: string; steps: StepDef[]
       { id: 'naskah',   nama: 'Buat Naskah', icon: 'naskah', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'shooting', nama: 'Shooting',    icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
       { id: 'editing',  nama: 'Editing',     icon: 'scissors', doneAt: 'Siap Tayang', href: '/studio' },
-      { id: 'caption',  nama: 'Caption',     icon: 'pen', doneAt: 'Siap Tayang', href: '/plan' },
+      { id: 'caption',  nama: 'Caption',     icon: 'pen', doneAt: 'Naskah Siap', href: '/plan' },
       { id: 'schedule', nama: 'Schedule',    icon: 'calendar', doneAt: 'Terjadwal',   href: '/calendar' },
     ],
   },
@@ -97,7 +97,7 @@ const MASTER_STEPS: StepDef[] = [
   { id: 'take_vid',  nama: 'Take Video',  icon: 'take_vid', doneAt: 'Produksi',    href: '/studio' },
   { id: 'shooting',  nama: 'Shooting',    icon: 'take_video', doneAt: 'Produksi',    href: '/studio' },
   { id: 'editing',   nama: 'Editing',     icon: 'scissors', doneAt: 'Siap Tayang', href: '/studio' },
-  { id: 'caption',   nama: 'Caption',     icon: 'pen', doneAt: 'Siap Tayang', href: '/plan' },
+  { id: 'caption',   nama: 'Caption',     icon: 'pen', doneAt: 'Naskah Siap', href: '/plan' },
   { id: 'thumbnail', nama: 'Thumbnail',   icon: 'broll', doneAt: 'Siap Tayang', href: '/studio' },
   { id: 'review',    nama: 'Review',      icon: 'persiapan', doneAt: 'Siap Tayang', href: '/studio' },
   { id: 'rundown',   nama: 'Rundown',     icon: 'list', doneAt: 'Naskah Siap', href: '/plan' },
@@ -146,9 +146,9 @@ const BOARD_COLS = [
 ]
 
 function getColFromStatus(status: string): 'todo' | 'doing' | 'done' {
-  if (status === 'Tayang') return 'done'
+  if (status === 'Tayang' || status === 'Terjadwal') return 'done'
   if (status === 'Draft') return 'todo'
-  return 'doing' // includes 'Revisi'
+  return 'doing' // Naskah Siap, Produksi, Siap Tayang, Revisi
 }
 
 function isStepDone(status: string, doneAt: string): boolean {
