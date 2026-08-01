@@ -26,10 +26,6 @@ type ReadyItem = {
   product_id: string | null; product_nama: string | null; sprint_id: string | null
   tanggal_tayang: string | null; jam_tayang: string | null
 }
-type PlannedItem = {
-  id: string; judul: string; product_id: string | null; product_nama: string | null
-  tanggal_tayang: string; jam_tayang: string | null
-}
 type TaskSnap = { id: string; nama: string; platform: string; due_date: string; percent_complete: number; priority: string; stage?: string | null }
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
@@ -45,13 +41,12 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], plannedItems = [] }: {
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [] }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
   tasks?: TaskSnap[]
   readyQueue?: ReadyItem[]
-  plannedItems?: PlannedItem[]
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -93,12 +88,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
     return tasks.filter(t => t.due_date === dateStr && !linkedTaskIds.has(t.id) && t.stage === 'schedule')
   }
 
-  function plannedForDay(day: number) {
-    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    return plannedItems.filter(p => p.tanggal_tayang === dateStr)
-  }
-
-  function prevMonth() {
+function prevMonth() {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) } else setViewMonth(m => m - 1)
   }
   function nextMonth() {
@@ -289,7 +279,6 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
         <span style={{ fontSize: '0.78rem', color: '#9ca3af', marginLeft: 4 }}>
           {monthEntries.length > 0 && `${monthEntries.length} jadwal`}
           {monthTasks.length > 0 ? ` · ${monthTasks.length} deadline` : ''}
-          {(() => { const mp = plannedItems.filter(p => { const d = new Date(p.tanggal_tayang); return d.getFullYear() === viewYear && d.getMonth() === viewMonth }).length; return mp > 0 ? ` · ${mp} rencana` : '' })()}
         </span>
       </div>
 
@@ -306,10 +295,9 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
             {calDays.map((day, idx) => {
               const dayEntries = day ? entriesForDay(day) : []
               const dayTasks = day ? tasksForDay(day) : []
-              const dayPlanned = day ? plannedForDay(day) : []
               const dateStr = day ? `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : ''
               const isToday = dateStr === todayStr
-              const totalItems = dayEntries.length + dayTasks.length + dayPlanned.length
+              const totalItems = dayEntries.length + dayTasks.length
               const MAX_SHOW = 3
               let shown = 0
               return (
@@ -353,18 +341,6 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
                             style={{ fontSize: '0.63rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: pct === 100 ? 'rgba(134,239,172,0.06)' : pct > 0 ? 'rgba(251,191,36,0.06)' : 'rgba(148,163,184,0.06)', border: `1px solid ${taskColor}40`, color: taskColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
                             title={`${t.nama} · ${pct}%`}>
                             {dot} {ctx ? ctx + ' · ' : ''}{stepName}
-                          </div>
-                        )
-                      })}
-                      {dayPlanned.slice(0, Math.max(0, MAX_SHOW - shown)).map(p => {
-                        shown++
-                        return (
-                          <div key={p.id} onClick={ev => ev.stopPropagation()}
-                            style={{ fontSize: '0.62rem', padding: '2px 5px', borderRadius: 3, marginBottom: 2, background: 'transparent', border: '1px dashed #9ca3af', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'default' }}
-                            title={`Rencana: ${p.judul}${p.jam_tayang ? ' · ' + p.jam_tayang : ''}`}>
-                            {p.jam_tayang && <span style={{ opacity: 0.6 }}>{p.jam_tayang} </span>}
-                            {p.product_nama ? `${p.product_nama.split(' ')[0]} · ` : ''}
-                            {p.judul.replace(/^.*?—\s*/, '').slice(0, 18)}
                           </div>
                         )
                       })}

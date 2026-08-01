@@ -17,13 +17,12 @@ export default async function CalendarPage() {
   const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
   if (!brandCheck?.niche) redirect('/brand?setup=1')
 
-  const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: plannedRaw }] = await Promise.all([
+  const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }] = await Promise.all([
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id').eq('workspace_id', wsId),
     supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority,stage').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_products').select('id, nama').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
-    supabase.from('kf_content_ideas').select('id, judul, product_id, tanggal_tayang, jam_tayang, status').eq('workspace_id', wsId).not('tanggal_tayang', 'is', null).not('status', 'in', '("Terjadwal","Tayang","Siap Tayang")'),
   ])
 
   const productMap = Object.fromEntries((products || []).map(p => [p.id as string, p.nama as string]))
@@ -49,18 +48,6 @@ export default async function CalendarPage() {
     jam_tayang: (r.jam_tayang as string | null) || null,
   }))
 
-  // Content with planned dates (not yet scheduled/posted) — show as "rencana" in calendar
-  const scheduledContentIds = new Set((entries || []).filter(e => e.content_id).map(e => e.content_id as string))
-  const plannedItems = (plannedRaw || [])
-    .filter(r => !scheduledContentIds.has(r.id as string))
-    .map(r => ({
-      id: r.id as string,
-      judul: r.judul as string,
-      product_id: (r.product_id as string | null) || null,
-      product_nama: r.product_id ? (productMap[r.product_id as string] || null) : null,
-      tanggal_tayang: r.tanggal_tayang as string,
-      jam_tayang: (r.jam_tayang as string | null) || null,
-    }))
 
   return (
     <CalendarModule
@@ -69,7 +56,6 @@ export default async function CalendarPage() {
       ideas={ideasWithProduct}
       tasks={tasks || []}
       readyQueue={readyQueue}
-      plannedItems={plannedItems}
     />
   )
 }
