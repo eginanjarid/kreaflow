@@ -106,12 +106,14 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
   }
 
   useEffect(() => {
+    if (!workspace?.id) return
+    const wsId = workspace.id
     const supabase = createClient()
     async function fetchCounts() {
       const [plan, studio, calendar] = await Promise.all([
-        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).in('status', ['Draft', 'Revisi']),
-        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Naskah Siap'),
-        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Siap Tayang'),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('status', 'Naskah Siap'),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
       ])
       setPlanCount(plan.count || 0)
       setStudioCount(studio.count || 0)
@@ -120,7 +122,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
     fetchCounts()
     const t = setInterval(fetchCounts, 30000)
     return () => clearInterval(t)
-  }, [])
+  }, [workspace?.id])
 
   function onEnter(e: React.MouseEvent<HTMLElement>, label: string) {
     if (!collapsed) return

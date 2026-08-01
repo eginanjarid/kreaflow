@@ -51,9 +51,10 @@ function relTime(ts: string) {
 
 type Props = {
   user: { email: string; nama: string }
+  workspaceId?: string
 }
 
-export default function Topbar({ user }: Props) {
+export default function Topbar({ user, workspaceId }: Props) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -70,18 +71,20 @@ export default function Topbar({ user }: Props) {
   const initials = user.nama.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
   useEffect(() => {
+    if (!workspaceId) return
     const supabase = createClient()
     async function fetchCount() {
       const { count } = await supabase
         .from('kf_notifications')
         .select('*', { count: 'exact', head: true })
+        .eq('workspace_id', workspaceId)
         .eq('is_read', false)
       setUnreadCount(count || 0)
     }
     fetchCount()
     const interval = setInterval(fetchCount, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [workspaceId])
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
@@ -97,11 +100,13 @@ export default function Topbar({ user }: Props) {
     setBellOpen(true)
     setNotifLoading(true)
     const supabase = createClient()
-    const { data } = await supabase
+    let q = supabase
       .from('kf_notifications')
       .select('id, type, title, message, is_read, created_at, content_idea_id, task_id')
       .order('created_at', { ascending: false })
       .limit(20)
+    if (workspaceId) q = q.eq('workspace_id', workspaceId)
+    const { data } = await q
     setNotifs(data || [])
     setNotifLoading(false)
   }
@@ -115,7 +120,9 @@ export default function Topbar({ user }: Props) {
 
   async function markAllRead() {
     const supabase = createClient()
-    await supabase.from('kf_notifications').update({ is_read: true }).eq('is_read', false)
+    let q = supabase.from('kf_notifications').update({ is_read: true }).eq('is_read', false)
+    if (workspaceId) q = q.eq('workspace_id', workspaceId)
+    await q
     setNotifs(prev => prev.map(n => ({ ...n, is_read: true })))
     setUnreadCount(0)
   }

@@ -24,7 +24,7 @@ export default function AppShell({ workspace, workspaces, isSuperAdmin, user, ch
         className="app-sidebar"
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-        <Topbar user={user} />
+        <Topbar user={user} workspaceId={workspace?.id} />
         <main className="kf-main-scroll" style={{ background: '#f5f7fb' }}>
           <div className="main-content-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 28px' }}>
             {children}
