@@ -31,9 +31,13 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
     currentMaxWs = (lifetimeWs?.max_workspaces as number) || 1
 
     // If lifetime and still have room for workspaces, redirect away
+    // But only if the currently active workspace is also lifetime (avoid loop with free workspaces)
     if (isLifetime && wsCount < currentMaxWs) {
       const wsId = await resolveWorkspaceId(supabase, user.id)
-      if (wsId) redirect('/sprints')
+      if (wsId) {
+        const { data: activeWs } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
+        if (activeWs?.plan === 'lifetime') redirect('/sprints')
+      }
     }
   }
 
