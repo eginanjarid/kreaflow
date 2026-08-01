@@ -40,6 +40,10 @@ type ContentItem = {
   assigned_produksi: string | null
   assigned_schedule: string | null
   step_log: Record<string, string> | null
+  perf_views: number | null
+  perf_likes: number | null
+  perf_komentar: number | null
+  perf_shares: number | null
 }
 
 type Product = { id: string; nama: string; platform_affiliate: string | null }
@@ -364,6 +368,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [savingAction, setSavingAction] = useState(false)
   const [detailJadwal, setDetailJadwal] = useState<{ date: string; time: string }>({ date: '', time: '18:00' })
   const [savingJadwal, setSavingJadwal] = useState(false)
+  const [detailPerf, setDetailPerf] = useState<{ views: string; likes: string; komentar: string; shares: string }>({ views: '', likes: '', komentar: '', shares: '' })
+  const [savingPerf, setSavingPerf] = useState(false)
 
   // Manual tasks
   const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
@@ -675,6 +681,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
       setDetailItem(prev => prev ? { ...prev, tanggal_tayang: tanggal, jam_tayang: jam } : null)
     }
     setSavingJadwal(false)
+  }
+
+  async function savePerf() {
+    if (!detailItem) return
+    setSavingPerf(true)
+    const patch = {
+      perf_views: parseInt(detailPerf.views) || null,
+      perf_likes: parseInt(detailPerf.likes) || null,
+      perf_komentar: parseInt(detailPerf.komentar) || null,
+      perf_shares: parseInt(detailPerf.shares) || null,
+    }
+    const { error } = await supabase.from('kf_content_ideas').update(patch).eq('id', detailItem.id)
+    if (!error) {
+      setContents(prev => prev.map(c => c.id === detailItem.id ? { ...c, ...patch } : c))
+      setDetailItem(prev => prev ? { ...prev, ...patch } : null)
+    }
+    setSavingPerf(false)
   }
 
   function deleteSprint(sprintId: string, sprintName: string) {
@@ -1113,6 +1136,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             onClick={() => {
                               setDetailItem(item)
                               setDetailJadwal({ date: item.tanggal_tayang || '', time: item.jam_tayang || '18:00' })
+                              setDetailPerf({ views: String(item.perf_views || ''), likes: String(item.perf_likes || ''), komentar: String(item.perf_komentar || ''), shares: String(item.perf_shares || '') })
                             }}
                             onStepDone={(step) => advanceToStep(item, step)} />
                         ))}
@@ -1632,6 +1656,37 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 {savingJadwal ? 'Menyimpan...' : 'Simpan Jadwal'}
               </button>
             </div>
+
+            {/* Performa Konten */}
+            {(detailItem.status === 'Terjadwal' || detailItem.status === 'Tayang') && (
+              <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Performa Konten</div>
+                {/* Show saved stats if available */}
+                {(detailItem.perf_views || detailItem.perf_likes) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 10 }}>
+                    {[['Views', detailItem.perf_views], ['Likes', detailItem.perf_likes], ['Komentar', detailItem.perf_komentar], ['Share', detailItem.perf_shares]].map(([label, val]) => (
+                      <div key={label as string} style={{ textAlign: 'center', background: '#f0f9ff', borderRadius: 8, padding: '7px 4px' }}>
+                        <div style={{ fontWeight: 700, color: '#1a73e8', fontSize: '0.88rem' }}>{Number(val || 0).toLocaleString('id-ID')}</div>
+                        <div style={{ fontSize: '0.6rem', color: '#6b7280', marginTop: 1 }}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {([['views','Views'],['likes','Likes'],['komentar','Komentar'],['shares','Share']] as [keyof typeof detailPerf, string][]).map(([key, label]) => (
+                    <div key={key}>
+                      <div style={{ fontSize: '0.65rem', color: '#6b7280', marginBottom: 3 }}>{label}</div>
+                      <input type="number" min="0" value={detailPerf[key]} onChange={e => setDetailPerf(prev => ({ ...prev, [key]: e.target.value }))} placeholder="0"
+                        style={{ width: '100%', background: '#f0f5f9', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 9px', color: '#111827', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                    </div>
+                  ))}
+                </div>
+                <button onClick={savePerf} disabled={savingPerf}
+                  style={{ marginTop: 8, width: '100%', background: '#1a73e8', border: 'none', borderRadius: 7, padding: '8px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: savingPerf ? 'not-allowed' : 'pointer', opacity: savingPerf ? 0.7 : 1 }}>
+                  {savingPerf ? 'Menyimpan...' : 'Simpan Performa'}
+                </button>
+              </div>
+            )}
 
             {/* Manual status advance */}
             <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>

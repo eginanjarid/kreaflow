@@ -14,9 +14,11 @@ export default async function TrackerPage() {
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
   const { data: metrics } = await supabase
-    .from('kf_monthly_metrics').select('*')
+    .from('kf_daily_metrics')
+    .select('*')
     .eq('workspace_id', wsId)
-    .order('year', { ascending: false })
+    .order('tanggal', { ascending: false })
+    .order('created_at', { ascending: false })
 
   return <TrackerModule initialMetrics={metrics || []} workspaceId={wsId} />
 }
