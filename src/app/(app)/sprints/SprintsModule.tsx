@@ -178,7 +178,7 @@ function getWeekDates() {
 }
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+  return new Date(d + (d.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
 }
 
 function fieldStyle(extra?: object) {
@@ -1478,7 +1478,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           {step.memberName && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{step.memberName}</span>}
                           {step.deadline && (
                             <span style={{ fontSize: '0.65rem', color: isOverdue ? '#dc2626' : done ? '#374151' : '#d97706', fontWeight: isOverdue ? 700 : 400 }}>
-                              {isOverdue ? 'Perhatian: ' : ''}{new Date(step.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                              {isOverdue ? 'Perhatian: ' : ''}{new Date(step.deadline + (step.deadline.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                               {isOverdue && !done ? ' (terlambat)' : ''}
                             </span>
                           )}
@@ -1627,7 +1627,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 1 }}>
                               {r.memberName}
                               {hasDeadline && <span style={{ marginLeft: 6, color: dlOverdue ? '#dc2626' : '#374151' }}>
-                                · Deadline: {new Date(r.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                · Deadline: {new Date(r.deadline + (r.deadline.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                                 {dlOverdue && <> · <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:'inline', verticalAlign:'middle' }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Overdue</>}
                               </span>}
                             </div>
@@ -1807,7 +1807,7 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
         }
         if (item.tanggal_tayang) return (
           <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: 8 }}>
-            {new Date(item.tanggal_tayang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}
+            {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}
           </div>
         )
         return null
