@@ -39,6 +39,7 @@ type BrandProfile = {
   bio_options: BioOptions
   // Affiliator Brand fields
   affiliate_tipe: string
+  affiliate_micro_niche: string
   affiliate_target_buyer: string
   affiliate_kategori_fokus: string[]
   affiliate_platforms: string[]
@@ -133,6 +134,7 @@ const AFFILIATE_FREQ_CHECKS = [
   { key: 'affiliate_tipe',           label: 'Tipe Akun',          tab: 'aff-niche' },
   { key: 'affiliate_kategori_fokus', label: 'Kategori Fokus',     tab: 'aff-niche' },
   { key: 'affiliate_platforms',      label: 'Platform Affiliate', tab: 'aff-niche' },
+  { key: 'affiliate_micro_niche',    label: 'Micro-niche Dipilih',tab: 'aff-niche' },
   { key: 'affiliate_target_buyer',   label: 'Target Pembeli',     tab: 'aff-niche' },
   { key: 'affiliate_positioning',    label: 'Positioning',        tab: 'aff-identity' },
   { key: 'affiliate_tagline',        label: 'Tagline Akun',       tab: 'aff-identity' },
@@ -273,6 +275,7 @@ export default function BrandModule({
     premis_options: [],
     bio_options: {},
     affiliate_tipe: 'personal',
+    affiliate_micro_niche: '',
     affiliate_target_buyer: '',
     affiliate_kategori_fokus: [],
     affiliate_platforms: [],
@@ -1818,15 +1821,31 @@ Format output: per seksi dengan header jelas. Mulai dari yang paling actionable.
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#d1fae5', border: '1px solid #34d399', color: '#059669', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
                   <div>
-                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI</div>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Dari hasil AI, paste buyer persona yang dipilih ke sini</div>
+                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: '#111827' }}>Simpan Hasil AI — 2 bagian</div>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>Dari seksi <strong style={{ color: '#111827' }}>Rekomendasi Micro-niche</strong> → field pertama · Dari seksi <strong style={{ color: '#111827' }}>Target Buyer Persona</strong> → field kedua</div>
                   </div>
                 </div>
 
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '12px 14px', fontSize: '0.78rem', color: '#166534', lineHeight: 1.6 }}>
+                  <strong>Cara baca hasil AI:</strong><br />
+                  • <em>Analisis Niche</em> — baca saja untuk referensi<br />
+                  • <em>Rekomendasi Micro-niche</em> → pilih 1 terbaik → paste ke field di bawah<br />
+                  • <em>Target Buyer Persona</em> → paste ringkasannya ke field kedua<br />
+                  • <em>Competitive Edge</em> — simpan di kepala, jadi bahan positioning tab berikutnya
+                </div>
+
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Pembeli (Buyer Persona) <span style={{ color: '#059669', fontWeight: 400 }}>← dari AI</span></label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Micro-niche Dipilih <span style={{ color: '#059669', fontWeight: 400 }}>← dari seksi "Rekomendasi Micro-niche" AI</span></label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Tulis micro-niche pilihan kamu dalam 1 kalimat singkat</div>
+                  <input style={fieldStyle({})} value={profile.affiliate_micro_niche} onChange={e => setField('affiliate_micro_niche', e.target.value)}
+                    placeholder="cth: Mainan edukatif Montessori untuk balita 0–3 tahun" />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Target Pembeli (Buyer Persona) <span style={{ color: '#059669', fontWeight: 400 }}>← dari seksi "Target Buyer Persona" AI</span></label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Paste ringkasan profil buyer dari hasil AI</div>
                   <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.affiliate_target_buyer} onChange={e => setField('affiliate_target_buyer', e.target.value)}
-                    placeholder={`Paste buyer persona dari hasil AI...\ncth: Ibu-ibu 25-40 tahun yang punya anak balita, aktif di TikTok, cari produk mainan edukatif yang aman dan harga terjangkau`} />
+                    placeholder={`cth: Ibu-ibu 25-40 tahun yang punya anak balita, aktif di TikTok, cari produk mainan edukatif yang aman dan harga terjangkau`} />
                 </div>
 
                 <div className="kf-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
