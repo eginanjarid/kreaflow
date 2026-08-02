@@ -1,38 +1,33 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { resolveWorkspaceId } from '@/lib/workspace'
+import { getServerContext } from '@/lib/server-context'
 import PlanModule from './PlanModule'
 
 export default async function PlanPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { supabase, wsId } = await getServerContext()
 
-  const wsId = await resolveWorkspaceId(supabase, user.id)
-  if (!wsId) redirect('/login')
-
-  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-
-  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
-  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
-
-  const { data: wsType } = await supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).maybeSingle()
-  if (wsType?.brand_type === 'affiliate') {
-    const { count } = await supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true)
-    if (!count) redirect('/catalog?setup=1')
-  }
-
-  const [{ data: brandProfile }, { data: products }, { data: workspace }, { data: tasks }, { data: sprintDrafts }, { data: pillars }] = await Promise.all([
+  const [
+    { data: wsData },
+    { data: brandProfile },
+    { data: products },
+    { data: tasks },
+    { data: sprintDrafts },
+    { data: pillars },
+    { count: productCount },
+  ] = await Promise.all([
+    supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars,affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
-    supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,kf_sprints(nama)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
     supabase.from('kf_content_pillars').select('id,nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
+    supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
   ])
 
-  const brandType = (workspace?.brand_type as string | null) ?? 'creator'
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche) redirect('/brand?setup=1')
+  if (wsData?.brand_type === 'affiliate' && !productCount) redirect('/catalog?setup=1')
+
+  const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
 
   return (

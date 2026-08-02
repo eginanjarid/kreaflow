@@ -1,23 +1,18 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { resolveWorkspaceId } from '@/lib/workspace'
+import { getServerContext } from '@/lib/server-context'
 import CatalogModule from './CatalogModule'
 
 export default async function CatalogPage({ searchParams }: { searchParams: Promise<{ setup?: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { supabase, wsId } = await getServerContext()
 
-  const wsId = await resolveWorkspaceId(supabase, user.id)
-  if (!wsId) redirect('/login')
-  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-
-  const [{ data: products }, { data: workspace }, { data: brandProfile }] = await Promise.all([
+  const [{ data: wsData }, { data: products }, { data: workspace }, { data: brandProfile }] = await Promise.all([
+    supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_products').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
     supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
     supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus, affiliate_platforms').eq('workspace_id', wsId).maybeSingle(),
   ])
+
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
   const brandType = (workspace?.brand_type as string | null) ?? 'creator'
   const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']

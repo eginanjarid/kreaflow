@@ -1,28 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { resolveWorkspaceId } from '@/lib/workspace'
+import { getServerContext } from '@/lib/server-context'
 import CalendarModule from './CalendarModule'
 
 export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ content?: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { supabase, wsId } = await getServerContext()
 
-  const wsId = await resolveWorkspaceId(supabase, user.id)
-  if (!wsId) redirect('/login')
-
-  const { data: wsData } = await supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle()
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-
-  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
-  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
-
-  if (wsData?.brand_type === 'affiliate') {
-    const { count } = await supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true)
-    if (!count) redirect('/catalog?setup=1')
-  }
-
-  const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }, { data: importantDatesRaw }] = await Promise.all([
+  const [{ data: wsData }, { data: brandCheck }, { data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }, { data: importantDatesRaw }, { count: productCount }] = await Promise.all([
+    supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
+    supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId),
     supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority,stage,assigned_to').eq('workspace_id', wsId).not('due_date', 'is', null),
@@ -30,10 +15,14 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('platform'),
     supabase.from('kf_important_dates').select('id, workspace_id, nama, tanggal, tipe, warna, deskripsi, is_repeating').or(`workspace_id.eq.${wsId},workspace_id.is.null`).order('tanggal'),
+    supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
   ])
 
-  const productMap = Object.fromEntries((products || []).map(p => [p.id as string, p.nama as string]))
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
+  if (wsData?.brand_type === 'affiliate' && !productCount) redirect('/catalog?setup=1')
 
+  const productMap = Object.fromEntries((products || []).map(p => [p.id as string, p.nama as string]))
   const { content: autoContentId } = await searchParams
 
   const ideasWithProduct = (ideas || []).map(i => ({
@@ -58,7 +47,6 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     tanggal_tayang: (r.tanggal_tayang as string | null) || null,
     jam_tayang: (r.jam_tayang as string | null) || null,
   }))
-
 
   const accountList = (accounts || []).map(a => ({
     id: a.id as string,
