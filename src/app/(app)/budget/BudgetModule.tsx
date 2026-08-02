@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 
 type Transaction = {
   id?: string
@@ -77,6 +78,13 @@ export default function BudgetModule({ initialTx, workspaceId, isAffiliate = fal
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!modal) return
+    const t = modal.tx
+    const missing: string[] = []
+    if (!t.tanggal) missing.push('Tanggal')
+    if (!t.deskripsi?.trim()) missing.push('Deskripsi')
+    if (!t.kategori) missing.push('Kategori')
+    if (!Number(t.jumlah)) missing.push('Jumlah')
+    if (missing.length) { showToast(`Wajib diisi: ${missing.join(', ')}.`); return }
     setSaving(true); setError('')
     const supabase = createClient()
     const t = { ...modal.tx, jumlah: Number(modal.tx.jumlah), workspace_id: workspaceId }
@@ -89,7 +97,7 @@ export default function BudgetModule({ initialTx, workspaceId, isAffiliate = fal
       if (err) { setError(err.message); setSaving(false); return }
       setTransactions(prev => [{ ...t, id: data.id }, ...prev])
     }
-    setSaving(false); setModal(null)
+    setSaving(false); showToast('Transaksi berhasil disimpan.', 'success'); setModal(null)
   }
 
   async function deleteTx(id: string) {

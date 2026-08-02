@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
 type Entry = {
@@ -158,6 +159,10 @@ function prevMonth() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!modal) return
+    const missing: string[] = []
+    if (!modal.entry.platform) missing.push('Platform')
+    if (!modal.entry.scheduled_at) missing.push('Jadwal posting')
+    if (missing.length) { showToast(`Wajib diisi: ${missing.join(', ')}.`); return }
     setSaving(true)
     setError('')
     const supabase = createClient()
@@ -178,6 +183,7 @@ function prevMonth() {
       setEntries(prev => [...prev, { ...entry, id: data.id }])
     }
     setSaving(false)
+    showToast('Jadwal berhasil disimpan.', 'success')
     closeModal()
   }
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 
 type Member = {
   id: string
@@ -114,6 +115,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
   async function saveWorkspace(e: React.FormEvent) {
     e.preventDefault()
+    if (!wsName.trim()) { showToast('Nama workspace wajib diisi.'); return }
     setWsSaving(true)
     setWsMsg('')
     const updates: Record<string, unknown> = {}
@@ -135,6 +137,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       await supabase.auth.updateUser({ data: { nama: displayName.trim() } })
     }
     setWsSaving(false)
+    showToast('Pengaturan berhasil disimpan! Refresh halaman untuk melihat perubahan.', 'success')
     setWsMsg('Tersimpan! Refresh halaman untuk melihat perubahan.')
     setTimeout(() => setWsMsg(''), 4000)
   }
@@ -143,13 +146,15 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     e.preventDefault()
     setPwdError('')
     setPwdMsg('')
-    if (newPwd !== confirmPwd) { setPwdError('Password baru tidak cocok.'); return }
-    if (newPwd.length < 6) { setPwdError('Password minimal 6 karakter.'); return }
+    if (!newPwd) { showToast('Password baru wajib diisi.'); return }
+    if (newPwd.length < 6) { showToast('Password minimal 6 karakter.'); return }
+    if (newPwd !== confirmPwd) { showToast('Konfirmasi password tidak cocok.'); return }
     setPwdSaving(true)
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({ password: newPwd })
     setPwdSaving(false)
     if (error) { setPwdError(error.message); return }
+    showToast('Password berhasil diubah!', 'success')
     setPwdMsg('Password berhasil diubah!')
     setCurPwd(''); setNewPwd(''); setConfirmPwd('')
     setTimeout(() => setPwdMsg(''), 4000)

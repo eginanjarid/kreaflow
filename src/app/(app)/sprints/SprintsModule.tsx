@@ -1,6 +1,7 @@
 'use client'
 
 import { ISearch, IPen, IVideo, IFilm, IScissors, ICalendar, STEP_ICON_MAP } from '@/components/ui/Icons'
+import { showToast } from '@/components/ui/Toast'
 
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -454,7 +455,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const autoNama = !sprintForm.nama.trim() && calcStart && calcEnd
       ? `Sprint ${fmtDate(calcStart)} – ${fmtDate(calcEnd)}`
       : sprintForm.nama.trim()
-    if (!autoNama) return
+    if (!autoNama) { showToast('Nama sprint wajib diisi atau pilih tanggal agar nama otomatis terbentuk.'); return }
 
     // Check holiday overlap before saving
     if (weeklyStart && importantDates.length > 0) {
@@ -572,7 +573,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   }
 
   async function saveContent() {
-    if (!addForm.judul.trim() || !selectedSprintId) return
+    if (!selectedSprintId) { showToast('Pilih sprint terlebih dahulu sebelum menambah konten.'); return }
+    if (!addForm.judul.trim()) { showToast('Judul konten wajib diisi.'); return }
     setSavingAdd(true)
     const { data, error } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
@@ -787,7 +789,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
     return { workspace_id: workspaceId, nama: '', platform: null, priority: 'Medium', start_date: null, due_date: null, percent_complete: 0, notes: null, assigned_to: null }
   }
   async function saveTask() {
-    if (!taskModal || !taskModal.task.nama.trim()) return
+    if (!taskModal) return
+    if (!taskModal.task.nama.trim()) { showToast('Nama tugas wajib diisi.'); return }
     setSavingTask(true)
     const raw = taskModal.task
     const t = {

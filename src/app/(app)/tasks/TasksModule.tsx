@@ -1,6 +1,7 @@
 'use client'
 
 import { STEP_ICON_MAP, IZap, ICheckCircle, IBarChart, IList, IClipboard, IRefresh } from '@/components/ui/Icons'
+import { showToast } from '@/components/ui/Toast'
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -293,6 +294,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    if (!modal.task.nama?.trim()) { showToast('Nama tugas wajib diisi.'); return }
     setSaving(true)
     setError('')
     const supabase = createClient()
@@ -307,6 +309,7 @@ export default function TasksModule({ initialTasks, workspaceId, products = [], 
       setTasks(prev => [{ ...t, id: data.id }, ...prev])
     }
     setSaving(false)
+    showToast('Tugas berhasil disimpan.', 'success')
     closeModal()
   }
 

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 
 type DailyMetric = {
   id?: string
@@ -94,6 +95,10 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!modal) return
+    const missing: string[] = []
+    if (!modal.metric.tanggal) missing.push('Tanggal')
+    if (!modal.metric.platform) missing.push('Platform')
+    if (missing.length) { showToast(`Wajib diisi: ${missing.join(', ')}.`); return }
     setSaving(true); setError('')
     const supabase = createClient()
     const numFields = ['views', 'likes', 'komentar', 'shares', 'follower_gained'] as const
@@ -108,7 +113,7 @@ export default function TrackerModule({ initialMetrics, workspaceId }: { initial
       if (err) { setError(err.message); setSaving(false); return }
       setMetrics(prev => [{ ...m, id: data.id }, ...prev].sort((a, b) => b.tanggal.localeCompare(a.tanggal)))
     }
-    setSaving(false); setModal(null)
+    setSaving(false); showToast('Data berhasil disimpan.', 'success'); setModal(null)
   }
 
   async function handleDelete(id: string) {

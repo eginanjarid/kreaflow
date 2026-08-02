@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 
 type ContentIdea = {
   id?: string
@@ -449,6 +450,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    if (!modal.idea.judul?.trim()) { showToast('Judul konten wajib diisi.'); return }
     setSaving(true)
     setError('')
     const supabase = createClient()
@@ -464,6 +466,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
       setIdeas(prev => [{ ...payload, id: data.id }, ...prev])
     }
     setSaving(false)
+    showToast('Konten berhasil disimpan.', 'success')
     closeModal()
   }
 

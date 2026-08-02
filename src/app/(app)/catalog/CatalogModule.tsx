@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 
 type Product = {
   id?: string
@@ -110,6 +111,11 @@ export default function CatalogModule({ initialProducts, workspaceId, modes, aff
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!modal) return
+    const p = modal.product
+    const missing: string[] = []
+    if (!p.nama?.trim()) missing.push('Nama produk')
+    if (!p.tipe_produk) missing.push('Tipe produk')
+    if (missing.length) { showToast(`Wajib diisi: ${missing.join(', ')}.`); return }
     setSaving(true); setError('')
     const supabase = createClient()
     const p = modal.product
@@ -128,7 +134,7 @@ export default function CatalogModule({ initialProducts, workspaceId, modes, aff
       if (err) { setError(err.message); setSaving(false); return }
       setProducts(prev => [...prev, { ...payload, id: data.id }])
     }
-    setSaving(false); closeModal()
+    setSaving(false); showToast('Produk berhasil disimpan.', 'success'); closeModal()
   }
 
   async function handleDelete(id: string) {

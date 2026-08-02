@@ -3,6 +3,7 @@
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import BottomNav from './BottomNav'
+import Toast from '@/components/ui/Toast'
 
 type Workspace = { id: string; name: string; plan: string; brand_type: string }
 
@@ -40,6 +41,7 @@ export default function AppShell({ workspace, workspaces, isSuperAdmin, user, ch
         </main>
       </div>
       <BottomNav isSuperAdmin={isSuperAdmin} workspaceId={workspace?.id} />
+      <Toast />
     </div>
   )
 }
