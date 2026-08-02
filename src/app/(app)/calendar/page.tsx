@@ -14,8 +14,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
-  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
-  if (!brandCheck?.niche) redirect('/brand?setup=1')
+  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
 
   const [{ data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }, { data: importantDatesRaw }] = await Promise.all([
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),

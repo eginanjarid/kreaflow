@@ -16,8 +16,8 @@ export default async function SprintsPage() {
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle()
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
-  const { data: brand } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
-  if (!brand?.niche) redirect('/brand?setup=1')
+  const { data: brand } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brand?.niche && !brand?.affiliate_micro_niche) redirect('/brand?setup=1')
 
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 

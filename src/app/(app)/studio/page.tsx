@@ -14,8 +14,8 @@ export default async function StudioPage() {
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
-  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche').eq('workspace_id', wsId).maybeSingle()
-  if (!brandCheck?.niche) redirect('/brand?setup=1')
+  const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
+  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
 
   const [{ data: contents }, { data: products }, { data: notifications }, { data: workspace }] = await Promise.all([
     supabase

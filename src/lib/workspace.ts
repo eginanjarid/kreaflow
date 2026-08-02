@@ -54,11 +54,11 @@ export async function getWorkspaceWithBrandGuard() {
 
   const { data: brand } = await supabase
     .from('kf_brand_profiles')
-    .select('niche')
+    .select('niche, affiliate_micro_niche')
     .eq('workspace_id', wsId)
     .maybeSingle()
 
-  if (!brand?.niche) redirect('/brand?setup=1')
+  if (!brand?.niche && !brand?.affiliate_micro_niche) redirect('/brand?setup=1')
 
   return { supabase, user, wsId }
 }
