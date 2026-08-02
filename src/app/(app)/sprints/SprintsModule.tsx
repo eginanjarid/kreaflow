@@ -325,9 +325,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const PLATFORMS = isAffiliate ? PLATFORMS_AFFILIATE : PLATFORMS_CREATOR
   const FORMATS = isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR
   const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
-  // Creator: creator only. Affiliate: affiliate + live only.
+  // Creator: creator only. Affiliate: affiliate only.
   const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) =>
-    isAffiliate ? (key === 'affiliate' || key === 'live') : key === 'creator'
+    isAffiliate ? key === 'affiliate' : key === 'creator'
   )
 
   const registeredPlatforms = accounts.map(a => a.platform)
