@@ -1023,21 +1023,14 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     </select>
                   </div>
 
-                  {/* Niche Produk */}
-                  {(() => {
-                    const NICHE_PRESETS = ['Kecantikan & Skincare', 'Fashion & Style', 'Kesehatan & Suplemen', 'Makanan & Minuman', 'Peralatan Rumah', 'Gadget & Elektronik', 'Mainan Anak', 'Olahraga & Fitness', 'Otomotif', 'Buku & Edukasi', 'Bisnis & Produktivitas', 'Perawatan Bayi', 'Travel & Outdoor', 'Hewan Peliharaan', ...(brandProfile?.affiliate_kategori_fokus || [])]
-                    const isCustomNiche = affForm.niche_produk !== '' && !NICHE_PRESETS.includes(affForm.niche_produk)
-                    return (
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Niche Produk</label>
-                        <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustomNiche ? '' : affForm.niche_produk} onChange={e => setAFF('niche_produk', e.target.value)}>
-                          <option value="">— Pilih dari daftar —</option>
-                          {NICHE_PRESETS.map(n => <option key={n} value={n}>{n}</option>)}
-                        </select>
-                        <input style={fieldStyle({ fontSize: '0.8rem', marginTop: 6, color: isCustomNiche ? '#111827' : '#6b7280' })} value={isCustomNiche ? affForm.niche_produk : ''} onChange={e => setAFF('niche_produk', e.target.value)} placeholder="atau ketik niche kustom sendiri..." />
-                      </div>
-                    )
-                  })()}
+                  {/* Niche Produk — locked from Brand */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Niche Produk</label>
+                    <div style={{ ...fieldStyle({ fontSize: '0.85rem' }), color: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>{affForm.niche_produk || brandProfile?.affiliate_kategori_fokus?.[0] || '-'}</span>
+                      <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 600 }}>dari Brand</span>
+                    </div>
+                  </div>
 
                   {/* Target Audiens + Gender */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
