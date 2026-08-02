@@ -16,7 +16,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
   const [{ data: products }, { data: workspace }, { data: brandProfile }] = await Promise.all([
     supabase.from('kf_products').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
     supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
-    supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus').eq('workspace_id', wsId).maybeSingle(),
+    supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus, affiliate_platforms').eq('workspace_id', wsId).maybeSingle(),
   ])
 
   const brandType = (workspace?.brand_type as string | null) ?? 'creator'
@@ -38,6 +38,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         workspaceId={wsId}
         modes={modes}
         affiliateKategori={(brandProfile?.affiliate_kategori_fokus as string[] | null) || []}
+        affiliatePlatforms={(brandProfile?.affiliate_platforms as string[] | null) || []}
       />
     </>
   )
