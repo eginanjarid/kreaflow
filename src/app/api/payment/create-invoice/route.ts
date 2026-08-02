@@ -6,7 +6,7 @@ const TIERS = {
   starter: { amount: 99000, label: 'KreaFlow Starter — 1 Workspace', maxWorkspaces: 1 },
   pro:     { amount: 199000, label: 'KreaFlow Pro — 3 Workspace', maxWorkspaces: 3 },
   agency:  { amount: 399000, label: 'KreaFlow Agency — 10 Workspace', maxWorkspaces: 10 },
-  addon:   { amount: 49000, label: 'KreaFlow Add-on — +1 Workspace', maxWorkspaces: 1 },
+  addon:   { amount: 69000, label: 'KreaFlow Add-on — +1 Workspace', maxWorkspaces: 1 },
 }
 
 export async function POST(req: NextRequest) {
