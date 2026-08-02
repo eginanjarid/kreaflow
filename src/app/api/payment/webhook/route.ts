@@ -3,7 +3,7 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 
 const TIER_LIMITS: Record<string, number> = {
   starter: 1,
-  pro: 3,
+  pro: 4,
   agency: 10,
 }
 

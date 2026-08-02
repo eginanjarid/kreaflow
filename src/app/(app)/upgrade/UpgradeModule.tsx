@@ -28,11 +28,11 @@ const TIERS = [
     name: 'Pro',
     price: 199000,
     oldPrice: 399000,
-    maxWorkspaces: 3,
+    maxWorkspaces: 4,
     highlight: true,
     badge: 'PALING POPULER',
     features: [
-      '3 Workspace / Brand',
+      '4 Workspace / Brand',
       '1 owner + 5 anggota tim',
       'Semua modul lengkap',
       'Sprint, Plan, Library, Studio, Calendar',
@@ -198,7 +198,7 @@ export default function UpgradeModule({
             <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.9rem', marginBottom: 2 }}>Add-on +1 Workspace</div>
             <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Berlaku lifetime.</div>
           </div>
-          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#0f172a', flexShrink: 0 }}>Rp69.000</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#0f172a', flexShrink: 0 }}>Rp49.000</div>
           <button
             onClick={() => handleBuy('addon')}
             disabled={!!loading}

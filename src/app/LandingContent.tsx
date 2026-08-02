@@ -316,15 +316,15 @@ const PLATFORM_TABS = [
 
 const TIERS = [
   { id: 'starter', name: 'Starter', price: 'Rp99.000', maxWs: '1 Workspace', highlight: false, badge: null, features: ['1 Workspace / Brand', '1 owner + 3 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
-  { id: 'pro', name: 'Pro', price: 'Rp199.000', oldPrice: 'Rp399.000', maxWs: '3 Workspace', highlight: true, badge: 'PALING POPULER', features: ['3 Workspace / Brand', '1 owner + 5 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
+  { id: 'pro', name: 'Pro', price: 'Rp199.000', oldPrice: 'Rp399.000', maxWs: '4 Workspace', highlight: true, badge: 'PALING POPULER', features: ['4 Workspace / Brand', '1 owner + 5 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
   { id: 'agency', name: 'Agency', price: 'Rp399.000', maxWs: '10 Workspace', highlight: false, badge: null, features: ['10 Workspace / Brand', '1 owner + 10 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
 ]
 
 const FAQS = [
   { q: 'Apa itu KreaFlow?', a: 'KreaFlow adalah platform manajemen konten end-to-end untuk content creator dan affiliator Indonesia. Mulai dari membangun brand, menyusun konten, menjadwalkan, hingga memantau performa, semua dalam satu platform.' },
-  { q: 'Apa perbedaan Starter, Pro, dan Agency?', a: 'Perbedaan utamanya ada di jumlah workspace dan anggota tim. Starter cocok untuk 1 brand, Pro untuk yang punya 3 brand/klien, Agency untuk agensi dengan banyak brand. Semua paket dapat akses ke semua modul.' },
+  { q: 'Apa perbedaan Starter, Pro, dan Agency?', a: 'Perbedaan utamanya ada di jumlah workspace dan anggota tim. Starter cocok untuk 1 brand, Pro untuk yang punya 4 brand/klien, Agency untuk agensi dengan banyak brand. Semua paket dapat akses ke semua modul.' },
   { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga ini hanya tersedia selama masa launch.' },
-  { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa. Tersedia add-on +1 workspace seharga Rp69.000 (sekali bayar, lifetime). Atau upgrade ke paket lebih tinggi untuk dapat lebih banyak workspace sekaligus.' },
+  { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa. Tersedia add-on +1 workspace seharga Rp49.000 (sekali bayar, lifetime). Atau upgrade ke paket lebih tinggi untuk dapat lebih banyak workspace sekaligus.' },
   { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule Post sedang dalam pengembangan dan akan segera hadir sebagai add-on Rp49.000/bulan. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
 ]
 
@@ -753,7 +753,7 @@ export default function LandingContent() {
               <div style={{ fontSize:'0.78rem', color:'#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Bayar sekali, berlaku selamanya.</div>
             </div>
             <div style={{ flexShrink:0, textAlign:'right' }}>
-              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp69.000</div>
+              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp49.000</div>
               <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>lifetime</div>
             </div>
             <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0, whiteSpace:'nowrap' }}>
