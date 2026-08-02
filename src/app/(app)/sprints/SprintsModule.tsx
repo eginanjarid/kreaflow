@@ -155,9 +155,9 @@ function getTemplateColor(template_type: string): string {
 
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
-type DaySlot = { format: string; pillar_id: string; jam: string }
+type DaySlot = { format: string; pillar_id: string; product_id: string; jam: string }
 type DayPattern = { active: boolean; slots: DaySlot[] }
-const defaultSlot = (): DaySlot => ({ format: '', pillar_id: '', jam: '18:00' })
+const defaultSlot = (): DaySlot => ({ format: '', pillar_id: '', product_id: '', jam: '18:00' })
 const defaultDayPattern = (): DayPattern => ({ active: false, slots: [defaultSlot()] })
 const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
 const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
@@ -526,15 +526,20 @@ export default function SprintsModule({ initialSprints, initialContents, product
             dp.slots.filter(s => s.format).forEach(slot => {
               counterPerDay[dayIdx] = (counterPerDay[dayIdx] || 0) + 1
               const pillar = pillars.find(p => p.id === slot.pillar_id)
+              const produk = products.find(p => p.id === slot.product_id)
+              const judulPrefix = isAffiliate
+                ? (produk ? produk.nama : null)
+                : (pillar ? pillar.nama : null)
               items.push({
                 workspace_id: workspaceId,
                 sprint_id: sprint.id,
-                judul: pillar ? `${pillar.nama} — ${slot.format} ${counterPerDay[dayIdx]}` : `${slot.format} ${counterPerDay[dayIdx]}`,
+                judul: judulPrefix ? `${judulPrefix} — ${slot.format} ${counterPerDay[dayIdx]}` : `${slot.format} ${counterPerDay[dayIdx]}`,
                 status: 'Draft',
                 format: slot.format,
                 platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
                 tanggal_tayang: dateStr,
                 jam_tayang: slot.jam || null,
+                product_id: isAffiliate ? (slot.product_id || null) : null,
                 ...assignByCol,
               })
             })
@@ -1333,7 +1338,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <div>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Jadwal Konten</div>
-                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set pola posting mingguan — pilih hari, format, pilar & jam</div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set pola posting mingguan — pilih hari, format, {isAffiliate ? 'produk' : 'pilar'} & jam</div>
                   </div>
                 </div>
 
@@ -1412,6 +1417,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                           <option value="">— Format —</option>
                                           {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
                                         </select>
+                                        {isAffiliate && products.length > 0 && (
+                                          <select value={slot.product_id} onChange={e => setWeeklyPattern(p => {
+                                            const slots = p[idx].slots.map((s, j) => j === si ? { ...s, product_id: e.target.value } : s)
+                                            return { ...p, [idx]: { ...p[idx], slots } }
+                                          })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                            <option value="">— Produk —</option>
+                                            {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                                          </select>
+                                        )}
                                         {!isAffiliate && pillars.length > 0 && (
                                           <select value={slot.pillar_id} onChange={e => setWeeklyPattern(p => {
                                             const slots = p[idx].slots.map((s, j) => j === si ? { ...s, pillar_id: e.target.value } : s)
