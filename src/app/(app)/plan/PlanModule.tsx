@@ -436,18 +436,14 @@ Untuk setiap varian, format seperti ini:
 VARIAN [N] — [Nama angle/hook]
 ═══════════════════════════════
 
-🎬 VISUAL HOOK (0:00-0:03)
+🎬 VISUAL HOOK
 [Deskripsi visual yang menarik perhatian dalam 3 detik pertama menggunakan strategi: ${affForm.visual_hook}]
 
-🗣️ HOOK VERBAL (0:00-0:03)
+🗣️ HOOK VERBAL
 [Kalimat pembuka yang terucap — harus bikin orang BERHENTI scroll. Pakai formula ${affForm.formula_copywriting}.]
 
 📜 NASKAH LENGKAP
-[Script dengan timestamp, sesuai ${affForm.target_durasi}. Format:
-- 0:00-0:03 Hook
-- 0:03-... Body (bangun interest/desire, sebutkan produk secara natural, bukan di detik pertama)
-- ...  Proof/testimoni pendek / objection handle
-- Akhir: CTA]
+[Script dalam bentuk paragraf/alur narasi — TANPA timestamp. Alur: Hook → Bangun interest (sebut produk secara natural, bukan di awal) → Proof/testimoni singkat → Handle objection natural → CTA. Panjang script menyesuaikan target durasi ${affForm.target_durasi}.]
 
 Catatan script:
 - Gunakan bahasa ${tone.toLowerCase()} yang sesuai untuk ${affForm.target_audiens} (${affForm.gender})
