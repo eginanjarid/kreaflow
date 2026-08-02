@@ -52,18 +52,19 @@ const MORE_ITEMS = [
 
 const ADMIN_ITEM = { href: '/admin', label: 'Admin', icon: (c: string) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> }
 
-export default function BottomNav({ isSuperAdmin }: { isSuperAdmin: boolean }) {
+export default function BottomNav({ isSuperAdmin, workspaceId }: { isSuperAdmin: boolean; workspaceId?: string }) {
   const pathname = usePathname()
   const [moreOpen, setMoreOpen] = useState(false)
   const [planCount, setPlanCount] = useState(0)
   const [studioCount, setStudioCount] = useState(0)
 
   useEffect(() => {
+    if (!workspaceId) return
     const supabase = createClient()
     async function fetchCounts() {
       const [plan, studio] = await Promise.all([
-        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).in('status', ['Draft', 'Revisi']),
-        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('status', 'Naskah Siap'),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('workspace_id', workspaceId!).in('status', ['Draft', 'Revisi']),
+        supabase.from('kf_content_ideas').select('*', { count: 'exact', head: true }).eq('workspace_id', workspaceId!).eq('status', 'Naskah Siap'),
       ])
       setPlanCount(plan.count || 0)
       setStudioCount(studio.count || 0)
@@ -71,7 +72,7 @@ export default function BottomNav({ isSuperAdmin }: { isSuperAdmin: boolean }) {
     fetchCounts()
     const t = setInterval(fetchCounts, 30000)
     return () => clearInterval(t)
-  }, [])
+  }, [workspaceId])
 
   const NAV_COUNTS: Record<string, number> = { '/plan': planCount, '/studio': studioCount }
 

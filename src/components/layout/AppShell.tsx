@@ -39,7 +39,7 @@ export default function AppShell({ workspace, workspaces, isSuperAdmin, user, ch
           </footer>
         </main>
       </div>
-      <BottomNav isSuperAdmin={isSuperAdmin} />
+      <BottomNav isSuperAdmin={isSuperAdmin} workspaceId={workspace?.id} />
     </div>
   )
 }
