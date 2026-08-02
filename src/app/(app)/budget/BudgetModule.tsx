@@ -87,15 +87,15 @@ export default function BudgetModule({ initialTx, workspaceId, isAffiliate = fal
     if (missing.length) { showToast(`Wajib diisi: ${missing.join(', ')}.`); return }
     setSaving(true); setError('')
     const supabase = createClient()
-    const t = { ...modal.tx, jumlah: Number(modal.tx.jumlah), workspace_id: workspaceId }
-    if (t.id) {
-      const { error: err } = await supabase.from('kf_transactions').update(t).eq('id', t.id)
+    const tx = { ...modal.tx, jumlah: Number(modal.tx.jumlah), workspace_id: workspaceId }
+    if (tx.id) {
+      const { error: err } = await supabase.from('kf_transactions').update(tx).eq('id', tx.id)
       if (err) { setError(err.message); setSaving(false); return }
-      setTransactions(prev => prev.map(x => x.id === t.id ? t : x))
+      setTransactions(prev => prev.map(x => x.id === tx.id ? tx : x))
     } else {
-      const { data, error: err } = await supabase.from('kf_transactions').insert(t).select('id').single()
+      const { data, error: err } = await supabase.from('kf_transactions').insert(tx).select('id').single()
       if (err) { setError(err.message); setSaving(false); return }
-      setTransactions(prev => [{ ...t, id: data.id }, ...prev])
+      setTransactions(prev => [{ ...tx, id: data.id }, ...prev])
     }
     setSaving(false); showToast('Transaksi berhasil disimpan.', 'success'); setModal(null)
   }

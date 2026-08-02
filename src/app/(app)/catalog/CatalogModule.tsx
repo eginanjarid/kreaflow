@@ -118,7 +118,6 @@ export default function CatalogModule({ initialProducts, workspaceId, modes, aff
     if (missing.length) { showToast(`Wajib diisi: ${missing.join(', ')}.`); return }
     setSaving(true); setError('')
     const supabase = createClient()
-    const p = modal.product
     const payload = {
       ...p, workspace_id: workspaceId,
       harga_normal: Number(p.harga_normal) || 0,
