@@ -1339,7 +1339,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
               <br />
               <span style={{ color: '#1a73e8', fontWeight: 600 }}>&ldquo;{sprintLinkModal.draft.judul}&rdquo;</span>
               <br /><br />
-              Mau update slot sprint itu dengan naskah ini, atau simpan sebagai konten baru terpisah?
+              Naskah ini akan disimpan ke Library dan slot sprint tersebut akan diupdate.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button
@@ -1347,14 +1347,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 disabled={sprintLinkSaving}
                 style={{ background: '#1a73e8', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '12px 0', cursor: sprintLinkSaving ? 'default' : 'pointer', opacity: sprintLinkSaving ? 0.6 : 1 }}
               >
-                {sprintLinkSaving ? 'Menyimpan...' : '✓ Update Slot Sprint'}
-              </button>
-              <button
-                onClick={confirmSaveNew}
-                disabled={sprintLinkSaving}
-                style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, color: '#6b7280', fontWeight: 600, fontSize: '0.9rem', padding: '12px 0', cursor: sprintLinkSaving ? 'default' : 'pointer' }}
-              >
-                Simpan Sebagai Konten Baru
+                {sprintLinkSaving ? 'Menyimpan...' : '✓ Simpan ke Library'}
               </button>
               <button
                 onClick={() => setSprintLinkModal(null)}
