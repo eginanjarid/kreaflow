@@ -82,8 +82,12 @@ export default function Topbar({ user, workspaceId }: Props) {
       setUnreadCount(count || 0)
     }
     fetchCount()
+    const channel = supabase
+      .channel(`topbar-notif-${workspaceId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'kf_notifications', filter: `workspace_id=eq.${workspaceId}` }, () => fetchCount())
+      .subscribe()
     const interval = setInterval(fetchCount, 30000)
-    return () => clearInterval(interval)
+    return () => { clearInterval(interval); supabase.removeChannel(channel) }
   }, [workspaceId])
 
   useEffect(() => {
