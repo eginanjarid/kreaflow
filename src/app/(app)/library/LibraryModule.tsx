@@ -428,40 +428,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
   const [filterPlatform, setFilterPlatform] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
   const [expandedScript, setExpandedScript] = useState<string | null>(null)
-  const [scheduleModal, setScheduleModal] = useState<{ idea: ContentIdea } | null>(null)
-  const [schedEntry, setSchedEntry] = useState({ platform: '', scheduled_at: '', status: 'Planned' })
-  const [schedSaving, setSchedSaving] = useState(false)
-  const [schedDone, setSchedDone] = useState(false)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
-
-  function openSchedule(c: ContentIdea) {
-    setScheduleModal({ idea: c })
-    setSchedEntry({ platform: (c.platform || [])[0] || '', scheduled_at: '', status: 'Planned' })
-    setSchedDone(false)
-  }
-
-  async function handleSchedule(e: React.FormEvent) {
-    e.preventDefault()
-    if (!scheduleModal?.idea.id) return
-    setSchedSaving(true)
-    const supabase = createClient()
-    await supabase.from('kf_calendar_entries').insert({
-      workspace_id: workspaceId,
-      content_id: scheduleModal.idea.id,
-      platform: schedEntry.platform,
-      scheduled_at: schedEntry.scheduled_at,
-      posted_at: null,
-      posted_url: null,
-      status: schedEntry.status,
-    })
-    if (['Draft', 'Ready'].includes(scheduleModal.idea.status)) {
-      await supabase.from('kf_content_ideas').update({ status: 'Scheduled' }).eq('id', scheduleModal.idea.id)
-      setIdeas(prev => prev.map(x => x.id === scheduleModal.idea.id ? { ...x, status: 'Scheduled' } : x))
-    }
-    setSchedSaving(false)
-    setSchedDone(true)
-    setTimeout(() => setScheduleModal(null), 1200)
-  }
 
   function openAdd() {
     setModal({ open: true, idea: emptyIdea(workspaceId), tab: 'basic' })
@@ -625,10 +592,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                       {expandedScript === c.id ? 'Tutup' : 'Script'}
                     </button>
                   )}
-                  <button onClick={() => openSchedule(c)}
-                    style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 8, padding: '6px 10px', color: '#0284c7', fontSize: '0.75rem', cursor: 'pointer' }}
-                    title="Jadwalkan ke Calendar">
-                    </button>
                   <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
                     Edit
                   </button>
@@ -640,58 +603,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
         </div>
       )}
 
-
-      {/* Quick Schedule Modal */}
-      {scheduleModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 400 }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111827' }}>Jadwalkan ke Calendar</h3>
-              <button onClick={() => setScheduleModal(null)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
-            </div>
-            {schedDone ? (
-              <div style={{ padding: '32px 20px', textAlign: 'center' }}>
-                <div style={{ marginBottom: 8, color: '#059669' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                <div style={{ color: '#059669', fontWeight: 600, fontSize: '0.9rem' }}>Berhasil dijadwalkan!</div>
-              </div>
-            ) : (
-              <form onSubmit={handleSchedule} style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ background: '#f3f4f6', borderRadius: 8, padding: '10px 12px', fontSize: '0.82rem', color: '#6b7280', border: 'none' }}>
-                  <span style={{ color: '#6b7280', fontSize: '0.72rem' }}>Konten: </span>
-                  <span style={{ fontWeight: 600, color: '#111827' }}>{scheduleModal.idea.judul}</span>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Platform *</label>
-                  <select style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}
-                    value={schedEntry.platform} onChange={e => setSchedEntry(s => ({ ...s, platform: e.target.value }))} required>
-                    <option value="">Pilih platform</option>
-                    {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Jadwal Posting *</label>
-                  <input type="datetime-local" required
-                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const }}
-                    value={schedEntry.scheduled_at} onChange={e => setSchedEntry(s => ({ ...s, scheduled_at: e.target.value }))} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Status</label>
-                  <select style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}
-                    value={schedEntry.status} onChange={e => setSchedEntry(s => ({ ...s, status: e.target.value }))}>
-                    {['Planned', 'Ready'].map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => setScheduleModal(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
-                  <button type="submit" disabled={schedSaving} style={{ background: schedSaving ? '#1557b0' : '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: schedSaving ? 'not-allowed' : 'pointer' }}>
-                    {schedSaving ? 'Menjadwalkan...' : 'Jadwalkan'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Modal */}
       {modal.open && (
