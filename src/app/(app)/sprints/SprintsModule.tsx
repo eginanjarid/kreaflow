@@ -325,9 +325,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const PLATFORMS = isAffiliate ? PLATFORMS_AFFILIATE : PLATFORMS_CREATOR
   const FORMATS = isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR
   const defaultTemplate = isAffiliate ? 'affiliate' : 'creator'
-  // Creator: creator only. Affiliate: affiliate + carousel + live.
+  // Creator: creator only. Affiliate: affiliate + live only.
   const visibleTemplates = Object.entries(TEMPLATES).filter(([key]) =>
-    isAffiliate ? key !== 'creator' : key === 'creator'
+    isAffiliate ? (key === 'affiliate' || key === 'live') : key === 'creator'
   )
 
   const registeredPlatforms = accounts.map(a => a.platform)
@@ -1190,12 +1190,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {tpl.label}
                     </button>
                   ))}
-                  {isAffiliate && (
-                    <button type="button" onClick={() => { setSprintForm(f => ({ ...f, template_type: 'custom' })); setSprintSteps([]) }}
-                      style={{ flex: '1 1 auto', minWidth: 90, padding: '8px 6px', borderRadius: 8, border: `1px solid ${sprintForm.template_type === 'custom' ? '#94a3b860' : '#e5eaf2'}`, background: sprintForm.template_type === 'custom' ? 'rgba(148,163,184,0.08)' : '#f1f5f9', color: sprintForm.template_type === 'custom' ? '#374151' : '#6b7280', fontSize: '0.75rem', fontWeight: sprintForm.template_type === 'custom' ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
-                      Custom
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -1417,7 +1411,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                           <option value="">— Format —</option>
                                           {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
                                         </select>
-                                        {isAffiliate && products.length > 0 && (
+                                        {isAffiliate && (
                                           <select value={slot.product_id} onChange={e => setWeeklyPattern(p => {
                                             const slots = p[idx].slots.map((s, j) => j === si ? { ...s, product_id: e.target.value } : s)
                                             return { ...p, [idx]: { ...p[idx], slots } }
