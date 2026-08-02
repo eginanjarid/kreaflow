@@ -719,17 +719,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
             </div>
           ) : (
           <>
-          {/* Mode switcher — hanya tampil kalau isAffiliate */}
-          {isAffiliate && (
-            <div style={{ display: 'flex', gap: 0, background: '#f3f4f6', border: 'none', borderRadius: 10, overflow: 'hidden', alignSelf: 'flex-start' }}>
-              {[{ id: 'creator', label: 'Creator' }, { id: 'affiliate', label: 'Affiliator' }].map(m => (
-                <button key={m.id} type="button" onClick={() => setNaskahMode(m.id as 'creator' | 'affiliate')}
-                  style={{ padding: '9px 22px', border: 'none', background: naskahMode === m.id ? '#1a73e8' : 'transparent', color: naskahMode === m.id ? '#fff' : '#6b7280', fontSize: '0.85rem', fontWeight: naskahMode === m.id ? 700 : 400, cursor: 'pointer', transition: 'all 0.15s' }}>
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          )}
 
           {/* ── CREATOR FLOW ── */}
           {naskahMode === 'creator' && (
