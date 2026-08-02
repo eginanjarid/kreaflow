@@ -1,6 +1,6 @@
 # KreaFlow — Product Requirements Document
 
-**Last updated:** 31 Juli 2026  
+**Last updated:** 2 Agustus 2026  
 **Domain:** kreaflow.id  
 **Stack:** Next.js 16.2.10 App Router + TypeScript + Supabase self-hosted + AI (OpenRouter)  
 **VPS:** 194.233.95.194 | PM2: `kreaflow` (id: 15) | Port: 2847  
@@ -50,15 +50,33 @@ Tayang → Sprint Board column "Done ✓"
 ### ✅ LIVE
 
 #### 1. Brand
-Setup identitas workspace sekali. AI-powered.
+Setup identitas workspace sekali. AI-powered. Mode tab ditentukan oleh `kf_workspaces.brand_type`.
+
+**Mode Creator** (tab: Frekuensi | Account Identity | Niche Hunt | Origin Story | Content Pillars | Bio Studio | Brand Identity | Akun Sosial)
 - Niche Finder, Micro-niche, Storytelling Builder, Smart Content Pillar, Bio Generator
-- Tab "📲 Akun Sosial": daftarkan akun sosmed (platform + handle + nama label)
-  - Maksimal 10 akun per workspace
-  - Menjadi sumber dropdown "Akun Posting" di Sprint modal
-- `kf_brand_profiles`, `kf_accounts` (id, workspace_id, platform, handle, nama)
-- **Feature gating**: Brand wajib diisi (minimal `niche`) sebelum bisa akses Sprint/Plan/Studio/Calendar
+
+**Mode Affiliate** (tab: Brand Score | Profil & Target | Identitas Akun | Bio & Trust | Akun Sosial | Brand Visual)
+- **Profil & Target** (`aff-niche`): tipe akun (personal/store), kategori produk fokus, platform affiliate
+  - 3 save fields dari AI: Micro-niche Dipilih, Target Pembeli, Competitive Edge
+  - Generate AI button disabled sampai kategori + platform dipilih
+- **Identitas Akun** (`aff-identity`): CRUD nama akun (is_primary), tagline, positioning (tag + textarea)
+  - AI output: 5 nama options + 3 taglines + 1 positioning statement
+- **Bio & Trust** (`aff-bio`): latar belakang (input konteks AI), kalimat disclosure, CRUD variasi bio
+  - AI output: 3 variasi bio + 3 pilihan kalimat disclosure
+- Tidak ada tab Konten Strategy — konten affiliate driven by produk di Catalog
+- `AFFILIATE_FREQ_CHECKS`: 10 checks (tipe, kategori, platform, micro-niche, target buyer, competitive edge, positioning, tagline, trust builder, disclosure)
+- AI prompts semua tab: output fokus (2-3 section max) matching exact save fields
+
+**Shared:**
+- Tab "Akun Sosial": daftarkan akun sosmed (platform + handle + nama label), max 10 per workspace
+- `kf_brand_profiles` + `kf_accounts`
+- New DB columns (Agustus 2026): `affiliate_micro_niche text`, `affiliate_competitive_edge text`
+- **Feature gating**: Brand wajib diisi (minimal `niche`/`affiliate_micro_niche`) sebelum bisa akses Sprint/Plan/Studio/Calendar
   - Redirect ke `/brand?setup=1` dengan banner peringatan jika belum isi
   - Gate dilakukan di server component masing-masing halaman
+- **Multi-workspace isolation fix**: Sidebar badge + Topbar notifications filter by `workspace_id` (bug: sebelumnya tampil data semua workspace)
+- **`/upgrade` redirect loop fix**: hanya redirect ke `/sprints` jika active workspace (cookie) juga lifetime
+- **SaveButton UX**: `tabHasContent()` per-tab check field isi → button "✓ Tersimpan" akurat per tab, persists on reload
 
 #### 2. Catalog
 Database produk affiliate.
@@ -270,7 +288,14 @@ kf_invites             (workspace_id, email, role, token, invited_by, accepted_a
 
 -- Brand
 kf_brand_profiles      (workspace_id, niche, micro_niche, premis, tone_of_voice,
-                         target_audiens, platform_utama, affiliate_*, ...)
+                         target_audiens, platform_utama,
+                         -- Affiliate fields:
+                         affiliate_tipe, affiliate_kategori_fokus[], affiliate_platforms[],
+                         affiliate_micro_niche, affiliate_target_buyer, affiliate_competitive_edge,
+                         affiliate_nama_options JSONB, affiliate_tagline,
+                         affiliate_positioning, affiliate_positioning_statement,
+                         affiliate_trust_builder, affiliate_disclosure,
+                         affiliate_bio_options JSONB, ...)
 kf_accounts            (workspace_id, platform, handle, nama, created_at)
 
 -- Catalog
