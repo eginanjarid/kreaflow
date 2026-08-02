@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import PlanModule from './PlanModule'
 
 export default async function PlanPage() {
-  const { supabase, wsId } = await getServerContext()
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'plan')) redirect(firstAccessibleRoute(role, jabatan))
 
   const [
     { data: wsData },

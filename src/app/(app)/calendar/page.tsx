@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import CalendarModule from './CalendarModule'
 
 export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ content?: string }> }) {
-  const { supabase, wsId } = await getServerContext()
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'calendar')) redirect(firstAccessibleRoute(role, jabatan))
 
   const [{ data: wsData }, { data: brandCheck }, { data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }, { data: importantDatesRaw }, { count: productCount }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),

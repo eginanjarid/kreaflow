@@ -7,7 +7,7 @@ const SUPER_ADMINS = ['eginanjarism@gmail.com']
 type Workspace = { id: string; name: string; plan: string; brand_type: string }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, user, wsId } = await getServerContext()
+  const { supabase, user, wsId, role, jabatan } = await getServerContext()
 
   const { data: memberRows } = await supabase
     .from('kf_workspace_members')
@@ -28,6 +28,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       workspaces={(allWorkspaces as Workspace[] | null) || []}
       isSuperAdmin={isSuperAdmin}
       user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
+      role={role}
+      jabatan={jabatan}
     >
       {children}
     </AppShell>

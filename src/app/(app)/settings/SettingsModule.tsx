@@ -281,7 +281,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                   style={{ background: '#f3f4f6', border: 'none', borderRadius: 6, padding: '4px 8px', color: m.jabatan ? '#1a73e8' : '#374151', fontSize: '0.72rem', cursor: 'pointer', outline: 'none', minWidth: 110 }}
                 >
                   <option value="">— Jabatan —</option>
-                  {['Copywriter','Videografer','Editor','Admin Sosmed','Art Director','Content Creator','Owner'].map(j => (
+                  {['Manager','Copywriter','Videografer','Editor','Desainer','Admin Sosmed','Art Director','Content Creator'].map(j => (
                     <option key={j} value={j}>{j}</option>
                   ))}
                 </select>

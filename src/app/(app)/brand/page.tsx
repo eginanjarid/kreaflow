@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import BrandModule from './BrandModule'
 
 export default async function BrandPage({ searchParams }: { searchParams: Promise<{ setup?: string }> }) {
-  const { supabase, wsId } = await getServerContext()
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'brand')) redirect(firstAccessibleRoute(role, jabatan))
 
   const [{ data: wsCheck }, { data: profile }, { data: akun }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, modes, brand_type').eq('id', wsId).single(),

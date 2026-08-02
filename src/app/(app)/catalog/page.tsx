@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import CatalogModule from './CatalogModule'
 
 export default async function CatalogPage({ searchParams }: { searchParams: Promise<{ setup?: string }> }) {
-  const { supabase, wsId } = await getServerContext()
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'catalog')) redirect(firstAccessibleRoute(role, jabatan))
 
   const [{ data: wsData }, { data: products }, { data: workspace }, { data: brandProfile }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),

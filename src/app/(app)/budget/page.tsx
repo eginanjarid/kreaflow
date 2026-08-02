@@ -1,15 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { resolveWorkspaceId } from '@/lib/workspace'
+import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import BudgetModule from './BudgetModule'
 
 export default async function BudgetPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'budget')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const wsId = await resolveWorkspaceId(supabase, user.id)
-  if (!wsId) redirect('/login')
   const [{ data: wsData }, { data: wsType }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle(),
     supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),

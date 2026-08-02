@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { canAccess, type Module } from '@/lib/jabatan-access'
 
 const MAIN_ITEMS = [
   {
@@ -52,7 +53,7 @@ const MORE_ITEMS = [
 
 const ADMIN_ITEM = { href: '/admin', label: 'Admin', icon: (c: string) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> }
 
-export default function BottomNav({ isSuperAdmin, workspaceId }: { isSuperAdmin: boolean; workspaceId?: string }) {
+export default function BottomNav({ isSuperAdmin, workspaceId, role = 'owner', jabatan = '' }: { isSuperAdmin: boolean; workspaceId?: string; role?: string; jabatan?: string }) {
   const pathname = usePathname()
   const [moreOpen, setMoreOpen] = useState(false)
   const [planCount, setPlanCount] = useState(0)
@@ -76,7 +77,19 @@ export default function BottomNav({ isSuperAdmin, workspaceId }: { isSuperAdmin:
 
   const NAV_COUNTS: Record<string, number> = { '/plan': planCount, '/studio': studioCount }
 
-  const allMore = isSuperAdmin ? [...MORE_ITEMS, ADMIN_ITEM] : MORE_ITEMS
+  const HREF_TO_MODULE: Record<string, Module> = {
+    '/sprints': 'sprints', '/plan': 'plan', '/library': 'library', '/studio': 'studio',
+    '/calendar': 'calendar', '/tracker': 'tracker', '/budget': 'budget', '/brand': 'brand',
+    '/catalog': 'catalog', '/settings': 'settings', '/insights': 'insights', '/notifications': 'notifications',
+  }
+  const visibleMain = MAIN_ITEMS.filter(item => {
+    const mod = HREF_TO_MODULE[item.href]
+    return !mod || canAccess(role, jabatan, mod)
+  })
+  const allMore = (isSuperAdmin ? [...MORE_ITEMS, ADMIN_ITEM] : MORE_ITEMS).filter(item => {
+    const mod = HREF_TO_MODULE[item.href]
+    return !mod || canAccess(role, jabatan, mod)
+  })
   const moreActive = allMore.some(item => pathname.startsWith(item.href))
 
   return (
@@ -115,7 +128,7 @@ export default function BottomNav({ isSuperAdmin, workspaceId }: { isSuperAdmin:
 
       {/* Bottom bar */}
       <nav className="kf-bottom-nav">
-        {MAIN_ITEMS.map(item => {
+        {visibleMain.map(item => {
           const active = pathname.startsWith(item.href)
           const color = active ? '#1a73e8' : '#9ca3af'
           const count = NAV_COUNTS[item.href] || 0

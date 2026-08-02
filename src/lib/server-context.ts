@@ -12,5 +12,15 @@ export const getServerContext = cache(async () => {
   const wsId = await resolveWorkspaceId(supabase, user.id)
   if (!wsId) redirect('/login')
 
-  return { supabase, user, wsId }
+  const { data: membership } = await supabase
+    .from('kf_workspace_members')
+    .select('role, jabatan')
+    .eq('workspace_id', wsId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const role = (membership?.role as string) || 'owner'
+  const jabatan = (membership?.jabatan as string) || ''
+
+  return { supabase, user, wsId, role, jabatan }
 })

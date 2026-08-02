@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import StudioModule from './StudioModule'
 
 export default async function StudioPage() {
-  const { supabase, wsId } = await getServerContext()
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'studio')) redirect(firstAccessibleRoute(role, jabatan))
 
   const [{ data: wsData }, { data: brandCheck }, { data: contents }, { data: products }, { data: notifications }, { data: workspace }, { count: productCount }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),

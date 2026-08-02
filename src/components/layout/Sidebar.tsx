@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState, useRef } from 'react'
+import { canAccess, type Module } from '@/lib/jabatan-access'
 
 const ICONS: Record<string, React.ReactNode> = {
   dashboard: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
@@ -58,6 +59,8 @@ type Props = {
   workspace: Workspace | null
   workspaces: Workspace[]
   isSuperAdmin: boolean
+  role: string
+  jabatan: string
   className?: string
 }
 
@@ -67,7 +70,7 @@ const BRAND_TYPES = [
   { id: 'business', label: 'Business', desc: 'Brand toko / perusahaan', color: '#7c3aed' },
 ]
 
-export default function Sidebar({ workspace, workspaces, isSuperAdmin, className }: Props) {
+export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jabatan, className }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const [planCount, setPlanCount] = useState(0)
@@ -169,9 +172,21 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, className
     }
   }
 
-  const items: NavEntry[] = isSuperAdmin
+  const allNav: NavEntry[] = isSuperAdmin
     ? [...NAV, { href: '/admin', label: 'Admin', key: 'admin', admin: true }]
     : NAV
+
+  // Filter nav items based on jabatan access; null separators are kept/cleaned up after
+  const filteredNav = allNav.filter(item => {
+    if (item === null) return true
+    const moduleKey = item.key as Module
+    return canAccess(role, jabatan, moduleKey)
+  })
+  // Remove consecutive/trailing null separators
+  const items: NavEntry[] = filteredNav.reduce<NavEntry[]>((acc, item, i) => {
+    if (item === null && (acc.length === 0 || acc[acc.length - 1] === null)) return acc
+    return [...acc, item]
+  }, []).filter((item, i, arr) => !(item === null && i === arr.length - 1))
 
   const W = collapsed ? 68 : 220
   const bt = workspace?.brand_type || 'creator'

@@ -12,16 +12,20 @@ type Props = {
   workspaces: Workspace[]
   isSuperAdmin: boolean
   user: { email: string; nama: string }
+  role: string
+  jabatan: string
   children: React.ReactNode
 }
 
-export default function AppShell({ workspace, workspaces, isSuperAdmin, user, children }: Props) {
+export default function AppShell({ workspace, workspaces, isSuperAdmin, user, role, jabatan, children }: Props) {
   return (
     <div className="kf-app-shell">
       <Sidebar
         workspace={workspace}
         workspaces={workspaces}
         isSuperAdmin={isSuperAdmin}
+        role={role}
+        jabatan={jabatan}
         className="app-sidebar"
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
@@ -40,7 +44,7 @@ export default function AppShell({ workspace, workspaces, isSuperAdmin, user, ch
           </footer>
         </main>
       </div>
-      <BottomNav isSuperAdmin={isSuperAdmin} workspaceId={workspace?.id} />
+      <BottomNav isSuperAdmin={isSuperAdmin} workspaceId={workspace?.id} role={role} jabatan={jabatan} />
       <Toast />
     </div>
   )
