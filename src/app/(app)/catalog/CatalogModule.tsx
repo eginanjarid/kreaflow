@@ -81,10 +81,11 @@ function TipeIcon({ icon, color, size = 22 }: { icon: string; color: string; siz
   )
 }
 
-export default function CatalogModule({ initialProducts, workspaceId, modes }: {
+export default function CatalogModule({ initialProducts, workspaceId, modes, affiliateKategori = [] }: {
   initialProducts: Product[]
   workspaceId: string
   modes: string[]
+  affiliateKategori?: string[]
 }) {
   const isAffiliate = modes.includes('affiliate')
   const [products, setProducts] = useState<Product[]>(initialProducts)
@@ -311,7 +312,10 @@ export default function CatalogModule({ initialProducts, workspaceId, modes }: {
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Kategori</label>
                   <select style={selectStyle()} value={modal.product.kategori ?? ''} onChange={e => setField('kategori', e.target.value)}>
                     <option value="">Pilih kategori</option>
-                    {(isDigital || isAffiliateProduct ? KATEGORI_DIGITAL : KATEGORI_FISIK).map(k => <option key={k} value={k}>{k}</option>)}
+                    {(isAffiliateProduct
+                      ? (affiliateKategori.length > 0 ? affiliateKategori : KATEGORI_DIGITAL)
+                      : isDigital ? KATEGORI_DIGITAL : KATEGORI_FISIK
+                    ).map(k => <option key={k} value={k}>{k}</option>)}
                   </select>
                 </div>
 
