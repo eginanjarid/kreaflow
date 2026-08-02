@@ -1118,27 +1118,21 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     )
                   })()}
 
-                  {/* Platform + Format */}
+                  {/* Platform + Format — locked from Brand & Sprint */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Platform</label>
-                      <select style={fieldStyle({ fontSize: '0.85rem' })} value={affForm.platform} onChange={e => setAFF('platform', e.target.value)}>
-                        {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee Video', 'LinkedIn'].map(p => <option key={p} value={p}>{p}</option>)}
-                      </select>
+                      <div style={{ ...fieldStyle({ fontSize: '0.85rem' }), color: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>{affForm.platform || brandProfile?.platform_utama || 'TikTok'}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 600 }}>dari Brand</span>
+                      </div>
                     </div>
                     <div>
-                      {(() => {
-                        const FORMAT_PRESETS = ['Video Pendek', 'Reels', 'Story', 'Live Script', 'Thread/Caption', 'Carousel']
-                        const isCustom = affForm.tipe_konten !== '' && !FORMAT_PRESETS.includes(affForm.tipe_konten)
-                        return <>
-                          <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Format Konten</label>
-                          <select style={fieldStyle({ fontSize: '0.85rem' })} value={isCustom ? '' : affForm.tipe_konten} onChange={e => setAFF('tipe_konten', e.target.value)}>
-                            <option value="">— Pilih —</option>
-                            {FORMAT_PRESETS.map(t => <option key={t} value={t}>{t}</option>)}
-                          </select>
-                          <input style={fieldStyle({ fontSize: '0.78rem', marginTop: 6, color: isCustom ? '#111827' : '#6b7280' })} value={isCustom ? affForm.tipe_konten : ''} onChange={e => setAFF('tipe_konten', e.target.value)} placeholder="atau format kustom..." />
-                        </>
-                      })()}
+                      <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Format Konten</label>
+                      <div style={{ ...fieldStyle({ fontSize: '0.85rem' }), color: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>{affForm.tipe_konten || 'Video Pendek'}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 600 }}>dari Sprint</span>
+                      </div>
                     </div>
                   </div>
 
