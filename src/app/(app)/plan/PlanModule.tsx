@@ -343,9 +343,9 @@ Tulis naskah yang terasa seperti manusia, bukan iklan. Bahasa sehari-hari Indone
     const nama = selectedProduct?.nama || 'Produk'
     const deskripsi = affForm.deskripsi_produk || '[paste deskripsi produk]'
     const kategori = selectedProduct?.kategori || brandProfile?.affiliate_kategori_fokus?.join(', ') || '-'
-    return `Kamu adalah product analyst dan marketing strategist yang spesialis menganalisis produk untuk keperluan konten affiliate Indonesia.
+    return `Kamu adalah product analyst yang spesialis menganalisis produk untuk keperluan konten affiliate Indonesia.
 
-Analisis produk berikut dan berikan output yang bisa langsung dipakai untuk membuat konten.
+Analisis produk berikut dan berikan USP-nya saja.
 
 ---
 
@@ -360,26 +360,9 @@ ${deskripsi}
 OUTPUT YANG DIBUTUHKAN:
 
 ▸ USP (Unique Selling Proposition)
-3-5 poin USP terkuat produk ini — apa yang bikin produk ini layak direkomendasiin, bukan sekadar fitur tapi manfaat nyata untuk pembeli
+Tulis 3-5 poin USP terkuat produk ini — bukan sekadar fitur, tapi manfaat nyata yang bikin produk ini layak direkomendasiin ke calon pembeli.
 
-▸ PAIN POINTS YANG DISELESAIKAN
-3-4 masalah nyata yang dialami calon pembeli yang diselesaikan produk ini — pakai bahasa yang relate
-
-▸ TARGET SEGMEN
-Siapa yang paling cocok beli produk ini? (usia, gender, situasi, behavior) — spesifik, bukan generik
-
-▸ ANGLE PROMOSI TERKUAT
-3 angle konten yang paling potensial untuk produk ini (masing-masing 1 kalimat konsep)
-
-▸ OBJECTION HANDLING
-2-3 keberatan umum calon pembeli + cara handle natural di konten (bukan hard sell)
-
-▸ KATA KUNCI EMOSIONAL
-10 kata/frasa yang trigger emotion calon pembeli untuk kategori produk ini
-
----
-
-Format: per seksi, singkat, langsung ke poin. Bahasa Indonesia yang natural.`
+Format: poin bernomor, singkat, langsung ke manfaat. Bahasa Indonesia yang natural.`
   }
 
   function buildAffNaskahPrompt(): string {
@@ -1006,7 +989,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                       style={fieldStyle({ minHeight: 140, resize: 'vertical', fontSize: '0.82rem', lineHeight: 1.7, border: `1px solid ${affForm.usp ? '#ec489940' : 'transparent'}`, color: affForm.usp ? '#111827' : '#6b7280' })}
                       value={affForm.usp}
                       onChange={e => setAFF('usp', e.target.value)}
-                      placeholder={'Paste hasil analisis USP dari AI di sini...\n\nHasil akan mencakup: USP, pain points, target segmen, angle promosi, objection handling, kata kunci emosional'}
+                      placeholder={'Paste hasil analisis USP dari AI di sini...\n\nContoh:\n1. Belajar 3 bahasa sejak dini (Indonesia, Inggris, Mandarin)\n2. Belajar sambil bermain dengan suara interaktif\n3. ...'}
                     />
                   </div>
                   <button type="button" onClick={() => setAffLeftTab('config')}
