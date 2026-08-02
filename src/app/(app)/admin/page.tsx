@@ -10,7 +10,7 @@ export default async function AdminPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || !SUPER_ADMINS.includes(user.email!)) redirect('/sprints')
 
-  const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 500 }),

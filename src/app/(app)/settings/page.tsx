@@ -17,7 +17,7 @@ export default async function SettingsPage() {
     supabase.from('kf_workspace_members').select('role').eq('user_id', user.id).eq('workspace_id', wsId).single(),
   ])
 
-  const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const [{ data: membersRaw }, { data: pendingInvites }] = await Promise.all([
     admin.from('kf_workspace_members').select('id, role, jabatan, created_at, user_id').eq('workspace_id', wsId),

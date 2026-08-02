@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   if (!user || !SUPER_ADMINS.includes(user.email!)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { action, userId, plan, workspaceId, password } = await req.json()
-  const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   if (action === 'plan') {
     if (workspaceId) await admin.from('kf_workspaces').update({ plan }).eq('id', workspaceId)
