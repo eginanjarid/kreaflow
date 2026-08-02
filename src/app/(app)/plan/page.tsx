@@ -17,6 +17,12 @@ export default async function PlanPage() {
   const { data: brandCheck } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
   if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
 
+  const { data: wsType } = await supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).maybeSingle()
+  if (wsType?.brand_type === 'affiliate') {
+    const { count } = await supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true)
+    if (!count) redirect('/catalog?setup=1')
+  }
+
   const [{ data: brandProfile }, { data: products }, { data: workspace }, { data: tasks }, { data: sprintDrafts }, { data: pillars }] = await Promise.all([
     supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars,affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),

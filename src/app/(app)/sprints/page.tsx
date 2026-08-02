@@ -19,6 +19,11 @@ export default async function SprintsPage() {
   const { data: brand } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle()
   if (!brand?.niche && !brand?.affiliate_micro_niche) redirect('/brand?setup=1')
 
+  if (wsData?.brand_type === 'affiliate') {
+    const { count } = await supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true)
+    if (!count) redirect('/catalog?setup=1')
+  }
+
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const [{ data: sprints }, { data: contents }, { data: products }, { data: membersRaw }, { data: tasks }, { data: authUsersData }, { data: accounts }, { data: pillars }] = await Promise.all([
