@@ -7,10 +7,11 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'brand')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const [{ data: wsCheck }, { data: profile }, { data: akun }] = await Promise.all([
+  const [{ data: wsCheck }, { data: profile }, { data: akun }, { count: pillarCount }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, modes, brand_type').eq('id', wsId).single(),
     supabase.from('kf_brand_profiles').select('*').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('created_at'),
+    supabase.from('kf_content_pillars').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId),
   ])
 
   if (wsCheck?.plan !== 'lifetime') redirect('/upgrade')
@@ -34,6 +35,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
         workspaceId={wsId}
         modes={modes}
         initialAkun={(akun || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
+        hasPillars={(pillarCount ?? 0) > 0}
       />
     </>
   )

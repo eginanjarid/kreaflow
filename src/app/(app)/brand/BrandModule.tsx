@@ -128,6 +128,7 @@ const FREQ_CHECKS = [
   { key: 'kelemahan', label: 'Kelemahan Brand', tab: 'story' },
   { key: 'premis', label: 'Origin Story / Premis', tab: 'story' },
   { key: 'bio_instagram', label: 'Bio Sosmed (minimal 1)', tab: 'bio' },
+  { key: 'content_pillars', label: 'Content Pillars', tab: 'pillars' },
   { key: 'color_palette', label: 'Color Palette Brand', tab: 'visual' },
 ] as const
 
@@ -248,11 +249,13 @@ export default function BrandModule({
   workspaceId,
   modes = ['creator'],
   initialAkun = [],
+  hasPillars = false,
 }: {
   initialProfile: BrandProfile | null
   workspaceId: string
   modes?: string[]
   initialAkun?: SosmedAkun[]
+  hasPillars?: boolean
 }) {
   const isAffiliate = modes.includes('affiliate')
   const TABS = isAffiliate ? AFFILIATE_TABS : CREATOR_TABS
@@ -898,6 +901,7 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
   const freqChecked = ACTIVE_FREQ_CHECKS.map(c => {
     if (!isAffiliate && c.key === 'bio_instagram') return hasBio
     if (c.key === 'color_palette') return hasColorPalette
+    if (c.key === 'content_pillars') return hasPillars
     const val = profile[c.key as keyof BrandProfile]
     return typeof val === 'string' ? val.trim().length > 0 : Array.isArray(val) ? val.length > 0 : false
   })
