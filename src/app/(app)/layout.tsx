@@ -7,6 +7,7 @@ const SUPER_ADMINS = ['eginanjarism@gmail.com']
 type Workspace = { id: string; name: string; plan: string; brand_type: string }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  console.log('[AppLayout] called — route should be in (app) group')
   const { supabase, user, wsId, role, jabatan } = await getServerContext()
 
   const { data: memberRows } = await supabase
