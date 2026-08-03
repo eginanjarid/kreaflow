@@ -5,10 +5,9 @@ import { resolveWorkspaceId } from '@/lib/workspace'
 
 // Cached per-request: layout + page share one result, no duplicate DB calls
 export const getServerContext = cache(async () => {
-  process.stdout.write(`[KREAFLOW-DEBUG] getServerContext called at ${new Date().toISOString()}\n`)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) { process.stdout.write('[KREAFLOW-DEBUG] no user → redirect\n'); redirect('/test-redirect-marker') }
+  if (!user) redirect('/login')
 
   const wsId = await resolveWorkspaceId(supabase, user.id)
   if (!wsId) redirect('/login')
