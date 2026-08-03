@@ -17,10 +17,12 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [redirectTo, setRedirectTo] = useState('')
+  const [emailParam, setEmailParam] = useState('')
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
     setRedirectTo(p.get('redirect') || '')
+    setEmailParam(p.get('email') || '')
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -111,7 +113,7 @@ export default function LoginPage() {
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: '0.83rem', color: '#6b7280' }}>
           Belum punya akun?{' '}
-          <Link href={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : '/register'} style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Daftar sekarang</Link>
+          <Link href={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}${emailParam ? `&email=${encodeURIComponent(emailParam)}` : ''}` : '/register'} style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Daftar sekarang</Link>
         </p>
       </div>
     </div>

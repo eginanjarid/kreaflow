@@ -99,7 +99,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
             Login atau daftar dengan email <strong style={{ color: '#7C3AED' }}>{invite.email}</strong> untuk bergabung.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <Link href={`/login?redirect=/invite/${token}`} style={{ display: 'block', textAlign: 'center', padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
+            <Link href={`/login?redirect=/invite/${token}&email=${encodeURIComponent(invite.email)}`} style={{ display: 'block', textAlign: 'center', padding: '12px', borderRadius: 10, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>
               Login & Bergabung
             </Link>
             <Link href={`/register?email=${encodeURIComponent(invite.email)}&redirect=/invite/${token}`} style={{ display: 'block', textAlign: 'center', padding: '12px', borderRadius: 10, border: '1px solid #e2e8f0', color: '#374151', fontSize: '0.9rem', fontWeight: 500, textDecoration: 'none', background: '#f8fafc' }}>

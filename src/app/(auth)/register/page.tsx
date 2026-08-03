@@ -99,8 +99,19 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 6, fontWeight: 600 }}>Email</label>
-            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" required style={inputStyle} />
+            <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 6, fontWeight: 600 }}>
+              Email {isInvite && <span style={{ color: '#7c3aed', fontWeight: 400 }}>· harus sesuai invite</span>}
+            </label>
+            {isInvite ? (
+              <div style={{ position: 'relative' }}>
+                <input type="email" value={form.email} readOnly style={{ ...inputStyle, background: '#f0ebff', border: '1.5px solid #c4b5fd', color: '#5b21b6', cursor: 'not-allowed', paddingRight: 36 }} />
+                <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#7c3aed' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </span>
+              </div>
+            ) : (
+              <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" required style={inputStyle} />
+            )}
           </div>
 
           <div>
