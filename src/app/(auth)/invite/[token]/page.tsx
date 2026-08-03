@@ -4,10 +4,9 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 import Link from 'next/link'
 
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
-  const { appendFileSync } = require('fs')
-  appendFileSync('/tmp/kreaflow-debug.log', `[${new Date().toISOString()}] InvitePage rendering\n`)
+  process.stdout.write(`[KREAFLOW-DEBUG] InvitePage rendering at ${new Date().toISOString()}\n`)
   const { token } = await params
-  appendFileSync('/tmp/kreaflow-debug.log', `[${new Date().toISOString()}] InvitePage token: ${token}\n`)
+  process.stdout.write(`[KREAFLOW-DEBUG] InvitePage token: ${token}\n`)
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   // Validate invite
