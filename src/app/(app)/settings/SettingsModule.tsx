@@ -28,26 +28,19 @@ type Props = {
   userEmail: string
   userName: string
   plan: string
-  modes: string[]
   myRole: string
   members: Member[]
   pendingInvites: PendingInvite[]
   appUrl: string
 }
 
-const MODE_OPTIONS = [
-  { id: 'creator', label: 'Content Creator', desc: 'Brand building, Library konten, Calendar, Plan, Tracker', icon: 'creator', color: '#1a73e8' },
-  { id: 'affiliate', label: 'Affiliator', desc: 'Catalog produk affiliate + digital, komisi tracker, affiliate stats', icon: 'link', color: '#059669' },
-]
-
 function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, modes: initialModes, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
+export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
   const [tab, setTab] = useState('workspace')
   const [wsName, setWsName] = useState(workspaceName)
-  const [activeModes, setActiveModes] = useState<string[]>(initialModes?.length ? initialModes : ['creator'])
   const [displayName, setDisplayName] = useState(userName === userEmail ? '' : userName)
   const [wsSaving, setWsSaving] = useState(false)
   const [wsMsg, setWsMsg] = useState('')
@@ -140,7 +133,6 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     setWsMsg('')
     const updates: Record<string, unknown> = {}
     if (wsName.trim() && wsName !== workspaceName) updates.name = wsName.trim()
-    updates.modes = activeModes
     const res = await fetch('/api/settings/workspace', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -213,38 +205,6 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 2 }}>Plan saat ini</div>
               <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a73e8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{plan || 'Free'}</div>
             </div>
-          </div>
-
-          {/* Mode Toggle */}
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 16, padding: '18px 20px', marginBottom: 20 }}>
-            <div style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>Mode Aktif</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {MODE_OPTIONS.map(m => {
-                const active = activeModes.includes(m.id)
-                return (
-                  <div key={m.id} onClick={() => {
-                    if (active && activeModes.length === 1) return // minimal 1 mode aktif
-                    setActiveModes(prev => active ? prev.filter(x => x !== m.id) : [...prev, m.id])
-                  }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, border: `1px solid ${active ? m.color + '30' : '#e5e7eb'}`, background: active ? m.color + '08' : '#f9fafb', cursor: 'pointer', transition: 'all 0.15s' }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 10, background: active ? m.color + '15' : '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {m.id === 'creator'
-                        ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? m.color : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? m.color : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-                      }
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, color: active ? m.color : '#6b7280', fontSize: '0.875rem', marginBottom: 2 }}>{m.label}</div>
-                      <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>{m.desc}</div>
-                    </div>
-                    <div style={{ width: 36, height: 20, borderRadius: 10, background: active ? m.color : '#e5eaf2', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
-                      <div style={{ position: 'absolute', top: 3, left: active ? 18 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 10 }}>Kedua mode bisa aktif sekaligus. Klik Simpan untuk menyimpan.</div>
           </div>
 
           <form onSubmit={saveWorkspace} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

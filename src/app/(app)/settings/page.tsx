@@ -13,7 +13,7 @@ export default async function SettingsPage() {
   if (!wsId) redirect('/login')
 
   const [{ data: ws }, { data: myMembership }] = await Promise.all([
-    supabase.from('kf_workspaces').select('id, name, plan, modes').eq('id', wsId).single(),
+    supabase.from('kf_workspaces').select('id, name, plan').eq('id', wsId).single(),
     supabase.from('kf_workspace_members').select('role').eq('user_id', user.id).eq('workspace_id', wsId).single(),
   ])
 
@@ -44,7 +44,6 @@ export default async function SettingsPage() {
       userEmail={user.email!}
       userName={user.user_metadata?.nama || user.email!}
       plan={ws?.plan || 'Free'}
-      modes={ws?.modes || ['creator']}
       myRole={(myMembership?.role as string) || 'member'}
       members={members}
       pendingInvites={(pendingInvites || []).map(i => ({ id: i.id, email: i.email, role: i.role as string, token: i.token as string, expires_at: i.expires_at as string }))}
