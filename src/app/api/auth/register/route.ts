@@ -15,8 +15,8 @@ const BRAND_TYPE_MODES: Record<string, string[]> = {
 export async function POST(req: NextRequest) {
   try {
     const { nama, email, password, workspace, brand_type = 'creator' } = await req.json()
-    if (!nama || !email || !password || !workspace) {
-      return NextResponse.json({ error: 'Semua field wajib diisi' }, { status: 400 })
+    if (!nama || !email || !password) {
+      return NextResponse.json({ error: 'Nama, email, dan password wajib diisi' }, { status: 400 })
     }
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -27,6 +27,12 @@ export async function POST(req: NextRequest) {
     if (authError) return NextResponse.json({ error: authError.message }, { status: 400 })
 
     const userId = authData.user.id
+
+    // Kalau invite flow (workspace tidak dikirim), skip buat workspace
+    if (!workspace) {
+      return NextResponse.json({ success: true })
+    }
+
     const modes = BRAND_TYPE_MODES[brand_type] || ['creator']
 
     const { data: ws, error: wsError } = await supabase

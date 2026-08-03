@@ -23,21 +23,30 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [redirectTo, setRedirectTo] = useState('')
+  const [isInvite, setIsInvite] = useState(false)
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
-    setRedirectTo(p.get('redirect') || '')
+    const redirect = p.get('redirect') || ''
+    const emailParam = p.get('email') || ''
+    setRedirectTo(redirect)
+    setIsInvite(redirect.includes('/invite/'))
+    if (emailParam) setForm(f => ({ ...f, email: emailParam }))
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!isInvite && !form.workspace.trim()) { setError('Nama Brand / Workspace wajib diisi'); return }
     setLoading(true)
     setError('')
     try {
+      const body = isInvite
+        ? { nama: form.nama, email: form.email, password: form.password }
+        : form
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(body),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal daftar')
@@ -70,7 +79,9 @@ export default function RegisterPage() {
           </div>
           <span style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.5px', color: '#111827' }}>KreaFlow</span>
         </div>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Buat akun dan mulai kelola konten tim kamu</p>
+        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+          {isInvite ? 'Buat akun untuk bergabung dengan tim' : 'Buat akun dan mulai kelola konten tim kamu'}
+        </p>
       </div>
 
       {/* Card */}
@@ -112,26 +123,30 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 6, fontWeight: 600 }}>Nama Brand / Workspace</label>
-            <input type="text" value={form.workspace} onChange={e => setForm(f => ({ ...f, workspace: e.target.value }))} placeholder="Contoh: Toko Kopi Pak Budi" required style={inputStyle} />
-            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 4 }}>Bisa diubah kapan saja di Settings</div>
-          </div>
+          {!isInvite && (
+            <>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 6, fontWeight: 600 }}>Nama Brand / Workspace</label>
+                <input type="text" value={form.workspace} onChange={e => setForm(f => ({ ...f, workspace: e.target.value }))} placeholder="Contoh: Toko Kopi Pak Budi" style={inputStyle} />
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 4 }}>Bisa diubah kapan saja di Settings</div>
+              </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 8, fontWeight: 600 }}>Tipe Brand Kamu</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {BRAND_TYPES.map(bt => (
-                <label key={bt.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', border: `1.5px solid ${form.brand_type === bt.id ? bt.color : '#e5eaf2'}`, borderRadius: 9, cursor: 'pointer', background: form.brand_type === bt.id ? `${bt.color}0d` : '#fff', transition: 'all 0.12s' }}>
-                  <input type="radio" name="brand_type" value={bt.id} checked={form.brand_type === bt.id} onChange={() => setForm(f => ({ ...f, brand_type: bt.id }))} style={{ accentColor: bt.color, width: 14, height: 14, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: form.brand_type === bt.id ? bt.color : '#374151' }}>{bt.label}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#9ca3af', marginLeft: 8 }}>{bt.desc}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 8, fontWeight: 600 }}>Tipe Brand Kamu</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {BRAND_TYPES.map(bt => (
+                    <label key={bt.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', border: `1.5px solid ${form.brand_type === bt.id ? bt.color : '#e5eaf2'}`, borderRadius: 9, cursor: 'pointer', background: form.brand_type === bt.id ? `${bt.color}0d` : '#fff', transition: 'all 0.12s' }}>
+                      <input type="radio" name="brand_type" value={bt.id} checked={form.brand_type === bt.id} onChange={() => setForm(f => ({ ...f, brand_type: bt.id }))} style={{ accentColor: bt.color, width: 14, height: 14, flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: form.brand_type === bt.id ? bt.color : '#374151' }}>{bt.label}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#9ca3af', marginLeft: 8 }}>{bt.desc}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
           <button
             type="submit"
@@ -148,14 +163,16 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20 }}>
-        {['Bayar sekali', 'Akses selamanya', 'Mulai dari Rp99k'].map(t => (
-          <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{t}</span>
-          </div>
-        ))}
-      </div>
+      {!isInvite && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20 }}>
+          {['Bayar sekali', 'Akses selamanya', 'Mulai dari Rp99k'].map(t => (
+            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{t}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
