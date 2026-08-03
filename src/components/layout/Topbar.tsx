@@ -49,12 +49,24 @@ function relTime(ts: string) {
   return `${Math.floor(m / 1440)}h lalu`
 }
 
+const JABATAN_NOTIF_TYPES: Record<string, string[]> = {
+  'Copywriter':   ['naskah', 'deadline'],
+  'Videografer':  ['produksi', 'deadline'],
+  'Editor':       ['produksi', 'deadline'],
+  'Desainer':     ['produksi', 'deadline'],
+  'Admin Sosmed': ['schedule', 'deadline'],
+  'Art Director': ['naskah', 'produksi', 'deadline'],
+}
+
 type Props = {
   user: { email: string; nama: string }
   workspaceId?: string
+  role?: string
+  jabatan?: string
 }
 
-export default function Topbar({ user, workspaceId }: Props) {
+export default function Topbar({ user, workspaceId, role = 'owner', jabatan = '' }: Props) {
+  const allowedTypes = (role === 'owner' || role === 'admin') ? null : (JABATAN_NOTIF_TYPES[jabatan] ?? null)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -74,11 +86,13 @@ export default function Topbar({ user, workspaceId }: Props) {
     if (!workspaceId) return
     const supabase = createClient()
     async function fetchCount() {
-      const { count } = await supabase
+      let q = supabase
         .from('kf_notifications')
         .select('*', { count: 'exact', head: true })
         .eq('workspace_id', workspaceId)
         .eq('is_read', false)
+      if (allowedTypes) q = q.in('type', allowedTypes)
+      const { count } = await q
       setUnreadCount(count || 0)
     }
     fetchCount()
@@ -110,6 +124,7 @@ export default function Topbar({ user, workspaceId }: Props) {
       .order('created_at', { ascending: false })
       .limit(20)
     if (workspaceId) q = q.eq('workspace_id', workspaceId)
+    if (allowedTypes) q = q.in('type', allowedTypes)
     const { data } = await q
     setNotifs(data || [])
     setNotifLoading(false)
@@ -126,6 +141,7 @@ export default function Topbar({ user, workspaceId }: Props) {
     const supabase = createClient()
     let q = supabase.from('kf_notifications').update({ is_read: true }).eq('is_read', false)
     if (workspaceId) q = q.eq('workspace_id', workspaceId)
+    if (allowedTypes) q = q.in('type', allowedTypes)
     await q
     setNotifs(prev => prev.map(n => ({ ...n, is_read: true })))
     setUnreadCount(0)
