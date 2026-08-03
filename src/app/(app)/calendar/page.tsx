@@ -21,8 +21,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche) redirect('/brand?setup=1')
-  if (wsData?.brand_type === 'affiliate' && !productCount) redirect('/catalog?setup=1')
+  if (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
+  if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')
 
   const productMap = Object.fromEntries((products || []).map(p => [p.id as string, p.nama as string]))
   const { content: autoContentId } = await searchParams

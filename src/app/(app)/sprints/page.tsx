@@ -2,10 +2,12 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getServerContext } from '@/lib/server-context'
+import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import SprintsModule from './SprintsModule'
 
 export default async function SprintsPage() {
-  const { supabase, wsId } = await getServerContext()
+  const { supabase, wsId, role, jabatan } = await getServerContext()
+  if (!canAccess(role, jabatan, 'sprints')) redirect(firstAccessibleRoute(role, jabatan))
 
   const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -24,8 +26,8 @@ export default async function SprintsPage() {
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-  if (!brand?.niche && !brand?.affiliate_micro_niche) redirect('/brand?setup=1')
-  if (wsData?.brand_type === 'affiliate' && !productCount) redirect('/catalog?setup=1')
+  if (!brand?.niche && !brand?.affiliate_micro_niche && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
+  if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')
 
   const userMap = Object.fromEntries(
     (authUsersData?.users || []).map(u => [u.id, { email: u.email || '', nama: (u.user_metadata?.nama as string) || u.email || '' }])
