@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { superAdmin } from '@/lib/super-admins'
+import { isSuperAdmin } from '@/lib/super-admins'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const { name, brand_type } = await req.json()
   if (!name || !brand_type) return NextResponse.json({ error: 'name dan brand_type wajib diisi' }, { status: 400 })
 
-  const superAdmin = await superAdmin(user.email!)
+  const superAdmin = await isSuperAdmin(user.email!)
 
   if (!superAdmin) {
     // Enforce workspace limit: find user's owned workspaces
