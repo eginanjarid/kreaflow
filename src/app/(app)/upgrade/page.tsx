@@ -1,12 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { resolveWorkspaceId } from '@/lib/workspace'
 import UpgradeModule from './UpgradeModule'
+import { isSuperAdmin } from '@/lib/super-admins'
 
 export default async function UpgradePage({ searchParams }: { searchParams: Promise<{ failed?: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  // Super admins have unlimited workspaces — never show upgrade page
+  if (await isSuperAdmin(user.email!)) redirect('/sprints')
 
   const { data: memberRows } = await supabase
     .from('kf_workspace_members')
@@ -30,14 +33,9 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
     isLifetime = !!lifetimeWs
     currentMaxWs = (lifetimeWs?.max_workspaces as number) || 1
 
-    // If lifetime and still have room for workspaces, redirect away
-    // But only if the currently active workspace is also lifetime (avoid loop with free workspaces)
+    // If lifetime and still have room for workspaces, redirect back
     if (isLifetime && wsCount < currentMaxWs) {
-      const wsId = await resolveWorkspaceId(supabase, user.id)
-      if (wsId) {
-        const { data: activeWs } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
-        if (activeWs?.plan === 'lifetime') redirect('/sprints')
-      }
+      redirect('/sprints')
     }
   }
 
