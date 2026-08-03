@@ -5,9 +5,10 @@ import { resolveWorkspaceId } from '@/lib/workspace'
 
 // Cached per-request: layout + page share one result, no duplicate DB calls
 export const getServerContext = cache(async () => {
+  console.log('[getServerContext] called from:', new Error().stack?.split('\n')[2])
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) { console.log('[getServerContext] no user, redirecting to /login'); redirect('/login') }
 
   const wsId = await resolveWorkspaceId(supabase, user.id)
   if (!wsId) redirect('/login')
