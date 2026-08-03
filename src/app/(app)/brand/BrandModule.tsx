@@ -399,10 +399,10 @@ export default function BrandModule({
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     const missing: string[] = []
-    if (isAffiliate) {
+    if (isAffiliate && tab === 'aff-niche') {
       if (!profile.affiliate_micro_niche?.trim()) missing.push('Micro Niche')
       if (!profile.affiliate_target_buyer?.trim()) missing.push('Target Buyer')
-    } else {
+    } else if (!isAffiliate && tab === 'niche') {
       if (!profile.niche?.trim()) missing.push('Niche')
     }
     if (missing.length) { showToast(`Wajib diisi sebelum menyimpan: ${missing.join(', ')}.`); return }
