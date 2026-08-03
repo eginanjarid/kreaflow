@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import AppShell from '@/components/layout/AppShell'
 
-const SUPER_ADMINS = ['eginanjarism@gmail.com']
+import { SUPER_ADMINS } from '@/lib/super-admins'
 
 type Workspace = { id: string; name: string; plan: string; brand_type: string }
 

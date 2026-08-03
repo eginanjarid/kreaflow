@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-
-const SUPER_ADMINS = ['eginanjarism@gmail.com']
+import { SUPER_ADMINS } from '@/lib/super-admins'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()

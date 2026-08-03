@@ -2,8 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import AdminModule from './AdminModule'
-
-const SUPER_ADMINS = ['eginanjarism@gmail.com']
+import { SUPER_ADMINS } from '@/lib/super-admins'
 
 export default async function AdminPage() {
   const supabase = await createClient()
