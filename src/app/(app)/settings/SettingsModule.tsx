@@ -18,6 +18,7 @@ type PendingInvite = {
   id: string
   email: string
   role: string
+  token: string
   expires_at: string
 }
 
@@ -73,9 +74,26 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     setInviting(false)
     if (!res.ok) { setInviteError(data.error || 'Gagal'); return }
     setInviteLink(data.url)
-    setPending(prev => [...prev, { id: data.token, email: inviteEmail, role: inviteRole, expires_at: new Date(Date.now() + 7 * 86400000).toISOString() }])
+    setPending(prev => [...prev, { id: data.token, email: inviteEmail, role: inviteRole, token: data.token, expires_at: new Date(Date.now() + 7 * 86400000).toISOString() }])
     setInviteEmail('')
     setInviteJabatan('')
+  }
+
+  async function resendInvite(inv: PendingInvite) {
+    const url = `${appUrl}/invite/${inv.token}`
+    await navigator.clipboard.writeText(url)
+    setTeamMsg(`Link untuk ${inv.email} disalin!`)
+    setTimeout(() => setTeamMsg(''), 3000)
+  }
+
+  async function cancelInvite(inviteId: string) {
+    if (!confirm('Batalkan undangan ini?')) return
+    const res = await fetch('/api/team', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspaceId, inviteId }),
+    })
+    if (res.ok) { setPending(prev => prev.filter(i => i.id !== inviteId)); setTeamMsg('Undangan dibatalkan.'); setTimeout(() => setTeamMsg(''), 3000) }
   }
 
   async function removeMember(memberId: string) {
@@ -313,13 +331,27 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Undangan Tertunda</div>
               </div>
               {pending.map(inv => (
-                <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', borderBottom: '1px solid #f3f4f6' }}>
+                <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px', borderBottom: '1px solid #f3f4f6' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: '0.85rem', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.email}</div>
-                    <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>Expires {new Date(inv.expires_at).toLocaleDateString('id-ID')}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>Exp. {new Date(inv.expires_at).toLocaleDateString('id-ID')}</div>
                   </div>
                   <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(254,188,46,0.1)', color: '#d97706', fontWeight: 600, textTransform: 'capitalize' }}>{inv.role}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: 10, background: 'rgba(71,85,105,0.2)', color: '#6b7280' }}>Pending</span>
+                  <button
+                    onClick={() => resendInvite(inv)}
+                    title="Salin link undangan"
+                    style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #e5eaf2', background: '#f8fafc', color: '#374151', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    Salin Link
+                  </button>
+                  <button
+                    onClick={() => cancelInvite(inv.id)}
+                    title="Batalkan undangan"
+                    style={{ padding: '4px 8px', borderRadius: 8, border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', fontSize: '0.72rem', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>

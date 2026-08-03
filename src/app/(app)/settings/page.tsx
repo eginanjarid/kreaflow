@@ -21,7 +21,7 @@ export default async function SettingsPage() {
 
   const [{ data: membersRaw }, { data: pendingInvites }] = await Promise.all([
     admin.from('kf_workspace_members').select('id, role, jabatan, created_at, user_id').eq('workspace_id', wsId),
-    admin.from('kf_invites').select('id, email, role, created_at, expires_at').eq('workspace_id', wsId).is('accepted_at', null).gt('expires_at', new Date().toISOString()),
+    admin.from('kf_invites').select('id, email, role, token, created_at, expires_at').eq('workspace_id', wsId).is('accepted_at', null).gt('expires_at', new Date().toISOString()),
   ])
 
   const { data: authUsers } = await admin.auth.admin.listUsers()
@@ -47,7 +47,7 @@ export default async function SettingsPage() {
       modes={ws?.modes || ['creator']}
       myRole={(myMembership?.role as string) || 'member'}
       members={members}
-      pendingInvites={(pendingInvites || []).map(i => ({ id: i.id, email: i.email, role: i.role as string, expires_at: i.expires_at as string }))}
+      pendingInvites={(pendingInvites || []).map(i => ({ id: i.id, email: i.email, role: i.role as string, token: i.token as string, expires_at: i.expires_at as string }))}
       appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'}
     />
   )
