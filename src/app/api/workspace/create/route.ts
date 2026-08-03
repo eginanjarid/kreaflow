@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { SUPER_ADMINS } from '@/lib/super-admins'
+import { superAdmin } from '@/lib/super-admins'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
   const { name, brand_type } = await req.json()
   if (!name || !brand_type) return NextResponse.json({ error: 'name dan brand_type wajib diisi' }, { status: 400 })
 
-  const isSuperAdmin = SUPER_ADMINS.includes(user.email!)
+  const superAdmin = await superAdmin(user.email!)
 
-  if (!isSuperAdmin) {
+  if (!superAdmin) {
     // Enforce workspace limit: find user's owned workspaces
     const { data: memberRows } = await supabase
       .from('kf_workspace_members')
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   const { data: ws, error } = await supabase
     .from('kf_workspaces')
-    .insert({ name, owner_id: user.id, plan: isSuperAdmin ? 'lifetime' : 'free', brand_type })
+    .insert({ name, owner_id: user.id, plan: superAdmin ? 'lifetime' : 'free', brand_type })
     .select('id')
     .single()
 

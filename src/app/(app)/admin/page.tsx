@@ -2,20 +2,25 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import AdminModule from './AdminModule'
-import { SUPER_ADMINS } from '@/lib/super-admins'
+import { isSuperAdmin, isGodAdmin, GOD_ADMIN } from '@/lib/super-admins'
 
 export default async function AdminPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !SUPER_ADMINS.includes(user.email!)) redirect('/sprints')
+  if (!user) redirect('/sprints')
+  const superAdmin = await isSuperAdmin(user.email!)
+  if (!superAdmin) redirect('/sprints')
 
   const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }] = await Promise.all([
+  const godAdmin = isGodAdmin(user.email!)
+
+  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }, { data: superAdmins }] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 500 }),
     admin.from('kf_workspaces').select('id, name, plan, owner_id, created_at, modes'),
     admin.from('kf_workspace_members').select('workspace_id, user_id, role, created_at'),
     admin.from('kf_invites').select('workspace_id, email, role, created_at, accepted_at, expires_at'),
+    admin.from('kf_super_admins').select('email, added_by, created_at'),
   ])
 
   const userMap = Object.fromEntries(
@@ -92,5 +97,11 @@ export default async function AdminPage() {
     revenue: lifetimeCount * 149000,
   }
 
-  return <AdminModule users={users} workspaces={workspaceList} stats={stats} />
+  const superAdminList = (superAdmins || []).map(s => ({
+    email: s.email as string,
+    added_by: s.added_by as string,
+    created_at: s.created_at as string,
+  }))
+
+  return <AdminModule users={users} workspaces={workspaceList} stats={stats} isGodAdmin={godAdmin} superAdmins={superAdminList} godAdminEmail={GOD_ADMIN} />
 }

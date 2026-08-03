@@ -43,6 +43,12 @@ type Stats = {
   revenue: number
 }
 
+type SuperAdminRow = {
+  email: string
+  added_by: string
+  created_at: string
+}
+
 const PLANS = ['free', 'lifetime']
 const PLAN_COLORS: Record<string, string> = { free: '#6b7280', lifetime: '#059669' }
 
@@ -56,9 +62,9 @@ function fmtDate(s: string) {
   return new Date(s).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
-export default function AdminModule({ users, workspaces, stats }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats }) {
+export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'users' | 'workspaces'>('users')
+  const [tab, setTab] = useState<'users' | 'workspaces' | 'superadmins'>('users')
   const [search, setSearch] = useState('')
   const [filterPlan, setFilterPlan] = useState('')
   const [expandedWs, setExpandedWs] = useState<string | null>(null)
@@ -69,6 +75,10 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
   const [newPassword, setNewPassword] = useState('')
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+  const [saList, setSaList] = useState<SuperAdminRow[]>(superAdmins)
+  const [newSaEmail, setNewSaEmail] = useState('')
+  const [saMsg, setSaMsg] = useState('')
+  const [saLoading, setSaLoading] = useState(false)
 
   const filteredUsers = users.filter(u => {
     const matchSearch = !search || u.email.includes(search.toLowerCase()) || u.nama.toLowerCase().includes(search.toLowerCase())
@@ -107,6 +117,29 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
     if (!res.ok) { setMsg('Error: ' + (data.error || 'Gagal')); return }
     setMsg(actionType === 'password' ? 'Password direset!' : 'Plan diperbarui!')
     setTimeout(() => { closeAction(); window.location.reload() }, 800)
+  }
+
+  async function addSuperAdmin() {
+    if (!newSaEmail.trim()) return
+    setSaLoading(true); setSaMsg('')
+    const res = await fetch('/api/admin/super-admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: newSaEmail.trim() }) })
+    const data = await res.json()
+    setSaLoading(false)
+    if (!res.ok) { setSaMsg('Error: ' + (data.error || 'Gagal')); return }
+    setSaList(prev => [...prev, { email: newSaEmail.trim().toLowerCase(), added_by: godAdminEmail, created_at: new Date().toISOString() }])
+    setNewSaEmail(''); setSaMsg('Super admin ditambahkan!')
+    setTimeout(() => setSaMsg(''), 3000)
+  }
+
+  async function removeSuperAdmin(email: string) {
+    if (!confirm(`Hapus ${email} dari super admin?`)) return
+    setSaLoading(true); setSaMsg('')
+    const res = await fetch('/api/admin/super-admins', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+    const data = await res.json()
+    setSaLoading(false)
+    if (!res.ok) { setSaMsg('Error: ' + (data.error || 'Gagal')); return }
+    setSaList(prev => prev.filter(s => s.email !== email))
+    setSaMsg('Dihapus.'); setTimeout(() => setSaMsg(''), 3000)
   }
 
   return (
@@ -165,10 +198,16 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
             {label} <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 4 }}>{id === 'users' ? users.length : workspaces.length}</span>
           </button>
         ))}
+        {isGodAdmin && (
+          <button onClick={() => setTab('superadmins')}
+            style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === 'superadmins' ? '2px solid #7c3aed' : '2px solid transparent', color: tab === 'superadmins' ? '#7c3aed' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === 'superadmins' ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+            Super Admin <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 4 }}>{saList.length}</span>
+          </button>
+        )}
       </div>
 
       {/* Search + filter */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+      {tab !== 'superadmins' && <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
         <input placeholder={tab === 'users' ? 'Cari email atau nama...' : 'Cari workspace atau owner...'}
           value={search} onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: 200, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
@@ -289,6 +328,56 @@ export default function AdminModule({ users, workspaces, stats }: { users: UserR
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Super Admin Tab */}
+      {tab === 'superadmins' && isGodAdmin && (
+        <div>
+          {/* God Admin card */}
+          <div style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', borderRadius: 16, padding: '16px 20px', marginBottom: 16, boxShadow: '0 4px 20px rgba(124,58,237,0.25)' }}>
+            <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>God Admin (Hardcoded)</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{godAdminEmail}</div>
+            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>Akses penuh. Tidak bisa dihapus.</div>
+          </div>
+
+          {/* Add new super admin */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', marginBottom: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)' }}>
+            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#111827', marginBottom: 12 }}>Tambah Super Admin</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <input value={newSaEmail} onChange={e => setNewSaEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addSuperAdmin()}
+                placeholder="email@contoh.com"
+                style={{ flex: 1, background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 10, padding: '9px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
+              <button onClick={addSuperAdmin} disabled={saLoading || !newSaEmail.trim()}
+                style={{ background: '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: saLoading ? 'not-allowed' : 'pointer', opacity: !newSaEmail.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+                {saLoading ? '...' : 'Tambah'}
+              </button>
+            </div>
+            {saMsg && <div style={{ marginTop: 10, fontSize: '0.8rem', color: saMsg.startsWith('Error') ? '#dc2626' : '#059669' }}>{saMsg}</div>}
+          </div>
+
+          {/* Super admin list */}
+          <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)' }}>
+            {saList.length === 0 && (
+              <div style={{ padding: 24, textAlign: 'center', color: '#6b7280', fontSize: '0.85rem' }}>Belum ada super admin lain</div>
+            )}
+            {saList.map((sa, i) => (
+              <div key={sa.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 18px', borderBottom: i < saList.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(124,58,237,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#7c3aed', flexShrink: 0 }}>
+                  {sa.email.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 500, color: '#111827' }}>{sa.email}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 2 }}>Ditambahkan oleh {sa.added_by} · {fmtDate(sa.created_at)}</div>
+                </div>
+                <button onClick={() => removeSuperAdmin(sa.email)} disabled={saLoading}
+                  style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 8, padding: '5px 12px', color: '#dc2626', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}>
+                  Hapus
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

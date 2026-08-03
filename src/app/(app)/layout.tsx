@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import AppShell from '@/components/layout/AppShell'
 
-import { SUPER_ADMINS } from '@/lib/super-admins'
+import { isSuperAdmin } from '@/lib/super-admins'
 
 type Workspace = { id: string; name: string; plan: string; brand_type: string }
 
@@ -20,13 +20,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     : { data: [] }
 
   const ws = (allWorkspaces as Workspace[] | null)?.find(w => w.id === wsId) || null
-  const isSuperAdmin = SUPER_ADMINS.includes(user.email!)
+  const superAdmin = await isSuperAdmin(user.email!)
 
   return (
     <AppShell
       workspace={ws}
       workspaces={(allWorkspaces as Workspace[] | null) || []}
-      isSuperAdmin={isSuperAdmin}
+      isSuperAdmin={superAdmin}
       user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
       role={role}
       jabatan={jabatan}

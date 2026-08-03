@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
-import { SUPER_ADMINS } from '@/lib/super-admins'
+import { isSuperAdmin } from '@/lib/super-admins'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !SUPER_ADMINS.includes(user.email!)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user || !(await isSuperAdmin(user.email!))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { action, userId, plan, workspaceId, password } = await req.json()
   const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
