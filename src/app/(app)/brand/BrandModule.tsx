@@ -306,6 +306,8 @@ export default function BrandModule({
     affiliate_bio_options: (initialProfile as unknown as { affiliate_bio_options?: BioOption[] }).affiliate_bio_options || [],
   } : defaultProfile)
 
+  const [savedProfile, setSavedProfile] = useState<BrandProfile>(profile)
+
   // Niche CRUD state
   const [nicheForm, setNicheForm] = useState<NicheOption | null>(null)
   const [nicheEditId, setNicheEditId] = useState<string | null>(null)
@@ -416,10 +418,14 @@ export default function BrandModule({
     if (profile.id) {
       const { error: err } = await supabase.from('kf_brand_profiles').update(payload).eq('id', profile.id)
       if (err) { setError(err.message); setSaving(false); return }
+      setSavedProfile({ ...profile })
     } else {
       const { data, error: err } = await supabase.from('kf_brand_profiles').insert(payload).select('id').single()
       if (err) { setError(err.message); setSaving(false); return }
-      if (data) setProfile(p => ({ ...p, id: data.id }))
+      if (data) {
+        setProfile(p => ({ ...p, id: data.id }))
+        setSavedProfile({ ...profile, id: data.id })
+      }
     }
     setSaving(false)
     showToast('Brand profile berhasil disimpan.', 'success')
@@ -894,15 +900,15 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
     </div>
   )
 
-  // Brand score / Frekuensi level calc
-  const hasBio = !!(profile.bio_tiktok || profile.bio_instagram || profile.bio_youtube || profile.bio_linkedin || profile.bio_facebook)
-  const hasColorPalette = (profile.color_palette?.length ?? 0) > 0
+  // Brand score / Frekuensi level calc — always uses savedProfile (only updates after save)
+  const hasBio = !!(savedProfile.bio_tiktok || savedProfile.bio_instagram || savedProfile.bio_youtube || savedProfile.bio_linkedin || savedProfile.bio_facebook)
+  const hasColorPalette = (savedProfile.color_palette?.length ?? 0) > 0
   const ACTIVE_FREQ_CHECKS = isAffiliate ? AFFILIATE_FREQ_CHECKS : FREQ_CHECKS
   const freqChecked = ACTIVE_FREQ_CHECKS.map(c => {
     if (!isAffiliate && c.key === 'bio_instagram') return hasBio
     if (c.key === 'color_palette') return hasColorPalette
     if (c.key === 'content_pillars') return hasPillars
-    const val = profile[c.key as keyof BrandProfile]
+    const val = savedProfile[c.key as keyof BrandProfile]
     return typeof val === 'string' ? val.trim().length > 0 : Array.isArray(val) ? val.length > 0 : false
   })
   const freqDone = freqChecked.filter(Boolean).length
