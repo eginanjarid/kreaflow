@@ -100,7 +100,7 @@ export default function Topbar({ user, workspaceId, role = 'owner', jabatan = ''
       .channel(`topbar-notif-${workspaceId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'kf_notifications', filter: `workspace_id=eq.${workspaceId}` }, () => fetchCount())
       .subscribe()
-    const interval = setInterval(fetchCount, 30000)
+    const interval = setInterval(fetchCount, 300000)
     return () => { clearInterval(interval); supabase.removeChannel(channel) }
   }, [workspaceId])
 

@@ -123,8 +123,12 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
       setCalendarCount(calendar.count || 0)
     }
     fetchCounts()
-    const t = setInterval(fetchCounts, 30000)
-    return () => clearInterval(t)
+    const channel = supabase
+      .channel(`sidebar-counts-${wsId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'kf_content_ideas', filter: `workspace_id=eq.${wsId}` }, () => fetchCounts())
+      .subscribe()
+    const t = setInterval(fetchCounts, 300000)
+    return () => { clearInterval(t); supabase.removeChannel(channel) }
   }, [workspace?.id])
 
   function onEnter(e: React.MouseEvent<HTMLElement>, label: string) {

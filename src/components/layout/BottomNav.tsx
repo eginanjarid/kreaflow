@@ -71,8 +71,12 @@ export default function BottomNav({ isSuperAdmin, workspaceId, role = 'owner', j
       setStudioCount(studio.count || 0)
     }
     fetchCounts()
-    const t = setInterval(fetchCounts, 30000)
-    return () => clearInterval(t)
+    const channel = supabase
+      .channel(`bottomnav-counts-${workspaceId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'kf_content_ideas', filter: `workspace_id=eq.${workspaceId}` }, () => fetchCounts())
+      .subscribe()
+    const t = setInterval(fetchCounts, 300000)
+    return () => { clearInterval(t); supabase.removeChannel(channel) }
   }, [workspaceId])
 
   const NAV_COUNTS: Record<string, number> = { '/plan': planCount, '/studio': studioCount }
