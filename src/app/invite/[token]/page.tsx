@@ -40,11 +40,11 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
       .select('id').eq('workspace_id', invite.workspace_id).eq('user_id', user.id).single()
 
     if (!alreadyMember) {
-      // Add to workspace
       await admin.from('kf_workspace_members').insert({
         workspace_id: invite.workspace_id,
         user_id: user.id,
         role: invite.role,
+        jabatan: (invite as { jabatan?: string }).jabatan || null,
       })
     }
 

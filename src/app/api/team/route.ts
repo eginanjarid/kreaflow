@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { workspaceId, email, role = 'member' } = await req.json()
+  const { workspaceId, email, role = 'member', jabatan = '' } = await req.json()
   if (!workspaceId || !email) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
   const callerRole = await getCallerRole(user.id, workspaceId)
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
     workspace_id: workspaceId,
     email: email.toLowerCase().trim(),
     role,
+    jabatan: jabatan || null,
     invited_by: user.id,
   }).select('token').single()
 

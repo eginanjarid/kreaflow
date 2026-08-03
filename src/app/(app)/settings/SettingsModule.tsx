@@ -55,6 +55,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
   const [pending, setPending] = useState<PendingInvite[]>(initialPending)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('member')
+  const [inviteJabatan, setInviteJabatan] = useState('')
   const [inviting, setInviting] = useState(false)
   const [inviteLink, setInviteLink] = useState('')
   const [inviteError, setInviteError] = useState('')
@@ -66,7 +67,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     const res = await fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workspaceId, email: inviteEmail, role: inviteRole }),
+      body: JSON.stringify({ workspaceId, email: inviteEmail, role: inviteRole, jabatan: inviteJabatan }),
     })
     const data = await res.json()
     setInviting(false)
@@ -74,6 +75,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     setInviteLink(data.url)
     setPending(prev => [...prev, { id: data.token, email: inviteEmail, role: inviteRole, expires_at: new Date(Date.now() + 7 * 86400000).toISOString() }])
     setInviteEmail('')
+    setInviteJabatan('')
   }
 
   async function removeMember(memberId: string) {
@@ -337,7 +339,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{6 - members.length} slot tersisa</div>
               </div>
               <form onSubmit={sendInvite} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10 }}>
                   <input
                     type="email"
                     placeholder="email@contoh.com"
@@ -346,6 +348,16 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                     required
                     style={fieldStyle()}
                   />
+                  <select
+                    value={inviteJabatan}
+                    onChange={e => setInviteJabatan(e.target.value)}
+                    style={{ ...fieldStyle(), width: 'auto', cursor: 'pointer', color: inviteJabatan ? '#111827' : '#9ca3af' }}
+                  >
+                    <option value="">— Jabatan —</option>
+                    {['Manager','Copywriter','Videografer','Editor','Desainer','Admin Sosmed','Art Director','Content Creator'].map(j => (
+                      <option key={j} value={j}>{j}</option>
+                    ))}
+                  </select>
                   <select
                     value={inviteRole}
                     onChange={e => setInviteRole(e.target.value)}
