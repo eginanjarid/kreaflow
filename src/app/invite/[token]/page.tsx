@@ -4,7 +4,9 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 import Link from 'next/link'
 
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
+  console.log('[INVITE] page rendering start')
   const { token } = await params
+  console.log('[INVITE] token:', token)
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   // Validate invite
