@@ -41,6 +41,7 @@ type Stats = {
   byPlan: { free: number; lifetime: number }
   totalWorkspaces: number
   revenue: number
+  paidUserCount: number
 }
 
 type SuperAdminRow = {
@@ -172,10 +173,11 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff' }}>
             Rp{stats.revenue.toLocaleString('id-ID')}
           </div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>berdasarkan plan/user · exclude super admin</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Lifetime Terjual</div>
-          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff' }}>{stats.byPlan.lifetime} ws</div>
+          <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.75)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>User Berbayar</div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff' }}>{stats.paidUserCount} user</div>
         </div>
       </div>
 

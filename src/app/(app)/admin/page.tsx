@@ -17,7 +17,7 @@ export default async function AdminPage() {
 
   const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }, { data: superAdmins }] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 500 }),
-    admin.from('kf_workspaces').select('id, name, plan, owner_id, created_at, modes'),
+    admin.from('kf_workspaces').select('id, name, plan, owner_id, created_at, modes, max_workspaces'),
     admin.from('kf_workspace_members').select('workspace_id, user_id, role, created_at'),
     admin.from('kf_invites').select('workspace_id, email, role, created_at, accepted_at, expires_at'),
     admin.from('kf_super_admins').select('email, added_by, created_at'),
@@ -82,7 +82,33 @@ export default async function AdminPage() {
   const weekAgo = new Date(now.getTime() - 7 * 86400000).toISOString()
   const monthAgo = new Date(now.getTime() - 30 * 86400000).toISOString()
 
+  // Revenue: count per unique paying user (exclude super admins), map max_workspaces to plan price
+  const superAdminEmails = new Set([GOD_ADMIN, ...(superAdmins || []).map(s => s.email as string)])
+
+  function estimatePlanRevenue(maxWs: number): number {
+    if (maxWs > 100) return 0   // manually set (admin), skip
+    if (maxWs <= 1) return 99000
+    if (maxWs <= 4) return 199000
+    if (maxWs <= 10) return 399000
+    return 399000 + (maxWs - 10) * 49000  // Agency + add-ons
+  }
+
+  // Group by owner: find the max slot workspace per paying user
+  const payingUsers = new Map<string, number>()
+  for (const ws of workspaceList) {
+    if (ws.plan !== 'lifetime') continue
+    if (superAdminEmails.has(ws.owner_email)) continue
+    const rawWs = (workspaces || []).find(w => w.id === ws.id)
+    const maxWs = (rawWs?.max_workspaces as number) || 1
+    const current = payingUsers.get(ws.owner_email) || 0
+    if (maxWs > current) payingUsers.set(ws.owner_email, maxWs)
+  }
+
+  let revenue = 0
+  for (const [, maxWs] of payingUsers) revenue += estimatePlanRevenue(maxWs)
+
   const lifetimeCount = workspaceList.filter(w => w.plan === 'lifetime').length
+  const paidUserCount = payingUsers.size
 
   const stats = {
     total: users.length,
@@ -94,7 +120,8 @@ export default async function AdminPage() {
       lifetime: lifetimeCount,
     },
     totalWorkspaces: workspaceList.length,
-    revenue: lifetimeCount * 149000,
+    revenue,
+    paidUserCount,
   }
 
   const superAdminList = (superAdmins || []).map(s => ({
