@@ -35,6 +35,25 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
   const workspaceName = (invite.kf_workspaces as { name: string } | null)?.name || 'Workspace'
 
   if (user) {
+    // Pastikan email yang login = email yang diundang
+    if (user.email?.toLowerCase() !== invite.email?.toLowerCase()) {
+      return (
+        <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ textAlign: 'center', maxWidth: 400 }}>
+            <div style={{ marginBottom: 16, color: '#f59e0b' }}><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <h1 style={{ color: '#f1f5f9', fontSize: '1.2rem', fontWeight: 700, marginBottom: 8 }}>Akun Tidak Sesuai</h1>
+            <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: 6 }}>
+              Invite ini untuk <strong style={{ color: '#A78BFA' }}>{invite.email}</strong>.
+            </p>
+            <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: 24 }}>
+              Kamu login sebagai <strong style={{ color: '#f87171' }}>{user.email}</strong>. Logout dulu lalu buka link ini kembali.
+            </p>
+            <Link href="/login" style={{ padding: '10px 24px', borderRadius: 8, background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', color: '#fff', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>Logout & Login Ulang</Link>
+          </div>
+        </div>
+      )
+    }
+
     // Check if already member
     const { data: alreadyMember } = await admin.from('kf_workspace_members')
       .select('id').eq('workspace_id', invite.workspace_id).eq('user_id', user.id).single()
