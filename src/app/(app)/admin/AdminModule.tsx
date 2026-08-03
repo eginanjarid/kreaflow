@@ -221,7 +221,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
             ))}
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Users Tab */}
       {tab === 'users' && (
