@@ -2,6 +2,7 @@
 
 import { ISearch, IPen, IVideo, IFilm, IScissors, ICalendar, STEP_ICON_MAP } from '@/components/ui/Icons'
 import { showToast } from '@/components/ui/Toast'
+import { getAccess } from '@/lib/jabatan-access'
 
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -244,7 +245,7 @@ const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 
 
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 
-export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [], brandType = 'creator', pillars = [] }: {
+export default function SprintsModule({ initialSprints, initialContents, products, workspaceId, workspaceMembers, initialTasks, accounts = [], brandType = 'creator', pillars = [], role = 'owner', jabatan = '' }: {
   initialSprints: Sprint[]
   initialContents: ContentItem[]
   products: Product[]
@@ -254,7 +255,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
   accounts?: SosmedAkun[]
   brandType?: string
   pillars?: { id: string; nama: string }[]
+  role?: string
+  jabatan?: string
 }) {
+  const canEdit = getAccess(role, jabatan, 'sprints') === 'full'
   const supabase = createClient()
   const [importantDates, setImportantDates] = useState<{ nama: string; tanggal: string; tipe: string; is_repeating: boolean }[]>([])
   const [holidayWarning, setHolidayWarning] = useState<{ dates: string[]; onProceed: () => void } | null>(null)
@@ -1000,12 +1004,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         {/* Left: Sprint sidebar */}
         <div className="kf-sprint-sidebar" style={{ width: 224, flexShrink: 0, background: '#fff', boxShadow: 'inset -1px 0 0 rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-            <button onClick={openSprintModal}
-              style={{ width: '100%', background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 0', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.01em' }}>
-              + Buat Sprint
-            </button>
-          </div>
+          {canEdit && (
+            <div style={{ padding: '12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+              <button onClick={openSprintModal}
+                style={{ width: '100%', background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 0', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.01em' }}>
+                + Buat Sprint
+              </button>
+            </div>
+          )}
           <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
             {sprints.length === 0 && <div style={{ fontSize: '0.78rem', color: '#9ca3af', padding: '24px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
             {sprints.map(s => {
@@ -1052,10 +1058,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </button>
               ))}
             </div>
-            <button onClick={openSprintModal}
-              style={{ flexShrink: 0, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
-              + Sprint
-            </button>
+            {canEdit && (
+              <button onClick={openSprintModal}
+                style={{ flexShrink: 0, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                + Sprint
+              </button>
+            )}
           </div>
 
           {!selectedSprint ? (
@@ -1065,9 +1073,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </div>
               <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.95rem' }}>Mulai dengan Sprint Mingguan</div>
               <div style={{ fontSize: '0.82rem', color: '#6b7280', textAlign: 'center', maxWidth: 280, lineHeight: 1.6 }}>Buat sprint untuk mengatur konten minggu ini dalam kanban board</div>
-              <button onClick={openSprintModal} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', marginTop: 8 }}>
-                + Buat Sprint Pertama
-              </button>
+              {canEdit && (
+                <button onClick={openSprintModal} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', marginTop: 8 }}>
+                  + Buat Sprint Pertama
+                </button>
+              )}
             </div>
           ) : (
             <>
@@ -1127,7 +1137,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{col.label}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9ca3af', background: '#f3f4f6', borderRadius: 20, padding: '2px 9px' }}>{items.length}</span>
-                          {col.id === 'todo' && (
+                          {col.id === 'todo' && canEdit && (
                             <button onClick={openAddModal}
                               style={{ background: '#1a73e8', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#fff', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}>
                               + Konten
@@ -1155,9 +1165,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
                             </div>
                             <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#374151' }}>Sprint siap!</div>
                             <div style={{ fontSize: '0.72rem', color: '#9ca3af', textAlign: 'center' }}>Tambah konten minggu ini</div>
-                            <button onClick={openAddModal} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
-                              + Tambah Konten
-                            </button>
+                            {canEdit && (
+                              <button onClick={openAddModal} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 18px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                                + Tambah Konten
+                              </button>
+                            )}
                           </div>
                         )}
                         {items.length === 0 && !(col.id === 'todo' && sprintContents.length === 0) && (

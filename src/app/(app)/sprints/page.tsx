@@ -54,6 +54,8 @@ export default async function SprintsPage() {
         accounts={(accounts || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
         brandType={(wsData?.brand_type as string) || 'creator'}
         pillars={(pillars || []).map(p => ({ id: p.id as string, nama: p.nama as string }))}
+        role={role}
+        jabatan={jabatan}
       />
     </Suspense>
   )
