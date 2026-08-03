@@ -148,8 +148,7 @@ export default function Topbar({ user, workspaceId, role = 'owner', jabatan = ''
   }
 
   async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await fetch('/api/auth/logout', { method: 'POST' })
     router.push('/login')
     router.refresh()
   }
