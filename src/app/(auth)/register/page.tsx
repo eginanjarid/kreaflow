@@ -102,7 +102,7 @@ export default function RegisterPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', color: '#374151', marginBottom: 6, fontWeight: 600 }}>
               Email {isInvite && <span style={{ color: '#7c3aed', fontWeight: 400 }}>· harus sesuai invite</span>}
             </label>
-            {isInvite ? (
+            {isInvite && form.email ? (
               <div style={{ position: 'relative' }}>
                 <input type="email" value={form.email} readOnly style={{ ...inputStyle, background: '#f0ebff', border: '1.5px solid #c4b5fd', color: '#5b21b6', cursor: 'not-allowed', paddingRight: 36 }} />
                 <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#7c3aed' }}>
@@ -110,7 +110,7 @@ export default function RegisterPage() {
                 </span>
               </div>
             ) : (
-              <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@kamu.com" required style={inputStyle} />
+              <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder={isInvite ? 'Masukkan email yang diundang' : 'email@kamu.com'} required style={inputStyle} />
             )}
           </div>
 
