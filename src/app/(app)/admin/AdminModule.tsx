@@ -80,8 +80,12 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   const [newSaEmail, setNewSaEmail] = useState('')
   const [saMsg, setSaMsg] = useState('')
   const [saLoading, setSaLoading] = useState(false)
+  const [deletingUser, setDeletingUser] = useState<string | null>(null)
+  const [userList, setUserList] = useState<UserRow[]>(users)
 
-  const filteredUsers = users.filter(u => {
+  const superAdminEmailSet = new Set([godAdminEmail, ...saList.map(s => s.email)])
+
+  const filteredUsers = userList.filter(u => {
     const matchSearch = !search || u.email.includes(search.toLowerCase()) || u.nama.toLowerCase().includes(search.toLowerCase())
     const matchPlan = !filterPlan || u.plan === filterPlan
     return matchSearch && matchPlan
@@ -118,6 +122,16 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
     if (!res.ok) { setMsg('Error: ' + (data.error || 'Gagal')); return }
     setMsg(actionType === 'password' ? 'Password direset!' : 'Plan diperbarui!')
     setTimeout(() => { closeAction(); window.location.reload() }, 800)
+  }
+
+  async function deleteUser(u: UserRow) {
+    if (!confirm(`Hapus akun "${u.email}" beserta semua workspace-nya? Ini tidak bisa dibatalkan.`)) return
+    setDeletingUser(u.id)
+    const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'deleteUser', userId: u.id }) })
+    const data = await res.json()
+    setDeletingUser(null)
+    if (!res.ok) { alert('Gagal: ' + (data.error || 'Unknown error')); return }
+    setUserList(prev => prev.filter(x => x.id !== u.id))
   }
 
   async function addSuperAdmin() {
@@ -242,6 +256,11 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '5px 10px', color: '#1a73e8', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
                     <button onClick={() => openUserAction(u, 'password')} style={{ background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 6, padding: '5px 10px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>PW</button>
+                    {isGodAdmin && !superAdminEmailSet.has(u.email) && (
+                      <button onClick={() => deleteUser(u)} disabled={deletingUser === u.id} style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 6, padding: '5px 8px', color: '#dc2626', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}>
+                        {deletingUser === u.id ? '...' : '✕'}
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -273,13 +292,18 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                   <div style={{ display: 'flex', gap: 6, paddingLeft: 12 }}>
                     <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
                     <button onClick={() => openUserAction(u, 'password')} style={{ background: 'rgba(71,85,105,0.15)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.68rem', cursor: 'pointer' }}>PW</button>
+                    {isGodAdmin && !superAdminEmailSet.has(u.email) && (
+                      <button onClick={() => deleteUser(u)} disabled={deletingUser === u.id} style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 6, padding: '4px 8px', color: '#dc2626', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>
+                        {deletingUser === u.id ? '...' : '✕'}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </>
           )}
 
-          <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.72rem', color: '#6b7280' }}>{filteredUsers.length} dari {users.length} user</div>
+          <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.72rem', color: '#6b7280' }}>{filteredUsers.length} dari {userList.length} user</div>
         </div>
       )}
 
