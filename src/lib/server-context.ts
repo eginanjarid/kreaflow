@@ -9,7 +9,7 @@ export const getServerContext = cache(async () => {
   appendFileSync('/tmp/kreaflow-debug.log', `[${new Date().toISOString()}] getServerContext called\n`)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) { appendFileSync('/tmp/kreaflow-debug.log', '[getServerContext] no user → redirect\n'); redirect('/login') }
+  if (!user) { appendFileSync('/tmp/kreaflow-debug.log', '[getServerContext] no user → redirect\n'); redirect('/test-redirect-marker') }
 
   const wsId = await resolveWorkspaceId(supabase, user.id)
   if (!wsId) redirect('/login')
