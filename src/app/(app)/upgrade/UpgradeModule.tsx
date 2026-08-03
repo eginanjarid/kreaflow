@@ -69,10 +69,12 @@ export default function UpgradeModule({
   failed,
   isLifetime = false,
   currentMaxWs = 0,
+  wsCount = 0,
 }: {
   failed: boolean
   isLifetime?: boolean
   currentMaxWs?: number
+  wsCount?: number
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
@@ -115,7 +117,7 @@ export default function UpgradeModule({
         </h1>
         <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6 }}>
           {isLifetime
-            ? `Kamu sudah punya ${currentMaxWs} workspace. Upgrade paket atau beli add-on untuk tambah lebih banyak.`
+            ? `Kamu sudah punya ${wsCount} dari ${currentMaxWs} workspace. Upgrade paket atau beli add-on untuk tambah slot.`
             : 'Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan.'}
         </p>
       </div>

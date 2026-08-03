@@ -41,5 +41,5 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
 
   const { failed } = await searchParams
 
-  return <UpgradeModule failed={failed === '1'} isLifetime={isLifetime} currentMaxWs={currentMaxWs} />
+  return <UpgradeModule failed={failed === '1'} isLifetime={isLifetime} currentMaxWs={currentMaxWs} wsCount={wsCount} />
 }
