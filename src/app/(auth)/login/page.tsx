@@ -111,7 +111,7 @@ export default function LoginPage() {
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: '0.83rem', color: '#6b7280' }}>
           Belum punya akun?{' '}
-          <Link href="/register" style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Daftar sekarang</Link>
+          <Link href={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : '/register'} style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Daftar sekarang</Link>
         </p>
       </div>
     </div>
