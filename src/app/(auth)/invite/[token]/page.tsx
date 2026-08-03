@@ -4,9 +4,7 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 import Link from 'next/link'
 
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
-  console.log('[INVITE] page rendering start')
   const { token } = await params
-  console.log('[INVITE] token:', token)
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   // Validate invite
@@ -19,7 +17,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
 
   if (!invite) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, zIndex: 50 }}>
         <div style={{ textAlign: 'center', maxWidth: 400 }}>
           <div style={{ marginBottom: 16, color: '#ef4444' }}><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <h1 style={{ color: '#f1f5f9', fontSize: '1.3rem', fontWeight: 700, marginBottom: 8 }}>Link Tidak Valid</h1>
@@ -40,7 +38,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     // Pastikan email yang login = email yang diundang
     if (user.email?.toLowerCase() !== invite.email?.toLowerCase()) {
       return (
-        <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, zIndex: 50 }}>
           <div style={{ textAlign: 'center', maxWidth: 400 }}>
             <div style={{ marginBottom: 16, color: '#f59e0b' }}><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
             <h1 style={{ color: '#f1f5f9', fontSize: '1.2rem', fontWeight: 700, marginBottom: 8 }}>Akun Tidak Sesuai</h1>
@@ -77,7 +75,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
 
   // Not logged in — show join page
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, zIndex: 50, fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ width: '100%', maxWidth: 400 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>

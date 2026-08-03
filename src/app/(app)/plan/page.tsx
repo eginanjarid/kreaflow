@@ -26,8 +26,8 @@ export default async function PlanPage() {
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-  if (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche) redirect('/brand?setup=1')
-  if (wsData?.brand_type === 'affiliate' && !productCount) redirect('/catalog?setup=1')
+  if (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
+  if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')
 
   const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
