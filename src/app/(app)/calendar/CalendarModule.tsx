@@ -386,7 +386,7 @@ function prevMonth() {
             ))}
           </div>
           {/* Calendar grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '110px' }}>
             {calDays.map((day, idx) => {
               const dayEntries = day ? entriesForDay(day) : []
               const dayTasks = day ? tasksForDay(day) : []
@@ -399,7 +399,7 @@ function prevMonth() {
               return (
                 <div key={idx}
                   style={{
-                    minHeight: 88, padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #f3f4f6' : 'none', borderBottom: '1px solid #f3f4f6',
+                    height: '100%', overflow: 'hidden', padding: 6, borderRight: (idx + 1) % 7 !== 0 ? '1px solid #f3f4f6' : 'none', borderBottom: '1px solid #f3f4f6',
                     background: dayImportant.length > 0 ? `${dayImportant[0].warna}08` : day ? 'transparent' : '#f9fafb', cursor: 'default',
                   }}>
                   {day && (
