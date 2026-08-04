@@ -61,11 +61,12 @@ const JABATAN_NOTIF_TYPES: Record<string, string[]> = {
 type Props = {
   user: { email: string; nama: string }
   workspaceId?: string
+  workspaceName?: string
   role?: string
   jabatan?: string
 }
 
-export default function Topbar({ user, workspaceId, role = 'owner', jabatan = '' }: Props) {
+export default function Topbar({ user, workspaceId, workspaceName, role = 'owner', jabatan = '' }: Props) {
   const allowedTypes = (role === 'owner' || role === 'admin') ? null : (JABATAN_NOTIF_TYPES[jabatan] ?? null)
   const pathname = usePathname()
   const router = useRouter()
@@ -173,7 +174,14 @@ export default function Topbar({ user, workspaceId, role = 'owner', jabatan = ''
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
         </div>
-        <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#2a3547', letterSpacing: '-0.3px' }}>KreaFlow</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+          <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#2a3547', letterSpacing: '-0.3px', lineHeight: 1.1 }}>KreaFlow</span>
+          {workspaceName && (
+            <span style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 500, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+              {workspaceName}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Desktop spacer */}

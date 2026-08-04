@@ -29,7 +29,7 @@ export default function AppShell({ workspace, workspaces, isSuperAdmin, user, ro
         className="app-sidebar"
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-        <Topbar user={user} workspaceId={workspace?.id} role={role} jabatan={jabatan} />
+        <Topbar user={user} workspaceId={workspace?.id} workspaceName={workspace?.name} role={role} jabatan={jabatan} />
         <main className="kf-main-scroll" style={{ background: '#f5f7fb' }}>
           <div className="main-content-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '28px 28px' }}>
             {children}
