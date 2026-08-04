@@ -119,6 +119,7 @@ const BUSINESS_TABS = [
   { id: 'biz-market',  label: 'Market & Produk' },
   { id: 'biz-konten',  label: 'Strategi Konten' },
   { id: 'biz-bio',     label: 'Bio & Copy' },
+  { id: 'pillars',     label: 'Content Pillars' },
   { id: 'visual',      label: 'Brand Visual' },
   { id: 'akun',        label: 'Akun Sosial' },
 ]
@@ -181,6 +182,7 @@ const BIZ_FREQ_CHECKS = [
   { key: 'biz_produk_unggulan', label: 'Produk Unggulan',       tab: 'biz-market' },
   { key: 'biz_platform_konten', label: 'Platform Konten',       tab: 'biz-konten' },
   { key: 'biz_bio_options',     label: 'Bio Akun',              tab: 'biz-bio' },
+  { key: 'content_pillars',     label: 'Content Pillars',       tab: 'pillars' },
   { key: 'color_palette',       label: 'Brand Visual',          tab: 'visual' },
 ] as const
 
@@ -933,6 +935,122 @@ Yang bikin audiens respect, bukan kabur. Natural dan sesuai karakter akun ini.
 ---
 
 Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan lain. Langsung ke outputnya.`
+  }
+
+  function buildBizProfilPrompt(): string {
+    const nama = profile.biz_nama_brand || '[nama belum diisi]'
+    const kategori = profile.biz_kategori || '[belum dipilih]'
+    const visi = profile.biz_visi || '[belum diisi]'
+    const misi = profile.biz_misi || '[belum diisi]'
+    const usp = profile.biz_usp || '[belum diisi]'
+    return `Kamu adalah brand strategist spesialis bisnis Indonesia 2026.
+
+DATA BISNIS
+Nama brand: ${nama}
+Kategori: ${kategori}
+Visi: ${visi}
+Misi: ${misi}
+USP saat ini: ${usp}
+
+Jawab dalam Bahasa Indonesia. Berikan HANYA 2 output berikut — tidak lebih, tidak kurang:
+
+---
+
+① TAGLINE BRAND (3 pilihan)
+Format — satu per baris:
+Tagline 1: [maks 8 kata, langsung ke value proposition]
+Tagline 2: [maks 8 kata, angle berbeda — lebih emosional/inspiratif]
+Tagline 3: [maks 8 kata, angle berbeda — lebih bold/provocative]
+
+Kriteria: mudah diingat, mencerminkan kategori & positioning, bukan generik.
+
+---
+
+② USP YANG LEBIH TAJAM
+Tulis ulang USP di atas menjadi 1–2 kalimat yang lebih spesifik, langsung ke poin, dan membedakan ${nama} dari kompetitor di kategori ${kategori}.
+Format: "USP: [kalimat USP yang tajam]"
+
+---
+
+Jangan tambahkan penjelasan, tips, atau analisis. Langsung ke outputnya.`
+  }
+
+  function buildBizMarketPrompt(): string {
+    const nama = profile.biz_nama_brand || '[nama belum diisi]'
+    const kategori = profile.biz_kategori || '[belum dipilih]'
+    const produk = profile.biz_produk_unggulan || '[belum diisi]'
+    const kompetitor = profile.biz_kompetitor || '[belum disebutkan]'
+    const usp = profile.biz_usp || '[belum diisi]'
+    return `Kamu adalah market research strategist spesialis bisnis Indonesia 2026.
+
+DATA BISNIS
+Nama brand: ${nama}
+Kategori: ${kategori}
+Produk/Jasa unggulan: ${produk}
+USP: ${usp}
+Kompetitor yang diketahui: ${kompetitor}
+
+Jawab dalam Bahasa Indonesia. Berikan HANYA 2 output berikut — tidak lebih, tidak kurang:
+
+---
+
+① TARGET PASAR (buyer persona)
+Tulis 3–4 kalimat deskripsi target pasar yang spesifik.
+Sertakan: usia, gender, lokasi, income/daya beli, pain point utama, trigger beli, kebiasaan belanja online.
+Format: "Target Pasar: [deskripsi lengkap]"
+
+---
+
+② KEUNGGULAN KOMPETITIF
+Tulis 2–3 kalimat yang menjelaskan apa yang bisa dilakukan ${nama} dan kompetitor tidak bisa lakukan.
+Fokus pada hal konkret yang bisa dieksekusi dan dikomunikasikan lewat konten sosial media.
+Format: "Keunggulan: [penjelasan keunggulan kompetitif yang spesifik]"
+
+---
+
+Jangan tambahkan penjelasan panjang, analisis pasar, atau tabel. Langsung ke outputnya.`
+  }
+
+  function buildBizBioPrompt(): string {
+    const nama = profile.biz_nama_brand || '[nama belum diisi]'
+    const kategori = profile.biz_kategori || '[belum dipilih]'
+    const usp = profile.biz_usp || '[belum diisi]'
+    const targetPasar = profile.biz_target_pasar || '[belum diisi]'
+    const tone = profile.biz_tone || 'Profesional'
+    const platform = (profile.biz_platform_konten || '').split(',').filter(Boolean).join('/') || 'Instagram/TikTok'
+    return `Kamu adalah copywriter spesialis bisnis Indonesia 2026.
+
+DATA BISNIS
+Nama brand: ${nama}
+Kategori: ${kategori}
+USP: ${usp}
+Target pasar: ${targetPasar}
+Tone of voice: ${tone}
+Platform: ${platform}
+
+Jawab dalam Bahasa Indonesia. Berikan HANYA 2 output berikut — tidak lebih, tidak kurang:
+
+---
+
+① BIO TOKO/AKUN (3 variasi)
+Format — satu per baris, langsung bisa di-copy:
+Bio 1: [maks 150 karakter, tonjolkan USP + CTA]
+Bio 2: [maks 150 karakter, variasi tone berbeda]
+Bio 3: [maks 150 karakter, lebih storytelling/emosional]
+
+Cocok untuk TikTok/Instagram/Shopee. Boleh pakai emoji. Jangan pakai hashtag.
+
+---
+
+② CALL TO ACTION (3 pilihan)
+Format:
+CTA 1 (Direct): [1 kalimat ajakan langsung — cth: DM "ORDER" untuk harga grosir]
+CTA 2 (Soft): [1 kalimat lebih halus — cth: Cek katalog lengkap di link bio]
+CTA 3 (Urgency): [1 kalimat dengan urgensi — cth: Stok terbatas, pesan sekarang sebelum habis]
+
+---
+
+Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung ke outputnya.`
   }
 
   async function callAI(prompt: string, fields: (keyof BrandProfile)[]) {
@@ -1736,9 +1854,18 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
 
         {/* ── Business: Profil Bisnis ── */}
         {tab === 'biz-profil' && sectionCard(<>
-          <div>
-            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Profil Bisnis</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+            <div>
+              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Profil Bisnis</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
+            </div>
+            <button type="button"
+              disabled={!profile.biz_nama_brand || !profile.biz_kategori}
+              onClick={() => setAiModal({ prompt: buildBizProfilPrompt() })}
+              style={{ background: (!profile.biz_nama_brand || !profile.biz_kategori) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_kategori) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Generate Tagline & USP
+            </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -1793,9 +1920,18 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
 
         {/* ── Business: Market & Produk ── */}
         {tab === 'biz-market' && sectionCard(<>
-          <div>
-            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Market & Produk</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Siapa yang kamu sasar, apa yang kamu jual, dan kenapa pelanggan pilih kamu</div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+            <div>
+              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Market & Produk</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Siapa yang kamu sasar, apa yang kamu jual, dan kenapa pelanggan pilih kamu</div>
+            </div>
+            <button type="button"
+              disabled={!profile.biz_kategori || !profile.biz_produk_unggulan}
+              onClick={() => setAiModal({ prompt: buildBizMarketPrompt() })}
+              style={{ background: (!profile.biz_kategori || !profile.biz_produk_unggulan) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_kategori || !profile.biz_produk_unggulan) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Generate Target & Keunggulan
+            </button>
           </div>
 
           <div>
@@ -1904,9 +2040,18 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
 
         {/* ── Business: Bio & Copy ── */}
         {tab === 'biz-bio' && sectionCard(<>
-          <div>
-            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Copywriting</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Bio toko/akun sosial media dan call-to-action yang mengundang pelanggan</div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+            <div>
+              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Copywriting</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Bio toko/akun sosial media dan call-to-action yang mengundang pelanggan</div>
+            </div>
+            <button type="button"
+              disabled={!profile.biz_nama_brand || !profile.biz_usp}
+              onClick={() => setAiModal({ prompt: buildBizBioPrompt() })}
+              style={{ background: (!profile.biz_nama_brand || !profile.biz_usp) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_usp) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Generate Bio & CTA
+            </button>
           </div>
 
           {/* Bio CRUD */}
@@ -2331,7 +2476,7 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
 
       {/* Content Pillars — own form, must be outside outer form */}
       {tab === 'pillars' && (
-        <ContentPillarsTab workspaceId={workspaceId} profile={profile} />
+        <ContentPillarsTab workspaceId={workspaceId} profile={profile} isBusiness={isBusiness} />
       )}
 
       {/* ── Akun Sosial ── */}
@@ -2448,7 +2593,7 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
   )
 }
 
-function ContentPillarsTab({ workspaceId, profile }: { workspaceId: string; profile: BrandProfile }) {
+function ContentPillarsTab({ workspaceId, profile, isBusiness = false }: { workspaceId: string; profile: BrandProfile; isBusiness?: boolean }) {
   const [pillars, setPillars] = useState<Array<{ id?: string; nama: string; fungsi: string; keterangan: string; hashtags: string; urutan: number }>>([
     { nama: '', fungsi: '', keterangan: '', hashtags: '', urutan: 1 }
   ])
@@ -2484,6 +2629,59 @@ function ContentPillarsTab({ workspaceId, profile }: { workspaceId: string; prof
   }, [workspaceId])
 
   function buildPillarsPromptLocal(): string {
+    if (isBusiness) {
+      const nama = profile.biz_nama_brand || '[nama belum diisi]'
+      const kategori = profile.biz_kategori || '[belum dipilih]'
+      const produk = profile.biz_produk_unggulan || '[belum diisi]'
+      const targetPasar = profile.biz_target_pasar || '[belum diisi]'
+      const usp = profile.biz_usp || '[belum diisi]'
+      const tone = profile.biz_tone || 'Profesional'
+      const platform = (profile.biz_platform_konten || '').split(',').filter(Boolean).join('/') || 'Instagram/TikTok'
+      const tipeKonten = (profile.biz_tipe_konten || '').split(',').filter(Boolean).join(', ') || '-'
+
+      return `Kamu adalah Content Strategist spesialis bisnis Indonesia 2026.
+
+Jawab dalam Bahasa Indonesia. Output harus langsung actionable dan spesifik untuk ${platform}.
+
+---
+
+DATA BISNIS
+
+Nama brand: ${nama}
+Kategori: ${kategori}
+Produk/Jasa unggulan: ${produk}
+USP: ${usp}
+Target pasar: ${targetPasar}
+Tone of voice: ${tone}
+Platform konten: ${platform}
+Tipe konten yang dipakai: ${tipeKonten}
+
+---
+
+YANG SAYA BUTUHKAN:
+
+▸ 5–7 CONTENT PILLAR UTAMA
+Pastikan 5 pilar dasar ini ada tapi disesuaikan dengan konteks bisnis ${kategori}:
+Edukasi Produk / Sosial Proof & Testimoni / Behind The Scene / Promosi & Flash Sale / Nilai & Lifestyle Brand
+
+Untuk SETIAP pillar, tulis dalam format persis ini:
+
+PILLAR [nomor]: [Nama Pillar — 2-4 kata, relevan untuk bisnis ${kategori}]
+FUNGSI: [1 kalimat — peran strategis pillar ini untuk membangun kepercayaan dan konversi pelanggan]
+KETERANGAN KONTEN: [2-3 kalimat — jenis konten apa, angle yang dipakai, dan kenapa relevan untuk target pasar di ${platform}]
+HASHTAG: [8-10 hashtag relevan, campuran niche bisnis + broad + produk]
+
+▸ 2 PILLAR BONUS
+Pillar tambahan spesifik untuk ${kategori} yang belum umum dipakai bisnis sejenis. Format sama.
+
+▸ STRATEGI ROTASI
+Pola posting mingguan 4–5x — pillar mana di hari apa. Sesuaikan dengan ritme bisnis (promo akhir minggu, edukasi awal minggu, dll).
+
+---
+
+Tutup dengan 1 pertanyaan untuk membantu saya memilih pillar mana yang paling realistis dieksekusi konsisten bulan pertama.`
+    }
+
     const niche = profile.niche || '[isi Niche Hunt dulu]'
     const microNiche = profile.micro_niche || '-'
     const premis = profile.premis || '[isi Origin Story dulu]'
@@ -2565,14 +2763,19 @@ Tutup dengan 1 pertanyaan yang membantu saya memilih pillar mana yang paling rea
   return (
     <>
     {/* Warning banners — di luar form agar tidak trigger submit */}
-    {!profile.niche && (
+    {!isBusiness && !profile.niche && (
       <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b', marginBottom: 12 }}>
         Pillar akan lebih tepat jika kamu sudah mengisi <strong>Niche Hunt</strong> dan <strong>Origin Story</strong> terlebih dahulu.
       </div>
     )}
-    {profile.niche && !profile.premis && (
+    {!isBusiness && profile.niche && !profile.premis && (
       <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b', marginBottom: 12 }}>
         Tip: Kamu sudah punya niche. Isi juga <strong>Origin Story</strong> agar AI bisa buat pillar yang lebih tajam dan sesuai premis brand.
+      </div>
+    )}
+    {isBusiness && !profile.biz_nama_brand && (
+      <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#f59e0b', marginBottom: 12 }}>
+        Pillar akan lebih akurat jika kamu sudah mengisi <strong>Profil Bisnis</strong> dan <strong>Market & Produk</strong> terlebih dahulu.
       </div>
     )}
     <form onSubmit={savePillars}>
@@ -2584,9 +2787,9 @@ Tutup dengan 1 pertanyaan yang membantu saya memilih pillar mana yang paling rea
           </div>
           <button
             type="button"
-            disabled={!profile.niche}
+            disabled={isBusiness ? !profile.biz_nama_brand : !profile.niche}
             onClick={() => setAiModal({ prompt: buildPillarsPromptLocal() })}
-            style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: profile.niche ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            style={{ background: (isBusiness ? !profile.biz_nama_brand : !profile.niche) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: (isBusiness ? !profile.biz_nama_brand : !profile.niche) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
             Generate dengan AI
           </button>
         </div>
