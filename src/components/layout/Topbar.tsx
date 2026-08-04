@@ -58,15 +58,30 @@ const JABATAN_NOTIF_TYPES: Record<string, string[]> = {
   'Art Director': ['naskah', 'produksi', 'deadline'],
 }
 
+type Workspace = { id: string; name: string; plan: string; brand_type: string }
+
+const BRAND_TYPE_COLOR: Record<string, string> = {
+  creator: '#1a73e8', affiliate: '#059669', business: '#7c3aed',
+}
+const BRAND_TYPE_LABEL: Record<string, string> = {
+  creator: 'Creator', affiliate: 'Affiliate', business: 'Business',
+}
+const BRAND_TYPES = [
+  { id: 'creator', label: 'Creator', desc: 'Konten kreator / personal brand' },
+  { id: 'affiliate', label: 'Affiliate', desc: 'Affiliator produk & komisi' },
+  { id: 'business', label: 'Business', desc: 'Brand toko / perusahaan' },
+]
+
 type Props = {
   user: { email: string; nama: string }
-  workspaceId?: string
-  workspaceName?: string
+  workspace?: Workspace | null
+  workspaces?: Workspace[]
   role?: string
   jabatan?: string
 }
 
-export default function Topbar({ user, workspaceId, workspaceName, role = 'owner', jabatan = '' }: Props) {
+export default function Topbar({ user, workspace, workspaces = [], role = 'owner', jabatan = '' }: Props) {
+  const workspaceId = workspace?.id
   const allowedTypes = (role === 'owner' || role === 'admin') ? null : (JABATAN_NOTIF_TYPES[jabatan] ?? null)
   const pathname = usePathname()
   const router = useRouter()
@@ -76,6 +91,14 @@ export default function Topbar({ user, workspaceId, workspaceName, role = 'owner
   const [notifs, setNotifs] = useState<NotifItem[]>([])
   const [notifLoading, setNotifLoading] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
+
+  // Mobile workspace switcher
+  const [wsSheetOpen, setWsSheetOpen] = useState(false)
+  const [switching, setSwitching] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [createForm, setCreateForm] = useState({ name: '', brand_type: 'creator' })
+  const [createError, setCreateError] = useState('')
+  const [creating, setCreating] = useState(false)
 
   const bellRef = useRef<HTMLDivElement>(null)
   const userRef = useRef<HTMLDivElement>(null)
@@ -148,6 +171,45 @@ export default function Topbar({ user, workspaceId, workspaceName, role = 'owner
     setUnreadCount(0)
   }
 
+  async function switchWorkspace(wsId: string) {
+    if (wsId === workspace?.id) { setWsSheetOpen(false); return }
+    setSwitching(true)
+    await fetch('/api/workspace/switch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspace_id: wsId }),
+    })
+    setSwitching(false)
+    setWsSheetOpen(false)
+    router.refresh()
+  }
+
+  async function createWorkspace(e: React.FormEvent) {
+    e.preventDefault()
+    if (!createForm.name.trim()) return
+    setCreating(true)
+    setCreateError('')
+    const res = await fetch('/api/workspace/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(createForm),
+    })
+    const data = await res.json()
+    setCreating(false)
+    if (res.ok) {
+      setCreateOpen(false)
+      setCreateForm({ name: '', brand_type: 'creator' })
+      setWsSheetOpen(false)
+      router.refresh()
+    } else if (data.needUpgrade) {
+      setCreateError('Akun belum aktif. Silakan upgrade terlebih dahulu.')
+    } else if (data.limitReached) {
+      setCreateError(`Batas workspace tercapai (${data.maxWorkspaces}). Upgrade paket untuk tambah lebih banyak.`)
+    } else {
+      setCreateError(data.error || 'Gagal membuat workspace')
+    }
+  }
+
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
     router.push('/login')
@@ -155,6 +217,7 @@ export default function Topbar({ user, workspaceId, workspaceName, role = 'owner
   }
 
   return (
+    <>
     <header className="kf-topbar" style={{
       height: 64,
       background: '#fff',
@@ -167,22 +230,28 @@ export default function Topbar({ user, workspaceId, workspaceName, role = 'owner
       position: 'relative',
       zIndex: 100,
     }}>
-      {/* Mobile brand (hidden on desktop, shown on mobile) */}
-      <div className="kf-topbar-brand" style={{ alignItems: 'center', gap: 8, marginRight: 'auto' }}>
+      {/* Mobile brand — tap to open workspace switcher */}
+      <button
+        className="kf-topbar-brand"
+        type="button"
+        onClick={() => { setWsSheetOpen(true); setCreateOpen(false) }}
+        style={{ alignItems: 'center', gap: 8, marginRight: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+      >
         <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, textAlign: 'left' }}>
           <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#2a3547', letterSpacing: '-0.3px', lineHeight: 1.1 }}>KreaFlow</span>
-          {workspaceName && (
-            <span style={{ fontSize: '0.68rem', color: '#5a6a85', fontWeight: 500, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
-              {workspaceName}
+          {workspace && (
+            <span style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140, display: 'flex', alignItems: 'center', gap: 3 }}>
+              {workspace.name}
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </span>
           )}
         </div>
-      </div>
+      </button>
 
       {/* Desktop spacer */}
       <div style={{ flex: 1 }} />
@@ -375,5 +444,98 @@ export default function Topbar({ user, workspaceId, workspaceName, role = 'owner
         </div>
       </div>
     </header>
+
+    {/* Mobile Workspace Switcher Sheet */}
+    {wsSheetOpen && (
+      <div
+        style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,0.45)' }}
+        onClick={() => { setWsSheetOpen(false); setCreateOpen(false) }}
+      >
+        <div
+          style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#fff', borderRadius: '20px 20px 0 0', paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))', maxHeight: '80vh', overflowY: 'auto' }}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Handle */}
+          <div style={{ width: 36, height: 4, background: '#e5eaf2', borderRadius: 2, margin: '12px auto 0' }} />
+
+          {/* Header */}
+          <div style={{ padding: '14px 18px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2a3547' }}>Pilih Workspace</div>
+            <button type="button" onClick={() => { setWsSheetOpen(false); setCreateOpen(false) }}
+              style={{ width: 28, height: 28, borderRadius: 8, background: '#f3f4f6', border: 'none', color: '#6b7280', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          </div>
+
+          {/* Workspace list */}
+          <div style={{ padding: '0 12px' }}>
+            {switching ? (
+              <div style={{ padding: '16px', textAlign: 'center', fontSize: '0.82rem', color: '#9ca3af' }}>Berpindah workspace...</div>
+            ) : (
+              workspaces.map(ws => {
+                const active = ws.id === workspace?.id
+                const color = BRAND_TYPE_COLOR[ws.brand_type] || '#1a73e8'
+                const btLabel = BRAND_TYPE_LABEL[ws.brand_type] || ws.brand_type
+                return (
+                  <button key={ws.id} type="button" onClick={() => switchWorkspace(ws.id)}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 10px', borderRadius: 12, background: active ? `${color}10` : 'transparent', border: `1.5px solid ${active ? color + '40' : 'transparent'}`, marginBottom: 6, cursor: 'pointer', textAlign: 'left' }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color }}>{ws.name.slice(0, 2).toUpperCase()}</span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: active ? 700 : 500, color: active ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ws.name}</div>
+                      <div style={{ fontSize: '0.68rem', color, fontWeight: 600, marginTop: 1 }}>{btLabel}</div>
+                    </div>
+                    {active && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    )}
+                  </button>
+                )
+              })
+            )}
+          </div>
+
+          {/* Buat workspace baru */}
+          <div style={{ padding: '8px 12px 0' }}>
+            {!createOpen ? (
+              <button type="button" onClick={() => setCreateOpen(true)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 10px', borderRadius: 12, border: '1.5px dashed #d1d5db', background: 'transparent', color: '#6b7280', fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </div>
+                Buat Workspace Baru
+              </button>
+            ) : (
+              <form onSubmit={createWorkspace} style={{ background: '#f9fafb', borderRadius: 14, padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#374151' }}>Workspace Baru</div>
+                <input
+                  value={createForm.name}
+                  onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Nama workspace..."
+                  style={{ width: '100%', background: '#fff', border: '1px solid #e5eaf2', borderRadius: 8, padding: '9px 12px', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                  autoFocus
+                />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {BRAND_TYPES.map(bt => (
+                    <button key={bt.id} type="button" onClick={() => setCreateForm(f => ({ ...f, brand_type: bt.id }))}
+                      style={{ flex: 1, padding: '8px 4px', borderRadius: 8, border: `1.5px solid ${createForm.brand_type === bt.id ? (BRAND_TYPE_COLOR[bt.id] || '#1a73e8') : '#e5eaf2'}`, background: createForm.brand_type === bt.id ? `${BRAND_TYPE_COLOR[bt.id] || '#1a73e8'}12` : '#fff', color: createForm.brand_type === bt.id ? (BRAND_TYPE_COLOR[bt.id] || '#1a73e8') : '#6b7280', fontSize: '0.72rem', fontWeight: createForm.brand_type === bt.id ? 700 : 400, cursor: 'pointer' }}>
+                      {bt.label}
+                    </button>
+                  ))}
+                </div>
+                {createError && <div style={{ fontSize: '0.75rem', color: '#dc2626' }}>{createError}</div>}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button type="button" onClick={() => { setCreateOpen(false); setCreateError('') }}
+                    style={{ flex: 1, padding: '9px', borderRadius: 8, background: '#f3f4f6', border: 'none', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Batal</button>
+                  <button type="submit" disabled={creating || !createForm.name.trim()}
+                    style={{ flex: 2, padding: '9px', borderRadius: 8, background: '#1a73e8', border: 'none', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: creating ? 'not-allowed' : 'pointer', opacity: !createForm.name.trim() ? 0.6 : 1 }}>
+                    {creating ? 'Membuat...' : 'Buat'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
