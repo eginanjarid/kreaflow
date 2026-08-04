@@ -55,6 +55,22 @@ type BrandProfile = {
   affiliate_content_pillars: string
   affiliate_disclosure: string
   affiliate_bio_options: BioOption[]
+  // Business Brand fields
+  biz_nama_brand: string
+  biz_kategori: string
+  biz_tagline: string
+  biz_usp: string
+  biz_visi: string
+  biz_misi: string
+  biz_target_pasar: string
+  biz_produk_unggulan: string
+  biz_kompetitor: string
+  biz_keunggulan: string
+  biz_platform_konten: string
+  biz_tipe_konten: string
+  biz_tone: string
+  biz_bio_options: BioOption[]
+  biz_cta: string
 }
 
 type NicheOption = {
@@ -95,6 +111,16 @@ const AFFILIATE_TABS = [
   { id: 'aff-bio',       label: 'Bio & Trust' },
   { id: 'akun',          label: 'Akun Sosial' },
   { id: 'visual',        label: 'Brand Visual' },
+]
+
+const BUSINESS_TABS = [
+  { id: 'overview',     label: 'Brand Score' },
+  { id: 'biz-profil',  label: 'Profil Bisnis' },
+  { id: 'biz-market',  label: 'Market & Produk' },
+  { id: 'biz-konten',  label: 'Strategi Konten' },
+  { id: 'biz-bio',     label: 'Bio & Copy' },
+  { id: 'visual',      label: 'Brand Visual' },
+  { id: 'akun',        label: 'Akun Sosial' },
 ]
 
 const PLATFORMS_SOSMED = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Twitter/X', 'LinkedIn']
@@ -143,6 +169,19 @@ const AFFILIATE_FREQ_CHECKS = [
   { key: 'affiliate_trust_builder',  label: 'Trust Builder',      tab: 'aff-bio' },
   { key: 'affiliate_disclosure',     label: 'Disclosure',         tab: 'aff-bio' },
   { key: 'color_palette',            label: 'Brand Visual',       tab: 'visual' },
+] as const
+
+const BIZ_FREQ_CHECKS = [
+  { key: 'biz_nama_brand',      label: 'Nama Brand',            tab: 'biz-profil' },
+  { key: 'biz_kategori',        label: 'Kategori Bisnis',       tab: 'biz-profil' },
+  { key: 'biz_usp',             label: 'Unique Selling Point',  tab: 'biz-profil' },
+  { key: 'biz_visi',            label: 'Visi Bisnis',           tab: 'biz-profil' },
+  { key: 'biz_target_pasar',    label: 'Target Pasar',          tab: 'biz-market' },
+  { key: 'biz_keunggulan',      label: 'Keunggulan Kompetitif', tab: 'biz-market' },
+  { key: 'biz_produk_unggulan', label: 'Produk Unggulan',       tab: 'biz-market' },
+  { key: 'biz_platform_konten', label: 'Platform Konten',       tab: 'biz-konten' },
+  { key: 'biz_bio_options',     label: 'Bio Akun',              tab: 'biz-bio' },
+  { key: 'color_palette',       label: 'Brand Visual',          tab: 'visual' },
 ] as const
 
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
@@ -258,8 +297,9 @@ export default function BrandModule({
   hasPillars?: boolean
 }) {
   const isAffiliate = modes.includes('affiliate')
-  const TABS = isAffiliate ? AFFILIATE_TABS : CREATOR_TABS
-  const [tab, setTab] = useState(isAffiliate ? 'aff-niche' : 'overview')
+  const isBusiness = modes.includes('business')
+  const TABS = isAffiliate ? AFFILIATE_TABS : isBusiness ? BUSINESS_TABS : CREATOR_TABS
+  const [tab, setTab] = useState(isAffiliate ? 'aff-niche' : isBusiness ? 'biz-profil' : 'overview')
   const [akunList, setAkunList] = useState<SosmedAkun[]>(initialAkun)
   const [akunForm, setAkunForm] = useState({ platform: 'TikTok', handle: '', nama: '' })
   const [savingAkun, setSavingAkun] = useState(false)
@@ -292,6 +332,21 @@ export default function BrandModule({
     affiliate_content_pillars: '',
     affiliate_disclosure: '',
     affiliate_bio_options: [],
+    biz_nama_brand: '',
+    biz_kategori: '',
+    biz_tagline: '',
+    biz_usp: '',
+    biz_visi: '',
+    biz_misi: '',
+    biz_target_pasar: '',
+    biz_produk_unggulan: '',
+    biz_kompetitor: '',
+    biz_keunggulan: '',
+    biz_platform_konten: '',
+    biz_tipe_konten: '',
+    biz_tone: '',
+    biz_bio_options: [],
+    biz_cta: '',
   }
   const [profile, setProfile] = useState<BrandProfile>(initialProfile ? {
     ...defaultProfile,
@@ -304,6 +359,7 @@ export default function BrandModule({
     affiliate_kategori_fokus: (initialProfile as unknown as { affiliate_kategori_fokus?: string[] }).affiliate_kategori_fokus || [],
     affiliate_nama_options: (initialProfile as unknown as { affiliate_nama_options?: AffNamaOption[] }).affiliate_nama_options || [],
     affiliate_bio_options: (initialProfile as unknown as { affiliate_bio_options?: BioOption[] }).affiliate_bio_options || [],
+    biz_bio_options: (initialProfile as unknown as { biz_bio_options?: BioOption[] }).biz_bio_options || [],
   } : defaultProfile)
 
   const [savedProfile, setSavedProfile] = useState<BrandProfile>(profile)
@@ -334,6 +390,10 @@ export default function BrandModule({
       case 'aff-niche':     return !!(p.affiliate_micro_niche || p.affiliate_target_buyer || p.affiliate_competitive_edge)
       case 'aff-identity':  return !!(p.affiliate_tagline || p.affiliate_positioning_statement || (p.affiliate_nama_options || []).length > 0)
       case 'aff-bio':       return !!(p.affiliate_trust_builder || p.affiliate_disclosure || (p.affiliate_bio_options || []).length > 0)
+      case 'biz-profil':    return !!(p.biz_nama_brand || p.biz_kategori || p.biz_usp)
+      case 'biz-market':    return !!(p.biz_target_pasar || p.biz_produk_unggulan || p.biz_keunggulan)
+      case 'biz-konten':    return !!(p.biz_platform_konten || p.biz_tipe_konten || p.biz_tone)
+      case 'biz-bio':       return !!(p.biz_cta || (p.biz_bio_options || []).length > 0)
       case 'overview':      return !!initialProfile?.id
       case 'niche':         return !!(p.niche || p.suka || p.bisa)
       case 'story':         return !!(p.premis)
@@ -343,7 +403,7 @@ export default function BrandModule({
       default:              return !!initialProfile?.id
     }
   }
-  const initialTab = isAffiliate ? 'aff-niche' : 'overview'
+  const initialTab = isAffiliate ? 'aff-niche' : isBusiness ? 'biz-profil' : 'overview'
   const [saved, setSaved] = useState(() => tabHasContent(initialTab, profile))
   function changeTab(id: string) { setTab(id); setSaved(tabHasContent(id, profile)) }
   const [aiLoading, setAiLoading] = useState(false)
@@ -903,9 +963,10 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
   // Brand score / Frekuensi level calc — always uses savedProfile (only updates after save)
   const hasBio = !!(savedProfile.bio_tiktok || savedProfile.bio_instagram || savedProfile.bio_youtube || savedProfile.bio_linkedin || savedProfile.bio_facebook)
   const hasColorPalette = (savedProfile.color_palette?.length ?? 0) > 0
-  const ACTIVE_FREQ_CHECKS = isAffiliate ? AFFILIATE_FREQ_CHECKS : FREQ_CHECKS
+  const ACTIVE_FREQ_CHECKS = isAffiliate ? AFFILIATE_FREQ_CHECKS : isBusiness ? BIZ_FREQ_CHECKS : FREQ_CHECKS
   const freqChecked = ACTIVE_FREQ_CHECKS.map(c => {
-    if (!isAffiliate && c.key === 'bio_instagram') return hasBio
+    if (!isAffiliate && !isBusiness && c.key === 'bio_instagram') return hasBio
+    if (isBusiness && c.key === 'biz_bio_options') return (savedProfile.biz_bio_options || []).length > 0
     if (c.key === 'color_palette') return hasColorPalette
     if (c.key === 'content_pillars') return hasPillars
     const val = savedProfile[c.key as keyof BrandProfile]
@@ -1670,6 +1731,240 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <SaveButton loading={saving} saved={saved} />
+          </div>
+        </>)}
+
+        {/* ── Business: Profil Bisnis ── */}
+        {tab === 'biz-profil' && sectionCard(<>
+          <div>
+            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Profil Bisnis</div>
+            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Nama Brand / Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
+              <input style={fieldStyle()} value={profile.biz_nama_brand ?? ''} onChange={e => setField('biz_nama_brand', e.target.value)} placeholder="cth: Kreaflow, Toko Batik Maju, NutriMama" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kategori Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {['UMKM', 'Kuliner & F&B', 'Fashion', 'Kosmetik & Beauty', 'Kesehatan', 'Pendidikan', 'Teknologi', 'Jasa', 'E-commerce', 'Properti', 'Otomotif', 'Lainnya'].map(kat => (
+                  <button key={kat} type="button" onClick={() => setField('biz_kategori', kat === profile.biz_kategori ? '' : kat)}
+                    style={{ padding: '5px 10px', borderRadius: 16, fontSize: '0.75rem', fontWeight: 500, border: profile.biz_kategori === kat ? '1px solid #1a73e8' : 'none', background: profile.biz_kategori === kat ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: profile.biz_kategori === kat ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
+                    {kat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Tagline Brand</label>
+            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Slogan singkat yang jadi signature bisnis kamu (maks 10 kata)</div>
+            <input style={fieldStyle()} value={profile.biz_tagline ?? ''} onChange={e => setField('biz_tagline', e.target.value)} placeholder="cth: Camilan Sehat untuk Keluarga Bahagia" />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Unique Selling Point (USP) <span style={{ color: '#dc2626' }}>*</span></label>
+            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Apa yang bikin bisnis kamu berbeda dari kompetitor? Jawab jujur dan spesifik.</div>
+            <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_usp ?? ''} onChange={e => setField('biz_usp', e.target.value)} placeholder="cth: Satu-satunya toko batik yang custom motif dalam 3 hari dengan bahan premium tanpa markup gila-gilaan" />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Visi Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
+              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_visi ?? ''} onChange={e => setField('biz_visi', e.target.value)} placeholder="Ke mana bisnis ini ingin melangkah dalam 5–10 tahun?" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Misi Bisnis</label>
+              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_misi ?? ''} onChange={e => setField('biz_misi', e.target.value)} placeholder="Apa yang dilakukan setiap hari untuk mencapai visi itu?" />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <SaveButton loading={saving} saved={saved} />
+            <button type="button" onClick={() => changeTab('biz-market')}
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+              Lanjut: Market & Produk →
+            </button>
+          </div>
+        </>)}
+
+        {/* ── Business: Market & Produk ── */}
+        {tab === 'biz-market' && sectionCard(<>
+          <div>
+            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Market & Produk</div>
+            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Siapa yang kamu sasar, apa yang kamu jual, dan kenapa pelanggan pilih kamu</div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Pasar <span style={{ color: '#dc2626' }}>*</span></label>
+            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Gambarkan pelanggan ideal kamu — demografi, kebiasaan, dan problem yang kamu selesaikan</div>
+            <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.biz_target_pasar ?? ''} onChange={e => setField('biz_target_pasar', e.target.value)} placeholder="cth: Ibu muda 25–40 tahun di kota besar yang peduli nutrisi tapi gak punya banyak waktu masak. Sering beli online, aktif di Instagram, budget Rp 50–150rb per snack order." />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Produk / Jasa Unggulan <span style={{ color: '#dc2626' }}>*</span></label>
+            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Produk atau layanan utama yang jadi andalan bisnis kamu</div>
+            <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={profile.biz_produk_unggulan ?? ''} onChange={e => setField('biz_produk_unggulan', e.target.value)} placeholder="cth: Granola box custom (15 varian rasa), Hamper lebaran premium, Subscription bulanan" />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kompetitor Utama</label>
+              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_kompetitor ?? ''} onChange={e => setField('biz_kompetitor', e.target.value)} placeholder="Siapa kompetitor langsung kamu? Nama brand atau deskripsi singkat." />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Keunggulan Kompetitif <span style={{ color: '#dc2626' }}>*</span></label>
+              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_keunggulan ?? ''} onChange={e => setField('biz_keunggulan', e.target.value)} placeholder="Apa yang kamu bisa lakukan dan kompetitor tidak?" />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="button" onClick={() => changeTab('biz-profil')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+              <SaveButton loading={saving} saved={saved} />
+            </div>
+            <button type="button" onClick={() => changeTab('biz-konten')}
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+              Lanjut: Strategi Konten →
+            </button>
+          </div>
+        </>)}
+
+        {/* ── Business: Strategi Konten ── */}
+        {tab === 'biz-konten' && sectionCard(<>
+          <div>
+            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Strategi Konten</div>
+            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Platform, tipe konten, dan tone of voice brand bisnis kamu di sosial media</div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Platform Konten Utama <span style={{ color: '#dc2626' }}>*</span></label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Tokopedia', 'Twitter/X', 'LinkedIn', 'WhatsApp Business'].map(pl => {
+                const selected = (profile.biz_platform_konten || '').split(',').filter(Boolean).includes(pl)
+                return (
+                  <button key={pl} type="button" onClick={() => {
+                    const cur = (profile.biz_platform_konten || '').split(',').filter(Boolean)
+                    const next = selected ? cur.filter(x => x !== pl) : [...cur, pl]
+                    setField('biz_platform_konten', next.join(','))
+                  }}
+                    style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? '#1a73e8' : 'transparent'}`, background: selected ? 'rgba(26,115,232,0.12)' : '#f3f4f6', color: selected ? '#1a73e8' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
+                    {pl}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Tipe Konten</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {['Produk Demo', 'Behind the Scene', 'Testimoni Pelanggan', 'Tutorial Pakai', 'Story & Flash Sale', 'Edukasi Produk', 'UGC Repost', 'Live Shopping'].map(tipe => {
+                const selected = (profile.biz_tipe_konten || '').split(',').filter(Boolean).includes(tipe)
+                return (
+                  <button key={tipe} type="button" onClick={() => {
+                    const cur = (profile.biz_tipe_konten || '').split(',').filter(Boolean)
+                    const next = selected ? cur.filter(x => x !== tipe) : [...cur, tipe]
+                    setField('biz_tipe_konten', next.join(','))
+                  }}
+                    style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? '#059669' : 'transparent'}`, background: selected ? 'rgba(5,150,105,0.1)' : '#f3f4f6', color: selected ? '#059669' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
+                    {tipe}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Tone of Voice Brand</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {['Profesional', 'Friendly & Hangat', 'Santai & Kasual', 'Mewah & Premium', 'Playful & Energik', 'Edukatif & Terpercaya', 'Inspiratif'].map(tone => (
+                <button key={tone} type="button" onClick={() => setField('biz_tone', profile.biz_tone === tone ? '' : tone)}
+                  style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${profile.biz_tone === tone ? '#7c3aed' : 'transparent'}`, background: profile.biz_tone === tone ? 'rgba(124,58,237,0.1)' : '#f3f4f6', color: profile.biz_tone === tone ? '#7c3aed' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: profile.biz_tone === tone ? 600 : 400 }}>
+                  {tone}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="button" onClick={() => changeTab('biz-market')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+              <SaveButton loading={saving} saved={saved} />
+            </div>
+            <button type="button" onClick={() => changeTab('biz-bio')}
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+              Lanjut: Bio & Copy →
+            </button>
+          </div>
+        </>)}
+
+        {/* ── Business: Bio & Copy ── */}
+        {tab === 'biz-bio' && sectionCard(<>
+          <div>
+            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Copywriting</div>
+            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Bio toko/akun sosial media dan call-to-action yang mengundang pelanggan</div>
+          </div>
+
+          {/* Bio CRUD */}
+          <div style={{ background: '#f9fafb', borderRadius: 16, padding: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Variasi Bio Toko / Akun</div>
+                <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Buat beberapa versi — pilih satu sebagai utama</div>
+              </div>
+              <button type="button" onClick={() => setProfile(p => ({ ...p, biz_bio_options: [...(p.biz_bio_options || []), { id: crypto.randomUUID(), teks: '', is_primary: (p.biz_bio_options || []).length === 0 }] }))}
+                style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 14px', color: '#fff', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                + Tambah Bio
+              </button>
+            </div>
+
+            {(profile.biz_bio_options || []).length === 0 && (
+              <div style={{ textAlign: 'center', padding: '20px 0', color: '#6b7280', fontSize: '0.82rem' }}>Belum ada bio — klik "+ Tambah Bio" untuk mulai</div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(profile.biz_bio_options || []).map((opt, idx) => (
+                <div key={opt.id} style={{ background: opt.is_primary ? 'rgba(26,115,232,0.06)' : '#fff', border: `1px solid ${opt.is_primary ? '#1a73e840' : '#f3f4f6'}`, borderRadius: 10, padding: 14 }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                    {opt.is_primary && <span style={{ background: '#eff6ff', color: '#1a73e8', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase' }}>Utama</span>}
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                      {!opt.is_primary && (
+                        <button type="button" onClick={() => { setProfile(p => ({ ...p, biz_bio_options: (p.biz_bio_options || []).map(b => ({ ...b, is_primary: b.id === opt.id })) })); setSaved(false) }}
+                          style={{ background: 'rgba(26,115,232,0.08)', border: '1px solid #1a73e830', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.73rem', cursor: 'pointer' }}>Pilih</button>
+                      )}
+                      <button type="button" onClick={() => { setProfile(p => ({ ...p, biz_bio_options: (p.biz_bio_options || []).filter(b => b.id !== opt.id) })); setSaved(false) }}
+                        style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 6, padding: '4px 8px', color: '#dc2626', fontSize: '0.73rem', cursor: 'pointer' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={opt.teks}
+                    onChange={e => { setProfile(p => ({ ...p, biz_bio_options: (p.biz_bio_options || []).map((b, i) => i === idx ? { ...b, teks: e.target.value } : b) })); setSaved(false) }}
+                    placeholder="cth: Camilan sehat homemade | Granola & Energy Bar | DM untuk custom order | Pengiriman seluruh Indonesia" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Call to Action (CTA)</label>
+            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Kalimat ajakan yang selalu muncul di konten atau bio — simple, spesifik, dan langsung actionable</div>
+            <input style={fieldStyle()} value={profile.biz_cta ?? ''} onChange={e => setField('biz_cta', e.target.value)} placeholder="cth: DM &quot;ORDER&quot; untuk harga grosir · Klik link di bio untuk katalog lengkap" />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="button" onClick={() => changeTab('biz-konten')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+              <SaveButton loading={saving} saved={saved} />
+            </div>
+            <button type="button" onClick={() => changeTab('visual')}
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+              Lanjut: Brand Visual →
+            </button>
           </div>
         </>)}
 

@@ -17,7 +17,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
   if (wsCheck?.plan !== 'lifetime') redirect('/upgrade')
 
   const brandType = (wsCheck?.brand_type as string | null) ?? 'creator'
-  const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
+  const modes = brandType === 'affiliate' ? ['affiliate'] : brandType === 'business' ? ['business'] : ['creator']
   const { setup } = await searchParams
 
   return (
@@ -26,7 +26,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
         <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '12px 18px', margin: '16px 0 0', display: 'flex', alignItems: 'center', gap: 10 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           <span style={{ fontSize: '0.875rem', color: '#92400e', fontWeight: 600 }}>
-            Lengkapi Brand terlebih dahulu — isi minimal {brandType === 'affiliate' ? 'Profil & Target' : 'Niche'} untuk mulai menggunakan Sprint, Plan, Studio, dan Calendar.
+            Lengkapi Brand terlebih dahulu — isi minimal {brandType === 'affiliate' ? 'Profil & Target' : brandType === 'business' ? 'Profil Bisnis' : 'Niche'} untuk mulai menggunakan Sprint, Plan, Studio, dan Calendar.
           </span>
         </div>
       )}
