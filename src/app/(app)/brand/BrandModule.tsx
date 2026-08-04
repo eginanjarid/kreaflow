@@ -71,6 +71,14 @@ type BrandProfile = {
   biz_tone: string
   biz_bio_options: BioOption[]
   biz_cta: string
+  biz_sub_tipe: string
+  biz_lokasi: string
+  biz_jam_operasional: string
+  biz_area_layanan: string
+  biz_model_bisnis: string
+  biz_price_range: string
+  biz_jenjang: string
+  biz_marketplace: string
 }
 
 type NicheOption = {
@@ -123,6 +131,128 @@ const BUSINESS_TABS = [
   { id: 'visual',      label: 'Brand Visual' },
   { id: 'akun',        label: 'Akun Sosial' },
 ]
+
+type BizTypeConfig = {
+  label: string; emoji: string; desc: string; color: string
+  kategoris: string[]; platformReko: string[]; tipeKonten: string[]
+  produkLabel: string; produkPlaceholder: string
+  targetLabel: string; targetPlaceholder: string
+  keunggulanPlaceholder: string; pillarReko: string[]
+  show: { lokasi?: boolean; jamOps?: boolean; areaLayanan?: boolean; modelBisnis?: boolean; priceRange?: boolean; jenjang?: boolean; marketplace?: boolean }
+}
+
+const BIZ_TYPES: Record<string, BizTypeConfig> = {
+  kuliner: {
+    label: 'Kuliner & F&B', emoji: '🍽️', desc: 'Restoran, kafe, katering, snack, minuman, cloud kitchen', color: '#f59e0b',
+    kategoris: ['Restoran/Rumah Makan', 'Kafe & Coffee Shop', 'Katering & Pesanan', 'Snack & Camilan', 'Minuman & Beverage', 'Cloud Kitchen', 'Bakery & Pastry'],
+    platformReko: ['Instagram', 'TikTok', 'Shopee Food', 'GoFood/GrabFood'],
+    tipeKonten: ['Food Photography', 'Promo & Flash Sale', 'Behind the Kitchen', 'Testimoni Pelanggan', 'Menu Baru', 'Live Masak', 'Tips & Resep'],
+    produkLabel: 'Menu Andalan', produkPlaceholder: 'cth: Nasi Goreng Spesial, Es Kopi Susu, Paket Katering Harian',
+    targetLabel: 'Target Pelanggan', targetPlaceholder: 'cth: Pekerja kantoran 22–40 tahun di area Sudirman, budget Rp 25–75rb/makan, aktif di GoFood dan Instagram',
+    keunggulanPlaceholder: 'cth: Bahan segar lokal, gratis ongkir >Rp100rb, siap dalam 15 menit',
+    pillarReko: ['Produk & Menu', 'Behind the Kitchen', 'Testimoni & Review', 'Promo & Seasonal', 'Edukasi Kuliner'],
+    show: { lokasi: true, jamOps: true, priceRange: true },
+  },
+  pendidikan: {
+    label: 'Pendidikan & Kursus', emoji: '🎓', desc: 'Sekolah, lembaga kursus, bimbel, pelatihan, online course', color: '#1a73e8',
+    kategoris: ['Sekolah Formal (TK–SMA)', 'Perguruan Tinggi', 'Bimbingan Belajar', 'Kursus Bahasa', 'Kursus Skill Digital', 'Pelatihan Profesional', 'Online Course'],
+    platformReko: ['Instagram', 'YouTube', 'TikTok', 'LinkedIn', 'WhatsApp Business'],
+    tipeKonten: ['Prestasi & Testimoni Alumni', 'Info Pendaftaran', 'Kehidupan Kelas / Campus Life', 'Tips Belajar', 'Profile Pengajar', 'Event & Lomba', 'Edukasi Gratis'],
+    produkLabel: 'Program / Kelas Unggulan', produkPlaceholder: 'cth: Program Intensif SNBT, Kelas Coding Dasar, English for Business',
+    targetLabel: 'Target Peserta & Wali', targetPlaceholder: 'cth: Pelajar SMA kelas 12 dan orang tua mereka di Jabodetabek, income menengah, aktif di WhatsApp dan Instagram',
+    keunggulanPlaceholder: 'cth: Rasio kelulusan 92%, pengajar berpengalaman 10+ tahun, metode belajar adaptif',
+    pillarReko: ['Prestasi & Alumni', 'Kehidupan Kelas', 'Tips & Edukasi', 'Info Program', 'Community'],
+    show: { jenjang: true, areaLayanan: true },
+  },
+  fashion: {
+    label: 'Fashion & Lifestyle', emoji: '👗', desc: 'Pakaian, aksesoris, sepatu, tas, streetwear, modest fashion', color: '#ec4899',
+    kategoris: ['Fashion Wanita', 'Fashion Pria', 'Modest Fashion / Hijab', 'Streetwear', 'Aksesoris & Tas', 'Sepatu & Sandal', 'Kids Fashion'],
+    platformReko: ['Instagram', 'TikTok', 'Shopee', 'Tokopedia'],
+    tipeKonten: ['Lookbook & OOTD', 'New Arrival', 'Behind Produksi', 'Styling Tips', 'Flash Sale', 'UGC Repost', 'Testimoni & Review'],
+    produkLabel: 'Produk Andalan', produkPlaceholder: 'cth: Gamis Terbaru, Denim Jacket Premium, Sneakers Lokal',
+    targetLabel: 'Target Pembeli', targetPlaceholder: 'cth: Wanita 18–35 tahun, fashion-conscious, budget Rp 100–500rb per item, aktif di TikTok dan Shopee',
+    keunggulanPlaceholder: 'cth: Bahan premium dengan harga lokal, size inklusif XS–5XL, produksi sendiri',
+    pillarReko: ['Lookbook & Styling', 'New Arrival', 'Flash Sale', 'Behind the Brand', 'Testimoni'],
+    show: { priceRange: true, areaLayanan: true },
+  },
+  kecantikan: {
+    label: 'Kecantikan & Kesehatan', emoji: '💆', desc: 'Salon, klinik kecantikan, spa, skincare, kosmetik, health clinic', color: '#db2777',
+    kategoris: ['Salon & Barber', 'Klinik Kecantikan', 'Spa & Wellness', 'Brand Skincare', 'Brand Kosmetik', 'Klinik Kesehatan', 'Apotek & Suplemen'],
+    platformReko: ['Instagram', 'TikTok', 'YouTube'],
+    tipeKonten: ['Before & After', 'Tips Kecantikan', 'Promo Layanan', 'Profile Dokter/Terapis', 'Edukasi Kulit/Kesehatan', 'Testimoni Klien', 'Tutorial Makeup/Skincare'],
+    produkLabel: 'Layanan / Produk Unggulan', produkPlaceholder: 'cth: Treatment Glow Booster, Paket Perawatan Wajah, Serum Vitamin C',
+    targetLabel: 'Target Klien', targetPlaceholder: 'cth: Wanita 20–45 tahun yang peduli penampilan, aktif di Instagram, budget Rp 200rb–2jt per kunjungan',
+    keunggulanPlaceholder: 'cth: Dokter berpengalaman, teknologi terkini, hasil terjamin dalam 4x treatment',
+    pillarReko: ['Before & After', 'Edukasi Kulit', 'Promo & Paket', 'Testimoni', 'Tips Perawatan'],
+    show: { lokasi: true, jamOps: true, priceRange: true },
+  },
+  properti: {
+    label: 'Properti & Interior', emoji: '🏠', desc: 'Developer, agen properti, desain interior, kontraktor, furnitur', color: '#0284c7',
+    kategoris: ['Developer Perumahan', 'Agen Properti', 'Desain Interior', 'Kontraktor & Renovasi', 'Furnitur & Dekorasi', 'Apartemen & Kost', 'Properti Komersial'],
+    platformReko: ['Instagram', 'YouTube', 'TikTok', 'Facebook'],
+    tipeKonten: ['Showcase Properti/Desain', 'Virtual Tour', 'Testimoni Buyer/Client', 'Tips Properti/Interior', 'Progress Pembangunan', 'Info Lokasi & Fasilitas', 'Market Update'],
+    produkLabel: 'Produk / Layanan Utama', produkPlaceholder: 'cth: Rumah subsidi type 36, Jasa desain interior minimalis, Renovasi dapur dan kamar mandi',
+    targetLabel: 'Target Pembeli / Klien', targetPlaceholder: 'cth: Pasangan muda 25–40 tahun yang baru menikah, penghasilan Rp 5–15jt/bulan, cari hunian pertama di area Bekasi',
+    keunggulanPlaceholder: 'cth: Desain custom tanpa biaya tambahan, garansi konstruksi 5 tahun, lokasi strategis dekat akses tol',
+    pillarReko: ['Showcase & Portfolio', 'Testimoni Klien', 'Tips & Edukasi', 'Market Update', 'Progress Proyek'],
+    show: { lokasi: true, priceRange: true, modelBisnis: true },
+  },
+  jasa: {
+    label: 'Jasa Profesional', emoji: '💼', desc: 'Konsultan, pengacara, akuntan, fotografer, event organizer, dll', color: '#7c3aed',
+    kategoris: ['Konsultan Bisnis', 'Jasa Hukum', 'Jasa Keuangan & Pajak', 'Fotografer & Videografer', 'Event Organizer', 'Jasa IT & Web', 'Jasa Marketing & Kreatif'],
+    platformReko: ['Instagram', 'LinkedIn', 'YouTube', 'WhatsApp Business'],
+    tipeKonten: ['Case Study & Portfolio', 'Thought Leadership', 'Behind the Process', 'Testimoni Klien', 'Team Introduction', 'Promo Paket', 'FAQ & Edukasi'],
+    produkLabel: 'Layanan Unggulan', produkPlaceholder: 'cth: Konsultasi pajak UMKM, Paket foto produk e-commerce, Event Wedding 200–500 tamu',
+    targetLabel: 'Target Klien', targetPlaceholder: 'cth: UMKM yang baru berkembang di Jakarta, omzet Rp 50–500jt/bulan, butuh bantuan pembukuan dan pelaporan pajak',
+    keunggulanPlaceholder: 'cth: Berpengalaman 8 tahun, proses transparan, hasil terukur dengan laporan bulanan',
+    pillarReko: ['Portfolio & Case Study', 'Edukasi & Tips', 'Testimoni Klien', 'Behind the Process', 'FAQ'],
+    show: { modelBisnis: true, areaLayanan: true, priceRange: true },
+  },
+  teknologi: {
+    label: 'Teknologi & SaaS', emoji: '💻', desc: 'Software, aplikasi, platform digital, startup teknologi', color: '#0369a1',
+    kategoris: ['SaaS / Software', 'Aplikasi Mobile', 'Platform E-learning', 'Fintech', 'Marketplace', 'AI & Automation', 'Jasa IT & Outsourcing'],
+    platformReko: ['LinkedIn', 'Twitter/X', 'YouTube', 'Instagram'],
+    tipeKonten: ['Feature Demo & Tutorial', 'Product Update', 'Case Study Pengguna', 'Tech Insight', 'Behind the Build', 'Testimoni', 'FAQ & Troubleshoot'],
+    produkLabel: 'Produk / Fitur Utama', produkPlaceholder: 'cth: Dashboard analytics real-time, Fitur otomasi laporan, Paket Pro Rp 299rb/bulan',
+    targetLabel: 'Target Pengguna', targetPlaceholder: 'cth: UMKM dan startup Indonesia yang butuh solusi manajemen konten, 1–50 karyawan, melek teknologi',
+    keunggulanPlaceholder: 'cth: Onboarding 10 menit, dukungan bahasa Indonesia, harga 3x lebih terjangkau dari kompetitor',
+    pillarReko: ['Product Demo', 'Case Study', 'Tech Education', 'Product Update', 'Community'],
+    show: { modelBisnis: true, priceRange: true, areaLayanan: true },
+  },
+  retail: {
+    label: 'Retail & E-commerce', emoji: '🛍️', desc: 'Toko online/offline, marketplace, reseller, dropshipper', color: '#059669',
+    kategoris: ['Toko Online (Shopee/Tokopedia)', 'Toko Offline / Minimarket', 'Dropshipping', 'Reseller & Distributor', 'Toko Multi-brand', 'Specialty Store', 'Wholesale & Grosir'],
+    platformReko: ['Shopee', 'Tokopedia', 'TikTok Shop', 'Instagram', 'Facebook'],
+    tipeKonten: ['Product Showcase', 'Unboxing & Review', 'Flash Sale', 'Comparison Produk', 'UGC Repost', 'Live Shopping', 'Packing & Pengiriman'],
+    produkLabel: 'Produk / Kategori Utama', produkPlaceholder: 'cth: Elektronik rumah tangga, Perlengkapan bayi, Produk kecantikan branded',
+    targetLabel: 'Target Pembeli', targetPlaceholder: 'cth: Ibu rumah tangga 25–45 tahun yang aktif belanja online, budget Rp 50–300rb per transaksi, sering cari promo',
+    keunggulanPlaceholder: 'cth: Pengiriman same day, garansi 30 hari, harga lebih murah dari toko resmi',
+    pillarReko: ['Product Showcase', 'Flash Sale & Promo', 'Unboxing & Review', 'Live Shopping', 'Testimoni'],
+    show: { marketplace: true, priceRange: true, areaLayanan: true },
+  },
+  otomotif: {
+    label: 'Otomotif', emoji: '🚗', desc: 'Dealer motor/mobil, bengkel, aksesori kendaraan, cuci kendaraan', color: '#d97706',
+    kategoris: ['Dealer Motor Baru', 'Dealer Mobil Baru', 'Kendaraan Bekas', 'Bengkel & Servis', 'Aksesori Kendaraan', 'Cuci & Detailing', 'Modifikasi'],
+    platformReko: ['Instagram', 'TikTok', 'YouTube', 'Facebook'],
+    tipeKonten: ['Unit Showcase', 'Tips Perawatan Kendaraan', 'Before & After', 'Proses Servis', 'Testimoni Pelanggan', 'Review Produk/Unit', 'Promo & DP'],
+    produkLabel: 'Produk / Layanan Utama', produkPlaceholder: 'cth: Honda Beat 2024, Servis mesin motor matic, Aksesori variasi Yamaha',
+    targetLabel: 'Target Pelanggan', targetPlaceholder: 'cth: Pria 20–45 tahun yang punya atau mau beli kendaraan, income Rp 3–10jt/bulan, aktif di YouTube dan Instagram',
+    keunggulanPlaceholder: 'cth: Mekanik bersertifikat, spare part original, garansi servis 1 bulan',
+    pillarReko: ['Unit Showcase', 'Tips Perawatan', 'Promo & DP', 'Testimoni', 'Before & After'],
+    show: { lokasi: true, jamOps: true, priceRange: true },
+  },
+  komunitas: {
+    label: 'Komunitas & Organisasi', emoji: '🤝', desc: 'NGO, komunitas hobi, organisasi sosial, yayasan, klub', color: '#6d28d9',
+    kategoris: ['Komunitas Hobi', 'Organisasi Sosial / NGO', 'Yayasan & Amal', 'Komunitas Olahraga', 'Komunitas Bisnis', 'Organisasi Pelajar/Mahasiswa', 'Komunitas Keagamaan'],
+    platformReko: ['Instagram', 'YouTube', 'WhatsApp', 'Facebook', 'TikTok'],
+    tipeKonten: ['Impact Story', 'Event & Kegiatan', 'Edukasi & Awareness', 'Volunteer & Member CTA', 'Progress & Update', 'Member Spotlight', 'Behind the Mission'],
+    produkLabel: 'Program / Kegiatan Utama', produkPlaceholder: 'cth: Program beasiswa, Turnamen futsal bulanan, Donasi untuk panti asuhan',
+    targetLabel: 'Target Anggota / Donatur', targetPlaceholder: 'cth: Profesional muda 22–35 tahun yang peduli sosial, aktif di Instagram, ingin berkontribusi nyata',
+    keunggulanPlaceholder: 'cth: Komunitas aktif 500+ anggota, laporan program transparan, dampak terukur per kuartal',
+    pillarReko: ['Impact Story', 'Event & Kegiatan', 'Edukasi & Awareness', 'Member Spotlight', 'Behind the Mission'],
+    show: { areaLayanan: true, modelBisnis: true },
+  },
+}
 
 const PLATFORMS_SOSMED = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Twitter/X', 'LinkedIn']
 const MAX_AKUN = 10
@@ -349,6 +479,14 @@ export default function BrandModule({
     biz_tone: '',
     biz_bio_options: [],
     biz_cta: '',
+    biz_sub_tipe: '',
+    biz_lokasi: '',
+    biz_jam_operasional: '',
+    biz_area_layanan: '',
+    biz_model_bisnis: '',
+    biz_price_range: '',
+    biz_jenjang: '',
+    biz_marketplace: '',
   }
   const [profile, setProfile] = useState<BrandProfile>(initialProfile ? {
     ...defaultProfile,
@@ -943,10 +1081,11 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
     const visi = profile.biz_visi || '[belum diisi]'
     const misi = profile.biz_misi || '[belum diisi]'
     const usp = profile.biz_usp || '[belum diisi]'
+    const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
     return `Kamu adalah brand strategist spesialis bisnis Indonesia 2026.
 
 DATA BISNIS
-Nama brand: ${nama}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
 Kategori: ${kategori}
 Visi: ${visi}
 Misi: ${misi}
@@ -981,10 +1120,11 @@ Jangan tambahkan penjelasan, tips, atau analisis. Langsung ke outputnya.`
     const produk = profile.biz_produk_unggulan || '[belum diisi]'
     const kompetitor = profile.biz_kompetitor || '[belum disebutkan]'
     const usp = profile.biz_usp || '[belum diisi]'
+    const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
     return `Kamu adalah market research strategist spesialis bisnis Indonesia 2026.
 
 DATA BISNIS
-Nama brand: ${nama}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
 Kategori: ${kategori}
 Produk/Jasa unggulan: ${produk}
 USP: ${usp}
@@ -1018,10 +1158,11 @@ Jangan tambahkan penjelasan panjang, analisis pasar, atau tabel. Langsung ke out
     const targetPasar = profile.biz_target_pasar || '[belum diisi]'
     const tone = profile.biz_tone || 'Profesional'
     const platform = (profile.biz_platform_konten || '').split(',').filter(Boolean).join('/') || 'Instagram/TikTok'
+    const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
     return `Kamu adalah copywriter spesialis bisnis Indonesia 2026.
 
 DATA BISNIS
-Nama brand: ${nama}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
 Kategori: ${kategori}
 USP: ${usp}
 Target pasar: ${targetPasar}
@@ -1854,192 +1995,293 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
 
         {/* ── Business: Profil Bisnis ── */}
         {tab === 'biz-profil' && sectionCard(<>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-            <div>
-              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Profil Bisnis</div>
-              <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
-            </div>
-            <button type="button"
-              disabled={!profile.biz_nama_brand || !profile.biz_kategori}
-              onClick={() => setAiModal({ prompt: buildBizProfilPrompt() })}
-              style={{ background: (!profile.biz_nama_brand || !profile.biz_kategori) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_kategori) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              Generate Tagline & USP
-            </button>
-          </div>
+          {/* ── Business Profiler: Type Picker ── */}
+          {!profile.biz_sub_tipe ? (
+            <>
+              <div>
+                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem', marginBottom: 4 }}>Pilih Tipe Bisnis Kamu</div>
+                <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>KreaFlow akan menyesuaikan semua form, konten, dan saran AI berdasarkan tipe bisnis yang kamu pilih.</div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                {Object.entries(BIZ_TYPES).map(([key, cfg]) => (
+                  <button key={key} type="button"
+                    onClick={() => { setField('biz_sub_tipe', key); setSaved(false) }}
+                    style={{ padding: '16px', borderRadius: 12, border: `1.5px solid ${cfg.color}30`, background: `${cfg.color}08`, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s' }}>
+                    <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{cfg.emoji}</div>
+                    <div style={{ fontWeight: 700, color: cfg.color, fontSize: '0.875rem', marginBottom: 3 }}>{cfg.label}</div>
+                    <div style={{ fontSize: '0.73rem', color: '#6b7280', lineHeight: 1.4 }}>{cfg.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (() => {
+            const bizCfg = BIZ_TYPES[profile.biz_sub_tipe]
+            if (!bizCfg) return null
+            return (
+              <>
+                {/* Header with type badge + change button */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: '1.1rem' }}>{bizCfg.emoji}</span>
+                      <span style={{ background: `${bizCfg.color}18`, color: bizCfg.color, fontWeight: 700, fontSize: '0.8rem', padding: '3px 10px', borderRadius: 20 }}>{bizCfg.label}</span>
+                      <button type="button" onClick={() => { setField('biz_sub_tipe', ''); setField('biz_kategori', '') }}
+                        style={{ background: 'none', border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 8px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>Ubah tipe</button>
+                    </div>
+                    <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
+                  </div>
+                  <button type="button"
+                    disabled={!profile.biz_nama_brand || !profile.biz_kategori}
+                    onClick={() => setAiModal({ prompt: buildBizProfilPrompt() })}
+                    style={{ background: (!profile.biz_nama_brand || !profile.biz_kategori) ? '#d1d5db' : bizCfg.color, border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_kategori) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    Generate Tagline & USP
+                  </button>
+                </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Nama Brand / Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
-              <input style={fieldStyle()} value={profile.biz_nama_brand ?? ''} onChange={e => setField('biz_nama_brand', e.target.value)} placeholder="cth: Kreaflow, Toko Batik Maju, NutriMama" />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Nama Brand / Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
+                    <input style={fieldStyle()} value={profile.biz_nama_brand ?? ''} onChange={e => setField('biz_nama_brand', e.target.value)} placeholder="cth: Kreaflow, Toko Batik Maju, NutriMama" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kategori <span style={{ color: '#dc2626' }}>*</span></label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {bizCfg.kategoris.map(kat => (
+                        <button key={kat} type="button" onClick={() => setField('biz_kategori', kat === profile.biz_kategori ? '' : kat)}
+                          style={{ padding: '5px 10px', borderRadius: 16, fontSize: '0.75rem', fontWeight: 500, border: profile.biz_kategori === kat ? `1px solid ${bizCfg.color}` : 'none', background: profile.biz_kategori === kat ? `${bizCfg.color}18` : '#f3f4f6', color: profile.biz_kategori === kat ? bizCfg.color : '#6b7280', cursor: 'pointer' }}>
+                          {kat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Tagline Brand</label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Slogan singkat yang jadi signature bisnis kamu (maks 10 kata)</div>
+                  <input style={fieldStyle()} value={profile.biz_tagline ?? ''} onChange={e => setField('biz_tagline', e.target.value)} placeholder="cth: Camilan Sehat untuk Keluarga Bahagia" />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Unique Selling Point (USP) <span style={{ color: '#dc2626' }}>*</span></label>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Apa yang bikin bisnis kamu berbeda dari kompetitor? Jawab jujur dan spesifik.</div>
+                  <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_usp ?? ''} onChange={e => setField('biz_usp', e.target.value)} placeholder="cth: Satu-satunya toko batik yang custom motif dalam 3 hari dengan bahan premium tanpa markup gila-gilaan" />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Visi Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
+                    <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_visi ?? ''} onChange={e => setField('biz_visi', e.target.value)} placeholder="Ke mana bisnis ini ingin melangkah dalam 5–10 tahun?" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Misi Bisnis</label>
+                    <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_misi ?? ''} onChange={e => setField('biz_misi', e.target.value)} placeholder="Apa yang dilakukan setiap hari untuk mencapai visi itu?" />
+                  </div>
+                </div>
+
+                {/* Dynamic fields per biz type */}
+                {(bizCfg.show.lokasi || bizCfg.show.jamOps || bizCfg.show.jenjang) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    {bizCfg.show.lokasi && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Lokasi Bisnis</label>
+                        <input style={fieldStyle()} value={profile.biz_lokasi ?? ''} onChange={e => setField('biz_lokasi', e.target.value)} placeholder="cth: Jl. Sudirman No. 12, Jakarta Selatan" />
+                      </div>
+                    )}
+                    {bizCfg.show.jamOps && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jam Operasional</label>
+                        <input style={fieldStyle()} value={profile.biz_jam_operasional ?? ''} onChange={e => setField('biz_jam_operasional', e.target.value)} placeholder="cth: Senin–Jumat 08.00–21.00, Sabtu 09.00–20.00" />
+                      </div>
+                    )}
+                    {bizCfg.show.jenjang && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jenjang / Level Program</label>
+                        <input style={fieldStyle()} value={profile.biz_jenjang ?? ''} onChange={e => setField('biz_jenjang', e.target.value)} placeholder="cth: TK, SD, SMP, SMA, D3, S1, Kursus Pemula–Mahir" />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {(bizCfg.show.areaLayanan || bizCfg.show.modelBisnis || bizCfg.show.priceRange || bizCfg.show.marketplace) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    {bizCfg.show.areaLayanan && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Area Layanan</label>
+                        <input style={fieldStyle()} value={profile.biz_area_layanan ?? ''} onChange={e => setField('biz_area_layanan', e.target.value)} placeholder="cth: Jabodetabek, seluruh Indonesia, online" />
+                      </div>
+                    )}
+                    {bizCfg.show.modelBisnis && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Model Bisnis</label>
+                        <input style={fieldStyle()} value={profile.biz_model_bisnis ?? ''} onChange={e => setField('biz_model_bisnis', e.target.value)} placeholder="cth: B2C, B2B, subscription, one-time project" />
+                      </div>
+                    )}
+                    {bizCfg.show.priceRange && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Rentang Harga</label>
+                        <input style={fieldStyle()} value={profile.biz_price_range ?? ''} onChange={e => setField('biz_price_range', e.target.value)} placeholder="cth: Rp 25.000–150.000, Rp 1–5 juta/proyek" />
+                      </div>
+                    )}
+                    {bizCfg.show.marketplace && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Marketplace Aktif</label>
+                        <input style={fieldStyle()} value={profile.biz_marketplace ?? ''} onChange={e => setField('biz_marketplace', e.target.value)} placeholder="cth: Shopee, Tokopedia, TikTok Shop, Lazada" />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <SaveButton loading={saving} saved={saved} />
+                  <button type="button" onClick={() => changeTab('biz-market')}
+                    style={{ background: bizCfg.color, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                    Lanjut: Market & Produk →
+                  </button>
+                </div>
+              </>
+            )
+          })()}
+        </>)}
+
+        {/* ── Business: Market & Produk ── */}
+        {tab === 'biz-market' && (() => {
+          const bizCfg = BIZ_TYPES[profile.biz_sub_tipe] || BIZ_TYPES.kuliner
+          return sectionCard(<>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+              <div>
+                <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Market & Produk</div>
+                <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Siapa yang kamu sasar, apa yang kamu jual, dan kenapa pelanggan pilih kamu</div>
+              </div>
+              <button type="button"
+                disabled={!profile.biz_kategori || !profile.biz_produk_unggulan}
+                onClick={() => setAiModal({ prompt: buildBizMarketPrompt() })}
+                style={{ background: (!profile.biz_kategori || !profile.biz_produk_unggulan) ? '#d1d5db' : bizCfg.color, border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_kategori || !profile.biz_produk_unggulan) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                Generate Target & Keunggulan
+              </button>
             </div>
+
             <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kategori Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {['UMKM', 'Kuliner & F&B', 'Fashion', 'Kosmetik & Beauty', 'Kesehatan', 'Pendidikan', 'Teknologi', 'Jasa', 'E-commerce', 'Properti', 'Otomotif', 'Lainnya'].map(kat => (
-                  <button key={kat} type="button" onClick={() => setField('biz_kategori', kat === profile.biz_kategori ? '' : kat)}
-                    style={{ padding: '5px 10px', borderRadius: 16, fontSize: '0.75rem', fontWeight: 500, border: profile.biz_kategori === kat ? '1px solid #1a73e8' : 'none', background: profile.biz_kategori === kat ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: profile.biz_kategori === kat ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
-                    {kat}
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>{bizCfg.targetLabel} <span style={{ color: '#dc2626' }}>*</span></label>
+              <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Gambarkan pelanggan ideal kamu — demografi, kebiasaan, dan problem yang kamu selesaikan</div>
+              <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.biz_target_pasar ?? ''} onChange={e => setField('biz_target_pasar', e.target.value)} placeholder={bizCfg.targetPlaceholder} />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>{bizCfg.produkLabel} <span style={{ color: '#dc2626' }}>*</span></label>
+              <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Produk atau layanan utama yang jadi andalan bisnis kamu</div>
+              <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={profile.biz_produk_unggulan ?? ''} onChange={e => setField('biz_produk_unggulan', e.target.value)} placeholder={bizCfg.produkPlaceholder} />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kompetitor Utama</label>
+                <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_kompetitor ?? ''} onChange={e => setField('biz_kompetitor', e.target.value)} placeholder="Siapa kompetitor langsung kamu? Nama brand atau deskripsi singkat." />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Keunggulan Kompetitif <span style={{ color: '#dc2626' }}>*</span></label>
+                <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_keunggulan ?? ''} onChange={e => setField('biz_keunggulan', e.target.value)} placeholder={bizCfg.keunggulanPlaceholder} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button type="button" onClick={() => changeTab('biz-profil')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                <SaveButton loading={saving} saved={saved} />
+              </div>
+              <button type="button" onClick={() => changeTab('biz-konten')}
+                style={{ background: bizCfg.color, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                Lanjut: Strategi Konten →
+              </button>
+            </div>
+          </>)
+        })()}
+
+        {/* ── Business: Strategi Konten ── */}
+        {tab === 'biz-konten' && (() => {
+          const bizCfg = BIZ_TYPES[profile.biz_sub_tipe] || BIZ_TYPES.kuliner
+          return sectionCard(<>
+            <div>
+              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Strategi Konten</div>
+              <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Platform, tipe konten, dan tone of voice brand bisnis kamu di sosial media</div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 4, fontWeight: 600 }}>Platform Konten Utama <span style={{ color: '#dc2626' }}>*</span></label>
+              {bizCfg.platformReko.length > 0 && (
+                <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>
+                  <span style={{ background: `${bizCfg.color}18`, color: bizCfg.color, padding: '2px 7px', borderRadius: 4, fontWeight: 600, fontSize: '0.68rem' }}>Rekomendasi</span>{' '}
+                  {bizCfg.platformReko.join(', ')}
+                </div>
+              )}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Tokopedia', 'TikTok Shop', 'Twitter/X', 'LinkedIn', 'WhatsApp Business'].map(pl => {
+                  const selected = (profile.biz_platform_konten || '').split(',').filter(Boolean).includes(pl)
+                  const isReko = bizCfg.platformReko.includes(pl)
+                  return (
+                    <button key={pl} type="button" onClick={() => {
+                      const cur = (profile.biz_platform_konten || '').split(',').filter(Boolean)
+                      const next = selected ? cur.filter(x => x !== pl) : [...cur, pl]
+                      setField('biz_platform_konten', next.join(','))
+                    }}
+                      style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? bizCfg.color : isReko ? `${bizCfg.color}40` : 'transparent'}`, background: selected ? `${bizCfg.color}15` : isReko ? `${bizCfg.color}06` : '#f3f4f6', color: selected ? bizCfg.color : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
+                      {pl}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Tipe Konten</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {bizCfg.tipeKonten.map(tipe => {
+                  const selected = (profile.biz_tipe_konten || '').split(',').filter(Boolean).includes(tipe)
+                  return (
+                    <button key={tipe} type="button" onClick={() => {
+                      const cur = (profile.biz_tipe_konten || '').split(',').filter(Boolean)
+                      const next = selected ? cur.filter(x => x !== tipe) : [...cur, tipe]
+                      setField('biz_tipe_konten', next.join(','))
+                    }}
+                      style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? bizCfg.color : 'transparent'}`, background: selected ? `${bizCfg.color}15` : '#f3f4f6', color: selected ? bizCfg.color : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
+                      {tipe}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Tone of Voice Brand</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {['Profesional', 'Friendly & Hangat', 'Santai & Kasual', 'Mewah & Premium', 'Playful & Energik', 'Edukatif & Terpercaya', 'Inspiratif'].map(tone => (
+                  <button key={tone} type="button" onClick={() => setField('biz_tone', profile.biz_tone === tone ? '' : tone)}
+                    style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${profile.biz_tone === tone ? '#7c3aed' : 'transparent'}`, background: profile.biz_tone === tone ? 'rgba(124,58,237,0.1)' : '#f3f4f6', color: profile.biz_tone === tone ? '#7c3aed' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: profile.biz_tone === tone ? 600 : 400 }}>
+                    {tone}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Tagline Brand</label>
-            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Slogan singkat yang jadi signature bisnis kamu (maks 10 kata)</div>
-            <input style={fieldStyle()} value={profile.biz_tagline ?? ''} onChange={e => setField('biz_tagline', e.target.value)} placeholder="cth: Camilan Sehat untuk Keluarga Bahagia" />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Unique Selling Point (USP) <span style={{ color: '#dc2626' }}>*</span></label>
-            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Apa yang bikin bisnis kamu berbeda dari kompetitor? Jawab jujur dan spesifik.</div>
-            <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_usp ?? ''} onChange={e => setField('biz_usp', e.target.value)} placeholder="cth: Satu-satunya toko batik yang custom motif dalam 3 hari dengan bahan premium tanpa markup gila-gilaan" />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Visi Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
-              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_visi ?? ''} onChange={e => setField('biz_visi', e.target.value)} placeholder="Ke mana bisnis ini ingin melangkah dalam 5–10 tahun?" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button type="button" onClick={() => changeTab('biz-market')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
+                <SaveButton loading={saving} saved={saved} />
+              </div>
+              <button type="button" onClick={() => changeTab('biz-bio')}
+                style={{ background: bizCfg.color, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                Lanjut: Bio & Copy →
+              </button>
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Misi Bisnis</label>
-              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_misi ?? ''} onChange={e => setField('biz_misi', e.target.value)} placeholder="Apa yang dilakukan setiap hari untuk mencapai visi itu?" />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <SaveButton loading={saving} saved={saved} />
-            <button type="button" onClick={() => changeTab('biz-market')}
-              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-              Lanjut: Market & Produk →
-            </button>
-          </div>
-        </>)}
-
-        {/* ── Business: Market & Produk ── */}
-        {tab === 'biz-market' && sectionCard(<>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-            <div>
-              <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Market & Produk</div>
-              <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Siapa yang kamu sasar, apa yang kamu jual, dan kenapa pelanggan pilih kamu</div>
-            </div>
-            <button type="button"
-              disabled={!profile.biz_kategori || !profile.biz_produk_unggulan}
-              onClick={() => setAiModal({ prompt: buildBizMarketPrompt() })}
-              style={{ background: (!profile.biz_kategori || !profile.biz_produk_unggulan) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_kategori || !profile.biz_produk_unggulan) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              Generate Target & Keunggulan
-            </button>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Target Pasar <span style={{ color: '#dc2626' }}>*</span></label>
-            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Gambarkan pelanggan ideal kamu — demografi, kebiasaan, dan problem yang kamu selesaikan</div>
-            <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.biz_target_pasar ?? ''} onChange={e => setField('biz_target_pasar', e.target.value)} placeholder="cth: Ibu muda 25–40 tahun di kota besar yang peduli nutrisi tapi gak punya banyak waktu masak. Sering beli online, aktif di Instagram, budget Rp 50–150rb per snack order." />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Produk / Jasa Unggulan <span style={{ color: '#dc2626' }}>*</span></label>
-            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Produk atau layanan utama yang jadi andalan bisnis kamu</div>
-            <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={profile.biz_produk_unggulan ?? ''} onChange={e => setField('biz_produk_unggulan', e.target.value)} placeholder="cth: Granola box custom (15 varian rasa), Hamper lebaran premium, Subscription bulanan" />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kompetitor Utama</label>
-              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_kompetitor ?? ''} onChange={e => setField('biz_kompetitor', e.target.value)} placeholder="Siapa kompetitor langsung kamu? Nama brand atau deskripsi singkat." />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Keunggulan Kompetitif <span style={{ color: '#dc2626' }}>*</span></label>
-              <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_keunggulan ?? ''} onChange={e => setField('biz_keunggulan', e.target.value)} placeholder="Apa yang kamu bisa lakukan dan kompetitor tidak?" />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="button" onClick={() => changeTab('biz-profil')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
-              <SaveButton loading={saving} saved={saved} />
-            </div>
-            <button type="button" onClick={() => changeTab('biz-konten')}
-              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-              Lanjut: Strategi Konten →
-            </button>
-          </div>
-        </>)}
-
-        {/* ── Business: Strategi Konten ── */}
-        {tab === 'biz-konten' && sectionCard(<>
-          <div>
-            <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Strategi Konten</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Platform, tipe konten, dan tone of voice brand bisnis kamu di sosial media</div>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Platform Konten Utama <span style={{ color: '#dc2626' }}>*</span></label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Tokopedia', 'Twitter/X', 'LinkedIn', 'WhatsApp Business'].map(pl => {
-                const selected = (profile.biz_platform_konten || '').split(',').filter(Boolean).includes(pl)
-                return (
-                  <button key={pl} type="button" onClick={() => {
-                    const cur = (profile.biz_platform_konten || '').split(',').filter(Boolean)
-                    const next = selected ? cur.filter(x => x !== pl) : [...cur, pl]
-                    setField('biz_platform_konten', next.join(','))
-                  }}
-                    style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? '#1a73e8' : 'transparent'}`, background: selected ? 'rgba(26,115,232,0.12)' : '#f3f4f6', color: selected ? '#1a73e8' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
-                    {pl}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Tipe Konten</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {['Produk Demo', 'Behind the Scene', 'Testimoni Pelanggan', 'Tutorial Pakai', 'Story & Flash Sale', 'Edukasi Produk', 'UGC Repost', 'Live Shopping'].map(tipe => {
-                const selected = (profile.biz_tipe_konten || '').split(',').filter(Boolean).includes(tipe)
-                return (
-                  <button key={tipe} type="button" onClick={() => {
-                    const cur = (profile.biz_tipe_konten || '').split(',').filter(Boolean)
-                    const next = selected ? cur.filter(x => x !== tipe) : [...cur, tipe]
-                    setField('biz_tipe_konten', next.join(','))
-                  }}
-                    style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${selected ? '#059669' : 'transparent'}`, background: selected ? 'rgba(5,150,105,0.1)' : '#f3f4f6', color: selected ? '#059669' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: selected ? 600 : 400 }}>
-                    {tipe}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Tone of Voice Brand</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {['Profesional', 'Friendly & Hangat', 'Santai & Kasual', 'Mewah & Premium', 'Playful & Energik', 'Edukatif & Terpercaya', 'Inspiratif'].map(tone => (
-                <button key={tone} type="button" onClick={() => setField('biz_tone', profile.biz_tone === tone ? '' : tone)}
-                  style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${profile.biz_tone === tone ? '#7c3aed' : 'transparent'}`, background: profile.biz_tone === tone ? 'rgba(124,58,237,0.1)' : '#f3f4f6', color: profile.biz_tone === tone ? '#7c3aed' : '#6b7280', fontSize: '0.8rem', cursor: 'pointer', fontWeight: profile.biz_tone === tone ? 600 : 400 }}>
-                  {tone}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="button" onClick={() => changeTab('biz-market')} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Kembali</button>
-              <SaveButton loading={saving} saved={saved} />
-            </div>
-            <button type="button" onClick={() => changeTab('biz-bio')}
-              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-              Lanjut: Bio & Copy →
-            </button>
-          </div>
-        </>)}
+          </>)
+        })()}
 
         {/* ── Business: Bio & Copy ── */}
-        {tab === 'biz-bio' && sectionCard(<>
+        {tab === 'biz-bio' && (() => {
+          const bizCfg = BIZ_TYPES[profile.biz_sub_tipe] || BIZ_TYPES.kuliner
+          return sectionCard(<>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div>
               <div style={{ fontWeight: 600, color: '#111827', marginBottom: 2 }}>Bio & Copywriting</div>
@@ -2048,7 +2290,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
             <button type="button"
               disabled={!profile.biz_nama_brand || !profile.biz_usp}
               onClick={() => setAiModal({ prompt: buildBizBioPrompt() })}
-              style={{ background: (!profile.biz_nama_brand || !profile.biz_usp) ? '#d1d5db' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_usp) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+              style={{ background: (!profile.biz_nama_brand || !profile.biz_usp) ? '#d1d5db' : bizCfg.color, border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_usp) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
               Generate Bio & CTA
             </button>
@@ -2107,11 +2349,12 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
               <SaveButton loading={saving} saved={saved} />
             </div>
             <button type="button" onClick={() => changeTab('visual')}
-              style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+              style={{ background: bizCfg.color, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
               Lanjut: Brand Visual →
             </button>
           </div>
-        </>)}
+        </>)
+        })()}
 
         {/* Affiliator Brand Tab — full flow with sub-steps */}
         {/* ── Affiliate: Profil & Target ── */}
@@ -2638,6 +2881,8 @@ function ContentPillarsTab({ workspaceId, profile, isBusiness = false }: { works
       const tone = profile.biz_tone || 'Profesional'
       const platform = (profile.biz_platform_konten || '').split(',').filter(Boolean).join('/') || 'Instagram/TikTok'
       const tipeKonten = (profile.biz_tipe_konten || '').split(',').filter(Boolean).join(', ') || '-'
+      const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
+      const pillarReko = profile.biz_sub_tipe && BIZ_TYPES[profile.biz_sub_tipe] ? BIZ_TYPES[profile.biz_sub_tipe].pillarReko.join(', ') : ''
 
       return `Kamu adalah Content Strategist spesialis bisnis Indonesia 2026.
 
@@ -2647,7 +2892,7 @@ Jawab dalam Bahasa Indonesia. Output harus langsung actionable dan spesifik untu
 
 DATA BISNIS
 
-Nama brand: ${nama}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
 Kategori: ${kategori}
 Produk/Jasa unggulan: ${produk}
 USP: ${usp}
@@ -2661,8 +2906,8 @@ Tipe konten yang dipakai: ${tipeKonten}
 YANG SAYA BUTUHKAN:
 
 ▸ 5–7 CONTENT PILLAR UTAMA
-Pastikan 5 pilar dasar ini ada tapi disesuaikan dengan konteks bisnis ${kategori}:
-Edukasi Produk / Sosial Proof & Testimoni / Behind The Scene / Promosi & Flash Sale / Nilai & Lifestyle Brand
+Pastikan 5 pilar dasar ini ada tapi disesuaikan dengan konteks bisnis ${subTipe || kategori}:
+${pillarReko ? `Rekomendasi pillar untuk tipe ini: ${pillarReko}` : 'Edukasi Produk / Sosial Proof & Testimoni / Behind The Scene / Promosi & Flash Sale / Nilai & Lifestyle Brand'}
 
 Untuk SETIAP pillar, tulis dalam format persis ini:
 
@@ -2672,7 +2917,7 @@ KETERANGAN KONTEN: [2-3 kalimat — jenis konten apa, angle yang dipakai, dan ke
 HASHTAG: [8-10 hashtag relevan, campuran niche bisnis + broad + produk]
 
 ▸ 2 PILLAR BONUS
-Pillar tambahan spesifik untuk ${kategori} yang belum umum dipakai bisnis sejenis. Format sama.
+Pillar tambahan spesifik untuk ${subTipe || kategori} yang belum umum dipakai bisnis sejenis. Format sama.
 
 ▸ STRATEGI ROTASI
 Pola posting mingguan 4–5x — pillar mana di hari apa. Sesuaikan dengan ritme bisnis (promo akhir minggu, edukasi awal minggu, dll).
