@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { sendInviteEmail } from '@/lib/mailer'
 
 function adminClient() {
   return createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -27,8 +28,9 @@ export async function POST(req: NextRequest) {
   const admin = adminClient()
 
   // Check plan & member limit
-  const { data: ws } = await admin.from('kf_workspaces').select('plan').eq('id', workspaceId).single()
-  const plan = (ws as { plan: string } | null)?.plan || 'free'
+  const { data: ws } = await admin.from('kf_workspaces').select('plan, name').eq('id', workspaceId).single()
+  const plan = (ws as { plan: string; name: string } | null)?.plan || 'free'
+  const workspaceName = (ws as { plan: string; name: string } | null)?.name || 'KreaFlow'
   const MAX_MEMBERS = plan === 'lifetime' ? 6 : 0
 
   const { count: currentCount } = await admin
@@ -67,6 +69,12 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${(invite as { token: string }).token}`
+
+  // Kirim invite email via Mailketing (fire-and-forget, jangan block response)
+  const inviterName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Tim KreaFlow'
+  sendInviteEmail({ to: email.toLowerCase().trim(), workspaceName, inviteUrl, inviterName })
+    .catch(err => console.error('[invite] Email error:', err))
+
   return NextResponse.json({ token: (invite as { token: string }).token, url: inviteUrl })
 }
 

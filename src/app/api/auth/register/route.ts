@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendWelcomeEmail } from '@/lib/mailer'
 
 const supabase = createClient(
   process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,6 +45,10 @@ export async function POST(req: NextRequest) {
     await supabase.from('kf_workspace_members').insert({
       workspace_id: ws.id, user_id: userId, role: 'owner'
     })
+
+    // Kirim welcome email (fire-and-forget)
+    sendWelcomeEmail({ to: email, name: nama })
+      .catch(err => console.error('[register] Welcome email error:', err))
 
     return NextResponse.json({ success: true, workspace_id: ws.id })
   } catch {
