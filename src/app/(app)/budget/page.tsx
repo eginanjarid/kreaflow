@@ -7,13 +7,10 @@ export default async function BudgetPage() {
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'budget')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const [{ data: wsData }, { data: wsType }] = await Promise.all([
-    supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle(),
-    supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
-  ])
+  const { data: wsData } = await supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle()
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
-  const brandType = (wsType?.brand_type as string | null) ?? 'creator'
+  const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const isAffiliate = brandType === 'affiliate'
 
   const { data: transactions } = await supabase

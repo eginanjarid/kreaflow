@@ -6,21 +6,19 @@ export default async function DashboardPage() {
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'insights')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-
   const today = new Date().toISOString().slice(0, 10)
 
   const [
+    { data: wsData },
     { data: ideas },
     { data: products },
     { data: transactions },
     { data: todayEntries },
     { data: overdueTasks },
-    { data: workspace },
     { data: activeSprints },
     { data: recentIdeas },
   ] = await Promise.all([
+    supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).maybeSingle(),
     supabase.from('kf_content_ideas').select('id, status, platform, sprint_id').eq('workspace_id', wsId),
     supabase.from('kf_products').select('is_active').eq('workspace_id', wsId),
     supabase.from('kf_transactions').select('tipe, jumlah').eq('workspace_id', wsId),
@@ -34,7 +32,6 @@ export default async function DashboardPage() {
       .lt('due_date', today)
       .lt('percent_complete', 100)
       .limit(5),
-    supabase.from('kf_workspaces').select('modes, name').eq('id', wsId).single(),
     supabase.from('kf_sprints').select('id, nama, start_date, end_date, target_konten')
       .eq('workspace_id', wsId)
       .lte('start_date', today)
@@ -46,8 +43,9 @@ export default async function DashboardPage() {
       .limit(6),
   ])
 
-  const ws = workspace as { modes?: string[]; name?: string } | null
-  const workspaceName = ws?.name || 'KreaFlow'
+  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+
+  const workspaceName = wsData?.name || 'KreaFlow'
 
   const allIdeas = ideas || []
   const activeSprint = (activeSprints || [])[0] || null

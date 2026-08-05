@@ -7,16 +7,15 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'catalog')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const [{ data: wsData }, { data: products }, { data: workspace }, { data: brandProfile }] = await Promise.all([
+  const [{ data: wsData }, { data: products }, { data: brandProfile }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_products').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
-    supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).single(),
     supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus, affiliate_platforms').eq('workspace_id', wsId).maybeSingle(),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
 
-  const brandType = (workspace?.brand_type as string | null) ?? 'creator'
+  const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
   const { setup } = await searchParams
 

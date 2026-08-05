@@ -1,6 +1,6 @@
 # KreaFlow — Product Requirements Document
 
-**Last updated:** 2 Agustus 2026  
+**Last updated:** 4 Agustus 2026 (rev 2)  
 **Domain:** kreaflow.id  
 **Stack:** Next.js 16.2.10 App Router + TypeScript + Supabase self-hosted + AI (OpenRouter)  
 **VPS:** 194.233.95.194 | PM2: `kreaflow` (id: 15) | Port: 2847  
@@ -200,13 +200,16 @@ Dashboard overview harian workspace.
 #### 11. Settings
 - Workspace settings, team management, profile
 - Jabatan field per member (Copywriter, Editor, Videografer, dll)
-- Invite member via link
+- Invite member via link + **Undangan Tertunda** (Salin Link + Cancel)
 - **Member limit enforcement (UI)**:
   - Free plan: banner "Fitur tim terkunci" + tombol Upgrade
   - Lifetime + full (5/5): banner merah "Slot anggota tim penuh"
   - Lifetime + tersedia: form invite + counter "X slot tersisa"
+- **Mode Aktif DIHAPUS** (Agustus 2026) — redundant dengan `brand_type` per workspace. Field `kf_workspaces.modes` tidak dipakai lagi.
 
 #### 12. Admin (Super Admin — `eginanjarism@gmail.com`)
+> **Unlimited Workspace**: Super admin bypass semua limit workspace. Workspace baru langsung `plan: lifetime`. Check dilakukan server-side via Supabase `user.email` — tidak bisa di-spoof dari client.
+
 Panel internal semua user/workspace.
 - Stats: Total User, Hari Ini, 7 Hari, 30 Hari, Total Workspace
 - **Revenue card**: estimasi revenue (lifetime workspace × Rp149.000) + jumlah lifetime terjual
@@ -234,6 +237,10 @@ Panel internal semua user/workspace.
 - **Member limit enforcement (API)**: `/api/team` POST cek jumlah member vs limit plan sebelum invite
   - `free` → max 1 (owner only)
   - `lifetime` → max 5
+- **Workspace limit enforcement (API)**: `/api/workspace/create` POST
+  - `free` → tidak bisa buat workspace baru (wajib upgrade)
+  - `lifetime` → max sesuai `max_workspaces` field
+  - **`SUPER_ADMINS`** → unlimited, workspace baru langsung `lifetime`, skip semua cek
 
 #### 14. Halaman Publik
 - `/` — Landing page (marketing)
@@ -258,7 +265,25 @@ Panel internal semua user/workspace.
 | Akses Sprint/Plan/Studio/Calendar tanpa Brand | `/brand?setup=1` |
 | Unauthorized admin | `/sprints` |
 
-`src/proxy.ts` = middleware auth. Public routes: `/`, `/privacy`, `/terms`, `/payment/success`.
+`src/proxy.ts` = middleware auth (Next.js 16 mengenali nama `proxy.ts`, bukan `middleware.ts`).  
+Public routes: `/`, `/privacy`, `/terms`, `/payment/success`, `/invite/*`.
+
+### Invite Flow (Live, Agustus 2026)
+1. Settings → Tim → "Undang Member Baru" → generate `kf_invites` row + link `kreaflow.id/invite/[token]`
+2. Penerima buka `/invite/[token]` (public, tidak perlu login):
+   - Pilih **"Login & Bergabung"** → `/login?redirect=/invite/[token]&email=[email]`
+   - Pilih **"Daftar Akun Baru"** → `/register?email=[email]&redirect=/invite/[token]`
+3. Setelah login/register → redirect ke `/invite/[token]` → server cek email match → join workspace → redirect `/sprints`
+4. Invite page server-side validasi: `user.email === invite.email`, jika tidak → error "Akun Tidak Sesuai"
+5. Setelah bergabung: `accepted_at` di-set → link invalid (cegah reuse)
+
+**Register page saat invite flow:**
+- Brand/Workspace fields di-hide (`isInvite = redirect.includes('/invite/')`)
+- Email field locked/readonly jika `?email=` param ada (security: cegah isi email berbeda)
+
+**Settings → Undangan Tertunda:**
+- Tiap row: tombol **"Salin Link"** (copy URL ke clipboard) + **"✕"** (cancel/delete invite)
+- Cancel: `DELETE /api/team` dengan `{ inviteId }` → hapus dari `kf_invites`
 
 ---
 
@@ -281,10 +306,12 @@ Sidebar badge: notifikasi unread di bell icon. `/notifications` page untuk list 
 
 ```sql
 -- Core
-kf_workspaces          (id, name, owner_id, plan, modes, created_at)
+kf_workspaces          (id, name, owner_id, plan, brand_type, created_at)
                         -- plan: 'free' | 'lifetime'
+                        -- brand_type: 'creator' | 'affiliate' | 'business'
+                        -- modes field DEPRECATED, tidak dipakai lagi
 kf_workspace_members   (workspace_id, user_id, role, jabatan)
-kf_invites             (workspace_id, email, role, token, invited_by, accepted_at, expires_at)
+kf_invites             (workspace_id, email, role, jabatan, token, invited_by, accepted_at, expires_at)
 
 -- Brand
 kf_brand_profiles      (workspace_id, niche, micro_niche, premis, tone_of_voice,
@@ -391,9 +418,12 @@ src/
     settings/   SettingsModule.tsx, page.tsx
     admin/      AdminModule.tsx, page.tsx
     upgrade/    UpgradeModule.tsx, page.tsx
+  app/invite/[token]/
+    page.tsx   — halaman join invite, PUBLIC (root level, bukan route group)
+                 dynamic = 'force-dynamic', cek token + email match server-side
   app/(auth)/
-    login/      page.tsx   — redirect ke /sprints setelah login
-    register/   page.tsx   — redirect ke /brand?setup=1 setelah register
+    login/      page.tsx   — redirect ke /sprints setelah login, forward ?redirect+email ke register
+    register/   page.tsx   — hide brand fields + lock email field saat invite flow
   app/api/
     payment/create-invoice/route.ts  — Xendit invoice
     payment/webhook/route.ts         — Xendit callback
@@ -405,10 +435,24 @@ src/
     payment/success/page.tsx
   lib/
     workspace.ts   — getWorkspace() + getWorkspaceWithBrandGuard()
-  proxy.ts           — middleware auth + public route whitelist
+  proxy.ts           — middleware auth + public route whitelist (termasuk /invite/*)
+                       Next.js 16 mengenali nama proxy.ts sebagai middleware
   components/layout/
     Sidebar.tsx    — nav + notif badge + upgrade banner
 ```
+
+---
+
+## Deploy Hook (Updated Agustus 2026)
+
+Hook: `/www/wwwroot/kreaflow.git/hooks/post-receive`
+- `while read oldrev newrev refname` — baca stdin per ref yang di-push
+- Proses hanya `refs/heads/main`
+- Setelah `git checkout -f main`: auto-delete file yang dihapus dari git via `git diff --diff-filter=D $oldrev $newrev | xargs rm`
+- Juga hapus empty dirs setelah file delete
+- `flock -x 200` → serialized, `set -e` → build gagal = PM2 tidak restart
+
+**Catatan:** Selalu pakai `git rm` (bukan `rm`) untuk hapus file yang perlu di-track git. File yang di-`rm` manual tanpa `git rm` tidak akan ke-delete otomatis di VPS oleh hook.
 
 ---
 
