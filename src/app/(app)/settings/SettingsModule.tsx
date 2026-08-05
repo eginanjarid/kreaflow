@@ -361,19 +361,28 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 </div>
                 {inviteError && <div style={{ color: '#dc2626', fontSize: '0.82rem' }}>{inviteError}</div>}
                 <button type="submit" disabled={inviting} style={{ background: inviting ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 9, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: inviting ? 'not-allowed' : 'pointer', alignSelf: 'flex-start' }}>
-                  {inviting ? 'Membuat link...' : '+ Generate Link Undangan'}
+                  {inviting ? 'Mengirim undangan...' : '✉ Kirim Undangan'}
                 </button>
               </form>
 
               {inviteLink && (
-                <div style={{ marginTop: 16, background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.25)', borderRadius: 10, padding: '14px 16px' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, marginBottom: 8 }}>Link Undangan (valid 7 hari)</div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <code style={{ flex: 1, fontSize: '0.72rem', color: '#6b7280', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
-                    <button
-                      onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
-                      style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
-                    >Salin</button>
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.25)', borderRadius: 10, padding: '12px 16px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: '1rem' }}>✅</span>
+                    <div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#065f46' }}>Email undangan terkirim!</div>
+                      <div style={{ fontSize: '0.72rem', color: '#059669', marginTop: 1 }}>Link juga bisa disalin manual di bawah sebagai backup.</div>
+                    </div>
+                  </div>
+                  <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Link backup (valid 7 hari)</div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <code style={{ flex: 1, fontSize: '0.72rem', color: '#6b7280', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
+                        style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
+                      >Salin</button>
+                    </div>
                   </div>
                 </div>
               )}
