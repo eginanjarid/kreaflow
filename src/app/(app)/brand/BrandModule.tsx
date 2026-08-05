@@ -1127,10 +1127,14 @@ Jangan tambahkan trust statement, angle konten, tips tambahan, atau penjelasan l
     const misi = profile.biz_misi || '[belum diisi]'
     const usp = profile.biz_usp || '[belum diisi]'
     const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
+    const jenjangLine = profile.biz_jenjang
+      ? (profile.biz_sub_tipe === 'pendidikan' ? `\nJenjang & Program/Jurusan: ${profile.biz_jenjang}` : `\nJenjang: ${profile.biz_jenjang}`)
+      : ''
+    const lokasiLine = profile.biz_lokasi ? `\nLokasi: ${profile.biz_lokasi}` : ''
     return `Kamu adalah brand strategist spesialis bisnis Indonesia 2026.
 
 DATA BISNIS
-Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}${jenjangLine}${lokasiLine}
 Kategori: ${kategori}
 Visi: ${visi}
 Misi: ${misi}
@@ -1166,10 +1170,13 @@ Jangan tambahkan penjelasan, tips, atau analisis. Langsung ke outputnya.`
     const kompetitor = profile.biz_kompetitor || '[belum disebutkan]'
     const usp = profile.biz_usp || '[belum diisi]'
     const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
+    const jenjangLine = profile.biz_jenjang
+      ? (profile.biz_sub_tipe === 'pendidikan' ? `\nJenjang & Program/Jurusan: ${profile.biz_jenjang}` : `\nJenjang: ${profile.biz_jenjang}`)
+      : ''
     return `Kamu adalah market research strategist spesialis bisnis Indonesia 2026.
 
 DATA BISNIS
-Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}${jenjangLine}
 Kategori: ${kategori}
 Produk/Jasa unggulan: ${produk}
 USP: ${usp}
@@ -2093,13 +2100,23 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                     </div>
                     <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
                   </div>
-                  <button type="button"
-                    disabled={!profile.biz_nama_brand || !profile.biz_kategori}
-                    onClick={() => setAiModal({ prompt: buildBizProfilPrompt() })}
-                    style={{ background: (!profile.biz_nama_brand || !profile.biz_kategori) ? '#d1d5db' : bizCfg.color, border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: (!profile.biz_nama_brand || !profile.biz_kategori) ? 'not-allowed' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    Generate Tagline & USP
-                  </button>
+                  {(() => {
+                    const needsJenjang = profile.biz_sub_tipe === 'pendidikan' && !profile.biz_jenjang
+                    const canGenerate = !!profile.biz_nama_brand && !!profile.biz_kategori && !needsJenjang
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                        <button type="button" disabled={!canGenerate}
+                          onClick={() => setAiModal({ prompt: buildBizProfilPrompt() })}
+                          style={{ background: canGenerate ? bizCfg.color : '#d1d5db', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: canGenerate ? 'pointer' : 'not-allowed', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                          Generate Tagline & USP
+                        </button>
+                        {needsJenjang && (
+                          <div style={{ fontSize: '0.7rem', color: '#d97706', textAlign: 'right' }}>Isi dulu Jenjang & Jurusan ↓</div>
+                        )}
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -2160,8 +2177,16 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                     )}
                     {bizCfg.show.jenjang && (
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jenjang / Level Program</label>
-                        <DebouncedInput style={fieldStyle()} value={profile.biz_jenjang ?? ''} onCommit={v => setField('biz_jenjang', v)} placeholder="cth: TK, SD, SMP, SMA, D3, S1, Kursus Pemula–Mahir" />
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>
+                          {profile.biz_sub_tipe === 'pendidikan' ? <>Jenjang & Program / Jurusan <span style={{ color: '#dc2626' }}>*</span></> : 'Jenjang / Level Program'}
+                        </label>
+                        {profile.biz_sub_tipe === 'pendidikan' && (
+                          <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 6 }}>Sebutkan jenjang sekolah dan jurusan/program keahlian yang ditawarkan — ini jadi konteks utama AI</div>
+                        )}
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_jenjang ?? ''} onCommit={v => setField('biz_jenjang', v)}
+                          placeholder={profile.biz_sub_tipe === 'pendidikan'
+                            ? 'cth: SMK — Agribisnis, Teknik Pengolahan Hasil Pertanian, TKRO; atau SMA — IPA, IPS; Kursus — Level Pemula hingga Advanced'
+                            : 'cth: TK, SD, SMP, SMA, D3, S1, Kursus Pemula–Mahir'} />
                       </div>
                     )}
                   </div>
@@ -2950,6 +2975,9 @@ function ContentPillarsTab({ workspaceId, profile, isBusiness = false }: { works
       const tipeKonten = (profile.biz_tipe_konten || '').split(',').filter(Boolean).join(', ') || '-'
       const subTipe = profile.biz_sub_tipe ? (BIZ_TYPES[profile.biz_sub_tipe]?.label || profile.biz_sub_tipe) : ''
       const pillarReko = profile.biz_sub_tipe && BIZ_TYPES[profile.biz_sub_tipe] ? BIZ_TYPES[profile.biz_sub_tipe].pillarReko.join(', ') : ''
+      const jenjangLine = profile.biz_jenjang
+        ? (profile.biz_sub_tipe === 'pendidikan' ? `\nJenjang & Program/Jurusan: ${profile.biz_jenjang}` : `\nJenjang: ${profile.biz_jenjang}`)
+        : ''
 
       return `Kamu adalah Content Strategist spesialis bisnis Indonesia 2026.
 
@@ -2959,7 +2987,7 @@ Jawab dalam Bahasa Indonesia. Output harus langsung actionable dan spesifik untu
 
 DATA BISNIS
 
-Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}
+Nama brand: ${nama}${subTipe ? `\nTipe bisnis: ${subTipe}` : ''}${jenjangLine}
 Kategori: ${kategori}
 Produk/Jasa unggulan: ${produk}
 USP: ${usp}
