@@ -263,13 +263,25 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                     )}
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  {u.workspaces[0]?.name && <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{u.workspaces[0].name}</span>}
-                  {u.workspaces[0]?.name && <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {u.workspaces[0]?.name && <span style={{ fontSize: '0.75rem', color: '#374151', fontWeight: 500 }}>{u.workspaces[0].name}</span>}
+                  {u.workspaces[0]?.role && (
+                    <span style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 6, fontWeight: 700, textTransform: 'uppercase',
+                      background: u.workspaces[0].role === 'owner' ? 'rgba(251,191,36,0.15)' : 'rgba(107,114,128,0.1)',
+                      color: u.workspaces[0].role === 'owner' ? '#b45309' : '#6b7280',
+                    }}>
+                      {u.workspaces[0].role === 'owner' ? '👑' : u.workspaces[0].role}
+                    </span>
+                  )}
+                  <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>
                   <PlanBadge plan={u.plan} />
                   <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>
                   <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>{fmtDate(u.created_at)}</span>
                 </div>
+                {u.workspaces[0]?.role && u.workspaces[0].role !== 'owner' && (() => {
+                  const ownerEmail = workspaces.find(w => w.id === u.workspaces[0].id)?.owner_email
+                  return ownerEmail ? <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: 2 }}>induk: {ownerEmail}</div> : null
+                })()}
               </div>
             ))
           ) : (
@@ -284,8 +296,27 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                     <div style={{ fontWeight: 500, color: '#111827', fontSize: '0.82rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.nama || u.email}</div>
                     {u.nama && <div style={{ fontSize: '0.7rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>}
                   </div>
-                  <div style={{ minWidth: 0, fontSize: '0.78rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>
-                    {u.workspaces[0]?.name || <span style={{ color: '#6b7280' }}>—</span>}
+                  <div style={{ minWidth: 0, paddingRight: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.78rem', color: '#374151', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {u.workspaces[0]?.name || '—'}
+                      </span>
+                      {u.workspaces[0]?.role && (
+                        <span style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 6, fontWeight: 700, textTransform: 'uppercase', flexShrink: 0,
+                          background: u.workspaces[0].role === 'owner' ? 'rgba(251,191,36,0.15)' : u.workspaces[0].role === 'admin' ? 'rgba(99,102,241,0.12)' : 'rgba(107,114,128,0.1)',
+                          color: u.workspaces[0].role === 'owner' ? '#b45309' : u.workspaces[0].role === 'admin' ? '#4f46e5' : '#6b7280',
+                        }}>
+                          {u.workspaces[0].role === 'owner' ? '👑 Owner' : u.workspaces[0].role}
+                        </span>
+                      )}
+                    </div>
+                    {u.workspaces[0]?.role && u.workspaces[0].role !== 'owner' && (() => {
+                      const ownerEmail = workspaces.find(w => w.id === u.workspaces[0].id)?.owner_email
+                      return ownerEmail ? <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: 1 }}>induk: {ownerEmail}</div> : null
+                    })()}
+                    {u.workspaces.length > 1 && (
+                      <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: 1 }}>+{u.workspaces.length - 1} workspace lain</div>
+                    )}
                   </div>
                   <div style={{ paddingLeft: 12 }}><PlanBadge plan={u.plan} /></div>
                   <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingLeft: 12, whiteSpace: 'nowrap' }}>{fmtDate(u.created_at)}</div>
