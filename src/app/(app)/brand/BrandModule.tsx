@@ -563,7 +563,26 @@ export default function BrandModule({
   }
   const initialTab = isAffiliate ? 'aff-niche' : isBusiness ? 'biz-profil' : 'overview'
   const [saved, setSaved] = useState(() => tabHasContent(initialTab, profile))
-  function changeTab(id: string) { setTab(id); setSaved(tabHasContent(id, profile)) }
+  const [ubahTipeConfirm, setUbahTipeConfirm] = useState(false)
+  function changeTab(id: string) { setTab(id); setSaved(tabHasContent(id, profile)); setUbahTipeConfirm(false) }
+  function doUbahTipe() {
+    setProfile(p => ({
+      ...p,
+      biz_sub_tipe: '',
+      biz_kategori: '',
+      biz_tipe_konten: '',
+      biz_platform_konten: '',
+      biz_lokasi: '',
+      biz_jam_operasional: '',
+      biz_jenjang: '',
+      biz_area_layanan: '',
+      biz_model_bisnis: '',
+      biz_price_range: '',
+      biz_marketplace: '',
+    }))
+    setUbahTipeConfirm(false)
+    setSaved(false)
+  }
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState('')
   const [aiModal, setAiModal] = useState<{ prompt: string } | null>(null)
@@ -2037,14 +2056,30 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
             if (!bizCfg) return null
             return (
               <>
+                {/* Confirm banner */}
+                {ubahTipeConfirm && (
+                  <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#92400e', fontSize: '0.875rem', marginBottom: 2 }}>Ganti tipe bisnis?</div>
+                      <div style={{ fontSize: '0.78rem', color: '#78350f' }}>Nama brand, USP, visi, misi, dan bio <strong>tetap tersimpan</strong>. Kategori, tipe konten, platform, dan field spesifik tipe akan di-reset.</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button type="button" onClick={() => setUbahTipeConfirm(false)}
+                        style={{ background: '#fff', border: '1px solid #d1d5db', borderRadius: 8, padding: '7px 14px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 500 }}>Batal</button>
+                      <button type="button" onClick={doUbahTipe}
+                        style={{ background: '#d97706', border: 'none', borderRadius: 8, padding: '7px 14px', color: '#fff', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 600 }}>Ya, ganti tipe</button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Header with type badge + change button */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                       <BizTypeIcon bizKey={profile.biz_sub_tipe} color={bizCfg.color} size={20} />
                       <span style={{ background: `${bizCfg.color}18`, color: bizCfg.color, fontWeight: 700, fontSize: '0.8rem', padding: '3px 10px', borderRadius: 20 }}>{bizCfg.label}</span>
-                      <button type="button" onClick={() => { setField('biz_sub_tipe', ''); setField('biz_kategori', '') }}
-                        style={{ background: 'none', border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 8px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>Ubah tipe</button>
+                      <button type="button" onClick={() => setUbahTipeConfirm(v => !v)}
+                        style={{ background: ubahTipeConfirm ? '#fef3c7' : 'none', border: `1px solid ${ubahTipeConfirm ? '#fcd34d' : '#d1d5db'}`, borderRadius: 6, padding: '2px 8px', color: ubahTipeConfirm ? '#92400e' : '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>Ubah tipe</button>
                     </div>
                     <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Fondasi identitas brand bisnis kamu — nama, kategori, tagline, dan nilai uniknya</div>
                   </div>
@@ -2153,8 +2188,8 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <button type="button" onClick={() => { setField('biz_sub_tipe', ''); setField('biz_kategori', '') }}
-                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Ubah Tipe</button>
+                    <button type="button" onClick={() => setUbahTipeConfirm(v => !v)}
+                      style={{ background: ubahTipeConfirm ? '#fef3c7' : '#f3f4f6', border: `1px solid ${ubahTipeConfirm ? '#fcd34d' : 'transparent'}`, borderRadius: 10, padding: '10px 16px', color: ubahTipeConfirm ? '#92400e' : '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Ubah Tipe</button>
                     <SaveButton loading={saving} saved={saved} />
                   </div>
                   <button type="button" onClick={() => changeTab('biz-market')}
