@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
 
@@ -341,6 +341,22 @@ const AUDIENS = ['Remaja', 'Dewasa Muda', 'Profesional', 'Ibu Rumah Tangga', 'Pe
 const TUJUAN = ['Meningkatkan Penjualan', 'Klik Link', 'Engagement', 'Brand Awareness']
 const TONE = ['Friendly', 'Profesional', 'Santai', 'Serius', 'Lucu', 'Emosional']
 
+function DebouncedInput({ value, onCommit, style, placeholder, ...rest }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & { onCommit: (v: string) => void }) {
+  const [local, setLocal] = useState(value as string ?? '')
+  useEffect(() => { setLocal(value as string ?? '') }, [value])
+  return <input {...rest} style={style} value={local} placeholder={placeholder}
+    onChange={e => setLocal(e.target.value)}
+    onBlur={e => { if (e.target.value !== value) onCommit(e.target.value) }} />
+}
+
+function DebouncedTextarea({ value, onCommit, style, placeholder, ...rest }: Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & { onCommit: (v: string) => void }) {
+  const [local, setLocal] = useState(value as string ?? '')
+  useEffect(() => { setLocal(value as string ?? '') }, [value])
+  return <textarea {...rest} style={style} value={local} placeholder={placeholder}
+    onChange={e => setLocal(e.target.value)}
+    onBlur={e => { if (e.target.value !== value) onCommit(e.target.value) }} />
+}
+
 function MultiSelect({ label, options, value, onChange }: {
   label: string
   options: string[]
@@ -564,25 +580,17 @@ export default function BrandModule({
   const initialTab = isAffiliate ? 'aff-niche' : isBusiness ? 'biz-profil' : 'overview'
   const [saved, setSaved] = useState(() => tabHasContent(initialTab, profile))
   const [ubahTipeConfirm, setUbahTipeConfirm] = useState(false)
-  function changeTab(id: string) { setTab(id); setSaved(tabHasContent(id, profile)); setUbahTipeConfirm(false) }
-  function doUbahTipe() {
+  const changeTab = useCallback((id: string) => { setTab(id); setSaved(tabHasContent(id, profile)); setUbahTipeConfirm(false) }, [profile])
+  const doUbahTipe = useCallback(() => {
     setProfile(p => ({
       ...p,
-      biz_sub_tipe: '',
-      biz_kategori: '',
-      biz_tipe_konten: '',
-      biz_platform_konten: '',
-      biz_lokasi: '',
-      biz_jam_operasional: '',
-      biz_jenjang: '',
-      biz_area_layanan: '',
-      biz_model_bisnis: '',
-      biz_price_range: '',
-      biz_marketplace: '',
+      biz_sub_tipe: '', biz_kategori: '', biz_tipe_konten: '', biz_platform_konten: '',
+      biz_lokasi: '', biz_jam_operasional: '', biz_jenjang: '', biz_area_layanan: '',
+      biz_model_bisnis: '', biz_price_range: '', biz_marketplace: '',
     }))
     setUbahTipeConfirm(false)
     setSaved(false)
-  }
+  }, [])
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState('')
   const [aiModal, setAiModal] = useState<{ prompt: string } | null>(null)
@@ -606,10 +614,10 @@ export default function BrandModule({
     setLogoUploading(false)
   }
 
-  function setField(key: keyof BrandProfile, value: string) {
+  const setField = useCallback((key: keyof BrandProfile, value: string) => {
     setProfile(p => ({ ...p, [key]: value }))
     setSaved(false)
-  }
+  }, [])
 
   async function addAkun() {
     if (!akunForm.handle.trim() || !akunForm.nama.trim()) return
@@ -1257,22 +1265,24 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
   )
 
   // Brand score / Frekuensi level calc — always uses savedProfile (only updates after save)
-  const hasBio = !!(savedProfile.bio_tiktok || savedProfile.bio_instagram || savedProfile.bio_youtube || savedProfile.bio_linkedin || savedProfile.bio_facebook)
-  const hasColorPalette = (savedProfile.color_palette?.length ?? 0) > 0
   const ACTIVE_FREQ_CHECKS = isAffiliate ? AFFILIATE_FREQ_CHECKS : isBusiness ? BIZ_FREQ_CHECKS : FREQ_CHECKS
-  const freqChecked = ACTIVE_FREQ_CHECKS.map(c => {
-    if (!isAffiliate && !isBusiness && c.key === 'bio_instagram') return hasBio
-    if (isBusiness && c.key === 'biz_bio_options') return (savedProfile.biz_bio_options || []).length > 0
-    if (c.key === 'color_palette') return hasColorPalette
-    if (c.key === 'content_pillars') return hasPillars
-    const val = savedProfile[c.key as keyof BrandProfile]
-    return typeof val === 'string' ? val.trim().length > 0 : Array.isArray(val) ? val.length > 0 : false
-  })
-  const freqDone = freqChecked.filter(Boolean).length
-  const freqTotal = ACTIVE_FREQ_CHECKS.length
-  const freqPct = Math.round((freqDone / freqTotal) * 100)
-  const freqLevelIdx = freqPct >= 90 ? 5 : freqPct >= 70 ? 4 : freqPct >= 50 ? 3 : freqPct >= 30 ? 2 : freqPct >= 10 ? 1 : 0
-  const freqLevel = FREQ_LEVELS[freqLevelIdx]
+  const { freqChecked, freqDone, freqTotal, freqPct, freqLevelIdx, freqLevel } = useMemo(() => {
+    const hasBio = !!(savedProfile.bio_tiktok || savedProfile.bio_instagram || savedProfile.bio_youtube || savedProfile.bio_linkedin || savedProfile.bio_facebook)
+    const hasColorPalette = (savedProfile.color_palette?.length ?? 0) > 0
+    const checked = ACTIVE_FREQ_CHECKS.map(c => {
+      if (!isAffiliate && !isBusiness && c.key === 'bio_instagram') return hasBio
+      if (isBusiness && c.key === 'biz_bio_options') return (savedProfile.biz_bio_options || []).length > 0
+      if (c.key === 'color_palette') return hasColorPalette
+      if (c.key === 'content_pillars') return hasPillars
+      const val = savedProfile[c.key as keyof BrandProfile]
+      return typeof val === 'string' ? val.trim().length > 0 : Array.isArray(val) ? val.length > 0 : false
+    })
+    const done = checked.filter(Boolean).length
+    const total = ACTIVE_FREQ_CHECKS.length
+    const pct = Math.round((done / total) * 100)
+    const levelIdx = pct >= 90 ? 5 : pct >= 70 ? 4 : pct >= 50 ? 3 : pct >= 30 ? 2 : pct >= 10 ? 1 : 0
+    return { freqChecked: checked, freqDone: done, freqTotal: total, freqPct: pct, freqLevelIdx: levelIdx, freqLevel: FREQ_LEVELS[levelIdx] }
+  }, [savedProfile, hasPillars, isAffiliate, isBusiness, ACTIVE_FREQ_CHECKS])
 
   return (
     <div>
@@ -2095,7 +2105,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Nama Brand / Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
-                    <input style={fieldStyle()} value={profile.biz_nama_brand ?? ''} onChange={e => setField('biz_nama_brand', e.target.value)} placeholder="cth: Kreaflow, Toko Batik Maju, NutriMama" />
+                    <DebouncedInput style={fieldStyle()} value={profile.biz_nama_brand ?? ''} onCommit={v => setField('biz_nama_brand', v)} placeholder="cth: Kreaflow, Toko Batik Maju, NutriMama" />
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kategori <span style={{ color: '#dc2626' }}>*</span></label>
@@ -2113,23 +2123,23 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Tagline Brand</label>
                   <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Slogan singkat yang jadi signature bisnis kamu (maks 10 kata)</div>
-                  <input style={fieldStyle()} value={profile.biz_tagline ?? ''} onChange={e => setField('biz_tagline', e.target.value)} placeholder="cth: Camilan Sehat untuk Keluarga Bahagia" />
+                  <DebouncedInput style={fieldStyle()} value={profile.biz_tagline ?? ''} onCommit={v => setField('biz_tagline', v)} placeholder="cth: Camilan Sehat untuk Keluarga Bahagia" />
                 </div>
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Unique Selling Point (USP) <span style={{ color: '#dc2626' }}>*</span></label>
                   <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Apa yang bikin bisnis kamu berbeda dari kompetitor? Jawab jujur dan spesifik.</div>
-                  <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_usp ?? ''} onChange={e => setField('biz_usp', e.target.value)} placeholder="cth: Satu-satunya toko batik yang custom motif dalam 3 hari dengan bahan premium tanpa markup gila-gilaan" />
+                  <DebouncedTextarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_usp ?? ''} onCommit={v => setField('biz_usp', v)} placeholder="cth: Satu-satunya toko batik yang custom motif dalam 3 hari dengan bahan premium tanpa markup gila-gilaan" />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Visi Bisnis <span style={{ color: '#dc2626' }}>*</span></label>
-                    <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_visi ?? ''} onChange={e => setField('biz_visi', e.target.value)} placeholder="Ke mana bisnis ini ingin melangkah dalam 5–10 tahun?" />
+                    <DebouncedTextarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_visi ?? ''} onCommit={v => setField('biz_visi', v)} placeholder="Ke mana bisnis ini ingin melangkah dalam 5–10 tahun?" />
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Misi Bisnis</label>
-                    <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_misi ?? ''} onChange={e => setField('biz_misi', e.target.value)} placeholder="Apa yang dilakukan setiap hari untuk mencapai visi itu?" />
+                    <DebouncedTextarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_misi ?? ''} onCommit={v => setField('biz_misi', v)} placeholder="Apa yang dilakukan setiap hari untuk mencapai visi itu?" />
                   </div>
                 </div>
 
@@ -2139,19 +2149,19 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                     {bizCfg.show.lokasi && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Lokasi Bisnis</label>
-                        <input style={fieldStyle()} value={profile.biz_lokasi ?? ''} onChange={e => setField('biz_lokasi', e.target.value)} placeholder="cth: Jl. Sudirman No. 12, Jakarta Selatan" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_lokasi ?? ''} onCommit={v => setField('biz_lokasi', v)} placeholder="cth: Jl. Sudirman No. 12, Jakarta Selatan" />
                       </div>
                     )}
                     {bizCfg.show.jamOps && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jam Operasional</label>
-                        <input style={fieldStyle()} value={profile.biz_jam_operasional ?? ''} onChange={e => setField('biz_jam_operasional', e.target.value)} placeholder="cth: Senin–Jumat 08.00–21.00, Sabtu 09.00–20.00" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_jam_operasional ?? ''} onCommit={v => setField('biz_jam_operasional', v)} placeholder="cth: Senin–Jumat 08.00–21.00, Sabtu 09.00–20.00" />
                       </div>
                     )}
                     {bizCfg.show.jenjang && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Jenjang / Level Program</label>
-                        <input style={fieldStyle()} value={profile.biz_jenjang ?? ''} onChange={e => setField('biz_jenjang', e.target.value)} placeholder="cth: TK, SD, SMP, SMA, D3, S1, Kursus Pemula–Mahir" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_jenjang ?? ''} onCommit={v => setField('biz_jenjang', v)} placeholder="cth: TK, SD, SMP, SMA, D3, S1, Kursus Pemula–Mahir" />
                       </div>
                     )}
                   </div>
@@ -2162,25 +2172,25 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                     {bizCfg.show.areaLayanan && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Area Layanan</label>
-                        <input style={fieldStyle()} value={profile.biz_area_layanan ?? ''} onChange={e => setField('biz_area_layanan', e.target.value)} placeholder="cth: Jabodetabek, seluruh Indonesia, online" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_area_layanan ?? ''} onCommit={v => setField('biz_area_layanan', v)} placeholder="cth: Jabodetabek, seluruh Indonesia, online" />
                       </div>
                     )}
                     {bizCfg.show.modelBisnis && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Model Bisnis</label>
-                        <input style={fieldStyle()} value={profile.biz_model_bisnis ?? ''} onChange={e => setField('biz_model_bisnis', e.target.value)} placeholder="cth: B2C, B2B, subscription, one-time project" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_model_bisnis ?? ''} onCommit={v => setField('biz_model_bisnis', v)} placeholder="cth: B2C, B2B, subscription, one-time project" />
                       </div>
                     )}
                     {bizCfg.show.priceRange && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Rentang Harga</label>
-                        <input style={fieldStyle()} value={profile.biz_price_range ?? ''} onChange={e => setField('biz_price_range', e.target.value)} placeholder="cth: Rp 25.000–150.000, Rp 1–5 juta/proyek" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_price_range ?? ''} onCommit={v => setField('biz_price_range', v)} placeholder="cth: Rp 25.000–150.000, Rp 1–5 juta/proyek" />
                       </div>
                     )}
                     {bizCfg.show.marketplace && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Marketplace Aktif</label>
-                        <input style={fieldStyle()} value={profile.biz_marketplace ?? ''} onChange={e => setField('biz_marketplace', e.target.value)} placeholder="cth: Shopee, Tokopedia, TikTok Shop, Lazada" />
+                        <DebouncedInput style={fieldStyle()} value={profile.biz_marketplace ?? ''} onCommit={v => setField('biz_marketplace', v)} placeholder="cth: Shopee, Tokopedia, TikTok Shop, Lazada" />
                       </div>
                     )}
                   </div>
@@ -2223,23 +2233,23 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>{bizCfg.targetLabel} <span style={{ color: '#dc2626' }}>*</span></label>
               <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Gambarkan pelanggan ideal kamu — demografi, kebiasaan, dan problem yang kamu selesaikan</div>
-              <textarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.biz_target_pasar ?? ''} onChange={e => setField('biz_target_pasar', e.target.value)} placeholder={bizCfg.targetPlaceholder} />
+              <DebouncedTextarea style={fieldStyle({ height: 88, resize: 'none' })} value={profile.biz_target_pasar ?? ''} onCommit={v => setField('biz_target_pasar', v)} placeholder={bizCfg.targetPlaceholder} />
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>{bizCfg.produkLabel} <span style={{ color: '#dc2626' }}>*</span></label>
               <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Produk atau layanan utama yang jadi andalan bisnis kamu</div>
-              <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={profile.biz_produk_unggulan ?? ''} onChange={e => setField('biz_produk_unggulan', e.target.value)} placeholder={bizCfg.produkPlaceholder} />
+              <DebouncedTextarea style={fieldStyle({ height: 72, resize: 'none' })} value={profile.biz_produk_unggulan ?? ''} onCommit={v => setField('biz_produk_unggulan', v)} placeholder={bizCfg.produkPlaceholder} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Kompetitor Utama</label>
-                <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_kompetitor ?? ''} onChange={e => setField('biz_kompetitor', e.target.value)} placeholder="Siapa kompetitor langsung kamu? Nama brand atau deskripsi singkat." />
+                <DebouncedTextarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_kompetitor ?? ''} onCommit={v => setField('biz_kompetitor', v)} placeholder="Siapa kompetitor langsung kamu? Nama brand atau deskripsi singkat." />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Keunggulan Kompetitif <span style={{ color: '#dc2626' }}>*</span></label>
-                <textarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_keunggulan ?? ''} onChange={e => setField('biz_keunggulan', e.target.value)} placeholder={bizCfg.keunggulanPlaceholder} />
+                <DebouncedTextarea style={fieldStyle({ height: 80, resize: 'none' })} value={profile.biz_keunggulan ?? ''} onCommit={v => setField('biz_keunggulan', v)} placeholder={bizCfg.keunggulanPlaceholder} />
               </div>
             </div>
 
@@ -2386,8 +2396,8 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                       </button>
                     </div>
                   </div>
-                  <textarea style={fieldStyle({ height: 72, resize: 'none' })} value={opt.teks}
-                    onChange={e => { setProfile(p => ({ ...p, biz_bio_options: (p.biz_bio_options || []).map((b, i) => i === idx ? { ...b, teks: e.target.value } : b) })); setSaved(false) }}
+                  <DebouncedTextarea style={fieldStyle({ height: 72, resize: 'none' })} value={opt.teks}
+                    onCommit={v => { setProfile(p => ({ ...p, biz_bio_options: (p.biz_bio_options || []).map((b, i) => i === idx ? { ...b, teks: v } : b) })); setSaved(false) }}
                     placeholder="cth: Camilan sehat homemade | Granola & Energy Bar | DM untuk custom order | Pengiriman seluruh Indonesia" />
                 </div>
               ))}
@@ -2397,7 +2407,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Call to Action (CTA)</label>
             <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 8 }}>Kalimat ajakan yang selalu muncul di konten atau bio — simple, spesifik, dan langsung actionable</div>
-            <input style={fieldStyle()} value={profile.biz_cta ?? ''} onChange={e => setField('biz_cta', e.target.value)} placeholder="cth: DM &quot;ORDER&quot; untuk harga grosir · Klik link di bio untuk katalog lengkap" />
+            <DebouncedInput style={fieldStyle()} value={profile.biz_cta ?? ''} onCommit={v => setField('biz_cta', v)} placeholder="cth: DM &quot;ORDER&quot; untuk harga grosir · Klik link di bio untuk katalog lengkap" />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
