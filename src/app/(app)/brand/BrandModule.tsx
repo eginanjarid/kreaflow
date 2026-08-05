@@ -133,7 +133,7 @@ const BUSINESS_TABS = [
 ]
 
 type BizTypeConfig = {
-  label: string; emoji: string; desc: string; color: string
+  label: string; desc: string; color: string
   kategoris: string[]; platformReko: string[]; tipeKonten: string[]
   produkLabel: string; produkPlaceholder: string
   targetLabel: string; targetPlaceholder: string
@@ -143,7 +143,7 @@ type BizTypeConfig = {
 
 const BIZ_TYPES: Record<string, BizTypeConfig> = {
   kuliner: {
-    label: 'Kuliner & F&B', emoji: '🍽️', desc: 'Restoran, kafe, katering, snack, minuman, cloud kitchen', color: '#f59e0b',
+    label: 'Kuliner & F&B', desc: 'Restoran, kafe, katering, snack, minuman, cloud kitchen', color: '#f59e0b',
     kategoris: ['Restoran/Rumah Makan', 'Kafe & Coffee Shop', 'Katering & Pesanan', 'Snack & Camilan', 'Minuman & Beverage', 'Cloud Kitchen', 'Bakery & Pastry'],
     platformReko: ['Instagram', 'TikTok', 'Shopee Food', 'GoFood/GrabFood'],
     tipeKonten: ['Food Photography', 'Promo & Flash Sale', 'Behind the Kitchen', 'Testimoni Pelanggan', 'Menu Baru', 'Live Masak', 'Tips & Resep'],
@@ -154,7 +154,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { lokasi: true, jamOps: true, priceRange: true },
   },
   pendidikan: {
-    label: 'Pendidikan & Kursus', emoji: '🎓', desc: 'Sekolah, lembaga kursus, bimbel, pelatihan, online course', color: '#1a73e8',
+    label: 'Pendidikan & Kursus', desc: 'Sekolah, lembaga kursus, bimbel, pelatihan, online course', color: '#1a73e8',
     kategoris: ['Sekolah Formal (TK–SMA)', 'Perguruan Tinggi', 'Bimbingan Belajar', 'Kursus Bahasa', 'Kursus Skill Digital', 'Pelatihan Profesional', 'Online Course'],
     platformReko: ['Instagram', 'YouTube', 'TikTok', 'LinkedIn', 'WhatsApp Business'],
     tipeKonten: ['Prestasi & Testimoni Alumni', 'Info Pendaftaran', 'Kehidupan Kelas / Campus Life', 'Tips Belajar', 'Profile Pengajar', 'Event & Lomba', 'Edukasi Gratis'],
@@ -165,7 +165,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { jenjang: true, areaLayanan: true },
   },
   fashion: {
-    label: 'Fashion & Lifestyle', emoji: '👗', desc: 'Pakaian, aksesoris, sepatu, tas, streetwear, modest fashion', color: '#ec4899',
+    label: 'Fashion & Lifestyle', desc: 'Pakaian, aksesoris, sepatu, tas, streetwear, modest fashion', color: '#ec4899',
     kategoris: ['Fashion Wanita', 'Fashion Pria', 'Modest Fashion / Hijab', 'Streetwear', 'Aksesoris & Tas', 'Sepatu & Sandal', 'Kids Fashion'],
     platformReko: ['Instagram', 'TikTok', 'Shopee', 'Tokopedia'],
     tipeKonten: ['Lookbook & OOTD', 'New Arrival', 'Behind Produksi', 'Styling Tips', 'Flash Sale', 'UGC Repost', 'Testimoni & Review'],
@@ -176,7 +176,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { priceRange: true, areaLayanan: true },
   },
   kecantikan: {
-    label: 'Kecantikan & Kesehatan', emoji: '💆', desc: 'Salon, klinik kecantikan, spa, skincare, kosmetik, health clinic', color: '#db2777',
+    label: 'Kecantikan & Kesehatan', desc: 'Salon, klinik kecantikan, spa, skincare, kosmetik, health clinic', color: '#db2777',
     kategoris: ['Salon & Barber', 'Klinik Kecantikan', 'Spa & Wellness', 'Brand Skincare', 'Brand Kosmetik', 'Klinik Kesehatan', 'Apotek & Suplemen'],
     platformReko: ['Instagram', 'TikTok', 'YouTube'],
     tipeKonten: ['Before & After', 'Tips Kecantikan', 'Promo Layanan', 'Profile Dokter/Terapis', 'Edukasi Kulit/Kesehatan', 'Testimoni Klien', 'Tutorial Makeup/Skincare'],
@@ -187,7 +187,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { lokasi: true, jamOps: true, priceRange: true },
   },
   properti: {
-    label: 'Properti & Interior', emoji: '🏠', desc: 'Developer, agen properti, desain interior, kontraktor, furnitur', color: '#0284c7',
+    label: 'Properti & Interior', desc: 'Developer, agen properti, desain interior, kontraktor, furnitur', color: '#0284c7',
     kategoris: ['Developer Perumahan', 'Agen Properti', 'Desain Interior', 'Kontraktor & Renovasi', 'Furnitur & Dekorasi', 'Apartemen & Kost', 'Properti Komersial'],
     platformReko: ['Instagram', 'YouTube', 'TikTok', 'Facebook'],
     tipeKonten: ['Showcase Properti/Desain', 'Virtual Tour', 'Testimoni Buyer/Client', 'Tips Properti/Interior', 'Progress Pembangunan', 'Info Lokasi & Fasilitas', 'Market Update'],
@@ -198,7 +198,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { lokasi: true, priceRange: true, modelBisnis: true },
   },
   jasa: {
-    label: 'Jasa Profesional', emoji: '💼', desc: 'Konsultan, pengacara, akuntan, fotografer, event organizer, dll', color: '#7c3aed',
+    label: 'Jasa Profesional', desc: 'Konsultan, pengacara, akuntan, fotografer, event organizer, dll', color: '#7c3aed',
     kategoris: ['Konsultan Bisnis', 'Jasa Hukum', 'Jasa Keuangan & Pajak', 'Fotografer & Videografer', 'Event Organizer', 'Jasa IT & Web', 'Jasa Marketing & Kreatif'],
     platformReko: ['Instagram', 'LinkedIn', 'YouTube', 'WhatsApp Business'],
     tipeKonten: ['Case Study & Portfolio', 'Thought Leadership', 'Behind the Process', 'Testimoni Klien', 'Team Introduction', 'Promo Paket', 'FAQ & Edukasi'],
@@ -209,7 +209,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { modelBisnis: true, areaLayanan: true, priceRange: true },
   },
   teknologi: {
-    label: 'Teknologi & SaaS', emoji: '💻', desc: 'Software, aplikasi, platform digital, startup teknologi', color: '#0369a1',
+    label: 'Teknologi & SaaS', desc: 'Software, aplikasi, platform digital, startup teknologi', color: '#0369a1',
     kategoris: ['SaaS / Software', 'Aplikasi Mobile', 'Platform E-learning', 'Fintech', 'Marketplace', 'AI & Automation', 'Jasa IT & Outsourcing'],
     platformReko: ['LinkedIn', 'Twitter/X', 'YouTube', 'Instagram'],
     tipeKonten: ['Feature Demo & Tutorial', 'Product Update', 'Case Study Pengguna', 'Tech Insight', 'Behind the Build', 'Testimoni', 'FAQ & Troubleshoot'],
@@ -220,7 +220,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { modelBisnis: true, priceRange: true, areaLayanan: true },
   },
   retail: {
-    label: 'Retail & E-commerce', emoji: '🛍️', desc: 'Toko online/offline, marketplace, reseller, dropshipper', color: '#059669',
+    label: 'Retail & E-commerce', desc: 'Toko online/offline, marketplace, reseller, dropshipper', color: '#059669',
     kategoris: ['Toko Online (Shopee/Tokopedia)', 'Toko Offline / Minimarket', 'Dropshipping', 'Reseller & Distributor', 'Toko Multi-brand', 'Specialty Store', 'Wholesale & Grosir'],
     platformReko: ['Shopee', 'Tokopedia', 'TikTok Shop', 'Instagram', 'Facebook'],
     tipeKonten: ['Product Showcase', 'Unboxing & Review', 'Flash Sale', 'Comparison Produk', 'UGC Repost', 'Live Shopping', 'Packing & Pengiriman'],
@@ -231,7 +231,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { marketplace: true, priceRange: true, areaLayanan: true },
   },
   otomotif: {
-    label: 'Otomotif', emoji: '🚗', desc: 'Dealer motor/mobil, bengkel, aksesori kendaraan, cuci kendaraan', color: '#d97706',
+    label: 'Otomotif', desc: 'Dealer motor/mobil, bengkel, aksesori kendaraan, cuci kendaraan', color: '#d97706',
     kategoris: ['Dealer Motor Baru', 'Dealer Mobil Baru', 'Kendaraan Bekas', 'Bengkel & Servis', 'Aksesori Kendaraan', 'Cuci & Detailing', 'Modifikasi'],
     platformReko: ['Instagram', 'TikTok', 'YouTube', 'Facebook'],
     tipeKonten: ['Unit Showcase', 'Tips Perawatan Kendaraan', 'Before & After', 'Proses Servis', 'Testimoni Pelanggan', 'Review Produk/Unit', 'Promo & DP'],
@@ -242,7 +242,7 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     show: { lokasi: true, jamOps: true, priceRange: true },
   },
   komunitas: {
-    label: 'Komunitas & Organisasi', emoji: '🤝', desc: 'NGO, komunitas hobi, organisasi sosial, yayasan, klub', color: '#6d28d9',
+    label: 'Komunitas & Organisasi', desc: 'NGO, komunitas hobi, organisasi sosial, yayasan, klub', color: '#6d28d9',
     kategoris: ['Komunitas Hobi', 'Organisasi Sosial / NGO', 'Yayasan & Amal', 'Komunitas Olahraga', 'Komunitas Bisnis', 'Organisasi Pelajar/Mahasiswa', 'Komunitas Keagamaan'],
     platformReko: ['Instagram', 'YouTube', 'WhatsApp', 'Facebook', 'TikTok'],
     tipeKonten: ['Impact Story', 'Event & Kegiatan', 'Edukasi & Awareness', 'Volunteer & Member CTA', 'Progress & Update', 'Member Spotlight', 'Behind the Mission'],
@@ -252,6 +252,24 @@ const BIZ_TYPES: Record<string, BizTypeConfig> = {
     pillarReko: ['Impact Story', 'Event & Kegiatan', 'Edukasi & Awareness', 'Member Spotlight', 'Behind the Mission'],
     show: { areaLayanan: true, modelBisnis: true },
   },
+}
+
+function BizTypeIcon({ bizKey, color, size = 28 }: { bizKey: string; color: string; size?: number }) {
+  const s = { width: size, height: size, color, display: 'block' }
+  const props = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: s }
+  switch (bizKey) {
+    case 'kuliner': return <svg {...props}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h1v7"/></svg>
+    case 'pendidikan': return <svg {...props}><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+    case 'fashion': return <svg {...props}><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+    case 'kecantikan': return <svg {...props}><path d="M20 7c0 4.4-3.6 8-8 8S4 11.4 4 7"/><path d="M12 15v7"/><path d="M9 22h6"/><circle cx="12" cy="4" r="2"/><path d="M7 7h10"/></svg>
+    case 'properti': return <svg {...props}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    case 'jasa': return <svg {...props}><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    case 'teknologi': return <svg {...props}><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><polyline points="10 9 7 12 10 15"/><polyline points="14 9 17 12 14 15"/></svg>
+    case 'retail': return <svg {...props}><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    case 'otomotif': return <svg {...props}><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+    case 'komunitas': return <svg {...props}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    default: return <svg {...props}><circle cx="12" cy="12" r="10"/></svg>
+  }
 }
 
 const PLATFORMS_SOSMED = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'Twitter/X', 'LinkedIn']
@@ -2007,7 +2025,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                   <button key={key} type="button"
                     onClick={() => { setField('biz_sub_tipe', key); setSaved(false) }}
                     style={{ padding: '16px', borderRadius: 12, border: `1.5px solid ${cfg.color}30`, background: `${cfg.color}08`, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s' }}>
-                    <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{cfg.emoji}</div>
+                    <div style={{ marginBottom: 10 }}><BizTypeIcon bizKey={key} color={cfg.color} size={26} /></div>
                     <div style={{ fontWeight: 700, color: cfg.color, fontSize: '0.875rem', marginBottom: 3 }}>{cfg.label}</div>
                     <div style={{ fontSize: '0.73rem', color: '#6b7280', lineHeight: 1.4 }}>{cfg.desc}</div>
                   </button>
@@ -2023,7 +2041,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: '1.1rem' }}>{bizCfg.emoji}</span>
+                      <BizTypeIcon bizKey={profile.biz_sub_tipe} color={bizCfg.color} size={20} />
                       <span style={{ background: `${bizCfg.color}18`, color: bizCfg.color, fontWeight: 700, fontSize: '0.8rem', padding: '3px 10px', borderRadius: 20 }}>{bizCfg.label}</span>
                       <button type="button" onClick={() => { setField('biz_sub_tipe', ''); setField('biz_kategori', '') }}
                         style={{ background: 'none', border: '1px solid #d1d5db', borderRadius: 6, padding: '2px 8px', color: '#6b7280', fontSize: '0.72rem', cursor: 'pointer' }}>Ubah tipe</button>
@@ -2134,7 +2152,11 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
                 )}
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <SaveButton loading={saving} saved={saved} />
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button type="button" onClick={() => { setField('biz_sub_tipe', ''); setField('biz_kategori', '') }}
+                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>← Ubah Tipe</button>
+                    <SaveButton loading={saving} saved={saved} />
+                  </div>
                   <button type="button" onClick={() => changeTab('biz-market')}
                     style={{ background: bizCfg.color, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                     Lanjut: Market & Produk →
