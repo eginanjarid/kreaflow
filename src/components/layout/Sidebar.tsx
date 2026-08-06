@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useTransition } from 'react'
 import { canAccess, type Module } from '@/lib/jabatan-access'
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -84,6 +84,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
   const [createError, setCreateError] = useState('')
   const [creating, setCreating] = useState(false)
   const [switching, setSwitching] = useState(false)
+  const [isRefreshing, startRefresh] = useTransition()
   const wsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -146,7 +147,8 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
       body: JSON.stringify({ workspace_id: wsId }),
     })
     setWsOpen(false)
-    router.push(pathname)
+    setSwitching(false)
+    startRefresh(() => { router.refresh() })
   }
 
   async function createWorkspace(e: React.FormEvent) {
@@ -196,6 +198,14 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
 
   return (
     <>
+      {isRefreshing && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(2px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: '16px 24px', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2.5" strokeLinecap="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Memuat workspace...</span>
+          </div>
+        </div>
+      )}
       <aside className={className} style={{
         width: W,
         background: '#fff',
