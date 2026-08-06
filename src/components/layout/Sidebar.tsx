@@ -146,8 +146,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
       body: JSON.stringify({ workspace_id: wsId }),
     })
     setWsOpen(false)
-    setSwitching(false)
-    router.refresh()
+    router.push(pathname)
   }
 
   async function createWorkspace(e: React.FormEvent) {
