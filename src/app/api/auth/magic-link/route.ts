@@ -22,10 +22,15 @@ export async function POST(req: NextRequest) {
     }
   )
 
+  // Always use server-side APP_URL — never trust client origin (could be localhost)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
+  const next = redirectTo ? new URL(redirectTo).pathname : '/sprints'
+  const callbackUrl = `${appUrl}/auth/callback${next !== '/sprints' ? `?next=${encodeURIComponent(next)}` : ''}`
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: redirectTo || `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: callbackUrl,
       shouldCreateUser: false,
     },
   })
