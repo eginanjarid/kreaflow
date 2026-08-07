@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+type WorkspaceMember = { id: string; user_id: string; role: string; jabatan: string; email: string; nama: string }
 type ContentItem = {
   id: string; workspace_id: string; product_id: string; pillar_id: string
   judul: string; format: string; platform: string[]; hook: string; body: string
@@ -14,6 +15,7 @@ type ContentItem = {
   preview_url?: string; studio_notes?: string; studio_done_at?: string; show_in_feed?: boolean
   sprint_id?: string | null; step_log?: Record<string, string> | null
   tanggal_tayang?: string | null; jam_tayang?: string | null; sprint_nama?: string | null
+  assigned_produksi?: string | null
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
@@ -199,7 +201,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
   )
 }
 
-function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem; products: Product[]; onClose: () => void; onUpdate: (updated: ContentItem) => void }) {
+function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { item: ContentItem; products: Product[]; workspaceMembers: WorkspaceMember[]; onClose: () => void; onUpdate: (updated: ContentItem) => void }) {
   const supabase = createClient()
   const router = useRouter()
   const [canvaUrl, setCanvaUrl] = useState(item.canva_url || '')
@@ -212,8 +214,12 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
   const [linkMentahan, setLinkMentahan] = useState(item.step_log?.link_mentahan || '')
   const [talentBriefed, setTalentBriefed] = useState(!!item.step_log?.talent_briefed_at)
   const [shootDone, setShootDone] = useState(!!item.step_log?.shoot_done_at)
+  const [assignedProduksi, setAssignedProduksi] = useState(item.assigned_produksi || '')
   const product = products.find(p => p.id === item.product_id)
   const isVideo = VIDEO_FORMATS.includes(item.format)
+  const PRODUKSI_JABATAN = ['Videografer', 'Editor', 'Desainer', 'Art Director', 'Content Creator']
+  const produksiMembers = workspaceMembers.filter(m => PRODUKSI_JABATAN.includes(m.jabatan))
+  const otherMembers = workspaceMembers.filter(m => !PRODUKSI_JABATAN.includes(m.jabatan))
 
   function buildStepLog(): Record<string, string> {
     const log: Record<string, string> = { ...(item.step_log || {}) }
@@ -226,7 +232,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
 
   async function handleSave() {
     setSaving(true)
-    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Produksi', step_log: buildStepLog() }
+    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Produksi', step_log: buildStepLog(), assigned_produksi: assignedProduksi || null }
     await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
     setSaving(false)
@@ -237,7 +243,7 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
   async function handleSelesai() {
     setMarking(true)
     const now = new Date().toISOString()
-    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, step_log: { ...buildStepLog(), editing_done_at: now } }
+    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null }
     await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
     await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
@@ -280,6 +286,22 @@ function NaskahModal({ item, products, onClose, onUpdate }: { item: ContentItem;
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Talent &amp; Tim Produksi</span>
+              </div>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Assign ke Tim Produksi</label>
+                <select value={assignedProduksi} onChange={e => setAssignedProduksi(e.target.value)} style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: assignedProduksi ? '#111827' : '#9ca3af', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }}>
+                  <option value=''>— Pilih anggota tim —</option>
+                  {produksiMembers.length > 0 && (
+                    <optgroup label='Tim Produksi'>
+                      {produksiMembers.map(m => <option key={m.id} value={m.nama || m.email}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>)}
+                    </optgroup>
+                  )}
+                  {otherMembers.length > 0 && (
+                    <optgroup label='Lainnya'>
+                      {otherMembers.map(m => <option key={m.id} value={m.nama || m.email}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>)}
+                    </optgroup>
+                  )}
+                </select>
               </div>
               <div style={{ marginBottom: isVideo ? 10 : 0 }}>
                 <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Nama Talent / Pemeran</label>
@@ -394,8 +416,8 @@ function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Not
   )
 }
 
-export default function StudioModule({ initialContents, products, initialNotifications, workspaceId, workspaceName = 'studio' }: {
-  initialContents: ContentItem[]; products: Product[]; initialNotifications: Notification[]; workspaceId: string; workspaceName?: string
+export default function StudioModule({ initialContents, products, initialNotifications, workspaceId, workspaceName = 'studio', workspaceMembers = [] }: {
+  initialContents: ContentItem[]; products: Product[]; initialNotifications: Notification[]; workspaceId: string; workspaceName?: string; workspaceMembers?: WorkspaceMember[]
 }) {
   const supabase = createClient()
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
@@ -760,7 +782,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       ) : null}
 
       {/* Modals */}
-      {selectedItem && <NaskahModal item={selectedItem} products={products} onClose={() => setSelectedItem(null)} onUpdate={handleUpdate} />}
+      {selectedItem && <NaskahModal item={selectedItem} products={products} workspaceMembers={workspaceMembers} onClose={() => setSelectedItem(null)} onUpdate={handleUpdate} />}
       {previewPost && <IGPostPreview item={previewPost} workspaceName={workspaceName} onEdit={() => { setPreviewPost(null); setSelectedItem(previewPost) }} onClose={() => setPreviewPost(null)} />}
       {previewReels && <IGReelsPreview item={previewReels} workspaceName={workspaceName} onEdit={() => { setPreviewReels(null); setSelectedItem(previewReels) }} onClose={() => setPreviewReels(null)} />}
       {showNotif && (<><div style={{ position: 'fixed', inset: 0, zIndex: 299 }} onClick={() => setShowNotif(false)} /><NotifPanel notifications={notifications} onClose={() => setShowNotif(false)} onMarkRead={markRead} /></>)}
