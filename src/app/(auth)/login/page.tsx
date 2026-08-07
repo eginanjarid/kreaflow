@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
 const inputStyle = {
   width: '100%', background: '#f3f4f6', border: '1.5px solid transparent', borderRadius: 10,
@@ -28,17 +27,18 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const supabase = createClient()
     const redirectParam = new URLSearchParams(window.location.search).get('redirect')
     const redirectTo = `${window.location.origin}/auth/callback${redirectParam ? `?next=${encodeURIComponent(redirectParam)}` : ''}`
 
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: redirectTo },
+    const res = await fetch('/api/auth/magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, redirectTo }),
     })
+    const data = await res.json()
 
-    if (err) {
-      setError(err.message)
+    if (!res.ok) {
+      setError(data.error || 'Gagal mengirim link. Coba lagi.')
       setLoading(false)
       return
     }
