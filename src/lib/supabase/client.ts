@@ -7,9 +7,13 @@ const BROWSER_SUPABASE_URL =
     ? `${window.location.origin}/supabase`
     : process.env.NEXT_PUBLIC_SUPABASE_URL!
 
+// Cookie name must match auth routes (derived from NEXT_PUBLIC_SUPABASE_URL first hostname segment)
+const AUTH_COOKIE_NAME = `sb-${new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split('.')[0]}-auth-token`
+
 export function createClient() {
   return createBrowserClient(
     BROWSER_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookieOptions: { name: AUTH_COOKIE_NAME } }
   )
 }
