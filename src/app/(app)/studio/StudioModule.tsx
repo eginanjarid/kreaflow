@@ -470,9 +470,50 @@ export default function StudioModule({ initialContents, products, initialNotific
           </div>
         </div>
       ) : viewMode === 'cards' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-          {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
-        </div>
+        tab === 'antrian' ? (() => {
+          const DAY_COLORS = ['#1a73e8', '#7c3aed', '#059669', '#d97706', '#0891b2', '#db2777', '#dc2626']
+          const sorted = [...filtered].sort((a, b) => {
+            const da = a.tanggal_tayang || '9999', db = b.tanggal_tayang || '9999'
+            return da !== db ? da.localeCompare(db) : (a.jam_tayang || '').localeCompare(b.jam_tayang || '')
+          })
+          const uniqueDates = [...new Set(sorted.map(i => i.tanggal_tayang || '__no_date__'))]
+          const dateColorMap = new Map(uniqueDates.map((d, idx) => [d, DAY_COLORS[idx % DAY_COLORS.length]]))
+          const groups = uniqueDates.map(d => ({ dateKey: d, items: sorted.filter(i => (i.tanggal_tayang || '__no_date__') === d) }))
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {groups.map(group => {
+                const color = dateColorMap.get(group.dateKey) || '#1a73e8'
+                const d = group.dateKey === '__no_date__' ? null : new Date(group.dateKey + 'T00:00:00')
+                return (
+                  <div key={group.dateKey}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                      <div style={{ flexShrink: 0, width: 56, borderRadius: 10, background: color + '12', border: `1.5px solid ${color}30`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '6px 4px', gap: 2 }}>
+                        <div style={{ fontSize: '0.55rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          {d ? d.toLocaleDateString('id-ID', { weekday: 'short' }) : '—'}
+                        </div>
+                        <div style={{ fontSize: '1.3rem', fontWeight: 800, color, lineHeight: 1 }}>
+                          {d ? d.getDate() : '?'}
+                        </div>
+                        <div style={{ fontSize: '0.55rem', fontWeight: 600, color: color + 'cc' }}>
+                          {d ? d.toLocaleDateString('id-ID', { month: 'short' }) : ''}
+                        </div>
+                      </div>
+                      <div style={{ flex: 1, height: 1.5, background: `linear-gradient(90deg, ${color}30, transparent)`, borderRadius: 1 }} />
+                      <span style={{ fontSize: '0.72rem', color, fontWeight: 600 }}>{group.items.length} konten</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })() : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
+          </div>
+        )
       ) : viewMode === 'platform' ? (
         /* Platform Preview */
         <div>
