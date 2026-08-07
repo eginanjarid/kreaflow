@@ -13,6 +13,7 @@ type ContentItem = {
   status: string; scheduled_date: string; canva_url?: string; gdrive_url?: string
   preview_url?: string; studio_notes?: string; studio_done_at?: string; show_in_feed?: boolean
   sprint_id?: string | null; step_log?: Record<string, string> | null
+  tanggal_tayang?: string | null; jam_tayang?: string | null; sprint_nama?: string | null
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
@@ -299,9 +300,21 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
           {(item.platform || []).slice(0, 2).map(p => <span key={p} style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 6px', borderRadius: 3 }}>{p}</span>)}
         </div>
         {item.hook && <div style={{ fontSize: '0.78rem', color: '#6b7280', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.hook}</div>}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 6 }}>
-          {item.scheduled_date ? <span style={{ fontSize: '0.68rem', color: '#fb923c' }}>{item.scheduled_date}</span> : <span style={{ fontSize: '0.68rem', color: '#6b7280' }}>Belum dijadwalkan</span>}
-          <span style={{ fontSize: '0.7rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
+        <div style={{ marginTop: 'auto', paddingTop: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {item.tanggal_tayang ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span style={{ fontSize: '0.68rem', color: '#fb923c', fontWeight: 600 }}>
+                {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}
+              </span>
+            </div>
+          ) : (
+            <span style={{ fontSize: '0.68rem', color: '#9ca3af' }}>Belum dijadwalkan</span>
+          )}
+          {item.sprint_nama && <span style={{ fontSize: '0.65rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.sprint_nama}</span>}
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: '0.7rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
+          </div>
         </div>
       </div>
     </div>
