@@ -215,6 +215,8 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const [talentBriefed, setTalentBriefed] = useState(!!item.step_log?.talent_briefed_at)
   const [shootDone, setShootDone] = useState(!!item.step_log?.shoot_done_at)
   const [assignedProduksi, setAssignedProduksi] = useState(item.assigned_produksi || '')
+  const [naskahFullscreen, setNaskahFullscreen] = useState(false)
+  const [tpFontSize, setTpFontSize] = useState(22)
   const product = products.find(p => p.id === item.product_id)
   const isVideo = VIDEO_FORMATS.includes(item.format)
   const PRODUKSI_JABATAN = ['Videografer', 'Editor', 'Desainer', 'Art Director', 'Content Creator']
@@ -270,13 +272,67 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
         </div>
         <div className="kf-studio-modal-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
           <div style={{ padding: '20px 24px', borderRight: '1px solid #f3f4f6' }}>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Naskah Copywriter</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1a73e8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Naskah Copywriter</div>
+              <button onClick={() => setNaskahFullscreen(true)} title="Fullscreen — baca saat take video" style={{ background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 7, padding: '5px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, color: '#1a73e8' }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                <span style={{ fontSize: '0.68rem', fontWeight: 600 }}>Fullscreen</span>
+              </button>
+            </div>
             {item.hook && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Hook</div><div style={{ fontSize: '0.85rem', color: '#111827', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8, borderLeft: '3px solid #1a73e8' }}>{item.hook}</div></div>}
             {item.body && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Body</div><div style={{ fontSize: '0.85rem', color: '#111827', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8, whiteSpace: 'pre-wrap' }}>{item.body}</div></div>}
             {item.cta && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>CTA</div><div style={{ fontSize: '0.85rem', color: '#111827', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8 }}>{item.cta}</div></div>}
             {item.script && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Script Lengkap</div><div style={{ fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.7, background: '#fff', padding: '10px 12px', borderRadius: 8, whiteSpace: 'pre-wrap', maxHeight: 200, overflowY: 'auto' }}>{item.script}</div></div>}
             {(item.hashtags || []).length > 0 && <div><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Hashtag</div><div style={{ fontSize: '0.78rem', color: '#1a73e8', lineHeight: 1.6 }}>{item.hashtags.join(' ')}</div></div>}
           </div>
+
+          {/* Teleprompter fullscreen overlay */}
+          {naskahFullscreen && (
+            <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: 500, display: 'flex', flexDirection: 'column', overflowY: 'auto' }} onClick={() => setNaskahFullscreen(false)}>
+              <div onClick={e => e.stopPropagation()} style={{ flex: 1, padding: '32px 10vw', maxWidth: 900, margin: '0 auto', width: '100%' }}>
+                {/* Top bar */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Naskah — {item.format || 'Konten'}</div>
+                    <div style={{ fontSize: '1rem', color: '#e5e7eb', fontWeight: 700 }}>{item.judul}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button onClick={() => setTpFontSize(s => Math.max(14, s - 2))} style={{ width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                    <span style={{ color: '#6b7280', fontSize: '0.78rem', minWidth: 36, textAlign: 'center' }}>{tpFontSize}px</span>
+                    <button onClick={() => setTpFontSize(s => Math.min(48, s + 2))} style={{ width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                    <button onClick={() => setNaskahFullscreen(false)} style={{ marginLeft: 8, width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                  </div>
+                </div>
+
+                {/* Script content */}
+                {item.script ? (
+                  <div style={{ fontSize: tpFontSize, color: '#f9fafb', lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif', letterSpacing: '0.01em' }}>{item.script}</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+                    {item.hook && (
+                      <div>
+                        <div style={{ fontSize: '0.65rem', color: '#4b5563', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Hook</div>
+                        <div style={{ fontSize: tpFontSize, color: '#60a5fa', lineHeight: 1.8, fontFamily: 'Georgia, serif' }}>{item.hook}</div>
+                      </div>
+                    )}
+                    {item.body && (
+                      <div>
+                        <div style={{ fontSize: '0.65rem', color: '#4b5563', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Body</div>
+                        <div style={{ fontSize: tpFontSize, color: '#f9fafb', lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif' }}>{item.body}</div>
+                      </div>
+                    )}
+                    {item.cta && (
+                      <div>
+                        <div style={{ fontSize: '0.65rem', color: '#4b5563', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>CTA</div>
+                        <div style={{ fontSize: tpFontSize, color: '#34d399', lineHeight: 1.8, fontFamily: 'Georgia, serif' }}>{item.cta}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div style={{ height: 80 }} />
+              </div>
+            </div>
+          )}
           <div style={{ padding: '20px 24px' }}>
             <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Input Hasil Produksi</div>
             {getThumbnail(item) && <div style={{ marginBottom: 16, borderRadius: 8, overflow: 'hidden', aspectRatio: '16/9', background: '#fff' }}><img src={getThumbnail(item)!} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
