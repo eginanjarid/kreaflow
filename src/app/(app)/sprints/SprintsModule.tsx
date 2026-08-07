@@ -61,6 +61,8 @@ type ManualTask = {
   percent_complete: number
   notes: string | null
   assigned_to: string | null
+  parent_id?: string | null
+  sort_order?: number | null
 }
 
 // ── Sprint templates ──────────────────────────────────────────────────────────
@@ -263,11 +265,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [importantDates, setImportantDates] = useState<{ nama: string; tanggal: string; tipe: string; is_repeating: boolean }[]>([])
   const [holidayWarning, setHolidayWarning] = useState<{ dates: string[]; onProceed: () => void } | null>(null)
 
-  // Fetch important dates once on mount
-  useState(() => {
+  // Fetch important dates client-side only (useEffect avoids SSR network calls)
+  useEffect(() => {
     supabase.from('kf_important_dates').select('nama,tanggal,tipe,is_repeating').or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
       .then(({ data }) => { if (data) setImportantDates(data as { nama: string; tanggal: string; tipe: string; is_repeating: boolean }[]) })
-  })
+  }, [workspaceId])
   const searchParams = useSearchParams()
 
   const [activeTab, setActiveTab] = useState<'board' | 'tasks'>(
@@ -378,8 +380,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // Manual tasks
   const [tasks, setTasks] = useState<ManualTask[]>(initialTasks)
-  const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask } | null>(null)
+  const [taskModal, setTaskModal] = useState<{ open: boolean; task: ManualTask; parentAssignedTo?: string | null } | null>(null)
+  const [viewNotesTask, setViewNotesTask] = useState<ManualTask | null>(null)
   const [savingTask, setSavingTask] = useState(false)
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set())
+  const [subtaskInputs, setSubtaskInputs] = useState<string[]>([])
+  const [editSubtasks, setEditSubtasks] = useState<{ id: string; nama: string }[]>([])
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set())
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null)
+  const [dragOverColId, setDragOverColId] = useState<string | null>(null)
+  const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null)
   const [reportOpen, setReportOpen] = useState(false)
   const [deleteUndo, setDeleteUndo] = useState<{
     sprintId: string; sprintName: string; sprint: Sprint; contents: ContentItem[]; timeoutId: ReturnType<typeof setTimeout>
@@ -522,23 +532,29 @@ export default function SprintsModule({ initialSprints, initialContents, product
       if (weeklyStart) {
         const cur = new Date(weeklyStart + 'T00:00:00')
         const endD = new Date((weeklyEnd || weeklyStart) + 'T00:00:00')
-        const counterPerDay: Record<number, number> = {}
+        const counterPerDate: Record<string, number> = {}
         while (cur <= endD) {
           const dayIdx = cur.getDay()
           const dp = weeklyPattern[dayIdx]
           if (dp.active) {
             const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
-            dp.slots.filter(s => s.format).forEach(slot => {
-              counterPerDay[dayIdx] = (counterPerDay[dayIdx] || 0) + 1
+            const dayLabel = `${cur.getDate()}/${cur.getMonth() + 1}`
+            const activeSlots = dp.slots.filter(s => s.format)
+            activeSlots.forEach(slot => {
+              counterPerDate[dateStr] = (counterPerDate[dateStr] || 0) + 1
+              const slotIdx = counterPerDate[dateStr]
               const pillar = pillars.find(p => p.id === slot.pillar_id)
               const produk = products.find(p => p.id === slot.product_id)
               const judulPrefix = isAffiliate
                 ? (produk ? produk.nama : null)
                 : (pillar ? pillar.nama : null)
+              const multiSuffix = activeSlots.length > 1 ? ` #${slotIdx}` : ''
               items.push({
                 workspace_id: workspaceId,
                 sprint_id: sprint.id,
-                judul: judulPrefix ? `${judulPrefix} — ${slot.format} ${counterPerDay[dayIdx]}` : `${slot.format} ${counterPerDay[dayIdx]}`,
+                judul: judulPrefix
+                  ? `${judulPrefix} — ${slot.format} [${dayLabel}]${multiSuffix}`
+                  : `${slot.format} — ${dayLabel}${multiSuffix}`,
                 status: 'Draft',
                 format: slot.format,
                 platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
@@ -562,6 +578,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
           title: `Sprint Dimulai — ${autoNama}`,
           message: `${items.length} konten siap dikerjakan. Buka Plan untuk mulai buat naskah.`,
         })
+        showToast(`Sprint dibuat! ${items.length} konten masuk ke antrian Plan.`)
+      } else if (weeklyStart) {
+        showToast('Sprint dibuat. Pilih format di setiap slot hari aktif agar konten terbuat otomatis di Plan.')
       }
       setSprints(prev => [sprint, ...prev])
       setSelectedSprintId(sprint.id)
@@ -672,7 +691,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   }
 
   async function removeFromSprint(id: string) {
-    if (!confirm('Hapus konten ini dari sprint?')) return
+    if (!window.confirm('Hapus konten ini dari sprint?')) return
     await supabase.from('kf_content_ideas').update({ sprint_id: null }).eq('id', id)
     setContents(prev => prev.filter(c => c.id !== id))
     setDetailItem(null)
@@ -788,9 +807,19 @@ export default function SprintsModule({ initialSprints, initialContents, product
     })
   }
 
+  function renderNotes(text: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const parts = text.split(urlRegex)
+    return parts.map((part, i) =>
+      urlRegex.test(part)
+        ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#3b82f6', textDecoration: 'underline', wordBreak: 'break-all' }}>{part}</a>
+        : <span key={i}>{part}</span>
+    )
+  }
+
   // ── Manual tasks ──────────────────────────────────────────────────────────
-  function emptyTask(): ManualTask {
-    return { workspace_id: workspaceId, nama: '', platform: null, priority: 'Medium', start_date: null, due_date: null, percent_complete: 0, notes: null, assigned_to: null }
+  function emptyTask(parentId?: string): ManualTask {
+    return { workspace_id: workspaceId, nama: '', platform: null, priority: 'Medium', start_date: null, due_date: null, percent_complete: 0, notes: null, assigned_to: null, parent_id: parentId || null }
   }
   async function saveTask() {
     if (!taskModal) return
@@ -805,13 +834,52 @@ export default function SprintsModule({ initialSprints, initialContents, product
       platform: raw.platform || null,
       notes: raw.notes || null,
       assigned_to: raw.assigned_to || null,
+      parent_id: raw.parent_id || null,
     }
     if (t.id) {
       await supabase.from('kf_tasks').update(t).eq('id', t.id)
       setTasks(prev => prev.map(x => x.id === t.id ? t : x))
+      // Update edited subtask names
+      for (const sub of editSubtasks) {
+        await supabase.from('kf_tasks').update({ nama: sub.nama }).eq('id', sub.id)
+        setTasks(prev => prev.map(x => x.id === sub.id ? { ...x, nama: sub.nama } : x))
+      }
+      // Add new subtasks typed in the input section
+      const validNewSubs = subtaskInputs.map(s => s.trim()).filter(Boolean)
+      if (validNewSubs.length > 0) {
+        const subRows = validNewSubs.map(nama => ({ workspace_id: workspaceId, parent_id: t.id!, nama, priority: t.priority, percent_complete: 0, platform: null, start_date: null, due_date: null, notes: null, assigned_to: null }))
+        const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id')
+        if (inserted) setTasks(prev => [...prev, ...inserted.map((s: ManualTask) => ({ ...s }))])
+        setExpandedTasks(prev => new Set([...prev, t.id!]))
+      }
+      setEditSubtasks([]); setSubtaskInputs([])
     } else {
-      const { data } = await supabase.from('kf_tasks').insert(t).select('id').single()
-      if (data) setTasks(prev => [{ ...t, id: data.id }, ...prev])
+      const maxOrder = tasks.filter(x => !x.parent_id).reduce((m, x) => Math.max(m, x.sort_order ?? 0), 0)
+      const tWithOrder = { ...t, sort_order: maxOrder + 1 }
+      const { data } = await supabase.from('kf_tasks').insert(tWithOrder).select('id').single()
+      if (data) {
+        const newTask = { ...tWithOrder, id: data.id }
+        setTasks(prev => [...prev, newTask])
+        if (t.parent_id) setExpandedTasks(prev => new Set([...prev, t.parent_id!]))
+        // Batch insert subtasks if any were added inline
+        const validSubs = subtaskInputs.map(s => s.trim()).filter(Boolean)
+        if (!t.parent_id && validSubs.length > 0) {
+          const subRows = validSubs.map(nama => ({
+            workspace_id: workspaceId,
+            parent_id: data.id,
+            nama,
+            priority: t.priority,
+            percent_complete: 0,
+            platform: null, start_date: null, due_date: null, notes: null, assigned_to: null,
+          }))
+          const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id')
+          if (inserted) {
+            setTasks(prev => [...inserted.map((s: ManualTask) => ({ ...s })), ...prev])
+            setExpandedTasks(prev => new Set([...prev, data.id]))
+          }
+        }
+        setSubtaskInputs([])
+      }
     }
     setSavingTask(false); setTaskModal(null)
   }
@@ -821,14 +889,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setTasks(prev => prev.map(x => x.id === id ? { ...x, percent_complete: pct } : x))
   }
   async function deleteTask(id: string) {
-    if (!confirm('Hapus task ini?')) return
+    if (!window.confirm('Hapus task ini?')) return
     await supabase.from('kf_tasks').delete().eq('id', id)
     setTasks(prev => prev.filter(x => x.id !== id))
   }
 
-  const tasksTodo  = tasks.filter(t => t.percent_complete === 0)
-  const tasksDoing = tasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
-  const tasksDone  = tasks.filter(t => t.percent_complete === 100)
+  const rootTasks  = tasks.filter(t => !t.parent_id)
+  const tasksTodo  = rootTasks.filter(t => t.percent_complete === 0)
+  const tasksDoing = rootTasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
+  const tasksDone  = rootTasks.filter(t => t.percent_complete === 100)
+  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId)
 
   async function advanceTaskCol(t: ManualTask, direction: 'forward' | 'back') {
     const next = direction === 'forward'
@@ -838,6 +908,72 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setTasks(prev => prev.map(x => x.id === t.id ? { ...x, percent_complete: next } : x))
   }
 
+  function duplicateTask(t: ManualTask) {
+    const subs = getSubtasks(t.id!)
+    setSubtaskInputs(subs.map(s => s.nama))
+    setTaskModal({ open: true, task: { ...t, id: undefined, nama: t.nama + ' — Kopi', sort_order: null }, parentAssignedTo: undefined })
+  }
+
+  async function bulkDelete() {
+    const ids = [...selectedTaskIds]
+    for (const id of ids) {
+      const subs = getSubtasks(id)
+      for (const sub of subs) await supabase.from('kf_tasks').delete().eq('id', sub.id!)
+      await supabase.from('kf_tasks').delete().eq('id', id)
+    }
+    setTasks(prev => prev.filter(x => !ids.includes(x.id!) && !ids.includes(x.parent_id!)))
+    setSelectedTaskIds(new Set())
+  }
+
+  async function bulkDuplicate() {
+    const ids = [...selectedTaskIds]
+    let maxOrder = tasks.filter(x => !x.parent_id).reduce((m, x) => Math.max(m, x.sort_order ?? 0), 0)
+    for (const id of ids) {
+      const t = tasks.find(x => x.id === id)
+      if (!t) continue
+      maxOrder++
+      const copy = { workspace_id: t.workspace_id, nama: t.nama + ' — Kopi', priority: t.priority, platform: t.platform, start_date: t.start_date, due_date: t.due_date, percent_complete: t.percent_complete, notes: t.notes, assigned_to: t.assigned_to, parent_id: null, sort_order: maxOrder }
+      const { data } = await supabase.from('kf_tasks').insert(copy).select('id').single()
+      if (data) {
+        const newTask = { ...copy, id: data.id }
+        setTasks(prev => [...prev, newTask])
+        const subs = getSubtasks(id)
+        if (subs.length > 0) {
+          const subRows = subs.map(s => ({ workspace_id: workspaceId, parent_id: data.id, nama: s.nama, priority: s.priority, percent_complete: 0, platform: null, start_date: null, due_date: null, notes: null, assigned_to: null }))
+          const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id')
+          if (inserted) setTasks(prev => [...prev, ...inserted.map((s: ManualTask) => ({ ...s }))])
+        }
+      }
+    }
+    setSelectedTaskIds(new Set())
+  }
+
+  async function dropTaskToCol(taskId: string, colId: string) {
+    const t = tasks.find(x => x.id === taskId)
+    if (!t) return
+    const next = colId === 'todo' ? 0 : colId === 'doing' ? 50 : 100
+    if (t.percent_complete === next) return
+    await supabase.from('kf_tasks').update({ percent_complete: next }).eq('id', taskId)
+    setTasks(prev => prev.map(x => x.id === taskId ? { ...x, percent_complete: next } : x))
+  }
+
+  async function reorderWithinCol(dragId: string, dropId: string) {
+    if (dragId === dropId) return
+    setTasks(prev => {
+      const roots = prev.filter(t => !t.parent_id)
+      const subs = prev.filter(t => t.parent_id)
+      const dragIdx = roots.findIndex(t => t.id === dragId)
+      const dropIdx = roots.findIndex(t => t.id === dropId)
+      if (dragIdx === -1 || dropIdx === -1) return prev
+      const reordered = [...roots]
+      const [moved] = reordered.splice(dragIdx, 1)
+      reordered.splice(dropIdx, 0, moved)
+      const updated = reordered.map((t, i) => ({ ...t, sort_order: i + 1 }))
+      updated.forEach(t => { supabase.from('kf_tasks').update({ sort_order: t.sort_order }).eq('id', t.id!) })
+      return [...updated, ...subs]
+    })
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 80px)', overflow: 'hidden' }}>
@@ -845,6 +981,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
         .kf-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
         .kf-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10) !important; transform: translateY(-1px); }
         .kf-sprint-item:hover { background: #f9fafb !important; }
+        .kf-card-dragging { opacity: 0.4; transform: rotate(2deg) scale(0.98); }
+        .kf-col-dragover { background: #f0f7ff !important; outline: 2px dashed #1a73e8; outline-offset: -4px; }
       `}</style>
 
       {/* Tab bar */}
@@ -872,10 +1010,26 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>Tasks</span>
             <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 10 }}>Non-konten · beli alat, meeting, admin, dll</span>
           </div>
-          <button onClick={() => setTaskModal({ open: true, task: emptyTask() })}
-            style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
-            + Task
-          </button>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {selectedTaskIds.size > 0 && (
+              <>
+                <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{selectedTaskIds.size} dipilih</span>
+                <button onClick={bulkDuplicate} style={{ background: '#f0f7ff', border: '1px solid #bfdbfe', borderRadius: 7, padding: '6px 12px', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
+                  Duplikat
+                </button>
+                <button onClick={bulkDelete} style={{ background: '#fff0f0', border: '1px solid #fca5a5', borderRadius: 7, padding: '6px 12px', color: '#dc2626', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
+                  Hapus
+                </button>
+                <button onClick={() => setSelectedTaskIds(new Set())} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 7, padding: '6px 10px', color: '#9ca3af', fontSize: '0.72rem', cursor: 'pointer' }}>
+                  Batal
+                </button>
+              </>
+            )}
+            <button onClick={() => { setSubtaskInputs([]); setTaskModal({ open: true, task: emptyTask() }) }}
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+              + Task
+            </button>
+          </div>
         </div>
 
         {/* 3-col kanban */}
@@ -888,56 +1042,163 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <div key={col.id} style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.06)', borderTop: `3px solid ${col.accent}` }}>
               {/* Col header */}
               <div style={{ padding: '13px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{col.label}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input type="checkbox" title="Pilih semua"
+                    checked={col.items.length > 0 && col.items.every(t => selectedTaskIds.has(t.id!))}
+                    onChange={e => {
+                      setSelectedTaskIds(prev => {
+                        const next = new Set(prev)
+                        if (e.target.checked) col.items.forEach(t => next.add(t.id!))
+                        else col.items.forEach(t => next.delete(t.id!))
+                        return next
+                      })
+                    }}
+                    style={{ width: 14, height: 14, accentColor: '#1a73e8', cursor: 'pointer' }}
+                  />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{col.label}</span>
+                </div>
                 <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9ca3af', background: '#f3f4f6', borderRadius: 20, padding: '2px 9px' }}>{col.items.length}</span>
               </div>
               {/* Cards */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px 10px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div
+                style={{ flex: 1, overflowY: 'auto', padding: '0 10px 10px', display: 'flex', flexDirection: 'column', gap: 8 }}
+                className={dragOverColId === col.id ? 'kf-col-dragover' : ''}
+                onDragOver={e => { e.preventDefault(); setDragOverColId(col.id) }}
+                onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverColId(null) }}
+                onDrop={e => { e.preventDefault(); if (draggingTaskId) dropTaskToCol(draggingTaskId, col.id); setDragOverColId(null); setDraggingTaskId(null) }}
+              >
                 {col.items.length === 0 && (
                   <div style={{ textAlign: 'center', padding: '32px 12px', color: '#d1d5db', fontSize: '0.78rem' }}>Kosong</div>
                 )}
                 {col.items.map(t => {
                   const isOverdue = t.due_date && t.due_date < localToday() && col.id !== 'done'
+                  const subtasks = getSubtasks(t.id!)
+                  const subtasksDone = subtasks.filter(s => s.percent_complete === 100).length
+                  const isExpanded = expandedTasks.has(t.id!)
+                  const isDragTarget = dragOverTaskId === t.id && draggingTaskId !== t.id
                   return (
-                    <div key={t.id} className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '11px 12px', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)', opacity: col.id === 'done' ? 0.6 : 1 }}>
-                      {/* Task name */}
-                      <div style={{ fontWeight: 600, color: col.id === 'done' ? '#6b7280' : '#111827', fontSize: '0.85rem', marginBottom: 7, textDecoration: col.id === 'done' ? 'line-through' : 'none' }}>{t.nama}</div>
-                      {/* Badges */}
-                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
-                        {t.priority && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 700 }}>{t.priority}</span>}
-                        {t.assigned_to && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                          {t.assigned_to}
-                        </span>}
-                        {t.due_date && <span style={{ fontSize: '0.62rem', color: isOverdue ? '#dc2626' : '#6b7280', fontWeight: isOverdue ? 700 : 400, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                          {isOverdue && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
-                          Due {new Date(t.due_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                        </span>}
-                      </div>
-                      {t.notes && <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.notes}</div>}
-                      {/* Actions */}
-                      <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-                        {col.id !== 'done' && (
-                          <button onClick={() => advanceTaskCol(t, 'forward')}
-                            style={{ flex: 1, background: col.id === 'todo' ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)', border: `1px solid ${col.id === 'todo' ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}`, borderRadius: 6, padding: '4px 0', color: col.id === 'todo' ? '#d97706' : '#059669', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}>
-                            {col.id === 'todo' ? '▶ Mulai' : '✓ Selesai'}
-                          </button>
+                    <div key={t.id}>
+                      {/* Parent card */}
+                      <div
+                        className={`kf-card${draggingTaskId === t.id ? ' kf-card-dragging' : ''}`}
+                        draggable
+                        onDragStart={e => { setDraggingTaskId(t.id!); e.dataTransfer.effectAllowed = 'move' }}
+                        onDragEnd={() => { setDraggingTaskId(null); setDragOverColId(null); setDragOverTaskId(null) }}
+                        onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDragOverTaskId(t.id!) }}
+                        onDragLeave={() => setDragOverTaskId(null)}
+                        onDrop={e => { e.preventDefault(); e.stopPropagation(); if (draggingTaskId && draggingTaskId !== t.id!) { const dragTask = tasks.find(x => x.id === draggingTaskId); const dropTask = t; if (dragTask && dropTask && dragTask.percent_complete === dropTask.percent_complete) { reorderWithinCol(draggingTaskId, t.id!) } else { dropTaskToCol(draggingTaskId, col.id) } } setDragOverTaskId(null); setDraggingTaskId(null); setDragOverColId(null) }}
+                        style={{ background: selectedTaskIds.has(t.id!) ? '#f0f7ff' : '#fff', borderRadius: 12, padding: '11px 12px', boxShadow: isDragTarget ? '0 0 0 2px #1a73e8' : selectedTaskIds.has(t.id!) ? '0 0 0 1.5px #1a73e8' : '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)', opacity: col.id === 'done' ? 0.6 : 1, cursor: 'grab', transition: 'box-shadow 0.1s, background 0.1s' }}
+                      >
+                        {/* Task name + checkbox */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
+                          <input type="checkbox" checked={selectedTaskIds.has(t.id!)}
+                            onChange={e => { e.stopPropagation(); setSelectedTaskIds(prev => { const n = new Set(prev); e.target.checked ? n.add(t.id!) : n.delete(t.id!); return n }) }}
+                            onClick={e => e.stopPropagation()}
+                            style={{ marginTop: 3, width: 14, height: 14, accentColor: '#1a73e8', cursor: 'pointer', flexShrink: 0 }} />
+                          <div style={{ fontWeight: 600, color: col.id === 'done' ? '#6b7280' : '#111827', fontSize: '0.85rem', textDecoration: col.id === 'done' ? 'line-through' : 'none', flex: 1 }}>{t.nama}</div>
+                        </div>
+                        {/* Badges */}
+                        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
+                          {t.priority && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, color: PRIORITY_COLOR[t.priority], background: `${PRIORITY_COLOR[t.priority]}18`, fontWeight: 700 }}>{t.priority}</span>}
+                          {t.assigned_to && <span style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: 'rgba(26,115,232,0.1)', color: '#1a73e8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            {t.assigned_to}
+                          </span>}
+                          {t.due_date && <span style={{ fontSize: '0.62rem', color: isOverdue ? '#dc2626' : '#6b7280', fontWeight: isOverdue ? 700 : 400, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                            {isOverdue && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
+                            Due {new Date(t.due_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                          </span>}
+                          {/* Subtask count badge */}
+                          {subtasks.length > 0 && (
+                            <button onClick={() => setExpandedTasks(prev => { const n = new Set(prev); isExpanded ? n.delete(t.id!) : n.add(t.id!); return n })}
+                              style={{ fontSize: '0.62rem', padding: '1px 6px', borderRadius: 3, background: '#f0f7ff', color: '#1a73e8', fontWeight: 600, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points={isExpanded ? '18 15 12 9 6 15' : '6 9 12 15 18 9'}/></svg>
+                              {subtasksDone}/{subtasks.length} subtask
+                            </button>
+                          )}
+                        </div>
+                        {t.notes && <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: 8, lineHeight: 1.5, wordBreak: 'break-word' }}>{renderNotes(t.notes)}</div>}
+                        {/* Progress bar for tasks with subtasks */}
+                        {subtasks.length > 0 && (
+                          <div style={{ height: 3, background: '#f1f5f9', borderRadius: 2, marginBottom: 8, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${subtasks.length ? (subtasksDone / subtasks.length) * 100 : 0}%`, background: '#10b981', borderRadius: 2, transition: 'width 0.3s' }} />
+                          </div>
                         )}
-                        {col.id === 'done' && (
-                          <button onClick={() => advanceTaskCol(t, 'back')}
-                            style={{ flex: 1, background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 0', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer' }}>
-                            ↩ Reopen
+                        {/* Actions */}
+                        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                          {col.id !== 'done' && (() => {
+                            const hasIncompleteSubtasks = col.id === 'doing' && subtasks.length > 0 && subtasksDone < subtasks.length
+                            return (
+                              <button onClick={() => !hasIncompleteSubtasks && advanceTaskCol(t, 'forward')}
+                                disabled={hasIncompleteSubtasks}
+                                title={hasIncompleteSubtasks ? `Selesaikan dulu semua subtask (${subtasksDone}/${subtasks.length} selesai)` : undefined}
+                                style={{ flex: 1, background: col.id === 'todo' ? 'rgba(245,158,11,0.1)' : hasIncompleteSubtasks ? '#f3f4f6' : 'rgba(16,185,129,0.1)', border: `1px solid ${col.id === 'todo' ? 'rgba(245,158,11,0.3)' : hasIncompleteSubtasks ? '#e5e7eb' : 'rgba(16,185,129,0.3)'}`, borderRadius: 6, padding: '4px 0', color: col.id === 'todo' ? '#d97706' : hasIncompleteSubtasks ? '#9ca3af' : '#059669', fontSize: '0.7rem', fontWeight: 700, cursor: hasIncompleteSubtasks ? 'not-allowed' : 'pointer', opacity: hasIncompleteSubtasks ? 0.6 : 1 }}>
+                                {col.id === 'todo' ? '▶ Mulai' : hasIncompleteSubtasks ? `✓ Selesai (${subtasksDone}/${subtasks.length})` : '✓ Selesai'}
+                              </button>
+                            )
+                          })()}
+                          {col.id === 'done' && (
+                            <button onClick={() => advanceTaskCol(t, 'back')}
+                              style={{ flex: 1, background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 0', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer' }}>
+                              ↩ Reopen
+                            </button>
+                          )}
+                          <button onClick={() => setTaskModal({ open: true, task: emptyTask(t.id), parentAssignedTo: t.assigned_to })}
+                            title="Tambah subtask"
+                            style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 7px', color: '#1a73e8', fontSize: '0.7rem', cursor: 'pointer' }}>
+                            +
                           </button>
-                        )}
-                        <button onClick={() => setTaskModal({ open: true, task: { ...t } })}
-                          style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer' }}>
-                          ✎
-                        </button>
-                        <button onClick={() => deleteTask(t.id!)}
-                          style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 7px', color: '#9ca3af', fontSize: '0.7rem', cursor: 'pointer' }}>
-                          ✕
-                        </button>
+                          {t.notes && (
+                            <button onClick={() => setViewNotesTask(t)} title="Lihat catatan"
+                              style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 7px', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                          )}
+                          <button onClick={() => { setEditSubtasks(getSubtasks(t.id!).map(s => ({ id: s.id!, nama: s.nama }))); setSubtaskInputs([]); setTaskModal({ open: true, task: { ...t } }) }}
+                            style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer' }}>
+                            ✎
+                          </button>
+                          <button onClick={() => duplicateTask(t)} title="Duplikat"
+                            style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 7px', color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                          </button>
+                          <button onClick={() => deleteTask(t.id!)}
+                            style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 7px', color: '#9ca3af', fontSize: '0.7rem', cursor: 'pointer' }}>
+                            ✕
+                          </button>
+                        </div>
                       </div>
+                      {/* Subtask cards (expandable) */}
+                      {isExpanded && subtasks.length > 0 && (
+                        <div style={{ marginLeft: 16, marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4, borderLeft: '2px solid #e0e7ff', paddingLeft: 8 }}>
+                          {subtasks.map(sub => {
+                            const subDone = sub.percent_complete === 100
+                            const subOverdue = sub.due_date && sub.due_date < localToday() && !subDone
+                            return (
+                              <div key={sub.id} style={{ background: '#f8faff', borderRadius: 9, padding: '8px 10px', border: '1px solid #e0e7ff', opacity: subDone ? 0.6 : 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                  <input type="checkbox" checked={subDone} onChange={() => advanceTaskCol(sub, subDone ? 'back' : 'forward')}
+                                    style={{ width: 13, height: 13, accentColor: '#1a73e8', flexShrink: 0, cursor: 'pointer' }} />
+                                  <span style={{ fontSize: '0.78rem', fontWeight: 500, color: subDone ? '#9ca3af' : '#374151', textDecoration: subDone ? 'line-through' : 'none', flex: 1 }}>{sub.nama}</span>
+                                  <button onClick={() => setTaskModal({ open: true, task: { ...sub } })}
+                                    style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.65rem', cursor: 'pointer', padding: '0 2px' }}>✎</button>
+                                  <button onClick={() => deleteTask(sub.id!)}
+                                    style={{ background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.65rem', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                                </div>
+                                {sub.assigned_to && (
+                                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', paddingLeft: 19 }}>
+                                    <span style={{ fontSize: '0.6rem', color: '#6b7280' }}>{sub.assigned_to}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                          <button onClick={() => setTaskModal({ open: true, task: emptyTask(t.id), parentAssignedTo: t.assigned_to })}
+                            style={{ background: 'transparent', border: '1px dashed #c7d2fe', borderRadius: 7, padding: '5px 8px', color: '#818cf8', fontSize: '0.7rem', cursor: 'pointer', textAlign: 'left' }}>
+                            + Tambah subtask
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
@@ -946,17 +1207,44 @@ export default function SprintsModule({ initialSprints, initialContents, product
           ))}
         </div>
 
+        {viewNotesTask && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 101, padding: 20 }}
+            onClick={() => setViewNotesTask(null)}>
+            <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}
+              onClick={e => e.stopPropagation()}>
+              <div style={{ padding: '14px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#111827' }}>{viewNotesTask.nama}</div>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 2 }}>Catatan</div>
+                </div>
+                <button onClick={() => setViewNotesTask(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '1.1rem', padding: '2px 6px' }}>✕</button>
+              </div>
+              <div style={{ padding: '16px 20px', maxHeight: '60vh', overflowY: 'auto' }}>
+                <div style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {renderNotes(viewNotesTask.notes!)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 18, width: '100%', maxWidth: 440 }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ fontWeight: 700, color: '#111827' }}>{taskModal.task.id ? 'Edit Task' : '+ Task Baru'}</div>
-                <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#111827' }}>{taskModal.task.id ? 'Edit Task' : taskModal.task.parent_id ? '+ Subtask Baru' : subtaskInputs.length > 0 && !taskModal.task.parent_id ? 'Duplikat Task' : '+ Task Baru'}</div>
+                  {taskModal.task.parent_id && (
+                    <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>
+                      Subtask dari: <span style={{ color: '#1a73e8', fontWeight: 600 }}>{tasks.find(t => t.id === taskModal.task.parent_id)?.nama || '—'}</span>
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => { setTaskModal(null); setSubtaskInputs([]); setEditSubtasks([]) }} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
               </div>
               <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Nama Task *</label>
-                  <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder="cth: Beli tripod, Perpanjang domain..." />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Nama {taskModal.task.parent_id ? 'Subtask' : 'Task'} *</label>
+                  <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder={taskModal.task.parent_id ? 'cth: Pelajari Figma, Riset referensi...' : 'cth: Beli tripod, Perpanjang domain...'} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
@@ -965,16 +1253,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Deadline</label>
-                    <input type="date" style={fieldStyle()} value={taskModal.task.due_date ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, due_date: e.target.value } } : m)} />
-                  </div>
+                  {!taskModal.task.parent_id && (
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Deadline</label>
+                      <input type="date" style={fieldStyle()} value={taskModal.task.due_date ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, due_date: e.target.value } } : m)} />
+                    </div>
+                  )}
                 </div>
                 {workspaceMembers.length > 0 && (
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Assign ke</label>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>
+                      Assign ke
+                      {taskModal.task.parent_id && taskModal.parentAssignedTo && (
+                        <span style={{ marginLeft: 6, fontSize: '0.65rem', color: '#9ca3af', fontWeight: 400 }}>
+                          (kosongkan = ikut task utama: {taskModal.parentAssignedTo})
+                        </span>
+                      )}
+                    </label>
                     <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={taskModal.task.assigned_to ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, assigned_to: e.target.value || null } } : m)}>
-                      <option value="">— Pilih anggota —</option>
+                      <option value="">{taskModal.task.parent_id ? '— Ikut task utama —' : '— Pilih anggota —'}</option>
                       {workspaceMembers.map(m => (
                         <option key={m.id} value={m.nama || m.email}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
                       ))}
@@ -985,8 +1282,48 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Catatan</label>
                   <input style={fieldStyle()} value={taskModal.task.notes ?? ''} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, notes: e.target.value } } : m)} placeholder="Detail..." />
                 </div>
+                {!taskModal.task.parent_id && (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <label style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 600 }}>Subtask</label>
+                      <button type="button" onClick={() => setSubtaskInputs(prev => [...prev, ''])}
+                        style={{ fontSize: '0.72rem', color: '#1a73e8', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                        + Tambah subtask
+                      </button>
+                    </div>
+                    {/* Existing subtasks (edit mode) */}
+                    {editSubtasks.map((sub, idx) => (
+                      <div key={sub.id} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+                        <input
+                          style={{ ...fieldStyle(), flex: 1 }}
+                          value={sub.nama}
+                          onChange={e => setEditSubtasks(prev => prev.map((s, i) => i === idx ? { ...s, nama: e.target.value } : s))}
+                          placeholder={`Subtask ${idx + 1}...`}
+                        />
+                        <button type="button" onClick={async () => { await deleteTask(sub.id); setEditSubtasks(prev => prev.filter((_, i) => i !== idx)) }}
+                          style={{ background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '1rem', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+                      </div>
+                    ))}
+                    {/* New subtask inputs */}
+                    {subtaskInputs.map((val, idx) => (
+                      <div key={`new-${idx}`} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+                        <input
+                          style={{ ...fieldStyle(), flex: 1 }}
+                          value={val}
+                          onChange={e => setSubtaskInputs(prev => prev.map((s, i) => i === idx ? e.target.value : s))}
+                          placeholder={`Subtask baru ${editSubtasks.length + idx + 1}...`}
+                        />
+                        <button type="button" onClick={() => setSubtaskInputs(prev => prev.filter((_, i) => i !== idx))}
+                          style={{ background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '1rem', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+                      </div>
+                    ))}
+                    {editSubtasks.length === 0 && subtaskInputs.length === 0 && (
+                      <div style={{ fontSize: '0.72rem', color: '#d1d5db', fontStyle: 'italic' }}>Belum ada subtask. Klik &quot;+ Tambah subtask&quot; untuk mulai.</div>
+                    )}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                  <button onClick={() => setTaskModal(null)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                  <button onClick={() => { setTaskModal(null); setSubtaskInputs([]); setEditSubtasks([]) }} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                   <button onClick={saveTask} disabled={savingTask} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
                     {savingTask ? 'Menyimpan...' : taskModal.task.id ? 'Update' : 'Simpan'}
                   </button>

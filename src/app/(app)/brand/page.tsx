@@ -20,9 +20,15 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
   const modes = brandType === 'affiliate' ? ['affiliate'] : brandType === 'business' ? ['business'] : ['creator']
   const { setup } = await searchParams
 
+  const brandActuallyIncomplete = brandType === 'business'
+    ? (!(profile as unknown as Record<string, string>)?.biz_nama_brand && !(profile as unknown as Record<string, string>)?.biz_kategori)
+    : brandType === 'affiliate'
+    ? !profile?.affiliate_micro_niche
+    : !profile?.niche && !profile?.affiliate_micro_niche
+
   return (
     <>
-      {setup === '1' && (
+      {setup === '1' && brandActuallyIncomplete && (
         <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '12px 18px', margin: '16px 0 0', display: 'flex', alignItems: 'center', gap: 10 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           <span style={{ fontSize: '0.875rem', color: '#92400e', fontWeight: 600 }}>

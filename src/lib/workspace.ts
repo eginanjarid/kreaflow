@@ -52,13 +52,15 @@ export async function getWorkspaceWithPlanGuard() {
 export async function getWorkspaceWithBrandGuard() {
   const { supabase, user, wsId } = await getWorkspaceWithPlanGuard()
 
-  const { data: brand } = await supabase
-    .from('kf_brand_profiles')
-    .select('niche, affiliate_micro_niche')
-    .eq('workspace_id', wsId)
-    .maybeSingle()
+  const [{ data: wsInfo }, { data: brand }] = await Promise.all([
+    supabase.from('kf_workspaces').select('brand_type').eq('id', wsId).maybeSingle(),
+    supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche, biz_nama_brand, biz_kategori').eq('workspace_id', wsId).maybeSingle(),
+  ])
 
-  if (!brand?.niche && !brand?.affiliate_micro_niche) redirect('/brand?setup=1')
+  const brandIncomplete = wsInfo?.brand_type === 'business'
+    ? (!brand?.biz_nama_brand && !brand?.biz_kategori)
+    : (!brand?.niche && !brand?.affiliate_micro_niche)
+  if (brandIncomplete) redirect('/brand?setup=1')
 
   return { supabase, user, wsId }
 }

@@ -132,7 +132,11 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
   const [promptCopied, setPromptCopied] = useState(false)
   const [savedToLibrary, setSavedToLibrary] = useState(false)
   const [generatedNaskah, setGeneratedNaskah] = useState('')
-  const naskahRef = useRef<HTMLTextAreaElement>(null)
+  const naskahRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!naskahRef.current) return
+    if (naskahRef.current.innerText !== generatedNaskah) naskahRef.current.innerText = generatedNaskah
+  }, [generatedNaskah])
 
   // Affiliate naskah state
   const emptyAffNaskah: AffNaskahForm = {
@@ -167,6 +171,9 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     platform: string; tipe: string; mode: 'affiliate' | 'creator'
   } | null>(null)
   const [sprintLinkSaving, setSprintLinkSaving] = useState(false)
+
+  // Warn user when saving without an active queue item
+  const [saveWithoutQueueModal, setSaveWithoutQueueModal] = useState<'creator' | 'affiliate' | null>(null)
 
   function setNF(key: keyof NaskahForm, val: string) { setNaskahForm(f => ({ ...f, [key]: val })) }
   function setAFF(key: keyof AffNaskahForm, val: string) { setAffForm(f => ({ ...f, [key]: val })) }
@@ -525,22 +532,52 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
   async function saveAffToLibrary() {
     if (!affNaskah.trim()) return
     setAffSavedToLibrary(false)
+    const supabase = createClient()
     const selectedProduct = products.find(p => p.id === affForm.product_id)
+    if (!activeQueueId && localQueue.length > 0) {
+      setSaveWithoutQueueModal('affiliate')
+      return
+    }
+    if (activeQueueId) {
+      const activeItem = localQueue.find(q => q.id === activeQueueId)
+      const judulAktif = activeItem?.judul || `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform}`
+      await supabase.from('kf_content_ideas').update({ script: affNaskah, status: 'Naskah Siap', judul: judulAktif }).eq('id', activeQueueId)
+      await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
+      removeFromQueue(activeQueueId)
+      setAffSavedToLibrary(true)
+      setTimeout(() => setAffSavedToLibrary(false), 3000)
+      return
+    }
     const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
-    const activeItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId) : null
     const matchingDraft = affForm.product_id ? sprintDrafts.find(d => d.product_id === affForm.product_id) : null
     if (matchingDraft) {
       setSprintLinkModal({ draft: matchingDraft, naskah: affNaskah, judul, productId: affForm.product_id, platform: affForm.platform, tipe: affForm.tipe_konten, mode: 'affiliate' })
       return
     }
-    await _doInsertNaskah(affNaskah, judul, affForm.product_id, affForm.platform, affForm.tipe_konten, 'affiliate', activeItem?.tanggal_tayang, activeItem?.jam_tayang)
+    await _doInsertNaskah(affNaskah, judul, affForm.product_id, affForm.platform, affForm.tipe_konten, 'affiliate', null, null)
   }
 
   async function saveToLibrary() {
     if (!generatedNaskah.trim()) return
     setSavedToLibrary(false)
+    const supabase = createClient()
+    // Warn user if they try to save without selecting a queue item
+    if (!activeQueueId && localQueue.length > 0) {
+      setSaveWithoutQueueModal('creator')
+      return
+    }
+    // If user is working on a specific queue item, always update that item directly
+    if (activeQueueId) {
+      const activeItem = localQueue.find(q => q.id === activeQueueId)
+      const judulAktif = activeItem?.judul || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten}`
+      await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: 'Naskah Siap', judul: judulAktif }).eq('id', activeQueueId)
+      await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
+      removeFromQueue(activeQueueId)
+      setSavedToLibrary(true)
+      setTimeout(() => setSavedToLibrary(false), 3000)
+      return
+    }
     const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
-    const activeItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId) : null
     const matchingDraft = naskahForm.product_id
       ? sprintDrafts.find(d => d.product_id === naskahForm.product_id)
       : naskahForm.pillar
@@ -550,7 +587,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       setSprintLinkModal({ draft: matchingDraft, naskah: generatedNaskah, judul, productId: naskahForm.product_id, platform: naskahForm.platform, tipe: naskahForm.tipe_konten, mode: 'creator' })
       return
     }
-    await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator', activeItem?.tanggal_tayang, activeItem?.jam_tayang)
+    await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator', null, null)
   }
 
   async function confirmSprintUpdate() {
@@ -583,6 +620,26 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     await _doInsertNaskah(naskah, judul, productId, platform, tipe, mode, activeItem?.tanggal_tayang, activeItem?.jam_tayang)
   }
 
+  async function forceSaveWithoutQueue() {
+    const mode = saveWithoutQueueModal!
+    setSaveWithoutQueueModal(null)
+    if (mode === 'creator') {
+      const supabase = createClient()
+      const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
+      await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator', null, null)
+    } else {
+      const supabase = createClient()
+      const selectedProduct = products.find(p => p.id === affForm.product_id)
+      const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
+      const matchingDraft = affForm.product_id ? sprintDrafts.find(d => d.product_id === affForm.product_id) : null
+      if (matchingDraft) {
+        setSprintLinkModal({ draft: matchingDraft, naskah: affNaskah, judul, productId: affForm.product_id, platform: affForm.platform, tipe: affForm.tipe_konten, mode: 'affiliate' })
+        return
+      }
+      await _doInsertNaskah(affNaskah, judul, affForm.product_id, affForm.platform, affForm.tipe_konten, 'affiliate', null, null)
+    }
+  }
+
   function copyPrompt(prompt: string) {
     navigator.clipboard.writeText(prompt)
     setPromptCopied(true)
@@ -612,69 +669,100 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* ── Naskah Generator ── */}
       {tab === 'naskah' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {!brandProfile?.niche && !brandProfile?.affiliate_micro_niche && (
+          {!brandProfile && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#d97706' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Lengkapi modul <a href="/brand" style={{ color: '#d97706', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
             </div>
           )}
 
           {/* ── Antrian Naskah ── */}
-          {localQueue.length > 0 && (
-            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>Antrian Naskah</span>
-                  <span style={{ background: '#1a73e8', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{localQueue.length}</span>
+          {localQueue.length > 0 && (() => {
+            const DAY_COLORS = ['#1a73e8', '#7c3aed', '#059669', '#d97706', '#0891b2', '#db2777', '#dc2626']
+            const sortedDates = [...new Set(localQueue.map(i => i.tanggal_tayang || '__no_date__'))].sort()
+            const dateColorMap = new Map(sortedDates.map((d, i) => [d, DAY_COLORS[i % DAY_COLORS.length]]))
+            const sortedQueue = [...localQueue].sort((a, b) => {
+              const da = a.tanggal_tayang || '9999', db = b.tanggal_tayang || '9999'
+              return da !== db ? da.localeCompare(db) : (a.jam_tayang || '').localeCompare(b.jam_tayang || '')
+            })
+            return (
+              <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f3f4f6', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>Antrian Naskah</span>
+                    <span style={{ background: '#1a73e8', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px', minWidth: 18, textAlign: 'center' }}>{localQueue.length}</span>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk isi form otomatis</span>
                 </div>
-                <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk isi form otomatis</span>
-              </div>
-              <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-                {localQueue.map(item => {
-                  const isRevisi = item.status === 'Revisi'
-                  const isActive = activeQueueId === item.id
-                  const parts = item.judul.split(' — ')
-                  const pillarName = parts[0]
-                  const contentLabel = parts[1] || null
-                  return (
-                    <button key={item.id} type="button" onClick={() => selectQueueItem(item)}
-                      style={{ flexShrink: 0, width: 180, textAlign: 'left', background: isActive ? (isRevisi ? 'rgba(220,38,38,0.06)' : 'rgba(26,115,232,0.06)') : '#f9fafb', border: `1.5px solid ${isActive ? (isRevisi ? '#dc2626' : '#1a73e8') : '#f3f4f6'}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-                        <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: isRevisi ? 'rgba(220,38,38,0.1)' : 'rgba(26,115,232,0.1)', color: isRevisi ? '#dc2626' : '#1a73e8' }}>
-                          {isRevisi ? 'REVISI' : 'DRAFT'}
-                        </span>
-                        {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
+                <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+                  {sortedQueue.map((item, idx) => {
+                    const dayKey = item.tanggal_tayang || '__no_date__'
+                    const dayColor = dateColorMap.get(dayKey) || '#1a73e8'
+                    const isRevisi = item.status === 'Revisi'
+                    const isActive = activeQueueId === item.id
+                    const accent = isRevisi ? '#dc2626' : dayColor
+                    const parts = item.judul.split(' — ')
+                    const pillarName = parts[0]
+                    const contentLabel = parts[1] || null
+                    const prevKey = idx > 0 ? (sortedQueue[idx - 1].tanggal_tayang || '__no_date__') : null
+                    const isNewDay = prevKey !== dayKey
+                    const dayLabel = dayKey === '__no_date__' ? 'Tanpa Tanggal'
+                      : new Date(dayKey + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })
+                    return (
+                      <div key={item.id} style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+                        {isNewDay && (
+                          <div style={{ flexShrink: 0, width: 72, borderRadius: 12, background: dayColor + '12', border: `1.5px solid ${dayColor}30`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 6px', gap: 4 }}>
+                            <div style={{ fontSize: '0.58rem', fontWeight: 700, color: dayColor, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center', lineHeight: 1.3 }}>
+                              {new Date(dayKey + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'short' })}
+                            </div>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: dayColor, lineHeight: 1 }}>
+                              {new Date(dayKey + 'T00:00:00').getDate()}
+                            </div>
+                            <div style={{ fontSize: '0.58rem', fontWeight: 600, color: dayColor + 'cc', textAlign: 'center', lineHeight: 1.3 }}>
+                              {new Date(dayKey + 'T00:00:00').toLocaleDateString('id-ID', { month: 'short' })}
+                            </div>
+                          </div>
+                        )}
+                      <button type="button" onClick={() => selectQueueItem(item)}
+                        style={{ flexShrink: 0, width: 180, textAlign: 'left', background: isActive ? accent + '10' : '#f9fafb', border: `1.5px solid ${isActive ? accent : '#f0f0f0'}`, borderTop: `3px solid ${accent}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                          <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: accent + '18', color: accent }}>
+                            {isRevisi ? 'REVISI' : 'DRAFT'}
+                          </span>
+                          {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
+                        </div>
+                        <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.8rem', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
+                          {pillarName}
+                        </div>
+                        {contentLabel && (
+                          <div style={{ fontSize: '0.72rem', color: accent, fontWeight: 600, marginBottom: 3 }}>
+                            {contentLabel}
+                          </div>
+                        )}
+                        {item.tanggal_tayang && (
+                          <div style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 600, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <span>{new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}</span>
+                          </div>
+                        )}
+                        {item.sprint_nama && (
+                          <div style={{ fontSize: '0.65rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {item.sprint_nama}
+                          </div>
+                        )}
+                        {item.assigned_naskah && (
+                          <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 4, display: 'flex', alignItems: 'center', gap: 3 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.assigned_naskah}</span>
+                          </div>
+                        )}
+                      </button>
                       </div>
-                      <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.8rem', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
-                        {pillarName}
-                      </div>
-                      {contentLabel && (
-                        <div style={{ fontSize: '0.72rem', color: '#1a73e8', fontWeight: 600, marginBottom: 3 }}>
-                          {contentLabel}
-                        </div>
-                      )}
-                      {item.tanggal_tayang && (
-                        <div style={{ fontSize: '0.65rem', color: '#059669', fontWeight: 600, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                          <span>{new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}</span>
-                        </div>
-                      )}
-                      {item.sprint_nama && (
-                        <div style={{ fontSize: '0.65rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {item.sprint_nama}
-                        </div>
-                      )}
-                      {item.assigned_naskah && (
-                        <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 4, display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.assigned_naskah}</span>
-                        </div>
-                      )}
-                    </button>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
 
           {/* ── Empty state ── */}
           {localQueue.length === 0 ? (
@@ -894,12 +982,47 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     </button>
                   )}
                 </div>
-                <textarea
+                {/* Formatting toolbar */}
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', padding: '6px 8px', background: '#f9fafb', borderRadius: 8, border: '1px solid #f0f0f0' }}>
+                  {([
+                    { label: 'B', cmd: 'bold', style: { fontWeight: 800 }, title: 'Bold (Ctrl+B)' },
+                    { label: 'I', cmd: 'italic', style: { fontStyle: 'italic' }, title: 'Italic (Ctrl+I)' },
+                    { label: 'U', cmd: 'underline', style: { textDecoration: 'underline' }, title: 'Underline (Ctrl+U)' },
+                    { label: 'S', cmd: 'strikeThrough', style: { textDecoration: 'line-through' }, title: 'Strikethrough' },
+                  ] as { label: string; cmd: string; style: React.CSSProperties; title: string }[]).map(btn => (
+                    <button key={btn.cmd} type="button" title={btn.title}
+                      onMouseDown={e => { e.preventDefault(); document.execCommand(btn.cmd) }}
+                      style={{ ...btn.style, background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 5, padding: '2px 9px', fontSize: '0.78rem', cursor: 'pointer', color: '#374151' }}>
+                      {btn.label}
+                    </button>
+                  ))}
+                  <div style={{ width: 1, background: '#e5e7eb', margin: '2px 4px' }} />
+                  {([
+                    { label: 'H1', cmd: 'formatBlock', val: 'h2', title: 'Heading' },
+                    { label: '•', cmd: 'insertUnorderedList', val: undefined, title: 'Bullet list' },
+                    { label: '1.', cmd: 'insertOrderedList', val: undefined, title: 'Numbered list' },
+                  ] as { label: string; cmd: string; val?: string; title: string }[]).map(btn => (
+                    <button key={btn.cmd + btn.label} type="button" title={btn.title}
+                      onMouseDown={e => { e.preventDefault(); document.execCommand(btn.cmd, false, btn.val) }}
+                      style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 5, padding: '2px 9px', fontSize: '0.78rem', cursor: 'pointer', color: '#374151', fontWeight: 600 }}>
+                      {btn.label}
+                    </button>
+                  ))}
+                  <div style={{ width: 1, background: '#e5e7eb', margin: '2px 4px' }} />
+                  <button type="button" title="Hapus format" onMouseDown={e => { e.preventDefault(); document.execCommand('removeFormat') }}
+                    style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 5, padding: '2px 9px', fontSize: '0.72rem', cursor: 'pointer', color: '#9ca3af' }}>
+                    T×
+                  </button>
+                </div>
+                <style>{`.naskah-editor:empty:before { content: attr(data-placeholder); color: #9ca3af; pointer-events: none; } .naskah-editor h2 { font-size: 1rem; font-weight: 700; margin: 4px 0; } .naskah-editor ul { padding-left: 18px; } .naskah-editor ol { padding-left: 18px; }`}</style>
+                <div
                   ref={naskahRef}
-                  style={fieldStyle({ flex: 1, minHeight: 480, resize: 'none', fontSize: '0.82rem', lineHeight: '1.7', fontFamily: 'inherit' })}
-                  value={generatedNaskah}
-                  onChange={e => setGeneratedNaskah(e.target.value)}
-                  placeholder={'Klik "Generate Naskah dengan AI" → pilih AI favorit → paste hasilnya di sini.\n\nAtau ketik langsung jika sudah punya drafnya.'}
+                  contentEditable
+                  suppressContentEditableWarning
+                  className="naskah-editor"
+                  data-placeholder={'Klik "Generate Naskah dengan AI" → paste hasilnya di sini.\n\nAtau ketik langsung jika sudah punya drafnya.'}
+                  onInput={e => setGeneratedNaskah((e.currentTarget as HTMLDivElement).innerText)}
+                  style={{ flex: 1, minHeight: 480, fontSize: '0.82rem', lineHeight: '1.7', fontFamily: 'inherit', outline: 'none', border: '1.5px solid #e5eaf2', borderRadius: 10, padding: '10px 14px', color: '#111827', overflowY: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word', background: '#fff' }}
                 />
                 {generatedNaskah && (
                   <div style={{ fontSize: '0.7rem', color: '#6b7280' }}>{generatedNaskah.length} karakter · {generatedNaskah.split(/\s+/).filter(Boolean).length} kata</div>
@@ -1330,6 +1453,31 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       )}
 
       {/* ── Sprint Link Modal ── */}
+      {saveWithoutQueueModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: 28, maxWidth: 400, width: '100%' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111827', marginBottom: 8 }}>Belum ada item antrian yang dipilih</div>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: 6, lineHeight: 1.6 }}>
+              Masih ada <strong style={{ color: '#111827' }}>{localQueue.length} item di antrian naskah</strong> yang belum selesai.
+            </p>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: 20, lineHeight: 1.6 }}>
+              Klik <strong>Batal</strong> dan pilih dulu kartu dari antrian di atas, baru simpan — agar naskah ter-link ke konten yang benar.<br /><br />
+              Atau klik <strong>Simpan Baru</strong> untuk buat konten baru terpisah (tidak update item antrian yang ada).
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button onClick={() => setSaveWithoutQueueModal(null)}
+                style={{ background: '#1a73e8', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '12px 0', cursor: 'pointer' }}>
+                Batal — Pilih item antrian dulu
+              </button>
+              <button onClick={forceSaveWithoutQueue}
+                style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 10, color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', padding: '10px 0', fontWeight: 500 }}>
+                Simpan Baru (konten terpisah)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {sprintLinkModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 28, maxWidth: 420, width: '100%' }}>

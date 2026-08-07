@@ -71,9 +71,11 @@ Setup identitas workspace sekali. AI-powered. Mode tab ditentukan oleh `kf_works
 - Tab "Akun Sosial": daftarkan akun sosmed (platform + handle + nama label), max 10 per workspace
 - `kf_brand_profiles` + `kf_accounts`
 - New DB columns (Agustus 2026): `affiliate_micro_niche text`, `affiliate_competitive_edge text`
-- **Feature gating**: Brand wajib diisi (minimal `niche`/`affiliate_micro_niche`) sebelum bisa akses Sprint/Plan/Studio/Calendar
+- **Feature gating**: Brand wajib diisi (minimal field utama sesuai brand_type) sebelum bisa akses Sprint/Plan/Studio/Calendar
   - Redirect ke `/brand?setup=1` dengan banner peringatan jika belum isi
   - Gate dilakukan di server component masing-masing halaman
+  - **CRITICAL**: Cek completeness per brand_type — `business` pakai `biz_nama_brand`/`biz_kategori`, `affiliate` pakai `affiliate_micro_niche`, `creator` pakai `niche`/`affiliate_micro_niche`. JANGAN cuma cek `niche && affiliate_micro_niche` untuk semua type → business brand selalu null di kedua field itu.
+  - Pattern: `const brandIncomplete = brand_type === 'business' ? (!biz_nama_brand && !biz_kategori) : (!niche && !affiliate_micro_niche)`
 - **Multi-workspace isolation fix**: Sidebar badge + Topbar notifications filter by `workspace_id` (bug: sebelumnya tampil data semua workspace)
 - **`/upgrade` redirect loop fix**: hanya redirect ke `/sprints` jika active workspace (cookie) juga lifetime
 - **SaveButton UX**: `tabHasContent()` per-tab check field isi → button "✓ Tersimpan" akurat per tab, persists on reload

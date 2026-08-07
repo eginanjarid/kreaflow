@@ -17,7 +17,7 @@ export default async function PlanPage() {
     { count: productCount },
   ] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
-    supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars,affiliate_micro_niche').eq('workspace_id', wsId).maybeSingle(),
+    supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars,affiliate_micro_niche,biz_nama_brand,biz_kategori').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,kf_sprints(nama)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
@@ -26,7 +26,8 @@ export default async function PlanPage() {
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
-  if (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
+  const brandIncomplete = wsData?.brand_type === 'business' ? (!brandProfile?.biz_nama_brand && !brandProfile?.biz_kategori) : (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche)
+  if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
   if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')
 
   const brandType = (wsData?.brand_type as string | null) ?? 'creator'
