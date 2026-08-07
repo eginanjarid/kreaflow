@@ -409,34 +409,39 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
   const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
 
   return (
-    <div onClick={onClick} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.15s', display: 'flex', flexDirection: 'column' }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(26,115,232,0.15)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)')}>
-      <div style={{ aspectRatio: '16/9', background: '#fff', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
-        {thumb ? <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={item} />}
-        <div style={{ position: 'absolute', top: 8, right: 8, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: stageColor[stage], padding: '2px 8px', borderRadius: 4 }}>{stageLabel[stage]}</div>
-      </div>
-      <div style={{ padding: '12px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#111827', lineHeight: 1.3 }}>{item.judul || '(Tanpa judul)'}</div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {product && <span style={{ fontSize: '0.68rem', color: '#1a73e8', background: 'rgba(26,115,232,0.12)', padding: '2px 6px', borderRadius: 3 }}>{product.nama}</span>}
-          {item.format && <span style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 6px', borderRadius: 3 }}>{item.format}</span>}
-          {(item.platform || []).slice(0, 2).map(p => <span key={p} style={{ fontSize: '0.68rem', color: '#6b7280', background: '#f3f4f6', padding: '2px 6px', borderRadius: 3 }}>{p}</span>)}
+    <div onClick={onClick}
+      style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)', borderRadius: 14, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.15s', display: 'flex', flexDirection: 'column', borderTop: thumb ? 'none' : `3px solid ${stageColor[stage]}` }}
+      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(26,115,232,0.14)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)')}>
+      {thumb && (
+        <div style={{ height: 96, position: 'relative', overflow: 'hidden', flexShrink: 0, background: '#f3f4f6' }}>
+          <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).closest('div')!.style.display = 'none' }} />
+          <div style={{ position: 'absolute', top: 6, right: 6, fontSize: '0.62rem', fontWeight: 700, color: '#fff', background: stageColor[stage], padding: '2px 7px', borderRadius: 4 }}>{stageLabel[stage]}</div>
         </div>
-        {item.hook && <div style={{ fontSize: '0.78rem', color: '#6b7280', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{item.hook}</div>}
-        <div style={{ marginTop: 'auto', paddingTop: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      )}
+      <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+        {!thumb && (
+          <span style={{ fontSize: '0.62rem', fontWeight: 700, color: stageColor[stage], background: stageColor[stage] + '18', padding: '2px 7px', borderRadius: 4, alignSelf: 'flex-start' }}>{stageLabel[stage]}</span>
+        )}
+        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#111827', lineHeight: 1.3 }}>{item.judul || '(Tanpa judul)'}</div>
+        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+          {product && <span style={{ fontSize: '0.64rem', color: '#1a73e8', background: 'rgba(26,115,232,0.10)', padding: '1px 5px', borderRadius: 3 }}>{product.nama}</span>}
+          {item.format && <span style={{ fontSize: '0.64rem', color: '#6b7280', background: '#f3f4f6', padding: '1px 5px', borderRadius: 3 }}>{item.format}</span>}
+          {(item.platform || []).slice(0, 2).map(p => <span key={p} style={{ fontSize: '0.64rem', color: '#6b7280', background: '#f3f4f6', padding: '1px 5px', borderRadius: 3 }}>{p}</span>)}
+        </div>
+        <div style={{ marginTop: 'auto', paddingTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {item.tanggal_tayang ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span style={{ fontSize: '0.68rem', color: '#fb923c', fontWeight: 600 }}>
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span style={{ fontSize: '0.67rem', color: '#fb923c', fontWeight: 600 }}>
                 {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}
               </span>
             </div>
           ) : (
-            <span style={{ fontSize: '0.68rem', color: '#9ca3af' }}>Belum dijadwalkan</span>
+            <span style={{ fontSize: '0.67rem', color: '#d1d5db' }}>Belum dijadwalkan</span>
           )}
-          {item.sprint_nama && <span style={{ fontSize: '0.65rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.sprint_nama}</span>}
+          {item.sprint_nama && <span style={{ fontSize: '0.62rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.sprint_nama}</span>}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '0.7rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
+            <span style={{ fontSize: '0.67rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
           </div>
         </div>
       </div>
@@ -624,7 +629,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                       <div style={{ flex: 1, height: 1.5, background: `linear-gradient(90deg, ${color}30, transparent)`, borderRadius: 1 }} />
                       <span style={{ fontSize: '0.72rem', color, fontWeight: 600 }}>{group.items.length} konten</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
                       {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
                     </div>
                   </div>
@@ -633,7 +638,7 @@ export default function StudioModule({ initialContents, products, initialNotific
             </div>
           )
         })() : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
             {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
           </div>
         )
