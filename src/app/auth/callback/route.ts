@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   if (code) {
     const response = NextResponse.redirect(new URL(next, appUrl))
     const supabase = createServerClient(
-      process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
