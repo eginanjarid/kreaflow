@@ -30,7 +30,8 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname === '/privacy' ||
     request.nextUrl.pathname === '/terms' ||
     request.nextUrl.pathname === '/payment/success' ||
-    request.nextUrl.pathname.startsWith('/invite')
+    request.nextUrl.pathname.startsWith('/invite') ||
+    request.nextUrl.pathname.startsWith('/auth/callback')
 
   if (!user && !isAuthRoute && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
