@@ -1464,11 +1464,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </div>
 
               {/* 3-Column Kanban */}
-              <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
+              <div style={{ flex: 1, minHeight: 0, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
                 {BOARD_COLS.map(col => {
                   const items = colItems(col.id)
                   return (
-                    <div key={col.id} style={{ flex: 1, minWidth: 280, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.06)', borderTop: `3px solid ${col.accentColor}` }}>
+                    <div key={col.id} style={{ flex: 1, minWidth: 280, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.06)', borderTop: `3px solid ${col.accentColor}` }}>
                       {/* Column header */}
                       <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{col.label}</span>
