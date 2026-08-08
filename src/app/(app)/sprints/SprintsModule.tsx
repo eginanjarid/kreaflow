@@ -1229,8 +1229,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
         )}
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
-            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 18, width: '100%', maxWidth: 440 }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 18, width: '100%', maxWidth: 440, maxHeight: 'calc(100vh - 40px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
                 <div>
                   <div style={{ fontWeight: 700, color: '#111827' }}>{taskModal.task.id ? 'Edit Task' : taskModal.task.parent_id ? '+ Subtask Baru' : subtaskInputs.length > 0 && !taskModal.task.parent_id ? 'Duplikat Task' : '+ Task Baru'}</div>
                   {taskModal.task.parent_id && (
@@ -1241,7 +1241,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </div>
                 <button onClick={() => { setTaskModal(null); setSubtaskInputs([]); setEditSubtasks([]) }} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
               </div>
-              <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', flex: 1 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Nama {taskModal.task.parent_id ? 'Subtask' : 'Task'} *</label>
                   <input style={fieldStyle()} value={taskModal.task.nama} onChange={e => setTaskModal(m => m ? { ...m, task: { ...m.task, nama: e.target.value } } : m)} placeholder={taskModal.task.parent_id ? 'cth: Pelajari Figma, Riset referensi...' : 'cth: Beli tripod, Perpanjang domain...'} />
