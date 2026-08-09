@@ -21,12 +21,17 @@ export default function LoginPage() {
   const [redirectTo, setRedirectTo] = useState('/sprints')
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
+  const [authError, setAuthError] = useState('')
+
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
     const em = p.get('email') || ''
     const redirect = p.get('redirect') || '/sprints'
     if (em) setEmail(em)
     setRedirectTo(redirect)
+    if (p.get('error') === 'auth') {
+      setAuthError('Link masuk sudah expired atau sudah dipakai. Minta link baru di bawah.')
+    }
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -120,6 +125,11 @@ export default function LoginPage() {
       <div style={{ background: '#fff', borderRadius: 20, padding: '28px 28px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 8px 32px rgba(0,0,0,0.08)' }}>
         {!sent ? (
           <>
+            {authError && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 9, padding: '10px 14px', color: '#92400e', fontSize: '0.83rem', marginBottom: 20, fontWeight: 500 }}>
+                ⚠️ {authError}
+              </div>
+            )}
             {error && (
               <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '10px 14px', color: '#dc2626', fontSize: '0.83rem', marginBottom: 20, fontWeight: 500 }}>
                 {error}
