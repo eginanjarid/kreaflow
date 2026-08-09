@@ -7,10 +7,11 @@ export default async function DashboardPage() {
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'insights')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }) // YYYY-MM-DD in WIB
 
-  const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
-  const sevenDaysAgoStr = sevenDaysAgo.toISOString().slice(0, 10)
+  const sevenDaysAgoDate = new Date()
+  sevenDaysAgoDate.setDate(sevenDaysAgoDate.getDate() - 6)
+  const sevenDaysAgoStr = sevenDaysAgoDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
 
   const [
     { data: wsData },
@@ -85,7 +86,7 @@ export default async function DashboardPage() {
   const tayangCount = allIdeas.filter(c => c.status === 'Tayang' || c.status === 'Posted').length
   const produkAktif = (products || []).filter(p => p.is_active).length
 
-  const hora = new Date().getHours()
+  const hora = parseInt(new Date().toLocaleTimeString('en-US', { hour: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' }), 10)
   const greeting = hora < 12 ? 'Selamat pagi' : hora < 17 ? 'Selamat siang' : 'Selamat malam'
 
   const PLATFORM_COLORS: Record<string, string> = {
@@ -151,7 +152,7 @@ export default async function DashboardPage() {
             {greeting}, {workspaceName}
           </div>
           <div style={{ fontSize: '0.82rem', color: '#6b7280', marginTop: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>{new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <span>{new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}</span>
             {(overdueTasks?.length ?? 0) > 0 && (
               <span style={{ background: '#fef2f2', color: '#dc2626', fontWeight: 700, padding: '1px 8px', borderRadius: 20, fontSize: '0.7rem' }}>
                 {overdueTasks!.length} overdue
