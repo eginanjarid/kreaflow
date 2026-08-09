@@ -93,7 +93,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
-type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null; naskah_days_before: number | null }
 
 export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
   workspaceId: string
@@ -707,6 +707,10 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     const isNewDay = prevKey !== dayKey
                     const dayLabel = dayKey === '__no_date__' ? 'Tanpa Tanggal'
                       : new Date(dayKey + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })
+                    const naskahDeadline = item.tanggal_tayang && item.naskah_days_before != null
+                      ? (() => { const d = new Date(item.tanggal_tayang + 'T00:00:00'); d.setDate(d.getDate() - item.naskah_days_before); return d })()
+                      : null
+                    const naskahOverdue = naskahDeadline ? naskahDeadline < new Date() : false
                     return (
                       <div key={item.id} style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
                         {isNewDay && (
@@ -742,6 +746,12 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           <div style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 600, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span>{new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}</span>
+                          </div>
+                        )}
+                        {naskahDeadline && (
+                          <div style={{ fontSize: '0.65rem', fontWeight: 700, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3, color: naskahOverdue ? '#dc2626' : '#d97706' }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Naskah: {naskahDeadline.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{naskahOverdue ? ' !' : ''}</span>
                           </div>
                         )}
                         {item.sprint_nama && (
