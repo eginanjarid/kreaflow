@@ -1264,26 +1264,120 @@ export default function SprintsModule({ initialSprints, initialContents, product
           ))}
         </div>
 
-        {viewNotesTask && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 101, padding: 20 }}
-            onClick={() => setViewNotesTask(null)}>
-            <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', overflow: 'hidden' }}
-              onClick={e => e.stopPropagation()}>
-              <div style={{ padding: '14px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#111827' }}>{viewNotesTask.nama}</div>
-                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: 2 }}>Catatan</div>
+        {viewNotesTask && (() => {
+          const vt = viewNotesTask
+          const PRIORITY_COLOR: Record<string, { bg: string; color: string }> = {
+            High: { bg: '#fef2f2', color: '#dc2626' },
+            Medium: { bg: '#fff7ed', color: '#d97706' },
+            Low: { bg: '#f0fdf4', color: '#16a34a' },
+          }
+          const pc = vt.percent_complete
+          const statusLabel = pc === 0 ? 'Todo' : pc === 100 ? 'Selesai' : 'Dikerjakan'
+          const statusColor = pc === 0 ? '#9ca3af' : pc === 100 ? '#059669' : '#d97706'
+          const statusBg = pc === 0 ? '#f3f4f6' : pc === 100 ? '#dcfce7' : '#fff7ed'
+          const subtasks = getSubtasks(vt.id!)
+          const subtasksDone = subtasks.filter(s => s.percent_complete === 100).length
+          const daysLate = vt.due_date && vt.due_date < localToday() && pc < 100
+            ? Math.floor((new Date(localToday()).getTime() - new Date(vt.due_date).getTime()) / 86400000)
+            : 0
+          const pri = PRIORITY_COLOR[vt.priority] || PRIORITY_COLOR.Medium
+          return (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(17,24,39,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '20px 20px 80px' }}
+              onClick={() => setViewNotesTask(null)}>
+              <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 500, boxShadow: '0 20px 60px rgba(0,0,0,0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 120px)' }}
+                onClick={e => e.stopPropagation()}>
+
+                {/* Header */}
+                <div style={{ padding: '20px 22px 16px', borderBottom: '1px solid #f3f4f6' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 800, fontSize: '1rem', color: '#111827', lineHeight: 1.4, marginBottom: 10 }}>{vt.nama}</div>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: pri.bg, color: pri.color }}>{vt.priority}</span>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: statusBg, color: statusColor }}>{statusLabel}</span>
+                        {daysLate > 0 && <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: '#fef2f2', color: '#dc2626' }}>+{daysLate} hari terlambat</span>}
+                      </div>
+                    </div>
+                    <button onClick={() => setViewNotesTask(null)}
+                      style={{ background: '#f3f4f6', border: 'none', cursor: 'pointer', color: '#6b7280', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
                 </div>
-                <button onClick={() => setViewNotesTask(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '1.1rem', padding: '2px 6px' }}>✕</button>
-              </div>
-              <div style={{ padding: '16px 20px', maxHeight: '60vh', overflowY: 'auto' }}>
-                <div style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                  {renderNotes(viewNotesTask.notes!)}
+
+                {/* Meta */}
+                <div style={{ padding: '14px 22px', borderBottom: '1px solid #f3f4f6', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {[
+                    { label: 'PIC', value: vt.assigned_to ? vt.assigned_to.split('@')[0] : '—', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+                    { label: 'Due Date', value: vt.due_date ? new Date(vt.due_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+                    { label: 'Platform', value: vt.platform || '—', icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                    { label: 'Progress', value: `${pc}%`, icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+                  ].map(m => (
+                    <div key={m.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={m.icon}/></svg>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.6rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.label}</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#111827', marginTop: 1 }}>{m.value}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+
+                {/* Scrollable content */}
+                <div style={{ overflowY: 'auto', flex: 1 }}>
+
+                  {/* Subtasks */}
+                  {subtasks.length > 0 && (
+                    <div style={{ padding: '14px 22px', borderBottom: '1px solid #f3f4f6' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#374151' }}>Subtask</span>
+                        <span style={{ fontSize: '0.65rem', color: '#9ca3af' }}>{subtasksDone}/{subtasks.length} selesai</span>
+                      </div>
+                      <div style={{ height: 4, background: '#e5e7eb', borderRadius: 3, overflow: 'hidden', marginBottom: 10 }}>
+                        <div style={{ height: '100%', width: `${subtasks.length ? subtasksDone/subtasks.length*100 : 0}%`, background: subtasksDone === subtasks.length ? '#059669' : '#1a73e8', borderRadius: 3 }} />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {subtasks.map(sub => (
+                          <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', background: sub.percent_complete === 100 ? '#f0fdf4' : '#f9fafb', borderRadius: 8 }}>
+                            <div style={{ width: 14, height: 14, borderRadius: 4, border: sub.percent_complete === 100 ? 'none' : '1.5px solid #d1d5db', background: sub.percent_complete === 100 ? '#059669' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              {sub.percent_complete === 100 && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                            </div>
+                            <span style={{ fontSize: '0.78rem', color: sub.percent_complete === 100 ? '#6b7280' : '#374151', textDecoration: sub.percent_complete === 100 ? 'line-through' : 'none', flex: 1 }}>{sub.nama}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  {vt.notes && (
+                    <div style={{ padding: '14px 22px' }}>
+                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#374151', marginBottom: 8 }}>Catatan</div>
+                      <div style={{ background: '#f9fafb', borderRadius: 10, padding: '12px 14px', fontSize: '0.84rem', color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {renderNotes(vt.notes)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer actions */}
+                <div style={{ padding: '12px 22px', borderTop: '1px solid #f3f4f6', display: 'flex', gap: 8 }}>
+                  <button onClick={() => { setViewNotesTask(null); setTaskModal({ open: true, task: { ...vt } }) }}
+                    style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 10, padding: '9px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+                    Edit Task
+                  </button>
+                  <button onClick={() => setViewNotesTask(null)}
+                    style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#6b7280', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    Tutup
+                  </button>
+                </div>
+
               </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
         {taskModal?.open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '20px 20px 80px 20px' }}>
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 18, width: '100%', maxWidth: 440, maxHeight: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
