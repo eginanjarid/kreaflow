@@ -1038,18 +1038,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
         {/* Assignee filter */}
         {allAssignees.length > 0 && (
-          <div style={{ padding: '8px 16px', background: '#fff', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', flexShrink: 0 }}>
+          <div style={{ padding: '8px 16px', background: '#fff', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <span style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Anggota:</span>
-            <button onClick={() => setFilterAssignee('')}
-              style={{ padding: '3px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 500, border: filterAssignee === '' ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterAssignee === '' ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterAssignee === '' ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
-              Semua
-            </button>
-            {allAssignees.map(a => (
-              <button key={a} onClick={() => setFilterAssignee(a === filterAssignee ? '' : a)}
-                style={{ padding: '3px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 500, border: filterAssignee === a ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterAssignee === a ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterAssignee === a ? '#1a73e8' : '#6b7280', cursor: 'pointer', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {a}
-              </button>
-            ))}
+            <select value={filterAssignee} onChange={e => setFilterAssignee(e.target.value)}
+              style={{ background: '#f8fafc', border: `1px solid ${filterAssignee ? '#1a73e8' : '#e5eaf2'}`, borderRadius: 8, padding: '5px 10px', color: filterAssignee ? '#1a73e8' : '#374151', fontSize: '0.78rem', fontWeight: filterAssignee ? 600 : 400, outline: 'none', cursor: 'pointer', minWidth: 160 }}>
+              <option value="">Semua Anggota</option>
+              {allAssignees.map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
           </div>
         )}
 
