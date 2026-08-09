@@ -463,10 +463,10 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
                   background: stepDiff < 0 ? '#fef2f2' : stepDiff <= 1 ? '#fffbeb' : '#f0fdf4',
                 }}>
                   {stepDiff < 0
-                    ? `⚠️ ${STEP_LABEL[relevantStep.id] || relevantStep.id} telat ${Math.abs(stepDiff)}hr`
+                    ? `⚠️ Deadline ${STEP_LABEL[relevantStep.id] || relevantStep.id} telat ${Math.abs(stepDiff)} hr`
                     : stepDiff === 0
-                    ? `⏰ ${STEP_LABEL[relevantStep.id] || relevantStep.id} hari ini!`
-                    : `⏰ ${STEP_LABEL[relevantStep.id] || relevantStep.id}: ${stepDiff}hr lagi`}
+                    ? `⏰ Deadline ${STEP_LABEL[relevantStep.id] || relevantStep.id}: hari ini!`
+                    : `⏰ Deadline ${STEP_LABEL[relevantStep.id] || relevantStep.id}: ${stepDiff} hr lagi`}
                 </span>
               )}
               {uploadDiff != null && (
