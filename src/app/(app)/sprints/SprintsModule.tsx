@@ -1230,8 +1230,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                 style={{ background: '#f8faff', borderRadius: 9, padding: '8px 10px', border: `1px solid ${isSubDragOver ? '#818cf8' : '#e0e7ff'}`, opacity: draggingSubtaskId === sub.id ? 0.4 : subDone ? 0.6 : 1, cursor: 'grab', boxShadow: isSubDragOver ? '0 0 0 2px #c7d2fe' : 'none', transition: 'box-shadow 0.1s, border-color 0.1s' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                                   <span style={{ color: '#c7d2fe', fontSize: '0.65rem', cursor: 'grab', flexShrink: 0, lineHeight: 1 }}>⠿</span>
-                                  <input type="checkbox" checked={subDone} onChange={() => advanceTaskCol(sub, subDone ? 'back' : 'forward')}
-                                    style={{ width: 13, height: 13, accentColor: '#1a73e8', flexShrink: 0, cursor: 'pointer' }} />
+                                  <input type="checkbox" checked={subDone}
+                                    onChange={() => {
+                                      if (col.id === 'todo') { showToast('Klik ▶ Mulai dulu sebelum mengerjakan subtask.'); return }
+                                      advanceTaskCol(sub, subDone ? 'back' : 'forward')
+                                    }}
+                                    style={{ width: 13, height: 13, accentColor: '#1a73e8', flexShrink: 0, cursor: col.id === 'todo' ? 'not-allowed' : 'pointer', opacity: col.id === 'todo' ? 0.4 : 1 }} />
                                   <span style={{ fontSize: '0.78rem', fontWeight: 500, color: subDone ? '#9ca3af' : '#374151', textDecoration: subDone ? 'line-through' : 'none', flex: 1 }}>{sub.nama}</span>
                                   <button onClick={() => setTaskModal({ open: true, task: { ...sub } })}
                                     style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.65rem', cursor: 'pointer', padding: '0 2px' }}>✎</button>
