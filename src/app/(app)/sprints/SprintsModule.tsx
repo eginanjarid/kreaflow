@@ -391,6 +391,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null)
   const [dragOverColId, setDragOverColId] = useState<string | null>(null)
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null)
+  const [draggingSubtaskId, setDraggingSubtaskId] = useState<string | null>(null)
+  const [dragOverSubtaskId, setDragOverSubtaskId] = useState<string | null>(null)
   const [reportOpen, setReportOpen] = useState(false)
   const [deleteUndo, setDeleteUndo] = useState<{
     sprintId: string; sprintName: string; sprint: Sprint; contents: ContentItem[]; timeoutId: ReturnType<typeof setTimeout>
@@ -903,7 +905,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const tasksTodo  = filteredRootTasks.filter(t => t.percent_complete === 0)
   const tasksDoing = filteredRootTasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
   const tasksDone  = filteredRootTasks.filter(t => t.percent_complete === 100)
-  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? ''))
+  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => {
+    if (a.sort_order != null && b.sort_order != null) return a.sort_order - b.sort_order
+    if (a.sort_order != null) return -1
+    if (b.sort_order != null) return 1
+    return (a.created_at ?? '').localeCompare(b.created_at ?? '')
+  })
+
+  async function reorderSubtasks(parentId: string, dragId: string, dropId: string) {
+    const subs = getSubtasks(parentId)
+    const dragIdx = subs.findIndex(s => s.id === dragId)
+    const dropIdx = subs.findIndex(s => s.id === dropId)
+    if (dragIdx === -1 || dropIdx === -1 || dragIdx === dropIdx) return
+    const reordered = [...subs]
+    const [dragged] = reordered.splice(dragIdx, 1)
+    reordered.splice(dropIdx, 0, dragged)
+    const withOrder = reordered.map((s, i) => ({ ...s, sort_order: i }))
+    setTasks(prev => prev.map(t => { const u = withOrder.find(s => s.id === t.id); return u ? { ...t, sort_order: u.sort_order } : t }))
+    await Promise.all(withOrder.map(s => supabase.from('kf_tasks').update({ sort_order: s.sort_order }).eq('id', s.id!)))
+  }
 
   async function advanceTaskCol(t: ManualTask, direction: 'forward' | 'back') {
     const next = direction === 'forward'
@@ -1193,9 +1213,18 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           {subtasks.map(sub => {
                             const subDone = sub.percent_complete === 100
                             const subOverdue = sub.due_date && sub.due_date < localToday() && !subDone
+                            const isSubDragOver = dragOverSubtaskId === sub.id && draggingSubtaskId !== sub.id
                             return (
-                              <div key={sub.id} style={{ background: '#f8faff', borderRadius: 9, padding: '8px 10px', border: '1px solid #e0e7ff', opacity: subDone ? 0.6 : 1 }}>
+                              <div key={sub.id}
+                                draggable
+                                onDragStart={e => { setDraggingSubtaskId(sub.id!); e.dataTransfer.effectAllowed = 'move'; e.stopPropagation() }}
+                                onDragEnd={() => { setDraggingSubtaskId(null); setDragOverSubtaskId(null) }}
+                                onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDragOverSubtaskId(sub.id!) }}
+                                onDragLeave={() => setDragOverSubtaskId(null)}
+                                onDrop={e => { e.preventDefault(); e.stopPropagation(); if (draggingSubtaskId && draggingSubtaskId !== sub.id) reorderSubtasks(t.id!, draggingSubtaskId, sub.id!); setDraggingSubtaskId(null); setDragOverSubtaskId(null) }}
+                                style={{ background: '#f8faff', borderRadius: 9, padding: '8px 10px', border: `1px solid ${isSubDragOver ? '#818cf8' : '#e0e7ff'}`, opacity: draggingSubtaskId === sub.id ? 0.4 : subDone ? 0.6 : 1, cursor: 'grab', boxShadow: isSubDragOver ? '0 0 0 2px #c7d2fe' : 'none', transition: 'box-shadow 0.1s, border-color 0.1s' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                  <span style={{ color: '#c7d2fe', fontSize: '0.65rem', cursor: 'grab', flexShrink: 0, lineHeight: 1 }}>⠿</span>
                                   <input type="checkbox" checked={subDone} onChange={() => advanceTaskCol(sub, subDone ? 'back' : 'forward')}
                                     style={{ width: 13, height: 13, accentColor: '#1a73e8', flexShrink: 0, cursor: 'pointer' }} />
                                   <span style={{ fontSize: '0.78rem', fontWeight: 500, color: subDone ? '#9ca3af' : '#374151', textDecoration: subDone ? 'line-through' : 'none', flex: 1 }}>{sub.nama}</span>
