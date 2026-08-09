@@ -1001,7 +1001,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 80px)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 80px)', overflowY: 'auto' }}>
       <style>{`
         .kf-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
         .kf-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10) !important; transform: translateY(-1px); }
@@ -1011,7 +1011,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       `}</style>
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', alignItems: 'center', background: '#fff', flexShrink: 0, paddingLeft: 20, paddingRight: 20, borderBottom: '1px solid rgba(0,0,0,0.06)', gap: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', background: '#fff', flexShrink: 0, paddingLeft: 20, paddingRight: 20, borderBottom: '1px solid rgba(0,0,0,0.06)', gap: 4, position: 'sticky', top: 0, zIndex: 10 }}>
         {[
           { key: 'board', label: 'Sprint Board' },
           { key: 'tasks', label: 'Tasks' },
@@ -1028,9 +1028,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
     {activeTab === 'tasks' ? (
       // ── TASKS KANBAN ───────────────────────────────────────────────────────
-      <div style={{ display: 'flex', flex: 1, flexDirection: 'column', overflow: 'hidden', background: '#f5f6fa' }}>
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, flexDirection: 'column', overflow: 'hidden', background: '#f5f6fa' }}>
         {/* Header */}
-        <div style={{ padding: '12px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: 12 }}>
+        <div style={{ padding: '12px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: 12, position: 'sticky', top: 49, zIndex: 9 }}>
           <div style={{ flexShrink: 0 }}>
             <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>Tasks</span>
             <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 10 }}>Non-konten · beli alat, meeting, admin, dll</span>
@@ -1067,7 +1067,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
 
         {/* 3-col kanban */}
-        <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
+        <div style={{ flex: 1, minHeight: 0, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
           {([
             { id: 'todo',    label: 'Todo',       accent: '#94a3b8', items: tasksTodo },
             { id: 'doing',   label: 'Dikerjakan', accent: '#f59e0b', items: tasksDoing },
