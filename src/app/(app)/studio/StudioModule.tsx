@@ -16,6 +16,7 @@ type ContentItem = {
   sprint_id?: string | null; step_log?: Record<string, string> | null
   tanggal_tayang?: string | null; jam_tayang?: string | null; sprint_nama?: string | null
   assigned_produksi?: string | null
+  sprint_step_config?: { id: string; daysBefore: number }[] | null
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
@@ -407,9 +408,24 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
   const stage = STATUS_STAGE[item.status]
   const stageColor: Record<Tab, string> = { antrian: '#d97706', dikerjakan: '#1a73e8', selesai: '#059669' }
   const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
-  const uploadDiff = item.tanggal_tayang && stage !== 'selesai'
+  // Step deadline: Antrian → step desain/produksi/talent, Dikerjakan → step editing
+  const STEP_FOR_STAGE: Record<string, string[]> = {
+    antrian: ['desain', 'produksi', 'talent'],
+    dikerjakan: ['editing', 'schedule'],
+  }
+  const relevantStep = item.sprint_step_config && stage !== 'selesai'
+    ? item.sprint_step_config.find(s => (STEP_FOR_STAGE[stage] || []).includes(s.id)) ?? null
+    : null
+  const stepDeadline = relevantStep && item.tanggal_tayang
+    ? (() => { const d = new Date(item.tanggal_tayang + 'T00:00:00'); d.setDate(d.getDate() - relevantStep.daysBefore); return d })()
+    : null
+  const stepDiff = stepDeadline
+    ? Math.round((stepDeadline.getTime() - new Date().setHours(0,0,0,0)) / 86400000)
+    : null
+  const uploadDiff = item.tanggal_tayang && stage !== 'selesai' && !stepDeadline
     ? Math.round((new Date(item.tanggal_tayang + 'T00:00:00').getTime() - new Date().setHours(0,0,0,0)) / 86400000)
     : null
+  const STEP_LABEL: Record<string, string> = { desain: 'Desain', produksi: 'Produksi', talent: 'Talent', editing: 'Editing', schedule: 'Schedule' }
 
   return (
     <div onClick={onClick}
@@ -440,13 +456,26 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
                   Upload: {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}
                 </span>
               </div>
+              {stepDiff != null && relevantStep && (
+                <span style={{
+                  fontSize: '0.63rem', fontWeight: 700, padding: '2px 6px', borderRadius: 5, alignSelf: 'flex-start',
+                  color: stepDiff < 0 ? '#dc2626' : stepDiff <= 1 ? '#d97706' : '#059669',
+                  background: stepDiff < 0 ? '#fef2f2' : stepDiff <= 1 ? '#fffbeb' : '#f0fdf4',
+                }}>
+                  {stepDiff < 0
+                    ? `⚠️ ${STEP_LABEL[relevantStep.id] || relevantStep.id} telat ${Math.abs(stepDiff)}hr`
+                    : stepDiff === 0
+                    ? `⏰ ${STEP_LABEL[relevantStep.id] || relevantStep.id} hari ini!`
+                    : `⏰ ${STEP_LABEL[relevantStep.id] || relevantStep.id}: ${stepDiff}hr lagi`}
+                </span>
+              )}
               {uploadDiff != null && (
                 <span style={{
                   fontSize: '0.63rem', fontWeight: 700, padding: '2px 6px', borderRadius: 5, alignSelf: 'flex-start',
                   color: uploadDiff < 0 ? '#dc2626' : uploadDiff <= 1 ? '#d97706' : '#059669',
                   background: uploadDiff < 0 ? '#fef2f2' : uploadDiff <= 1 ? '#fffbeb' : '#f0fdf4',
                 }}>
-                  {uploadDiff < 0 ? `⚠️ Terlambat ${Math.abs(uploadDiff)} hr` : uploadDiff === 0 ? '⏰ Upload hari ini!' : `⏰ ${uploadDiff} hari lagi`}
+                  {uploadDiff < 0 ? `⚠️ Terlambat ${Math.abs(uploadDiff)}hr` : uploadDiff === 0 ? '⏰ Upload hari ini!' : `⏰ ${uploadDiff} hari lagi`}
                 </span>
               )}
             </div>
