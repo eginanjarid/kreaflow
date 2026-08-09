@@ -393,6 +393,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null)
   const [draggingSubtaskId, setDraggingSubtaskId] = useState<string | null>(null)
   const [dragOverSubtaskId, setDragOverSubtaskId] = useState<string | null>(null)
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null)
   const [reportOpen, setReportOpen] = useState(false)
   const [deleteUndo, setDeleteUndo] = useState<{
     sprintId: string; sprintName: string; sprint: Sprint; contents: ContentItem[]; timeoutId: ReturnType<typeof setTimeout>
@@ -693,11 +694,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setSavingAction(false)
   }
 
-  async function removeFromSprint(id: string) {
-    if (!window.confirm('Hapus konten ini dari sprint?')) return
-    await supabase.from('kf_content_ideas').update({ sprint_id: null }).eq('id', id)
-    setContents(prev => prev.filter(c => c.id !== id))
-    setDetailItem(null)
+  function removeFromSprint(id: string) {
+    setConfirmModal({ message: 'Hapus konten ini dari sprint?', onConfirm: async () => {
+      await supabase.from('kf_content_ideas').update({ sprint_id: null }).eq('id', id)
+      setContents(prev => prev.filter(c => c.id !== id))
+      setDetailItem(null)
+    }})
   }
 
   async function saveJadwal() {
@@ -891,10 +893,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
     await supabase.from('kf_tasks').update({ percent_complete: pct }).eq('id', id)
     setTasks(prev => prev.map(x => x.id === id ? { ...x, percent_complete: pct } : x))
   }
-  async function deleteTask(id: string) {
-    if (!window.confirm('Hapus task ini?')) return
-    await supabase.from('kf_tasks').delete().eq('id', id)
-    setTasks(prev => prev.filter(x => x.id !== id))
+  function deleteTask(id: string) {
+    setConfirmModal({ message: 'Hapus task ini?', onConfirm: async () => {
+      await supabase.from('kf_tasks').delete().eq('id', id)
+      setTasks(prev => prev.filter(x => x.id !== id))
+    }})
   }
 
   const [filterAssignee, setFilterAssignee] = useState('')
@@ -2298,6 +2301,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <button onClick={confirmDeleteWithProgress} disabled={!deleteConfirmChecked}
                 style={{ flex: 1, background: deleteConfirmChecked ? '#dc2626' : '#f3f4f6', border: 'none', borderRadius: 8, padding: '10px', color: deleteConfirmChecked ? '#fff' : '#9ca3af', fontSize: '0.85rem', fontWeight: 700, cursor: deleteConfirmChecked ? 'pointer' : 'not-allowed', transition: 'all 0.15s' }}>
                 Hapus Permanen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom confirm modal */}
+      {confirmModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '24px', maxWidth: 360, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#111827', marginBottom: 20 }}>{confirmModal.message}</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setConfirmModal(null)}
+                style={{ flex: 1, background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px', color: '#374151', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}>
+                Batal
+              </button>
+              <button onClick={() => { confirmModal.onConfirm(); setConfirmModal(null) }}
+                style={{ flex: 1, background: '#dc2626', border: 'none', borderRadius: 8, padding: '10px', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
+                Hapus
               </button>
             </div>
           </div>
