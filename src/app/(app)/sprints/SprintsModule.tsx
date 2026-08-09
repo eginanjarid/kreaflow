@@ -1223,7 +1223,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                               <div key={sub.id}
                                 draggable
                                 onDragStart={e => { setDraggingSubtaskId(sub.id!); e.dataTransfer.effectAllowed = 'move'; e.stopPropagation() }}
-                                onDragEnd={() => { setDraggingSubtaskId(null); setDragOverSubtaskId(null) }}
+                                onDragEnd={() => { setDraggingSubtaskId(null); setDragOverSubtaskId(null); setDragOverColId(null) }}
                                 onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDragOverSubtaskId(sub.id!) }}
                                 onDragLeave={() => setDragOverSubtaskId(null)}
                                 onDrop={e => { e.preventDefault(); e.stopPropagation(); if (draggingSubtaskId && draggingSubtaskId !== sub.id) reorderSubtasks(t.id!, draggingSubtaskId, sub.id!); setDraggingSubtaskId(null); setDragOverSubtaskId(null) }}
