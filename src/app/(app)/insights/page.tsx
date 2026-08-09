@@ -13,6 +13,16 @@ export default async function DashboardPage() {
   sevenDaysAgoDate.setDate(sevenDaysAgoDate.getDate() - 6)
   const sevenDaysAgoStr = sevenDaysAgoDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
 
+  // Monday–Sunday of current Jakarta week
+  const jakartaNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
+  const dowJkt = jakartaNow.getDay() // 0=Sun
+  const weekMonday = new Date(jakartaNow)
+  weekMonday.setDate(jakartaNow.getDate() - (dowJkt === 0 ? 6 : dowJkt - 1))
+  const weekSunday = new Date(weekMonday)
+  weekSunday.setDate(weekMonday.getDate() + 6)
+  const weekStart = weekMonday.toLocaleDateString('en-CA')
+  const weekEnd = weekSunday.toLocaleDateString('en-CA')
+
   const [
     { data: wsData },
     { data: ideas },
@@ -26,6 +36,7 @@ export default async function DashboardPage() {
     { data: studioWork },
     { data: taskWork },
     { data: calendarWork },
+    { data: weeklyTasksRaw },
   ] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).maybeSingle(),
     supabase.from('kf_content_ideas').select('id, status, platform, sprint_id').eq('workspace_id', wsId),
@@ -66,6 +77,11 @@ export default async function DashboardPage() {
       .eq('workspace_id', wsId)
       .not('calendar_completed_at', 'is', null)
       .gte('calendar_completed_at', `${sevenDaysAgoStr}T00:00:00`),
+    supabase.from('kf_tasks').select('assigned_to, due_date, percent_complete, nama')
+      .eq('workspace_id', wsId)
+      .not('due_date', 'is', null)
+      .gte('due_date', weekStart)
+      .lte('due_date', weekEnd),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
@@ -318,6 +334,12 @@ export default async function DashboardPage() {
               assigned_calendar: (e.assigned_calendar as string | null) || null,
               calendar_started_at: (e.calendar_started_at as string | null) || null,
               calendar_completed_at: (e.calendar_completed_at as string | null) || null,
+            }))}
+            weeklyTasks={(weeklyTasksRaw || []).map(e => ({
+              assigned_to: (e.assigned_to as string | null) || null,
+              due_date: (e.due_date as string | null) || null,
+              percent_complete: (e.percent_complete as number | null) ?? null,
+              nama: (e.nama as string) || '',
             }))}
           />
 

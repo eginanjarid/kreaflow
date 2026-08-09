@@ -4,6 +4,7 @@ type PlanEntry = { assigned_naskah: string | null; plan_started_at: string | nul
 type StudioEntry = { assigned_produksi: string | null; studio_started_at: string | null; studio_completed_at: string | null }
 type TaskEntry = { assigned_to: string | null; started_at: string | null; completed_at: string | null; nama: string }
 type CalendarEntry = { assigned_calendar: string | null; calendar_started_at: string | null; calendar_completed_at: string | null }
+type WeeklyTask = { assigned_to: string | null; due_date: string | null; percent_complete: number | null; nama: string }
 
 function diffHours(start: string | null, end: string | null): number | null {
   if (!start || !end) return null
@@ -34,11 +35,12 @@ const BADGES = [
   { emoji: '🎯', label: 'Solid',    color: '#8b5cf6', anim: ''         },
 ]
 
-export default function WorkReportModule({ planEntries, studioEntries, taskEntries, calendarEntries }: {
+export default function WorkReportModule({ planEntries, studioEntries, taskEntries, calendarEntries, weeklyTasks }: {
   planEntries: PlanEntry[]
   studioEntries: StudioEntry[]
   taskEntries: TaskEntry[]
   calendarEntries: CalendarEntry[]
+  weeklyTasks: WeeklyTask[]
 }) {
   const CARD = { background: '#fff', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)' }
 
@@ -77,6 +79,11 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
     const cd = calendarEntries.filter(e => e.assigned_calendar === person && e.calendar_completed_at)
     const ch = cd.map(e => diffHours(e.calendar_started_at, e.calendar_completed_at)).filter((h): h is number => h !== null)
     const totalDone = pd.length + sd.length + td.length + cd.length
+
+    const myWeekTasks = weeklyTasks.filter(t => t.assigned_to === person)
+    const weekDone = myWeekTasks.filter(t => t.percent_complete === 100).length
+    const weekOverdue = myWeekTasks.filter(t => t.due_date && t.due_date < todayStr && (t.percent_complete ?? 0) < 100).length
+
     return {
       person,
       p: pd.length, ph: ph.length > 0 ? ph.reduce((a,b)=>a+b,0)/ph.length : null,
@@ -84,6 +91,9 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
       t: td.length, th: th.length > 0 ? th.reduce((a,b)=>a+b,0)/th.length : null,
       c: cd.length, ch: ch.length > 0 ? ch.reduce((a,b)=>a+b,0)/ch.length : null,
       totalDone,
+      weekTotal: myWeekTasks.length,
+      weekDone,
+      weekOverdue,
     }
   }).sort((a, b) => b.totalDone - a.totalDone)
 
@@ -219,8 +229,33 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
                     ))}
                   </div>
 
+                  {/* Weekly task progress */}
+                  {s.weekTotal > 0 && (
+                    <div style={{ marginTop: 10, borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                        <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>
+                          Task minggu ini:&nbsp;
+                          <span style={{ fontWeight: 700, color: '#111827' }}>{s.weekDone}/{s.weekTotal} selesai</span>
+                        </span>
+                        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                          {s.weekOverdue > 0 && (
+                            <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#dc2626', background: '#fef2f2', padding: '1px 7px', borderRadius: 20 }}>
+                              {s.weekOverdue} overdue
+                            </span>
+                          )}
+                          <span style={{ fontSize: '0.62rem', fontWeight: 700, color: s.weekDone === s.weekTotal ? '#059669' : '#6b7280' }}>
+                            {Math.round(s.weekDone / s.weekTotal * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ height: 5, background: '#e5e7eb', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${Math.round(s.weekDone / s.weekTotal * 100)}%`, background: s.weekDone === s.weekTotal ? '#059669' : s.weekOverdue > 0 ? '#dc2626' : '#1a73e8', borderRadius: 3, transition: 'width 0.4s' }} />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Progress bar vs top */}
-                  {rank > 0 && (
+                  {rank > 0 && s.weekTotal === 0 && (
                     <div style={{ marginTop: 8 }}>
                       <div style={{ height: 3, background: '#e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
                         <div style={{ height: '100%', width: `${Math.round(s.totalDone / maxPersonTotal * 100)}%`, background: '#6366f1', borderRadius: 2, transition: 'width 0.4s' }} />
