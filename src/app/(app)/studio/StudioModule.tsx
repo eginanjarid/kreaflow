@@ -17,6 +17,8 @@ type ContentItem = {
   tanggal_tayang?: string | null; jam_tayang?: string | null; sprint_nama?: string | null
   assigned_produksi?: string | null
   sprint_step_config?: { id: string; daysBefore: number }[] | null
+  studio_started_at?: string | null
+  studio_completed_at?: string | null
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
@@ -246,7 +248,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   async function handleSelesai() {
     setMarking(true)
     const now = new Date().toISOString()
-    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null }
+    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null }
     await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
     await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
@@ -584,8 +586,9 @@ export default function StudioModule({ initialContents, products, initialNotific
   }
 
   async function handleMulai(item: ContentItem) {
-    await supabase.from('kf_content_ideas').update({ status: 'Produksi' }).eq('id', item.id)
-    setContents(prev => prev.map(c => c.id === item.id ? { ...c, status: 'Produksi' } : c))
+    const startedAt = item.studio_started_at || new Date().toISOString()
+    await supabase.from('kf_content_ideas').update({ status: 'Produksi', studio_started_at: startedAt }).eq('id', item.id)
+    setContents(prev => prev.map(c => c.id === item.id ? { ...c, status: 'Produksi', studio_started_at: startedAt } : c))
     setTab('dikerjakan')
   }
 

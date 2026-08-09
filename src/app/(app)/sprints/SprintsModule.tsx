@@ -64,6 +64,8 @@ type ManualTask = {
   parent_id?: string | null
   sort_order?: number | null
   created_at?: string | null
+  started_at?: string | null
+  completed_at?: string | null
 }
 
 // ── Sprint templates ──────────────────────────────────────────────────────────
@@ -932,8 +934,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const next = direction === 'forward'
       ? t.percent_complete === 0 ? 50 : 100
       : t.percent_complete === 100 ? 50 : 0
-    await supabase.from('kf_tasks').update({ percent_complete: next }).eq('id', t.id!)
-    setTasks(prev => prev.map(x => x.id === t.id ? { ...x, percent_complete: next } : x))
+    const now = new Date().toISOString()
+    const timeFields: { started_at?: string; completed_at?: string | null } = {}
+    if (next > 0 && !t.started_at) timeFields.started_at = now
+    if (next === 100) timeFields.completed_at = now
+    if (next < 100) timeFields.completed_at = null
+    await supabase.from('kf_tasks').update({ percent_complete: next, ...timeFields }).eq('id', t.id!)
+    setTasks(prev => prev.map(x => x.id === t.id ? { ...x, percent_complete: next, ...timeFields } : x))
   }
 
   function duplicateTask(t: ManualTask) {

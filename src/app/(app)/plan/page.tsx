@@ -20,7 +20,7 @@ export default async function PlanPage() {
     supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars,affiliate_micro_niche,biz_nama_brand,biz_kategori').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
-    supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,kf_sprints(nama,step_config)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
+    supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,plan_started_at,plan_completed_at,kf_sprints(nama,step_config)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
     supabase.from('kf_content_pillars').select('id,nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
     supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
   ])
@@ -55,6 +55,8 @@ export default async function PlanPage() {
         script: (d.script as string | null) || null,
         tanggal_tayang: (d.tanggal_tayang as string | null) || null,
         jam_tayang: (d.jam_tayang as string | null) || null,
+        plan_started_at: (d.plan_started_at as string | null) || null,
+        plan_completed_at: (d.plan_completed_at as string | null) || null,
       }))}
     />
   )

@@ -181,6 +181,9 @@ function prevMonth() {
       const { error: err } = await supabase.from('kf_calendar_entries').update(entry).eq('id', entry.id)
       if (err) { setError(err.message); setSaving(false); return }
       setEntries(prev => prev.map(x => x.id === entry.id ? entry : x))
+      if (entry.status === 'Posted' && entry.content_id) {
+        await supabase.from('kf_content_ideas').update({ calendar_completed_at: new Date().toISOString(), status: 'Tayang' }).eq('id', entry.content_id)
+      }
     } else {
       const { data, error: err } = await supabase.from('kf_calendar_entries').insert(entry).select('id').single()
       if (err) { setError(err.message); setSaving(false); return }
@@ -227,7 +230,7 @@ function prevMonth() {
     const { data: newEntries } = await supabase.from('kf_calendar_entries').insert(
       platforms.map(p => ({ workspace_id: workspaceId, content_id: item.id, platform: p, scheduled_at, status: 'Planned', posted_at: null, posted_url: null }))
     ).select('id, platform')
-    await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date }).eq('id', item.id)
+    await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date, calendar_started_at: new Date().toISOString() }).eq('id', item.id)
     if (item.sprint_id) {
       await supabase.from('kf_notifications').insert({
         workspace_id: workspaceId,

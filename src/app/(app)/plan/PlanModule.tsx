@@ -93,7 +93,7 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
-type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null; naskah_days_before: number | null }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null; naskah_days_before: number | null; plan_started_at: string | null; plan_completed_at: string | null }
 
 export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
   workspaceId: string
@@ -178,10 +178,16 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
   function setNF(key: keyof NaskahForm, val: string) { setNaskahForm(f => ({ ...f, [key]: val })) }
   function setAFF(key: keyof AffNaskahForm, val: string) { setAffForm(f => ({ ...f, [key]: val })) }
 
-  function selectQueueItem(item: QueueItem) {
+  async function selectQueueItem(item: QueueItem) {
     // Toggle deselect
     if (activeQueueId === item.id) { setActiveQueueId(null); return }
     setActiveQueueId(item.id)
+    if (!item.plan_started_at) {
+      const now = new Date().toISOString()
+      const supabase = createClient()
+      await supabase.from('kf_content_ideas').update({ plan_started_at: now }).eq('id', item.id)
+      setLocalQueue(prev => prev.map(q => q.id === item.id ? { ...q, plan_started_at: now } : q))
+    }
     const pillarName = item.judul.split(' — ')[0]
 
     if (!isAffiliate || item.status === 'Revisi') {
@@ -498,6 +504,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       product_id: productId || null,
       tanggal_tayang: tanggal_tayang || null,
       jam_tayang: jam_tayang || null,
+      plan_completed_at: new Date().toISOString(),
     }).select('id').single()
     if (!err && inserted) {
       await supabase.from('kf_notifications').insert({
@@ -541,7 +548,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (activeQueueId) {
       const activeItem = localQueue.find(q => q.id === activeQueueId)
       const judulAktif = activeItem?.judul || `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform}`
-      await supabase.from('kf_content_ideas').update({ script: affNaskah, status: 'Naskah Siap', judul: judulAktif }).eq('id', activeQueueId)
+      await supabase.from('kf_content_ideas').update({ script: affNaskah, status: 'Naskah Siap', judul: judulAktif, plan_completed_at: new Date().toISOString() }).eq('id', activeQueueId)
       await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
       removeFromQueue(activeQueueId)
       setAffSavedToLibrary(true)
@@ -570,7 +577,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (activeQueueId) {
       const activeItem = localQueue.find(q => q.id === activeQueueId)
       const judulAktif = activeItem?.judul || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten}`
-      await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: 'Naskah Siap', judul: judulAktif }).eq('id', activeQueueId)
+      await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: 'Naskah Siap', judul: judulAktif, plan_completed_at: new Date().toISOString() }).eq('id', activeQueueId)
       await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
       removeFromQueue(activeQueueId)
       setSavedToLibrary(true)
@@ -595,7 +602,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setSprintLinkSaving(true)
     const { draft, naskah, mode } = sprintLinkModal
     const supabase = createClient()
-    await supabase.from('kf_content_ideas').update({ script: naskah, status: 'Naskah Siap', judul: sprintLinkModal.judul }).eq('id', draft.id)
+    await supabase.from('kf_content_ideas').update({ script: naskah, status: 'Naskah Siap', judul: sprintLinkModal.judul, plan_completed_at: new Date().toISOString() }).eq('id', draft.id)
     await supabase.from('kf_notifications').insert({
       workspace_id: workspaceId,
       type: 'produksi',
