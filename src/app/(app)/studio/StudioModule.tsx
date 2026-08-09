@@ -407,6 +407,9 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
   const stage = STATUS_STAGE[item.status]
   const stageColor: Record<Tab, string> = { antrian: '#d97706', dikerjakan: '#1a73e8', selesai: '#059669' }
   const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
+  const uploadDiff = item.tanggal_tayang && stage !== 'selesai'
+    ? Math.round((new Date(item.tanggal_tayang + 'T00:00:00').getTime() - new Date().setHours(0,0,0,0)) / 86400000)
+    : null
 
   return (
     <div onClick={onClick}
@@ -430,11 +433,22 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
         </div>
         <div style={{ marginTop: 'auto', paddingTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {item.tanggal_tayang ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span style={{ fontSize: '0.67rem', color: '#fb923c', fontWeight: 600 }}>
-                {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}
-              </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span style={{ fontSize: '0.67rem', color: '#6b7280', fontWeight: 500 }}>
+                  Upload: {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}
+                </span>
+              </div>
+              {uploadDiff != null && (
+                <span style={{
+                  fontSize: '0.63rem', fontWeight: 700, padding: '2px 6px', borderRadius: 5, alignSelf: 'flex-start',
+                  color: uploadDiff < 0 ? '#dc2626' : uploadDiff <= 1 ? '#d97706' : '#059669',
+                  background: uploadDiff < 0 ? '#fef2f2' : uploadDiff <= 1 ? '#fffbeb' : '#f0fdf4',
+                }}>
+                  {uploadDiff < 0 ? `⚠️ Terlambat ${Math.abs(uploadDiff)} hr` : uploadDiff === 0 ? '⏰ Upload hari ini!' : `⏰ ${uploadDiff} hari lagi`}
+                </span>
+              )}
             </div>
           ) : (
             <span style={{ fontSize: '0.67rem', color: '#d1d5db' }}>Belum dijadwalkan</span>
