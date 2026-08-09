@@ -401,7 +401,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   )
 }
 
-function ContentCard({ item, products, onClick }: { item: ContentItem; products: Product[]; onClick: () => void }) {
+function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; products: Product[]; onClick: () => void; onMulai?: () => void }) {
   const thumb = getThumbnail(item)
   const product = products.find(p => p.id === item.product_id)
   const stage = STATUS_STAGE[item.status]
@@ -440,7 +440,14 @@ function ContentCard({ item, products, onClick }: { item: ContentItem; products:
             <span style={{ fontSize: '0.67rem', color: '#d1d5db' }}>Belum dijadwalkan</span>
           )}
           {item.sprint_nama && <span style={{ fontSize: '0.62rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.sprint_nama}</span>}
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+            {stage === 'antrian' && onMulai ? (
+              <button
+                onClick={e => { e.stopPropagation(); onMulai() }}
+                style={{ fontSize: '0.67rem', fontWeight: 700, color: '#fff', background: '#1a73e8', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+                ▶ Mulai
+              </button>
+            ) : <span />}
             <span style={{ fontSize: '0.67rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
           </div>
         </div>
@@ -531,6 +538,12 @@ export default function StudioModule({ initialContents, products, initialNotific
   function handleUpdate(updated: ContentItem) {
     setContents(prev => prev.map(c => c.id === updated.id ? updated : c))
     setSelectedItem(updated)
+  }
+
+  async function handleMulai(item: ContentItem) {
+    await supabase.from('kf_content_ideas').update({ status: 'Produksi' }).eq('id', item.id)
+    setContents(prev => prev.map(c => c.id === item.id ? { ...c, status: 'Produksi' } : c))
+    setTab('dikerjakan')
   }
 
   const TAB_CONFIG = [
@@ -630,7 +643,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                       <span style={{ fontSize: '0.72rem', color, fontWeight: 600 }}>{group.items.length} konten</span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
+                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} />)}
                     </div>
                   </div>
                 )
@@ -639,7 +652,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           )
         })() : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-            {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} />)}
+            {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} />)}
           </div>
         )
       ) : viewMode === 'platform' ? (
