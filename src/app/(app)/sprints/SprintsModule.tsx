@@ -902,7 +902,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const tasksTodo  = filteredRootTasks.filter(t => t.percent_complete === 0)
   const tasksDoing = filteredRootTasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
   const tasksDone  = filteredRootTasks.filter(t => t.percent_complete === 100)
-  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => a.nama.localeCompare(b.nama))
+  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => a.nama.localeCompare(b.nama, undefined, { numeric: true }))
 
   async function advanceTaskCol(t: ManualTask, direction: 'forward' | 'back') {
     const next = direction === 'forward'
