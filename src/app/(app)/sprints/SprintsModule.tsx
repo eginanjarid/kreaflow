@@ -1044,7 +1044,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               style={{ background: '#f8fafc', border: `1px solid ${filterAssignee ? '#1a73e8' : '#e5eaf2'}`, borderRadius: 8, padding: '5px 10px', color: filterAssignee ? '#1a73e8' : '#374151', fontSize: '0.78rem', fontWeight: filterAssignee ? 600 : 400, outline: 'none', cursor: 'pointer', minWidth: 160 }}>
               <option value="">Semua Anggota</option>
               {allAssignees.map(a => (
-                <option key={a} value={a}>{a}</option>
+                <option key={a} value={a}>{a.split('@')[0]}</option>
               ))}
             </select>
           </div>
