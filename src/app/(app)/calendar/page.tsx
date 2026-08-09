@@ -1,3 +1,4 @@
+import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
@@ -7,7 +8,9 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'calendar')) redirect(firstAccessibleRoute(role, jabatan))
 
-  const [{ data: wsData }, { data: brandCheck }, { data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }, { data: importantDatesRaw }, { count: productCount }] = await Promise.all([
+  const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+  const [{ data: wsData }, { data: brandCheck }, { data: entries }, { data: ideas }, { data: tasks }, { data: products }, { data: readyRaw }, { data: accounts }, { data: importantDatesRaw }, { count: productCount }, { data: membersRaw }, { data: authUsersData }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche, biz_nama_brand, biz_kategori').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_calendar_entries').select('id,workspace_id,content_id,task_id,label,platform,scheduled_at,posted_at,posted_url,status').eq('workspace_id', wsId).order('scheduled_at'),
@@ -18,6 +21,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('platform'),
     supabase.from('kf_important_dates').select('id, workspace_id, nama, tanggal, tipe, warna, deskripsi, is_repeating').or(`workspace_id.eq.${wsId},workspace_id.is.null`).order('tanggal'),
     supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
+    admin.from('kf_workspace_members').select('id, user_id, role, jabatan').eq('workspace_id', wsId),
+    admin.auth.admin.listUsers(),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
@@ -58,6 +63,16 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     nama: a.nama as string,
   }))
 
+  const userMap = Object.fromEntries(
+    (authUsersData?.users || []).map(u => [u.id, { email: u.email || '', nama: (u.user_metadata?.nama as string) || u.email || '' }])
+  )
+  const workspaceMembers = (membersRaw || []).map((m: any) => ({
+    id: m.id as string,
+    user_id: m.user_id as string,
+    email: userMap[m.user_id as string]?.email || '',
+    nama: userMap[m.user_id as string]?.nama || userMap[m.user_id as string]?.email || '',
+  }))
+
   const importantDates = (importantDatesRaw || []).map(d => ({
     id: d.id as string,
     workspace_id: (d.workspace_id as string | null) || null,
@@ -79,6 +94,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
       autoContentId={autoContentId}
       accounts={accountList}
       importantDates={importantDates}
+      workspaceMembers={workspaceMembers}
     />
   )
 }

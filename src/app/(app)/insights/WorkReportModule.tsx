@@ -3,7 +3,7 @@
 type PlanEntry = { assigned_naskah: string | null; plan_started_at: string | null; plan_completed_at: string | null }
 type StudioEntry = { assigned_produksi: string | null; studio_started_at: string | null; studio_completed_at: string | null }
 type TaskEntry = { assigned_to: string | null; started_at: string | null; completed_at: string | null; nama: string }
-type CalendarEntry = { calendar_completed_at: string | null }
+type CalendarEntry = { assigned_calendar: string | null; calendar_started_at: string | null; calendar_completed_at: string | null }
 
 function diffHours(start: string | null, end: string | null): number | null {
   if (!start || !end) return null
@@ -53,6 +53,7 @@ export default function WorkReportModule({
   planEntries.forEach(e => { if (e.assigned_naskah) allPeople.add(e.assigned_naskah) })
   studioEntries.forEach(e => { if (e.assigned_produksi) allPeople.add(e.assigned_produksi) })
   taskEntries.forEach(e => { if (e.assigned_to) allPeople.add(e.assigned_to) })
+  calendarEntries.forEach(e => { if (e.assigned_calendar) allPeople.add(e.assigned_calendar) })
 
   const stats = Array.from(allPeople).map(person => {
     const pd = planEntries.filter(e => e.assigned_naskah === person && e.plan_completed_at)
@@ -61,12 +62,15 @@ export default function WorkReportModule({
     const sh = sd.map(e => diffHours(e.studio_started_at, e.studio_completed_at)).filter((h): h is number => h !== null)
     const td = taskEntries.filter(e => e.assigned_to === person && e.completed_at)
     const th = td.map(e => diffHours(e.started_at, e.completed_at)).filter((h): h is number => h !== null)
-    const totalDone = pd.length + sd.length + td.length
+    const cd = calendarEntries.filter(e => e.assigned_calendar === person && e.calendar_completed_at)
+    const ch = cd.map(e => diffHours(e.calendar_started_at, e.calendar_completed_at)).filter((h): h is number => h !== null)
+    const totalDone = pd.length + sd.length + td.length + cd.length
     return {
       person,
       pd: pd.length, ph: ph.length > 0 ? ph.reduce((a,b)=>a+b,0)/ph.length : null,
       sd: sd.length, sh: sh.length > 0 ? sh.reduce((a,b)=>a+b,0)/sh.length : null,
       td: td.length, th: th.length > 0 ? th.reduce((a,b)=>a+b,0)/th.length : null,
+      cd: cd.length, ch: ch.length > 0 ? ch.reduce((a,b)=>a+b,0)/ch.length : null,
       totalDone,
     }
   }).sort((a, b) => b.totalDone - a.totalDone)
@@ -119,10 +123,9 @@ export default function WorkReportModule({
         ))}
       </div>
 
-      {/* Calendar note */}
       {totalCalPosted > 0 && (
         <div style={{ fontSize: '0.65rem', color: '#6b7280', background: 'rgba(5,150,105,0.07)', borderRadius: 8, padding: '5px 10px', marginBottom: 14 }}>
-          <span style={{ fontWeight: 700, color: '#059669' }}>{totalCalPosted} konten</span> berhasil tayang di periode ini · per-anggota tidak tersedia untuk Calendar
+          <span style={{ fontWeight: 700, color: '#059669' }}>{totalCalPosted} konten tayang</span> di periode ini
         </div>
       )}
 
@@ -154,6 +157,7 @@ export default function WorkReportModule({
                   {s.pd > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(26,115,232,0.1)', color: '#1a73e8', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>P {s.pd}x{s.ph != null ? ` ~${fmtDur(s.ph)}` : ''}</span>}
                   {s.sd > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(124,58,237,0.1)', color: '#7c3aed', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>S {s.sd}x{s.sh != null ? ` ~${fmtDur(s.sh)}` : ''}</span>}
                   {s.td > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(99,102,241,0.1)', color: '#6366f1', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>T {s.td}x{s.th != null ? ` ~${fmtDur(s.th)}` : ''}</span>}
+                  {s.cd > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(5,150,105,0.1)', color: '#059669', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>C {s.cd}x{s.ch != null ? ` ~${fmtDur(s.ch)}` : ''}</span>}
                 </div>
                 <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#111827', minWidth: 20, textAlign: 'right', flexShrink: 0 }}>{s.totalDone}</span>
               </div>

@@ -62,7 +62,7 @@ export default async function DashboardPage() {
       .eq('workspace_id', wsId)
       .not('completed_at', 'is', null)
       .gte('completed_at', `${sevenDaysAgoStr}T00:00:00`),
-    supabase.from('kf_content_ideas').select('calendar_completed_at')
+    supabase.from('kf_content_ideas').select('assigned_calendar, calendar_started_at, calendar_completed_at')
       .eq('workspace_id', wsId)
       .not('calendar_completed_at', 'is', null)
       .gte('calendar_completed_at', `${sevenDaysAgoStr}T00:00:00`),
@@ -315,6 +315,8 @@ export default async function DashboardPage() {
               nama: (e.nama as string) || '',
             }))}
             calendarEntries={(calendarWork || []).map(e => ({
+              assigned_calendar: (e.assigned_calendar as string | null) || null,
+              calendar_started_at: (e.calendar_started_at as string | null) || null,
               calendar_completed_at: (e.calendar_completed_at as string | null) || null,
             }))}
           />

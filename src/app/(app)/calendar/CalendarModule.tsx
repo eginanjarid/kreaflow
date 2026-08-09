@@ -49,7 +49,9 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId, accounts = [], importantDates: initialImportantDates = [] }: {
+type WorkspaceMember = { id: string; user_id: string; email: string; nama: string }
+
+export default function CalendarModule({ initialEntries, workspaceId, ideas, tasks = [], readyQueue = [], autoContentId, accounts = [], importantDates: initialImportantDates = [], workspaceMembers = [] }: {
   initialEntries: Entry[]
   workspaceId: string
   ideas: ContentIdea[]
@@ -58,6 +60,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   autoContentId?: string
   accounts?: SosmedAkun[]
   importantDates?: ImportantDate[]
+  workspaceMembers?: WorkspaceMember[]
 }) {
   const now = new Date()
   const [entries, setEntries] = useState<Entry[]>(initialEntries)
@@ -71,7 +74,7 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
   const effectiveView = isMobile ? 'list' : view
   const [showTasks, setShowTasks] = useState(true)
   const [readyItems, setReadyItems] = useState<ReadyItem[]>(readyQueue)
-  const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platforms: string[] } | null>(null)
+  const [schedModal, setSchedModal] = useState<{ item: ReadyItem; date: string; time: string; platforms: string[]; assignedCalendar: string } | null>(null)
   // selectedAkunIds: akun yang dipilih untuk scheduling (id dari kf_accounts)
   const [schedSaving, setSchedSaving] = useState(false)
   const [schedError, setSchedError] = useState('')
@@ -210,7 +213,7 @@ function prevMonth() {
       : registeredPlatforms
     const defaultDate = item.tanggal_tayang || todayDateStr
     const defaultTime = item.jam_tayang || '09:00'
-    setSchedModal({ item, date: defaultDate, time: defaultTime, platforms: defaultPlatforms })
+    setSchedModal({ item, date: defaultDate, time: defaultTime, platforms: defaultPlatforms, assignedCalendar: '' })
     setSchedError('')
   }
 
@@ -230,7 +233,7 @@ function prevMonth() {
     const { data: newEntries } = await supabase.from('kf_calendar_entries').insert(
       platforms.map(p => ({ workspace_id: workspaceId, content_id: item.id, platform: p, scheduled_at, status: 'Planned', posted_at: null, posted_url: null }))
     ).select('id, platform')
-    await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date, calendar_started_at: new Date().toISOString() }).eq('id', item.id)
+    await supabase.from('kf_content_ideas').update({ status: 'Terjadwal', tanggal_tayang: date, calendar_started_at: new Date().toISOString(), assigned_calendar: schedModal.assignedCalendar || null }).eq('id', item.id)
     if (item.sprint_id) {
       await supabase.from('kf_notifications').insert({
         workspace_id: workspaceId,
@@ -612,6 +615,21 @@ function prevMonth() {
                   })}
                 </div>
               </div>
+              {/* Assignee */}
+              {workspaceMembers.length > 0 && (
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Dikerjakan oleh (Social Media)</label>
+                  <select
+                    value={schedModal.assignedCalendar}
+                    onChange={e => setSchedModal(s => s ? { ...s, assignedCalendar: e.target.value } : s)}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: schedModal.assignedCalendar ? '#111827' : '#9ca3af', fontSize: '0.875rem', outline: 'none' }}>
+                    <option value=''>— Pilih anggota —</option>
+                    {workspaceMembers.map(m => (
+                      <option key={m.id} value={m.email}>{m.nama || m.email.split('@')[0]}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {schedError && (
                 <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)', borderRadius: 8, padding: '10px 12px', fontSize: '0.8rem', color: '#dc2626' }}>
                   {schedError}
