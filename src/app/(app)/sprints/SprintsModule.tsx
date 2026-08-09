@@ -1060,7 +1060,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               </>
             )}
             <button onClick={() => { setSubtaskInputs([]); setTaskModal({ open: true, task: emptyTask() }) }}
-              style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+              style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '8px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
               + Task
             </button>
           </div>
