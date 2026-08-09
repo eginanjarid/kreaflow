@@ -63,6 +63,7 @@ type ManualTask = {
   assigned_to: string | null
   parent_id?: string | null
   sort_order?: number | null
+  created_at?: string | null
 }
 
 // ── Sprint templates ──────────────────────────────────────────────────────────
@@ -848,7 +849,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       const validNewSubs = subtaskInputs.map(s => s.trim()).filter(Boolean)
       if (validNewSubs.length > 0) {
         const subRows = validNewSubs.map(nama => ({ workspace_id: workspaceId, parent_id: t.id!, nama, priority: t.priority, percent_complete: 0, platform: null, start_date: null, due_date: null, notes: null, assigned_to: null }))
-        const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id')
+        const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id, created_at')
         if (inserted) setTasks(prev => [...prev, ...inserted.map((s: ManualTask) => ({ ...s }))])
         setExpandedTasks(prev => new Set([...prev, t.id!]))
       }
@@ -872,7 +873,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             percent_complete: 0,
             platform: null, start_date: null, due_date: null, notes: null, assigned_to: null,
           }))
-          const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id')
+          const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id, created_at')
           if (inserted) {
             setTasks(prev => [...inserted.map((s: ManualTask) => ({ ...s })), ...prev])
             setExpandedTasks(prev => new Set([...prev, data.id]))
@@ -902,7 +903,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const tasksTodo  = filteredRootTasks.filter(t => t.percent_complete === 0)
   const tasksDoing = filteredRootTasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
   const tasksDone  = filteredRootTasks.filter(t => t.percent_complete === 100)
-  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => a.nama.localeCompare(b.nama, undefined, { numeric: true }))
+  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? ''))
 
   async function advanceTaskCol(t: ManualTask, direction: 'forward' | 'back') {
     const next = direction === 'forward'
@@ -944,7 +945,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         const subs = getSubtasks(id)
         if (subs.length > 0) {
           const subRows = subs.map(s => ({ workspace_id: workspaceId, parent_id: data.id, nama: s.nama, priority: s.priority, percent_complete: 0, platform: null, start_date: null, due_date: null, notes: null, assigned_to: null }))
-          const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id')
+          const { data: inserted } = await supabase.from('kf_tasks').insert(subRows).select('id, nama, priority, percent_complete, platform, start_date, due_date, notes, assigned_to, workspace_id, parent_id, created_at')
           if (inserted) setTasks(prev => [...prev, ...inserted.map((s: ManualTask) => ({ ...s }))])
         }
       }
