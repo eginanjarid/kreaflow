@@ -444,6 +444,11 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
           <span style={{ fontSize: '0.62rem', fontWeight: 700, color: stageColor[stage], background: stageColor[stage] + '18', padding: '2px 7px', borderRadius: 4, alignSelf: 'flex-start' }}>{stageLabel[stage]}</span>
         )}
         <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#111827', lineHeight: 1.3 }}>{item.judul || '(Tanpa judul)'}</div>
+        {(item.hook || item.body || item.script) && (
+          <div style={{ fontSize: '0.72rem', color: '#6b7280', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            {(item.hook || item.body || item.script || '').slice(0, 100)}
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
           {product && <span style={{ fontSize: '0.64rem', color: '#1a73e8', background: 'rgba(26,115,232,0.10)', padding: '1px 5px', borderRadius: 3 }}>{product.nama}</span>}
           {item.format && <span style={{ fontSize: '0.64rem', color: '#6b7280', background: '#f3f4f6', padding: '1px 5px', borderRadius: 3 }}>{item.format}</span>}
