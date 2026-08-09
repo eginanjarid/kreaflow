@@ -898,7 +898,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const tasksTodo  = rootTasks.filter(t => t.percent_complete === 0)
   const tasksDoing = rootTasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
   const tasksDone  = rootTasks.filter(t => t.percent_complete === 100)
-  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId)
+  const getSubtasks = (parentId: string) => tasks.filter(t => t.parent_id === parentId).sort((a, b) => a.nama.localeCompare(b.nama))
 
   async function advanceTaskCol(t: ManualTask, direction: 'forward' | 'back') {
     const next = direction === 'forward'
