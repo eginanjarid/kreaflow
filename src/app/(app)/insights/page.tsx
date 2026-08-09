@@ -25,6 +25,7 @@ export default async function DashboardPage() {
     { data: planWork },
     { data: studioWork },
     { data: taskWork },
+    { data: calendarWork },
   ] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).maybeSingle(),
     supabase.from('kf_content_ideas').select('id, status, platform, sprint_id').eq('workspace_id', wsId),
@@ -61,6 +62,10 @@ export default async function DashboardPage() {
       .eq('workspace_id', wsId)
       .not('completed_at', 'is', null)
       .gte('completed_at', `${sevenDaysAgoStr}T00:00:00`),
+    supabase.from('kf_content_ideas').select('calendar_completed_at')
+      .eq('workspace_id', wsId)
+      .not('calendar_completed_at', 'is', null)
+      .gte('calendar_completed_at', `${sevenDaysAgoStr}T00:00:00`),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
@@ -308,6 +313,9 @@ export default async function DashboardPage() {
               started_at: (e.started_at as string | null) || null,
               completed_at: (e.completed_at as string | null) || null,
               nama: (e.nama as string) || '',
+            }))}
+            calendarEntries={(calendarWork || []).map(e => ({
+              calendar_completed_at: (e.calendar_completed_at as string | null) || null,
             }))}
           />
 
