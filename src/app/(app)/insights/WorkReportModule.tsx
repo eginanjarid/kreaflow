@@ -21,9 +21,20 @@ function fmtDur(h: number): string {
   return `${h.toFixed(1)}j`
 }
 
-export default function WorkReportModule({
-  planEntries, studioEntries, taskEntries, calendarEntries
-}: {
+const MODULES = [
+  { key: 'p', label: 'Naskah', color: '#1a73e8' },
+  { key: 's', label: 'Studio', color: '#7c3aed' },
+  { key: 't', label: 'Tasks',  color: '#6366f1' },
+  { key: 'c', label: 'Tayang', color: '#059669' },
+] as const
+
+const BADGES = [
+  { emoji: '🔥', label: 'On Fire!', color: '#f97316', anim: 'kf-flame' },
+  { emoji: '⭐', label: 'Bintang',  color: '#eab308', anim: 'kf-star'  },
+  { emoji: '🎯', label: 'Solid',    color: '#8b5cf6', anim: ''         },
+]
+
+export default function WorkReportModule({ planEntries, studioEntries, taskEntries, calendarEntries }: {
   planEntries: PlanEntry[]
   studioEntries: StudioEntry[]
   taskEntries: TaskEntry[]
@@ -31,6 +42,7 @@ export default function WorkReportModule({
 }) {
   const CARD = { background: '#fff', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)' }
 
+  // 7-day chart
   const days: string[] = []
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i)
@@ -46,9 +58,9 @@ export default function WorkReportModule({
     return { day, p, s, t, c, total: p + s + t + c }
   })
   const maxTotal = Math.max(...dailyCounts.map(d => d.total), 1)
-  const totalAllTime = planEntries.length + studioEntries.length + taskEntries.length + calendarEntries.length
+  const totalCalPosted = calendarEntries.length
 
-  // Per-person stats
+  // Per-person
   const allPeople = new Set<string>()
   planEntries.forEach(e => { if (e.assigned_naskah) allPeople.add(e.assigned_naskah) })
   studioEntries.forEach(e => { if (e.assigned_produksi) allPeople.add(e.assigned_produksi) })
@@ -67,18 +79,31 @@ export default function WorkReportModule({
     const totalDone = pd.length + sd.length + td.length + cd.length
     return {
       person,
-      pd: pd.length, ph: ph.length > 0 ? ph.reduce((a,b)=>a+b,0)/ph.length : null,
-      sd: sd.length, sh: sh.length > 0 ? sh.reduce((a,b)=>a+b,0)/sh.length : null,
-      td: td.length, th: th.length > 0 ? th.reduce((a,b)=>a+b,0)/th.length : null,
-      cd: cd.length, ch: ch.length > 0 ? ch.reduce((a,b)=>a+b,0)/ch.length : null,
+      p: pd.length, ph: ph.length > 0 ? ph.reduce((a,b)=>a+b,0)/ph.length : null,
+      s: sd.length, sh: sh.length > 0 ? sh.reduce((a,b)=>a+b,0)/sh.length : null,
+      t: td.length, th: th.length > 0 ? th.reduce((a,b)=>a+b,0)/th.length : null,
+      c: cd.length, ch: ch.length > 0 ? ch.reduce((a,b)=>a+b,0)/ch.length : null,
       totalDone,
     }
   }).sort((a, b) => b.totalDone - a.totalDone)
 
-  const totalCalPosted = calendarEntries.length
+  const maxPersonTotal = Math.max(...stats.map(s => s.totalDone), 1)
 
   return (
     <div style={{ ...CARD, padding: '20px 22px' }}>
+      <style>{`
+        @keyframes kf-flame {
+          0%,100% { transform: scale(1) rotate(-4deg); }
+          50%      { transform: scale(1.25) rotate(4deg); }
+        }
+        @keyframes kf-star {
+          0%,100% { transform: scale(1) rotate(0deg); opacity:1; }
+          50%      { transform: scale(1.2) rotate(20deg); opacity:0.85; }
+        }
+        .kf-flame { animation: kf-flame 0.9s ease-in-out infinite; display:inline-block; }
+        .kf-star  { animation: kf-star  1.4s ease-in-out infinite; display:inline-block; }
+      `}</style>
+
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.92rem' }}>Aktivitas Tim</div>
@@ -110,15 +135,10 @@ export default function WorkReportModule({
 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
-        {[
-          { color: '#1a73e8', label: 'Plan' },
-          { color: '#7c3aed', label: 'Studio' },
-          { color: '#6366f1', label: 'Tasks' },
-          { color: '#059669', label: 'Tayang' },
-        ].map(l => (
-          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 7, height: 7, borderRadius: 1.5, background: l.color, display: 'block', flexShrink: 0 }} />
-            <span style={{ fontSize: '0.65rem', color: '#9ca3af' }}>{l.label}</span>
+        {MODULES.map(m => (
+          <div key={m.key} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 7, height: 7, borderRadius: 1.5, background: m.color, display: 'block', flexShrink: 0 }} />
+            <span style={{ fontSize: '0.65rem', color: '#9ca3af' }}>{m.label}</span>
           </div>
         ))}
       </div>
@@ -129,10 +149,9 @@ export default function WorkReportModule({
         </div>
       )}
 
-      {/* Divider */}
       <div style={{ borderTop: '1px solid #f3f4f6', marginBottom: 14 }} />
 
-      {/* Per-person or empty state */}
+      {/* Per-person */}
       {allPeople.size === 0 ? (
         <div style={{ textAlign: 'center', padding: '14px 0' }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
@@ -143,25 +162,75 @@ export default function WorkReportModule({
         </div>
       ) : (
         <>
-          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
-            Per Anggota · {totalAllTime} aktivitas selesai
+          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
+            Per Anggota · {stats.reduce((a,b) => a + b.totalDone, 0)} aktivitas selesai
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {stats.map(s => (
-              <div key={s.person} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', background: '#f9fafb', borderRadius: 10 }}>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#374151' }}>{shortName(s.person).slice(0, 2).toUpperCase()}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {stats.map((s, rank) => {
+              const badge = rank < BADGES.length ? BADGES[rank] : null
+              const modules = [
+                { key: 'p', count: s.p, avg: s.ph, color: '#1a73e8', label: 'Naskah' },
+                { key: 's', count: s.s, avg: s.sh, color: '#7c3aed', label: 'Studio' },
+                { key: 't', count: s.t, avg: s.th, color: '#6366f1', label: 'Tasks' },
+                { key: 'c', count: s.c, avg: s.ch, color: '#059669', label: 'Tayang' },
+              ].filter(m => m.count > 0)
+
+              return (
+                <div key={s.person} style={{ background: rank === 0 ? 'linear-gradient(135deg, rgba(249,115,22,0.05), rgba(234,179,8,0.04))' : '#f9fafb', border: rank === 0 ? '1.5px solid rgba(249,115,22,0.2)' : '1.5px solid transparent', borderRadius: 12, padding: '12px 14px' }}>
+                  {/* Top row: avatar + name + badge + total */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: rank === 0 ? 'linear-gradient(135deg,#f97316,#eab308)' : '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 800, color: rank === 0 ? '#fff' : '#374151' }}>{shortName(s.person).slice(0, 2).toUpperCase()}</span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortName(s.person)}</span>
+                        {badge && (
+                          <span className={badge.anim} title={badge.label} style={{ fontSize: '0.9rem', lineHeight: 1, flexShrink: 0 }}>{badge.emoji}</span>
+                        )}
+                      </div>
+                      {rank === 0 && (
+                        <div style={{ fontSize: '0.6rem', color: '#f97316', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Top Performer</div>
+                      )}
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: rank === 0 ? '#f97316' : '#374151', lineHeight: 1 }}>{s.totalDone}</div>
+                      <div style={{ fontSize: '0.58rem', color: '#9ca3af' }}>aktivitas</div>
+                    </div>
+                  </div>
+
+                  {/* Mini stacked bar */}
+                  <div style={{ height: 6, background: '#e5e7eb', borderRadius: 4, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
+                    {modules.map(m => (
+                      <div key={m.key} style={{ background: m.color, width: `${Math.round(m.count / s.totalDone * 100)}%`, transition: 'width 0.4s' }} />
+                    ))}
+                  </div>
+
+                  {/* Module breakdown labels */}
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {modules.map(m => (
+                      <div key={m.key} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: 1.5, background: m.color, display: 'block', flexShrink: 0 }} />
+                        <span style={{ fontSize: '0.68rem', color: '#6b7280' }}>
+                          {m.label}: <span style={{ fontWeight: 700, color: '#374151' }}>{m.count}x</span>
+                          {m.avg != null && <span style={{ color: '#9ca3af' }}> ~{fmtDur(m.avg)}</span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Progress bar vs top */}
+                  {rank > 0 && (
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ height: 3, background: '#e5e7eb', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${Math.round(s.totalDone / maxPersonTotal * 100)}%`, background: '#6366f1', borderRadius: 2, transition: 'width 0.4s' }} />
+                      </div>
+                      <div style={{ fontSize: '0.58rem', color: '#9ca3af', marginTop: 3 }}>{Math.round(s.totalDone / maxPersonTotal * 100)}% dari top performer</div>
+                    </div>
+                  )}
                 </div>
-                <span style={{ flex: 1, fontSize: '0.78rem', fontWeight: 600, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortName(s.person)}</span>
-                <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
-                  {s.pd > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(26,115,232,0.1)', color: '#1a73e8', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>P {s.pd}x{s.ph != null ? ` ~${fmtDur(s.ph)}` : ''}</span>}
-                  {s.sd > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(124,58,237,0.1)', color: '#7c3aed', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>S {s.sd}x{s.sh != null ? ` ~${fmtDur(s.sh)}` : ''}</span>}
-                  {s.td > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(99,102,241,0.1)', color: '#6366f1', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>T {s.td}x{s.th != null ? ` ~${fmtDur(s.th)}` : ''}</span>}
-                  {s.cd > 0 && <span style={{ fontSize: '0.65rem', background: 'rgba(5,150,105,0.1)', color: '#059669', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>C {s.cd}x{s.ch != null ? ` ~${fmtDur(s.ch)}` : ''}</span>}
-                </div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#111827', minWidth: 20, textAlign: 'right', flexShrink: 0 }}>{s.totalDone}</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </>
       )}
