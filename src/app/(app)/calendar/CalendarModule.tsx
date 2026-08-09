@@ -27,6 +27,7 @@ type ReadyItem = {
   id: string; judul: string; format: string | null; platform: string[] | null
   product_id: string | null; product_nama: string | null; sprint_id: string | null
   tanggal_tayang: string | null; jam_tayang: string | null
+  assigned_schedule: string | null
 }
 type TaskSnap = { id: string; nama: string; platform: string | null; due_date: string; percent_complete: number; priority: string; stage?: string | null; assigned_to?: string | null }
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
@@ -213,7 +214,7 @@ function prevMonth() {
       : registeredPlatforms
     const defaultDate = item.tanggal_tayang || todayDateStr
     const defaultTime = item.jam_tayang || '09:00'
-    setSchedModal({ item, date: defaultDate, time: defaultTime, platforms: defaultPlatforms, assignedCalendar: '' })
+    setSchedModal({ item, date: defaultDate, time: defaultTime, platforms: defaultPlatforms, assignedCalendar: item.assigned_schedule || '' })
     setSchedError('')
   }
 
@@ -618,7 +619,10 @@ function prevMonth() {
               {/* Assignee */}
               {workspaceMembers.length > 0 && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Dikerjakan oleh (Social Media)</label>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>
+                    Social Media Specialist
+                    {schedModal.item.assigned_schedule && <span style={{ fontWeight: 400, color: '#059669', marginLeft: 6 }}>· auto dari sprint</span>}
+                  </label>
                   <select
                     value={schedModal.assignedCalendar}
                     onChange={e => setSchedModal(s => s ? { ...s, assignedCalendar: e.target.value } : s)}

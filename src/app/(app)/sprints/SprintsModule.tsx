@@ -246,7 +246,7 @@ const STEP_ASSIGN_COL: Record<string, string> = {
   persiapan: 'assigned_produksi',
 }
 
-const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 'Art Director', 'Owner', 'Content Creator']
+const JABATAN_PRESETS = ['Copywriter', 'Videografer', 'Editor', 'Admin Sosmed', 'Social Media Specialist', 'Art Director', 'Owner', 'Content Creator']
 
 type SosmedAkun = { id: string; platform: string; handle: string; nama: string }
 

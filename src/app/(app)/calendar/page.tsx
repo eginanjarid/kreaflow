@@ -17,7 +17,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId),
     supabase.from('kf_tasks').select('id,nama,platform,due_date,percent_complete,priority,stage,assigned_to').eq('workspace_id', wsId).not('due_date', 'is', null),
     supabase.from('kf_products').select('id, nama').eq('workspace_id', wsId).eq('is_active', true),
-    supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id, tanggal_tayang, jam_tayang').eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
+    supabase.from('kf_content_ideas').select('id, judul, format, platform, product_id, sprint_id, tanggal_tayang, jam_tayang, assigned_schedule').eq('workspace_id', wsId).eq('status', 'Siap Tayang'),
     supabase.from('kf_accounts').select('id, platform, handle, nama').eq('workspace_id', wsId).order('platform'),
     supabase.from('kf_important_dates').select('id, workspace_id, nama, tanggal, tipe, warna, deskripsi, is_repeating').or(`workspace_id.eq.${wsId},workspace_id.is.null`).order('tanggal'),
     supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
@@ -54,6 +54,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     sprint_id: (r.sprint_id as string | null) || null,
     tanggal_tayang: (r.tanggal_tayang as string | null) || null,
     jam_tayang: (r.jam_tayang as string | null) || null,
+    assigned_schedule: (r.assigned_schedule as string | null) || null,
   }))
 
   const accountList = (accounts || []).map(a => ({

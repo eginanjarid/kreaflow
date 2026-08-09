@@ -8,6 +8,7 @@ const JABATAN_NOTIF_TYPES: Record<string, string[]> = {
   'Editor':       ['produksi', 'deadline'],
   'Desainer':     ['produksi', 'deadline'],
   'Admin Sosmed': ['schedule', 'deadline'],
+  'Social Media Specialist': ['schedule', 'deadline'],
   'Art Director': ['naskah', 'produksi', 'deadline'],
 }
 
