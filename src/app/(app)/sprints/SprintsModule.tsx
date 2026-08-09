@@ -1030,12 +1030,21 @@ export default function SprintsModule({ initialSprints, initialContents, product
       // ── TASKS KANBAN ───────────────────────────────────────────────────────
       <div style={{ display: 'flex', flex: 1, flexDirection: 'column', overflow: 'hidden', background: '#f5f6fa' }}>
         {/* Header */}
-        <div style={{ padding: '12px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div>
+        <div style={{ padding: '12px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, gap: 12 }}>
+          <div style={{ flexShrink: 0 }}>
             <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>Tasks</span>
             <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 10 }}>Non-konten · beli alat, meeting, admin, dll</span>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginLeft: 'auto' }}>
+            {allAssignees.length > 0 && (
+              <select value={filterAssignee} onChange={e => setFilterAssignee(e.target.value)}
+                style={{ background: '#f8fafc', border: `1px solid ${filterAssignee ? '#1a73e8' : '#e5eaf2'}`, borderRadius: 8, padding: '6px 10px', color: filterAssignee ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', fontWeight: filterAssignee ? 600 : 400, outline: 'none', cursor: 'pointer' }}>
+                <option value="">Semua Anggota</option>
+                {allAssignees.map(a => (
+                  <option key={a} value={a}>{a.split('@')[0]}</option>
+                ))}
+              </select>
+            )}
             {selectedTaskIds.size > 0 && (
               <>
                 <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{selectedTaskIds.size} dipilih</span>
@@ -1056,20 +1065,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
             </button>
           </div>
         </div>
-
-        {/* Assignee filter */}
-        {allAssignees.length > 0 && (
-          <div style={{ padding: '8px 16px', background: '#fff', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <span style={{ fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Anggota:</span>
-            <select value={filterAssignee} onChange={e => setFilterAssignee(e.target.value)}
-              style={{ background: '#f8fafc', border: `1px solid ${filterAssignee ? '#1a73e8' : '#e5eaf2'}`, borderRadius: 8, padding: '5px 10px', color: filterAssignee ? '#1a73e8' : '#374151', fontSize: '0.78rem', fontWeight: filterAssignee ? 600 : 400, outline: 'none', cursor: 'pointer', minWidth: 160 }}>
-              <option value="">Semua Anggota</option>
-              {allAssignees.map(a => (
-                <option key={a} value={a}>{a.split('@')[0]}</option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {/* 3-col kanban */}
         <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', display: 'flex', padding: '16px', gap: 12 }}>
