@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 
 type PlanEntry = { assigned_naskah: string | null; plan_started_at: string | null; plan_completed_at: string | null }
 type StudioEntry = { assigned_produksi: string | null; studio_started_at: string | null; studio_completed_at: string | null }
@@ -42,41 +43,54 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
   calendarEntries: CalendarEntry[]
   weeklyTasks: WeeklyTask[]
 }) {
+  const [period, setPeriod] = useState<7 | 30>(7)
   const CARD = { background: '#fff', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)' }
 
-  // 7-day chart
+  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
+
+  // Build chart bars based on period
+  const periodStartStr = (() => {
+    const d = new Date(); d.setDate(d.getDate() - (period - 1))
+    return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
+  })()
+
   const days: string[] = []
-  for (let i = 6; i >= 0; i--) {
+  for (let i = period - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i)
     days.push(d.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }))
   }
-  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
+
+  // Filter entries to selected period
+  const filteredPlan = planEntries.filter(e => (e.plan_completed_at?.slice(0, 10) ?? '') >= periodStartStr)
+  const filteredStudio = studioEntries.filter(e => (e.studio_completed_at?.slice(0, 10) ?? '') >= periodStartStr)
+  const filteredTask = taskEntries.filter(e => (e.completed_at?.slice(0, 10) ?? '') >= periodStartStr)
+  const filteredCal = calendarEntries.filter(e => (e.calendar_completed_at?.slice(0, 10) ?? '') >= periodStartStr)
 
   const dailyCounts = days.map(day => {
-    const p = planEntries.filter(e => e.plan_completed_at?.slice(0, 10) === day).length
-    const s = studioEntries.filter(e => e.studio_completed_at?.slice(0, 10) === day).length
-    const t = taskEntries.filter(e => e.completed_at?.slice(0, 10) === day).length
-    const c = calendarEntries.filter(e => e.calendar_completed_at?.slice(0, 10) === day).length
+    const p = filteredPlan.filter(e => e.plan_completed_at?.slice(0, 10) === day).length
+    const s = filteredStudio.filter(e => e.studio_completed_at?.slice(0, 10) === day).length
+    const t = filteredTask.filter(e => e.completed_at?.slice(0, 10) === day).length
+    const c = filteredCal.filter(e => e.calendar_completed_at?.slice(0, 10) === day).length
     return { day, p, s, t, c, total: p + s + t + c }
   })
   const maxTotal = Math.max(...dailyCounts.map(d => d.total), 1)
-  const totalCalPosted = calendarEntries.length
+  const totalCalPosted = filteredCal.length
 
-  // Per-person
+  // Per-person (filtered)
   const allPeople = new Set<string>()
-  planEntries.forEach(e => { if (e.assigned_naskah) allPeople.add(e.assigned_naskah) })
-  studioEntries.forEach(e => { if (e.assigned_produksi) allPeople.add(e.assigned_produksi) })
-  taskEntries.forEach(e => { if (e.assigned_to) allPeople.add(e.assigned_to) })
-  calendarEntries.forEach(e => { if (e.assigned_calendar) allPeople.add(e.assigned_calendar) })
+  filteredPlan.forEach(e => { if (e.assigned_naskah) allPeople.add(e.assigned_naskah) })
+  filteredStudio.forEach(e => { if (e.assigned_produksi) allPeople.add(e.assigned_produksi) })
+  filteredTask.forEach(e => { if (e.assigned_to) allPeople.add(e.assigned_to) })
+  filteredCal.forEach(e => { if (e.assigned_calendar) allPeople.add(e.assigned_calendar) })
 
   const stats = Array.from(allPeople).map(person => {
-    const pd = planEntries.filter(e => e.assigned_naskah === person && e.plan_completed_at)
+    const pd = filteredPlan.filter(e => e.assigned_naskah === person && e.plan_completed_at)
     const ph = pd.map(e => diffHours(e.plan_started_at, e.plan_completed_at)).filter((h): h is number => h !== null)
-    const sd = studioEntries.filter(e => e.assigned_produksi === person && e.studio_completed_at)
+    const sd = filteredStudio.filter(e => e.assigned_produksi === person && e.studio_completed_at)
     const sh = sd.map(e => diffHours(e.studio_started_at, e.studio_completed_at)).filter((h): h is number => h !== null)
-    const td = taskEntries.filter(e => e.assigned_to === person && e.completed_at)
+    const td = filteredTask.filter(e => e.assigned_to === person && e.completed_at)
     const th = td.map(e => diffHours(e.started_at, e.completed_at)).filter((h): h is number => h !== null)
-    const cd = calendarEntries.filter(e => e.assigned_calendar === person && e.calendar_completed_at)
+    const cd = filteredCal.filter(e => e.assigned_calendar === person && e.calendar_completed_at)
     const ch = cd.map(e => diffHours(e.calendar_started_at, e.calendar_completed_at)).filter((h): h is number => h !== null)
     const totalDone = pd.length + sd.length + td.length + cd.length
 
@@ -117,7 +131,14 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.92rem' }}>Aktivitas Tim</div>
-        <span style={{ fontSize: '0.68rem', color: '#9ca3af' }}>7 hari terakhir</span>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {([7, 30] as const).map(p => (
+            <button key={p} onClick={() => setPeriod(p)}
+              style={{ fontSize: '0.65rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20, border: 'none', cursor: 'pointer', background: period === p ? '#1a73e8' : '#f3f4f6', color: period === p ? '#fff' : '#6b7280', transition: 'background 0.15s' }}>
+              {p === 7 ? '7 Hari' : '30 Hari'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Bar chart */}
@@ -128,7 +149,7 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
           const dayLabel = new Date(day + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'short' })
           return (
             <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-              {total > 0 && <span style={{ fontSize: '0.55rem', fontWeight: 700, color: '#6b7280' }}>{total}</span>}
+              {total > 0 && (period === 7 || total >= 5) && <span style={{ fontSize: '0.55rem', fontWeight: 700, color: '#6b7280' }}>{total}</span>}
               <div style={{ width: '100%', height: barH, borderRadius: '3px 3px 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column-reverse', background: total === 0 ? '#f3f4f6' : 'transparent' }}>
                 {total > 0 && <>
                   {c > 0 && <div style={{ background: '#059669', height: `${Math.round(c/total*100)}%` }} />}
@@ -137,7 +158,9 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
                   {p > 0 && <div style={{ background: '#1a73e8', height: `${Math.round(p/total*100)}%` }} />}
                 </>}
               </div>
-              <span style={{ fontSize: '0.55rem', color: isToday ? '#1a73e8' : '#c4c4c4', fontWeight: isToday ? 700 : 400 }}>{dayLabel}</span>
+              {(period === 7 || isToday || days.indexOf(day) % 5 === 0) && (
+                <span style={{ fontSize: '0.55rem', color: isToday ? '#1a73e8' : '#c4c4c4', fontWeight: isToday ? 700 : 400 }}>{isToday && period === 30 ? 'Hari ini' : dayLabel}</span>
+              )}
             </div>
           )
         })}

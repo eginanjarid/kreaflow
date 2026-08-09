@@ -13,6 +13,10 @@ export default async function DashboardPage() {
   sevenDaysAgoDate.setDate(sevenDaysAgoDate.getDate() - 6)
   const sevenDaysAgoStr = sevenDaysAgoDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
 
+  const thirtyDaysAgoDate = new Date()
+  thirtyDaysAgoDate.setDate(thirtyDaysAgoDate.getDate() - 29)
+  const thirtyDaysAgoStr = thirtyDaysAgoDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
+
   // Monday–Sunday of current Jakarta week
   const jakartaNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
   const dowJkt = jakartaNow.getDay() // 0=Sun
@@ -47,11 +51,11 @@ export default async function DashboardPage() {
       .gte('scheduled_at', `${today}T00:00:00`)
       .lte('scheduled_at', `${today}T23:59:59`)
       .order('scheduled_at'),
-    supabase.from('kf_tasks').select('id, nama')
+    supabase.from('kf_tasks').select('id, nama, assigned_to, due_date')
       .eq('workspace_id', wsId)
       .lt('due_date', today)
       .lt('percent_complete', 100)
-      .limit(5),
+      .order('due_date', { ascending: true }),
     supabase.from('kf_sprints').select('id, nama, start_date, end_date, target_konten')
       .eq('workspace_id', wsId)
       .lte('start_date', today)
@@ -64,19 +68,19 @@ export default async function DashboardPage() {
     supabase.from('kf_content_ideas').select('assigned_naskah, plan_started_at, plan_completed_at')
       .eq('workspace_id', wsId)
       .not('plan_completed_at', 'is', null)
-      .gte('plan_completed_at', `${sevenDaysAgoStr}T00:00:00`),
+      .gte('plan_completed_at', `${thirtyDaysAgoStr}T00:00:00`),
     supabase.from('kf_content_ideas').select('assigned_produksi, studio_started_at, studio_completed_at')
       .eq('workspace_id', wsId)
       .not('studio_completed_at', 'is', null)
-      .gte('studio_completed_at', `${sevenDaysAgoStr}T00:00:00`),
+      .gte('studio_completed_at', `${thirtyDaysAgoStr}T00:00:00`),
     supabase.from('kf_tasks').select('assigned_to, started_at, completed_at, nama')
       .eq('workspace_id', wsId)
       .not('completed_at', 'is', null)
-      .gte('completed_at', `${sevenDaysAgoStr}T00:00:00`),
+      .gte('completed_at', `${thirtyDaysAgoStr}T00:00:00`),
     supabase.from('kf_content_ideas').select('assigned_calendar, calendar_started_at, calendar_completed_at')
       .eq('workspace_id', wsId)
       .not('calendar_completed_at', 'is', null)
-      .gte('calendar_completed_at', `${sevenDaysAgoStr}T00:00:00`),
+      .gte('calendar_completed_at', `${thirtyDaysAgoStr}T00:00:00`),
     supabase.from('kf_tasks').select('assigned_to, due_date, percent_complete, nama')
       .eq('workspace_id', wsId)
       .not('due_date', 'is', null)
@@ -312,6 +316,54 @@ export default async function DashboardPage() {
             )}
           </div>
 
+          {/* Keterlambatan Tim */}
+          {(overdueTasks?.length ?? 0) > 0 && (<div id="keterlambatan" style={{ scrollMarginTop: 80 }}>{(() => {
+            const overdueList = (overdueTasks || []) as { id: string; nama: string; assigned_to: string | null; due_date: string | null }[]
+            const grouped: Record<string, { nama: string; due_date: string | null }[]> = {}
+            overdueList.forEach(t => {
+              const key = t.assigned_to || '—'
+              if (!grouped[key]) grouped[key] = []
+              grouped[key].push({ nama: t.nama, due_date: t.due_date })
+            })
+            const daysLate = (due: string | null) => {
+              if (!due) return 0
+              return Math.floor((new Date(today).getTime() - new Date(due).getTime()) / 86400000)
+            }
+            return (
+              <div style={{ ...CARD, padding: '20px 22px', borderLeft: '3px solid #dc2626' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontWeight: 700, color: '#dc2626', fontSize: '0.92rem' }}>Keterlambatan Tim</div>
+                    <span style={{ background: '#dc2626', color: '#fff', fontSize: '0.65rem', fontWeight: 800, padding: '2px 8px', borderRadius: 20 }}>{overdueList.length} task</span>
+                  </div>
+                  <a href="/tasks" style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 600, textDecoration: 'none' }}>Lihat Tasks →</a>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {Object.entries(grouped).sort((a, b) => b[1].length - a[1].length).map(([person, tasks]) => (
+                    <div key={person} style={{ background: '#fef2f2', borderRadius: 10, padding: '10px 14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span style={{ fontSize: '0.6rem', fontWeight: 800, color: '#fff' }}>{person.slice(0, 2).toUpperCase()}</span>
+                        </div>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#991b1b', flex: 1 }}>{person === '—' ? 'Belum ada PIC' : person.split('@')[0]}</span>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#dc2626', background: '#fee2e2', padding: '1px 8px', borderRadius: 20 }}>{tasks.length} terlambat</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {tasks.map((t, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span style={{ fontSize: '0.75rem', color: '#374151', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.nama}</span>
+                            <span style={{ fontSize: '0.6rem', color: '#dc2626', fontWeight: 700, flexShrink: 0 }}>+{daysLate(t.due_date)}h</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}</div>)}
+
           {/* Work Speed Report */}
           <WorkReportModule
             planEntries={(planWork || []).map(e => ({
@@ -399,24 +451,13 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          {/* Overdue Tasks */}
+          {/* Overdue badge shortcut (full list in left column) */}
           {(overdueTasks?.length ?? 0) > 0 && (
-            <div style={{ ...CARD, padding: '18px 20px', borderLeft: '3px solid #dc2626' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <div style={{ fontWeight: 700, color: '#dc2626', fontSize: '0.88rem' }}>
-                  Overdue ({overdueTasks!.length})
-                </div>
-                <a href="/tasks" style={{ fontSize: '0.72rem', color: '#dc2626', fontWeight: 600, textDecoration: 'none' }}>Lihat Semua →</a>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {overdueTasks!.map(t => (
-                  <div key={t.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: '0.78rem', color: '#374151' }}>
-                    <svg style={{ flexShrink: 0, marginTop: 1 }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{t.nama}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <a href="#keterlambatan" style={{ display: 'flex', alignItems: 'center', gap: 10, ...CARD, padding: '14px 18px', textDecoration: 'none', borderLeft: '3px solid #dc2626' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style={{ flex: 1, fontSize: '0.82rem', fontWeight: 700, color: '#dc2626' }}>{overdueTasks!.length} task terlambat</span>
+              <span style={{ fontSize: '0.72rem', color: '#dc2626' }}>Lihat ↓</span>
+            </a>
           )}
 
           {/* Quick Actions */}
