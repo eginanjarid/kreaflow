@@ -710,7 +710,10 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     const naskahDeadline = item.tanggal_tayang && item.naskah_days_before != null
                       ? (() => { const d = new Date(item.tanggal_tayang + 'T00:00:00'); d.setDate(d.getDate() - item.naskah_days_before); return d })()
                       : null
-                    const naskahOverdue = naskahDeadline ? naskahDeadline < new Date() : false
+                    const naskahDiffDays = naskahDeadline
+                      ? Math.round((naskahDeadline.getTime() - new Date().setHours(0,0,0,0)) / 86400000)
+                      : null
+                    const naskahOverdue = naskahDiffDays != null && naskahDiffDays < 0
                     return (
                       <div key={item.id} style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
                         {isNewDay && (
@@ -748,10 +751,16 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                             <span>{new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` ${item.jam_tayang}` : ''}</span>
                           </div>
                         )}
-                        {naskahDeadline && (
-                          <div style={{ fontSize: '0.65rem', fontWeight: 700, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3, color: naskahOverdue ? '#dc2626' : '#d97706' }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            <span>Naskah: {naskahDeadline.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{naskahOverdue ? ' !' : ''}</span>
+                        {naskahDeadline && naskahDiffDays != null && (
+                          <div style={{ fontSize: '0.63rem', fontWeight: 700, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 3,
+                            color: naskahOverdue ? '#dc2626' : naskahDiffDays <= 1 ? '#d97706' : '#059669',
+                            background: naskahOverdue ? '#fef2f2' : naskahDiffDays <= 1 ? '#fffbeb' : '#f0fdf4',
+                            borderRadius: 5, padding: '2px 6px', alignSelf: 'flex-start' }}>
+                            {naskahOverdue
+                              ? `⚠️ Terlambat ${Math.abs(naskahDiffDays)} hr`
+                              : naskahDiffDays === 0
+                              ? `⏰ Deadline hari ini!`
+                              : `⏰ Deadline ${naskahDeadline.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} · ${naskahDiffDays}hr lagi`}
                           </div>
                         )}
                         {item.sprint_nama && (
