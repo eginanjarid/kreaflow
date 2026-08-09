@@ -440,7 +440,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
 
       {/* Action Modal */}
       {(actionUser || actionWs) && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 400, padding: '24px' }}>
             <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem', marginBottom: 4 }}>
               {actionType === 'password' ? 'Reset Password' : 'Ubah Plan'}
