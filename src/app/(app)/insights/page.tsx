@@ -291,6 +291,26 @@ export default async function DashboardPage() {
             )}
           </div>
 
+          {/* Work Speed Report */}
+          <WorkReportModule
+            planEntries={(planWork || []).map(e => ({
+              assigned_naskah: (e.assigned_naskah as string | null) || null,
+              plan_started_at: (e.plan_started_at as string | null) || null,
+              plan_completed_at: (e.plan_completed_at as string | null) || null,
+            }))}
+            studioEntries={(studioWork || []).map(e => ({
+              assigned_produksi: (e.assigned_produksi as string | null) || null,
+              studio_started_at: (e.studio_started_at as string | null) || null,
+              studio_completed_at: (e.studio_completed_at as string | null) || null,
+            }))}
+            taskEntries={(taskWork || []).map(e => ({
+              assigned_to: (e.assigned_to as string | null) || null,
+              started_at: (e.started_at as string | null) || null,
+              completed_at: (e.completed_at as string | null) || null,
+              nama: (e.nama as string) || '',
+            }))}
+          />
+
           {/* Recent Content */}
           {(recentIdeas || []).length > 0 && (
             <div style={{ ...CARD, padding: '20px 22px' }}>
@@ -411,25 +431,6 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Work Time Report */}
-      <WorkReportModule
-        planEntries={(planWork || []).map(e => ({
-          assigned_naskah: (e.assigned_naskah as string | null) || null,
-          plan_started_at: (e.plan_started_at as string | null) || null,
-          plan_completed_at: (e.plan_completed_at as string | null) || null,
-        }))}
-        studioEntries={(studioWork || []).map(e => ({
-          assigned_produksi: (e.assigned_produksi as string | null) || null,
-          studio_started_at: (e.studio_started_at as string | null) || null,
-          studio_completed_at: (e.studio_completed_at as string | null) || null,
-        }))}
-        taskEntries={(taskWork || []).map(e => ({
-          assigned_to: (e.assigned_to as string | null) || null,
-          started_at: (e.started_at as string | null) || null,
-          completed_at: (e.completed_at as string | null) || null,
-          nama: (e.nama as string) || '',
-        }))}
-      />
     </div>
   )
 }
