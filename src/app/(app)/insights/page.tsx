@@ -1,12 +1,16 @@
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
+import WorkReportModule from './WorkReportModule'
 
 export default async function DashboardPage() {
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'insights')) redirect(firstAccessibleRoute(role, jabatan))
 
   const today = new Date().toISOString().slice(0, 10)
+
+  const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+  const sevenDaysAgoStr = sevenDaysAgo.toISOString().slice(0, 10)
 
   const [
     { data: wsData },
@@ -17,6 +21,9 @@ export default async function DashboardPage() {
     { data: overdueTasks },
     { data: activeSprints },
     { data: recentIdeas },
+    { data: planWork },
+    { data: studioWork },
+    { data: taskWork },
   ] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).maybeSingle(),
     supabase.from('kf_content_ideas').select('id, status, platform, sprint_id').eq('workspace_id', wsId),
@@ -41,6 +48,18 @@ export default async function DashboardPage() {
       .eq('workspace_id', wsId)
       .order('created_at', { ascending: false })
       .limit(6),
+    supabase.from('kf_content_ideas').select('assigned_naskah, plan_started_at, plan_completed_at')
+      .eq('workspace_id', wsId)
+      .not('plan_completed_at', 'is', null)
+      .gte('plan_completed_at', `${sevenDaysAgoStr}T00:00:00`),
+    supabase.from('kf_content_ideas').select('assigned_produksi, studio_started_at, studio_completed_at')
+      .eq('workspace_id', wsId)
+      .not('studio_completed_at', 'is', null)
+      .gte('studio_completed_at', `${sevenDaysAgoStr}T00:00:00`),
+    supabase.from('kf_tasks').select('assigned_to, started_at, completed_at, nama')
+      .eq('workspace_id', wsId)
+      .not('completed_at', 'is', null)
+      .gte('completed_at', `${sevenDaysAgoStr}T00:00:00`),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
@@ -390,6 +409,26 @@ export default async function DashboardPage() {
 
         </div>
       </div>
+
+      {/* Work Time Report */}
+      <WorkReportModule
+        planEntries={(planWork || []).map(e => ({
+          assigned_naskah: (e.assigned_naskah as string | null) || null,
+          plan_started_at: (e.plan_started_at as string | null) || null,
+          plan_completed_at: (e.plan_completed_at as string | null) || null,
+        }))}
+        studioEntries={(studioWork || []).map(e => ({
+          assigned_produksi: (e.assigned_produksi as string | null) || null,
+          studio_started_at: (e.studio_started_at as string | null) || null,
+          studio_completed_at: (e.studio_completed_at as string | null) || null,
+        }))}
+        taskEntries={(taskWork || []).map(e => ({
+          assigned_to: (e.assigned_to as string | null) || null,
+          started_at: (e.started_at as string | null) || null,
+          completed_at: (e.completed_at as string | null) || null,
+          nama: (e.nama as string) || '',
+        }))}
+      />
     </div>
   )
 }
