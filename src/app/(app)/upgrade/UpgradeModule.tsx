@@ -25,8 +25,32 @@ export default function UpgradeModule({
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [couponInput, setCouponInput] = useState('')
+  const [couponApplied, setCouponApplied] = useState<{ code: string; discountAmount: number; type: string; value: number } | null>(null)
+  const [couponError, setCouponError] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [activeTier, setActiveTier] = useState<string | null>(null)
 
   const config = pricing ?? DEFAULT_PRICING
+
+  async function applyCode(tier: string) {
+    if (!couponInput.trim()) return
+    setCouponLoading(true); setCouponError(''); setCouponApplied(null)
+    const tierObj = config.tiers.find(t => t.id === tier)
+    const originalAmount = tierObj?.price ?? 0
+    const res = await fetch('/api/payment/validate-coupon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: couponInput.trim(), tier, originalAmount }),
+    })
+    const data = await res.json()
+    setCouponLoading(false)
+    if (!data.valid) { setCouponError(data.error || 'Kupon tidak valid'); return }
+    setCouponApplied({ code: data.coupon.code, discountAmount: data.discountAmount, type: data.coupon.type, value: data.coupon.value })
+    setActiveTier(tier)
+  }
+
+  function clearCoupon() { setCouponApplied(null); setCouponError(''); setCouponInput(''); setActiveTier(null) }
 
   async function handleBuy(tier: string) {
     setLoading(tier)
@@ -35,7 +59,7 @@ export default function UpgradeModule({
       const res = await fetch('/api/payment/create-invoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, couponCode: couponApplied?.code || '' }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Gagal membuat invoice'); setLoading(null); return }
@@ -101,14 +125,23 @@ export default function UpgradeModule({
                 </div>
               )}
 
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', marginBottom: 4 }}>{tier.name}</div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 900, color: tier.highlight ? '#1a73e8' : '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>{fmtPrice(tier.price)}</span>
-                  {tier.isMonthly && <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>/bln</span>}
-                </div>
-                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: 4 }}>{tier.isMonthly ? 'Per bulan · bisa batal kapan saja' : 'Bayar sekali · Lifetime'}</div>
-              </div>
+              {(() => {
+                const hasCoupon = couponApplied && activeTier === tier.id
+                const finalPrice = hasCoupon ? tier.price - couponApplied!.discountAmount : tier.price
+                return (
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', marginBottom: 4 }}>{tier.name}</div>
+                    {hasCoupon && (
+                      <div style={{ fontSize: '0.82rem', color: '#cbd5e1', textDecoration: 'line-through', marginBottom: 2 }}>{fmtPrice(tier.price)}</div>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                      <span style={{ fontSize: '2rem', fontWeight: 900, color: hasCoupon ? '#059669' : tier.highlight ? '#1a73e8' : '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>{fmtPrice(finalPrice)}</span>
+                      {tier.isMonthly && <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>/bln</span>}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: 4 }}>{tier.isMonthly ? 'Per bulan · bisa batal kapan saja' : 'Bayar sekali · Lifetime'}</div>
+                  </div>
+                )
+              })()}
 
               <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 14, marginBottom: 18 }}>
                 {tier.features.map(f => (
@@ -137,6 +170,46 @@ export default function UpgradeModule({
             </div>
           )
         })}
+      </div>
+
+      {/* Coupon code */}
+      <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 14, padding: '16px 20px', marginBottom: 10 }}>
+        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: 10 }}>Punya kode promo?</div>
+        {couponApplied ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 9, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#059669' }}>{couponApplied.code}</span>
+              <span style={{ fontSize: '0.78rem', color: '#059669' }}>
+                — Diskon {couponApplied.type === 'percent' ? `${couponApplied.value}%` : fmtPrice(couponApplied.value)} = hemat {fmtPrice(couponApplied.discountAmount)}
+                {activeTier ? ` untuk ${config.tiers.find(t => t.id === activeTier)?.name}` : ''}
+              </span>
+            </div>
+            <button onClick={clearCoupon} style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 8, padding: '7px 14px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}>Hapus</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <input
+              value={couponInput}
+              onChange={e => { setCouponInput(e.target.value.toUpperCase()); setCouponError('') }}
+              onKeyDown={e => e.key === 'Enter' && activeTier && applyCode(activeTier)}
+              placeholder="KODE PROMO"
+              style={{ flex: 1, minWidth: 160, background: '#fff', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 14px', fontSize: '0.85rem', color: '#111827', outline: 'none', letterSpacing: '0.05em', fontWeight: 600 }}
+            />
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {config.tiers.filter(t => !t.isMonthly).map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => applyCode(t.id)}
+                  disabled={couponLoading || !couponInput.trim()}
+                  style={{ padding: '8px 14px', borderRadius: 9, background: couponLoading ? '#93c5fd' : '#1a73e8', color: '#fff', fontSize: '0.78rem', fontWeight: 700, border: 'none', cursor: couponLoading || !couponInput.trim() ? 'not-allowed' : 'pointer', opacity: !couponInput.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}
+                >
+                  {couponLoading ? '...' : `Cek untuk ${t.name.replace(' Lifetime', '')}`}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {couponError && <div style={{ marginTop: 8, fontSize: '0.78rem', color: '#dc2626' }}>{couponError}</div>}
       </div>
 
       {/* Add-on rows */}

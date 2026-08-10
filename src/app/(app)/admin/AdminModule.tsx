@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { DEFAULT_PRICING, type PricingConfig, type PricingTier } from '@/lib/pricing'
 
@@ -51,6 +51,44 @@ type SuperAdminRow = {
   created_at: string
 }
 
+type TxRow = {
+  id: string
+  external_id: string
+  workspace_id: string
+  user_email: string
+  tier: string
+  amount_original: number
+  amount_paid: number
+  coupon_code: string | null
+  discount_amount: number
+  status: string
+  paid_at: string | null
+  created_at: string
+}
+
+type CouponRow = {
+  id: string
+  code: string
+  type: string
+  value: number
+  max_uses: number | null
+  used_count: number
+  applicable_tiers: string[] | null
+  is_active: boolean
+  expires_at: string | null
+  created_at: string
+  created_by: string
+}
+
+type NewCoupon = {
+  code: string
+  type: string
+  value: string
+  maxUses: string
+  tiers: string[]
+  expiresAt: string
+}
+
 const PLANS = ['free', 'monthly', 'lifetime']
 const PLAN_COLORS: Record<string, string> = { free: '#6b7280', monthly: '#1a73e8', lifetime: '#059669' }
 
@@ -64,12 +102,128 @@ function fmtDate(s: string) {
   return new Date(s).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
+function fmtPrice(n: number) {
+  return 'Rp' + n.toLocaleString('id-ID')
+}
+
+const TX_STATUS_COLORS: Record<string, string> = { paid: '#059669', pending: '#d97706', failed: '#dc2626' }
+const TIER_NAMES: Record<string, string> = { bulanan: 'Bulanan', basic: 'Basic', pro: 'Pro', agency: 'Agency', addon: 'Add-on', starter: 'Starter (lama)' }
+
+function BarChart({ data, color = '#1a73e8', height = 56 }: { data: number[]; color?: string; height?: number }) {
+  if (!data.length) return null
+  const max = Math.max(...data, 1)
+  const n = data.length
+  return (
+    <svg width="100%" height={height} viewBox={`0 0 ${n * 5} ${height}`} preserveAspectRatio="none" style={{ display: 'block' }}>
+      {data.map((v, i) => {
+        const barH = Math.max(1, (v / max) * (height - 6))
+        return <rect key={i} x={i * 5 + 0.5} y={height - barH - 3} width={4} height={barH} fill={color} rx="0.8" opacity={0.85} />
+      })}
+    </svg>
+  )
+}
+
 export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail, savedPricing }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string; savedPricing: PricingConfig }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'users' | 'workspaces' | 'superadmins' | 'pricing'>('users')
+  const [tab, setTab] = useState<'dashboard' | 'users' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins'>('dashboard')
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>(savedPricing)
   const [pricingSaving, setPricingSaving] = useState(false)
   const [pricingMsg, setPricingMsg] = useState('')
+
+  // Transactions
+  const [txList, setTxList] = useState<TxRow[]>([])
+  const [txLoading, setTxLoading] = useState(false)
+  const [txDays, setTxDays] = useState(30)
+  const [txStatusFilter, setTxStatusFilter] = useState('')
+
+  // Coupons
+  const [couponList, setCouponList] = useState<CouponRow[]>([])
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [newCoupon, setNewCoupon] = useState<NewCoupon>({ code: '', type: 'percent', value: '', maxUses: '', tiers: [], expiresAt: '' })
+  const [couponMsg, setCouponMsg] = useState('')
+  const [couponSaving, setCouponSaving] = useState(false)
+
+  // Dashboard chart data (compute from users + tx)
+  const [dashTx, setDashTx] = useState<TxRow[]>([])
+
+  // Fetch transactions (used by both Transaksi tab and Dashboard)
+  async function fetchTx(days = 90) {
+    setTxLoading(true)
+    const res = await fetch(`/api/admin/transactions?days=${days}&status=${txStatusFilter}`)
+    const data = await res.json()
+    setTxLoading(false)
+    if (res.ok) setTxList(data.transactions || [])
+  }
+
+  async function fetchCoupons() {
+    setCouponLoading(true)
+    const res = await fetch('/api/admin/coupons')
+    const data = await res.json()
+    setCouponLoading(false)
+    if (res.ok) setCouponList(data.coupons || [])
+  }
+
+  async function fetchDashTx() {
+    const res = await fetch('/api/admin/transactions?days=90')
+    const data = await res.json()
+    if (res.ok) setDashTx(data.transactions || [])
+  }
+
+  useEffect(() => {
+    if (tab === 'transaksi') fetchTx(txDays)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, txDays, txStatusFilter])
+
+  useEffect(() => {
+    if (tab === 'kupon') fetchCoupons()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
+
+  useEffect(() => {
+    if (tab === 'dashboard') fetchDashTx()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
+
+  async function createCoupon() {
+    if (!newCoupon.code || !newCoupon.value) { setCouponMsg('Code dan value wajib diisi'); return }
+    setCouponSaving(true); setCouponMsg('')
+    const res = await fetch('/api/admin/coupons', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newCoupon, applicableTiers: newCoupon.tiers }),
+    })
+    const data = await res.json()
+    setCouponSaving(false)
+    if (!res.ok) { setCouponMsg('Error: ' + (data.error || 'Gagal')); return }
+    setCouponList(prev => [data.coupon, ...prev])
+    setNewCoupon({ code: '', type: 'percent', value: '', maxUses: '', tiers: [], expiresAt: '' })
+    setCouponMsg('Kupon berhasil dibuat!')
+    setTimeout(() => setCouponMsg(''), 3000)
+  }
+
+  async function toggleCoupon(id: string, isActive: boolean) {
+    await fetch('/api/admin/coupons', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, is_active: isActive }) })
+    setCouponList(prev => prev.map(c => c.id === id ? { ...c, is_active: isActive } : c))
+  }
+
+  async function deleteCoupon(id: string) {
+    if (!confirm('Hapus kupon ini?')) return
+    await fetch('/api/admin/coupons', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    setCouponList(prev => prev.filter(c => c.id !== id))
+  }
+
+  // Dashboard computations
+  const last30Days = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29 - i))
+    return d.toISOString().slice(0, 10)
+  })
+  const signupsByDay = last30Days.map(d => users.filter(u => u.created_at.startsWith(d)).length)
+  const revByDay = last30Days.map(d => dashTx.filter(t => t.status === 'paid' && t.paid_at?.startsWith(d)).reduce((s, t) => s + (t.amount_paid || 0), 0))
+  const totalRevenue = dashTx.filter(t => t.status === 'paid').reduce((s, t) => s + (t.amount_paid || 0), 0)
+  const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
+  const revenueThisMonth = dashTx.filter(t => t.status === 'paid' && t.paid_at && new Date(t.paid_at) >= monthStart).reduce((s, t) => s + (t.amount_paid || 0), 0)
+  const paidTxCount = dashTx.filter(t => t.status === 'paid').length
+  const convRate = stats.total > 0 ? ((stats.paidUserCount / stats.total) * 100).toFixed(1) : '0'
   const [search, setSearch] = useState('')
   const [filterPlan, setFilterPlan] = useState('')
   const [expandedWs, setExpandedWs] = useState<string | null>(null)
@@ -233,27 +387,32 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid #e5eaf2' }}>
-        {([['users', 'Users'], ['workspaces', 'Workspaces']] as const).map(([id, label]) => (
-          <button key={id} onClick={() => setTab(id)}
-            style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === id ? '2px solid #f87171' : '2px solid transparent', color: tab === id ? '#dc2626' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === id ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
-            {label} <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 4 }}>{id === 'users' ? users.length : workspaces.length}</span>
+      <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 0, marginBottom: 20, borderBottom: '1px solid #e5eaf2', overflowX: 'auto' }}>
+        {([
+          ['dashboard', 'Dashboard', '#1a73e8'],
+          ['users', 'Users', '#dc2626'],
+          ['workspaces', 'Workspaces', '#dc2626'],
+          ['transaksi', 'Transaksi', '#059669'],
+          ['kupon', 'Kupon', '#d97706'],
+          ['pricing', 'Pricing', '#d97706'],
+        ] as [string, string, string][]).map(([id, label, color]) => (
+          <button key={id} onClick={() => setTab(id as typeof tab)}
+            style={{ padding: '9px 14px', background: 'transparent', border: 'none', borderBottom: tab === id ? `2px solid ${color}` : '2px solid transparent', color: tab === id ? color : '#6b7280', fontSize: '0.82rem', fontWeight: tab === id ? 700 : 400, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            {label}
+            {id === 'users' && <span style={{ fontSize: '0.68rem', color: '#9ca3af', marginLeft: 4 }}>{users.length}</span>}
+            {id === 'workspaces' && <span style={{ fontSize: '0.68rem', color: '#9ca3af', marginLeft: 4 }}>{workspaces.length}</span>}
           </button>
         ))}
-        <button onClick={() => setTab('pricing')}
-          style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === 'pricing' ? '2px solid #d97706' : '2px solid transparent', color: tab === 'pricing' ? '#d97706' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === 'pricing' ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
-          Pricing
-        </button>
         {isGodAdmin && (
           <button onClick={() => setTab('superadmins')}
-            style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === 'superadmins' ? '2px solid #7c3aed' : '2px solid transparent', color: tab === 'superadmins' ? '#7c3aed' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === 'superadmins' ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
-            Super Admin <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 4 }}>{saList.length}</span>
+            style={{ padding: '9px 14px', background: 'transparent', border: 'none', borderBottom: tab === 'superadmins' ? '2px solid #7c3aed' : '2px solid transparent', color: tab === 'superadmins' ? '#7c3aed' : '#6b7280', fontSize: '0.82rem', fontWeight: tab === 'superadmins' ? 700 : 400, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            Super Admin
           </button>
         )}
       </div>
 
       {/* Search + filter */}
-      {tab !== 'superadmins' && <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+      {(tab === 'users' || tab === 'workspaces') && <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
         <input placeholder={tab === 'users' ? 'Cari email atau nama...' : 'Cari workspace atau owner...'}
           value={search} onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: 200, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
@@ -268,6 +427,95 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           </div>
         )}
       </div>}
+
+      {/* Dashboard Tab */}
+      {tab === 'dashboard' && (
+        <div>
+          {/* KPI row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 16 }}>
+            {[
+              { label: 'Total Revenue', value: fmtPrice(totalRevenue), sub: 'semua waktu', color: '#059669' },
+              { label: 'Revenue Bulan Ini', value: fmtPrice(revenueThisMonth), sub: new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }), color: '#1a73e8' },
+              { label: 'Transaksi Paid', value: paidTxCount, sub: 'last 90 days', color: '#059669' },
+              { label: 'Konversi', value: `${convRate}%`, sub: 'free → paid', color: '#7c3aed' },
+              { label: 'Total User', value: stats.total, sub: 'terdaftar', color: '#1a73e8' },
+              { label: 'User Berbayar', value: stats.paidUserCount, sub: 'lifetime aktif', color: '#059669' },
+            ].map(k => (
+              <div key={k.label} style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: '0.62rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{k.label}</div>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: k.color, lineHeight: 1 }}>{k.value}</div>
+                <div style={{ fontSize: '0.62rem', color: '#9ca3af', marginTop: 4 }}>{k.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts */}
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12, marginBottom: 16 }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#374151', marginBottom: 2 }}>User Baru (30 hari)</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a73e8' }}>{signupsByDay.reduce((a, b) => a + b, 0)}</div>
+                </div>
+                <div style={{ fontSize: '0.65rem', color: '#9ca3af' }}>30 hari terakhir</div>
+              </div>
+              <BarChart data={signupsByDay} color="#1a73e8" />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                <span style={{ fontSize: '0.6rem', color: '#9ca3af' }}>{last30Days[0]?.slice(5)}</span>
+                <span style={{ fontSize: '0.6rem', color: '#9ca3af' }}>{last30Days[29]?.slice(5)}</span>
+              </div>
+            </div>
+
+            <div style={{ background: '#fff', borderRadius: 16, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#374151', marginBottom: 2 }}>Revenue (30 hari)</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#059669' }}>{fmtPrice(revByDay.reduce((a, b) => a + b, 0))}</div>
+                </div>
+                <div style={{ fontSize: '0.65rem', color: '#9ca3af' }}>30 hari terakhir</div>
+              </div>
+              <BarChart data={revByDay} color="#059669" />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                <span style={{ fontSize: '0.6rem', color: '#9ca3af' }}>{last30Days[0]?.slice(5)}</span>
+                <span style={{ fontSize: '0.6rem', color: '#9ca3af' }}>{last30Days[29]?.slice(5)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Plan breakdown */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)', marginBottom: 16 }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#374151', marginBottom: 12 }}>Breakdown Plan</div>
+            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+              {Object.entries(stats.byPlan).map(([plan, count]) => (
+                <div key={plan} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 3, background: PLAN_COLORS[plan] || '#6b7280' }} />
+                  <span style={{ fontSize: '0.8rem', color: '#374151', fontWeight: 500, textTransform: 'capitalize' }}>{plan}</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#111827' }}>{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent transactions */}
+          <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#374151' }}>Transaksi Terbaru</div>
+              <button onClick={() => setTab('transaksi')} style={{ fontSize: '0.72rem', color: '#1a73e8', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>Lihat semua →</button>
+            </div>
+            {dashTx.slice(0, 8).map(tx => (
+              <div key={tx.id} style={{ padding: '10px 18px', borderBottom: '1px solid #f9fafb', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 500, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.user_email}</div>
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af' }}>{TIER_NAMES[tx.tier] || tx.tier} · {fmtDate(tx.created_at)}</div>
+                </div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#111827', flexShrink: 0 }}>{fmtPrice(tx.amount_paid)}</div>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: (TX_STATUS_COLORS[tx.status] || '#6b7280') + '20', color: TX_STATUS_COLORS[tx.status] || '#6b7280', flexShrink: 0 }}>{tx.status}</span>
+              </div>
+            ))}
+            {!dashTx.length && <div style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '0.82rem' }}>Belum ada transaksi</div>}
+          </div>
+        </div>
+      )}
 
       {/* Users Tab */}
       {tab === 'users' && (
@@ -527,6 +775,199 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
               style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '11px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>
               Reset ke Default
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Transaksi Tab */}
+      {tab === 'transaksi' && (
+        <div>
+          {/* Filters */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+            {[30, 60, 90].map(d => (
+              <button key={d} onClick={() => setTxDays(d)}
+                style={{ padding: '6px 12px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: txDays === d ? '1px solid #1a73e8' : '1px solid #e5eaf2', background: txDays === d ? '#eff6ff' : '#f8fafc', color: txDays === d ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
+                {d} hari
+              </button>
+            ))}
+            {['', 'paid', 'pending', 'failed'].map(s => (
+              <button key={s} onClick={() => setTxStatusFilter(s)}
+                style={{ padding: '6px 12px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: txStatusFilter === s ? `1px solid ${TX_STATUS_COLORS[s] || '#1a73e8'}` : '1px solid #e5eaf2', background: txStatusFilter === s ? (TX_STATUS_COLORS[s] || '#1a73e8') + '15' : '#f8fafc', color: txStatusFilter === s ? (TX_STATUS_COLORS[s] || '#1a73e8') : '#6b7280', cursor: 'pointer', textTransform: 'capitalize' }}>
+                {s || 'All'}
+              </button>
+            ))}
+          </div>
+
+          {/* Summary */}
+          {!txLoading && (
+            <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Total Paid', value: fmtPrice(txList.filter(t => t.status === 'paid').reduce((s, t) => s + t.amount_paid, 0)), color: '#059669' },
+                { label: 'Paid', value: txList.filter(t => t.status === 'paid').length, color: '#059669' },
+                { label: 'Pending', value: txList.filter(t => t.status === 'pending').length, color: '#d97706' },
+                { label: 'Failed', value: txList.filter(t => t.status === 'failed').length, color: '#dc2626' },
+              ].map(k => (
+                <div key={k.label} style={{ background: '#fff', borderRadius: 10, padding: '10px 14px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', minWidth: 100 }}>
+                  <div style={{ fontSize: '0.62rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{k.label}</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: k.color }}>{k.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            {txLoading && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Memuat...</div>}
+            {!txLoading && !txList.length && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Tidak ada transaksi</div>}
+            {!txLoading && txList.length > 0 && (
+              <>
+                {!isMobile && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto auto', padding: '10px 16px', borderBottom: '1px solid #e5eaf2', fontSize: '0.65rem', color: '#6b7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <div>User</div><div>Paket</div><div>Amount</div><div>Kupon</div><div>Status</div><div>Tanggal</div>
+                  </div>
+                )}
+                {txList.map((tx, i) => (
+                  <div key={tx.id} style={{
+                    display: isMobile ? 'block' : 'grid',
+                    gridTemplateColumns: '1fr 1fr auto auto auto auto',
+                    padding: '11px 16px',
+                    borderBottom: i < txList.length - 1 ? '1px solid #f3f4f6' : 'none',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}>
+                    {isMobile ? (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 500, color: '#111827' }}>{tx.user_email}</span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: TX_STATUS_COLORS[tx.status] || '#6b7280', padding: '1px 7px', borderRadius: 20, background: (TX_STATUS_COLORS[tx.status] || '#6b7280') + '20' }}>{tx.status}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, fontSize: '0.72rem', color: '#9ca3af' }}>
+                          <span>{TIER_NAMES[tx.tier] || tx.tier}</span>·
+                          <span style={{ fontWeight: 700, color: '#111827' }}>{fmtPrice(tx.amount_paid)}</span>
+                          {tx.discount_amount > 0 && <span style={{ color: '#059669' }}>-{fmtPrice(tx.discount_amount)}</span>}
+                          {tx.coupon_code && <span style={{ color: '#d97706' }}>{tx.coupon_code}</span>}·
+                          <span>{fmtDate(tx.created_at)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ fontSize: '0.78rem', color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.user_email}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{TIER_NAMES[tx.tier] || tx.tier}</div>
+                        <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#111827', whiteSpace: 'nowrap' }}>
+                          {fmtPrice(tx.amount_paid)}
+                          {tx.discount_amount > 0 && <span style={{ fontSize: '0.65rem', color: '#059669', marginLeft: 4 }}>(-{fmtPrice(tx.discount_amount)})</span>}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#d97706', fontWeight: 600 }}>{tx.coupon_code || '—'}</div>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: (TX_STATUS_COLORS[tx.status] || '#6b7280') + '20', color: TX_STATUS_COLORS[tx.status] || '#6b7280', whiteSpace: 'nowrap' }}>{tx.status}</span>
+                        <div style={{ fontSize: '0.7rem', color: '#9ca3af', whiteSpace: 'nowrap' }}>{fmtDate(tx.paid_at || tx.created_at)}</div>
+                      </>
+                    )}
+                  </div>
+                ))}
+                <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.7rem', color: '#9ca3af' }}>{txList.length} transaksi</div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Kupon Tab */}
+      {tab === 'kupon' && (
+        <div>
+          {/* Create coupon form */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', marginBottom: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111827', marginBottom: 14 }}>Buat Kupon Baru</div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Kode Kupon</label>
+                <input value={newCoupon.code} onChange={e => setNewCoupon(p => ({ ...p, code: e.target.value.toUpperCase() }))}
+                  placeholder="LAUNCH50"
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box', fontWeight: 700, letterSpacing: '0.05em' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Tipe Diskon</label>
+                <select value={newCoupon.type} onChange={e => setNewCoupon(p => ({ ...p, type: e.target.value }))}
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
+                  <option value="percent">Persentase (%)</option>
+                  <option value="fixed">Nominal Tetap (Rp)</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>
+                  {newCoupon.type === 'percent' ? 'Besar Diskon (%)' : 'Besar Diskon (Rp)'}
+                </label>
+                <input type="number" value={newCoupon.value} onChange={e => setNewCoupon(p => ({ ...p, value: e.target.value }))}
+                  placeholder={newCoupon.type === 'percent' ? '20' : '50000'}
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Maks Penggunaan (kosong = ∞)</label>
+                <input type="number" value={newCoupon.maxUses} onChange={e => setNewCoupon(p => ({ ...p, maxUses: e.target.value }))}
+                  placeholder="100"
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Expire Date (kosong = tidak expired)</label>
+                <input type="date" value={newCoupon.expiresAt} onChange={e => setNewCoupon(p => ({ ...p, expiresAt: e.target.value }))}
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Berlaku untuk (kosong = semua)</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {['bulanan', 'basic', 'pro', 'agency'].map(t => (
+                    <button key={t} onClick={() => setNewCoupon(p => ({ ...p, tiers: p.tiers.includes(t) ? p.tiers.filter(x => x !== t) : [...p.tiers, t] }))}
+                      style={{ padding: '4px 10px', borderRadius: 7, fontSize: '0.7rem', fontWeight: 600, border: newCoupon.tiers.includes(t) ? '1px solid #1a73e8' : '1px solid #e5eaf2', background: newCoupon.tiers.includes(t) ? '#eff6ff' : '#f8fafc', color: newCoupon.tiers.includes(t) ? '#1a73e8' : '#6b7280', cursor: 'pointer', textTransform: 'capitalize' }}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {couponMsg && <div style={{ marginBottom: 10, fontSize: '0.8rem', color: couponMsg.startsWith('Error') ? '#dc2626' : '#059669' }}>{couponMsg}</div>}
+            <button onClick={createCoupon} disabled={couponSaving}
+              style={{ background: couponSaving ? '#93c5fd' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: couponSaving ? 'not-allowed' : 'pointer' }}>
+              {couponSaving ? 'Menyimpan...' : 'Buat Kupon'}
+            </button>
+          </div>
+
+          {/* Coupon list */}
+          <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            {couponLoading && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Memuat...</div>}
+            {!couponLoading && !couponList.length && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Belum ada kupon</div>}
+            {couponList.map((cp, i) => (
+              <div key={cp.id} style={{ padding: '14px 18px', borderBottom: i < couponList.length - 1 ? '1px solid #f3f4f6' : 'none', display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 800, color: '#111827', fontSize: '0.9rem', letterSpacing: '0.05em' }}>{cp.code}</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+                      background: cp.type === 'percent' ? '#eff6ff' : '#fef3c7',
+                      color: cp.type === 'percent' ? '#1a73e8' : '#d97706' }}>
+                      {cp.type === 'percent' ? `${cp.value}% OFF` : `-${fmtPrice(cp.value)}`}
+                    </span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+                      background: cp.is_active ? '#f0fdf4' : '#f9fafb',
+                      color: cp.is_active ? '#059669' : '#9ca3af' }}>
+                      {cp.is_active ? 'AKTIF' : 'NONAKTIF'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#9ca3af', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    <span>Pakai: {cp.used_count}{cp.max_uses ? `/${cp.max_uses}` : ' (∞)'}</span>
+                    {cp.expires_at && <span>Exp: {fmtDate(cp.expires_at)}</span>}
+                    {cp.applicable_tiers?.length ? <span>Berlaku: {cp.applicable_tiers.join(', ')}</span> : <span>Semua paket</span>}
+                    <span>Dibuat: {fmtDate(cp.created_at)}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  <button onClick={() => toggleCoupon(cp.id, !cp.is_active)}
+                    style={{ padding: '5px 12px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: '1px solid #e5eaf2', background: '#f8fafc', color: '#374151', cursor: 'pointer' }}>
+                    {cp.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                  </button>
+                  <button onClick={() => deleteCoupon(cp.id)}
+                    style={{ padding: '5px 10px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: '1px solid rgba(220,38,38,0.2)', background: 'rgba(220,38,38,0.06)', color: '#dc2626', cursor: 'pointer' }}>
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

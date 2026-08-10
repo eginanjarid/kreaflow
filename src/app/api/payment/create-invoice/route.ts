@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 import { resolveWorkspaceId } from '@/lib/workspace'
-
-const TIERS = {
-  starter: { amount: 99000, label: 'KreaFlow Starter — 1 Workspace', maxWorkspaces: 1 },
-  pro:     { amount: 199000, label: 'KreaFlow Pro — 4 Workspace', maxWorkspaces: 4 },
-  agency:  { amount: 399000, label: 'KreaFlow Agency — 10 Workspace', maxWorkspaces: 10 },
-  addon:   { amount: 49000, label: 'KreaFlow Add-on — +1 Workspace', maxWorkspaces: 1 },
-}
+import { fetchPricingConfig } from '@/lib/pricing'
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,23 +11,63 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await req.json().catch(() => ({}))
-    const tier = (body.tier as string) || 'starter'
-    if (!TIERS[tier as keyof typeof TIERS]) {
-      return NextResponse.json({ error: 'Tier tidak valid' }, { status: 400 })
+    const tierId = (body.tier as string) || 'pro'
+    const couponCode = ((body.couponCode as string) || '').toUpperCase().trim()
+
+    const admin = createAdmin(
+      process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    const pricing = await fetchPricingConfig(admin)
+
+    // Build tier map from DB pricing
+    const tierMap: Record<string, { amount: number; label: string; plan: string }> = {}
+    for (const t of pricing.tiers) {
+      tierMap[t.id] = {
+        amount: t.price,
+        label: `KreaFlow ${t.name} — ${t.maxWorkspaces} Workspace`,
+        plan: t.isMonthly ? 'monthly' : 'lifetime',
+      }
     }
+    tierMap['addon'] = { amount: pricing.addonWs, label: 'KreaFlow Add-on — +1 Workspace', plan: 'addon' }
+    // Legacy tier ID compatibility
+    if (!tierMap['starter'] && tierMap['bulanan']) tierMap['starter'] = tierMap['bulanan']
+
+    const tierCfg = tierMap[tierId]
+    if (!tierCfg) return NextResponse.json({ error: 'Tier tidak valid' }, { status: 400 })
 
     const wsId = await resolveWorkspaceId(supabase, user.id)
     if (!wsId) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
 
     const { data: ws } = await supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).single()
-
-    // For addon, user must already have lifetime
-    if (tier === 'addon' && ws?.plan !== 'lifetime') {
+    if (tierId === 'addon' && ws?.plan !== 'lifetime') {
       return NextResponse.json({ error: 'Add-on hanya untuk akun yang sudah aktif' }, { status: 400 })
     }
 
-    const cfg = TIERS[tier as keyof typeof TIERS]
-    const externalId = `kreaflow-${tier}-${wsId}-${Date.now()}`
+    // Validate coupon
+    let discountAmount = 0
+    let finalCouponCode: string | null = null
+
+    if (couponCode) {
+      const { data: coupon } = await admin.from('kf_coupons')
+        .select('*').eq('code', couponCode).eq('is_active', true).single()
+
+      const valid = coupon
+        && (!coupon.expires_at || new Date(coupon.expires_at) > new Date())
+        && (!coupon.max_uses || coupon.used_count < coupon.max_uses)
+        && (!coupon.applicable_tiers || coupon.applicable_tiers.includes(tierId))
+
+      if (valid) {
+        discountAmount = coupon.type === 'percent'
+          ? Math.floor(tierCfg.amount * coupon.value / 100)
+          : Math.min(coupon.value as number, tierCfg.amount - 1000)
+        finalCouponCode = couponCode
+      }
+    }
+
+    const finalAmount = Math.max(1000, tierCfg.amount - discountAmount)
+    const externalId = `kreaflow-${tierId}-${wsId}-${Date.now()}`
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
     const userName = (user.user_metadata?.nama as string) || user.email || 'KreaFlow User'
 
@@ -48,14 +83,14 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         external_id: externalId,
-        amount: cfg.amount,
-        description: cfg.label,
+        amount: finalAmount,
+        description: tierCfg.label + (finalCouponCode ? ` [${finalCouponCode}]` : ''),
         invoice_duration: 86400,
         customer: { email: user.email, given_names: userName },
         success_redirect_url: `${appUrl}/payment/success`,
         failure_redirect_url: `${appUrl}/upgrade?failed=1`,
         currency: 'IDR',
-        items: [{ name: cfg.label, quantity: 1, price: cfg.amount, category: 'Software' }],
+        items: [{ name: tierCfg.label, quantity: 1, price: finalAmount, category: 'Software' }],
         fees: [],
       }),
     })
@@ -67,6 +102,21 @@ export async function POST(req: NextRequest) {
     }
 
     const invoice = await response.json()
+
+    // Log pending transaction
+    await admin.from('kf_transactions').insert({
+      external_id: externalId,
+      workspace_id: wsId,
+      user_email: user.email,
+      tier: tierId,
+      amount_original: tierCfg.amount,
+      amount_paid: finalAmount,
+      coupon_code: finalCouponCode,
+      discount_amount: discountAmount,
+      status: 'pending',
+      xendit_invoice_id: invoice.id,
+    })
+
     return NextResponse.json({ invoice_url: invoice.invoice_url, id: invoice.id })
   } catch (e) {
     console.error('create-invoice error:', e)
