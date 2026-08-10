@@ -3,63 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-
-const TIERS = [
-  {
-    id: 'starter',
-    name: 'Starter',
-    price: 99000,
-    oldPrice: null,
-    maxWorkspaces: 1,
-    highlight: false,
-    badge: null,
-    features: [
-      '1 Workspace / Brand',
-      '1 owner + 3 anggota tim',
-      'Semua modul lengkap',
-      'Sprint, Plan, Library, Studio, Calendar',
-      'Tracker, Budget, Insights',
-      'Unlimited konten & jadwal',
-      'Update fitur selamanya',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: 199000,
-    oldPrice: 399000,
-    maxWorkspaces: 4,
-    highlight: true,
-    badge: 'PALING POPULER',
-    features: [
-      '4 Workspace / Brand',
-      '1 owner + 5 anggota tim',
-      'Semua modul lengkap',
-      'Sprint, Plan, Library, Studio, Calendar',
-      'Tracker, Budget, Insights',
-      'Unlimited konten & jadwal',
-      'Update fitur selamanya',
-    ],
-  },
-  {
-    id: 'agency',
-    name: 'Agency',
-    price: 399000,
-    oldPrice: null,
-    maxWorkspaces: 10,
-    highlight: false,
-    badge: null,
-    features: [
-      '10 Workspace / Brand',
-      '1 owner + 10 anggota tim',
-      'Semua modul lengkap',
-      'Sprint, Plan, Library, Studio, Calendar',
-      'Tracker, Budget, Insights',
-      'Unlimited konten & jadwal',
-      'Update fitur selamanya',
-    ],
-  },
-]
+import { DEFAULT_PRICING, type PricingConfig } from '@/lib/pricing'
 
 function fmtPrice(n: number) {
   return 'Rp' + n.toLocaleString('id-ID')
@@ -70,15 +14,19 @@ export default function UpgradeModule({
   isLifetime = false,
   currentMaxWs = 0,
   wsCount = 0,
+  pricing,
 }: {
   failed: boolean
   isLifetime?: boolean
   currentMaxWs?: number
   wsCount?: number
+  pricing?: PricingConfig
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState('')
+
+  const config = pricing ?? DEFAULT_PRICING
 
   async function handleBuy(tier: string) {
     setLoading(tier)
@@ -118,7 +66,7 @@ export default function UpgradeModule({
         <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6 }}>
           {isLifetime
             ? `Kamu sudah punya ${wsCount} dari ${currentMaxWs} workspace. Upgrade paket atau beli add-on untuk tambah slot.`
-            : 'Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan.'}
+            : 'Pilih paket yang sesuai kebutuhanmu.'}
         </p>
       </div>
 
@@ -128,9 +76,9 @@ export default function UpgradeModule({
         </div>
       )}
 
-      {/* 3 Tier cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
-        {TIERS.map(tier => {
+      {/* Tier cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+        {config.tiers.map(tier => {
           const isCurrent = isLifetime && currentMaxWs === tier.maxWorkspaces
           const isLoading = loading === tier.id
           return (
@@ -155,13 +103,11 @@ export default function UpgradeModule({
 
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', marginBottom: 4 }}>{tier.name}</div>
-                {tier.oldPrice && (
-                  <div style={{ fontSize: '0.82rem', color: '#cbd5e1', textDecoration: 'line-through', marginBottom: 2 }}>{fmtPrice(tier.oldPrice)}</div>
-                )}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                   <span style={{ fontSize: '2rem', fontWeight: 900, color: tier.highlight ? '#1a73e8' : '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>{fmtPrice(tier.price)}</span>
+                  {tier.isMonthly && <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>/bln</span>}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: 4 }}>Bayar sekali · Lifetime</div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: 4 }}>{tier.isMonthly ? 'Per bulan · bisa batal kapan saja' : 'Bayar sekali · Lifetime'}</div>
               </div>
 
               <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 14, marginBottom: 18 }}>
@@ -186,30 +132,45 @@ export default function UpgradeModule({
                   cursor: loading || isCurrent ? 'not-allowed' : 'pointer', transition: 'all 0.15s',
                 }}
               >
-                {isCurrent ? 'Paket Aktif' : isLoading ? 'Memproses...' : `Beli ${tier.name} →`}
+                {isCurrent ? 'Paket Aktif' : isLoading ? 'Memproses...' : tier.isMonthly ? 'Mulai Berlangganan →' : `Beli ${tier.name} →`}
               </button>
             </div>
           )
         })}
       </div>
 
-      {/* Add-on row */}
-      {isLifetime && (
-        <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.9rem', marginBottom: 2 }}>Add-on +1 Workspace</div>
-            <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Berlaku lifetime.</div>
+      {/* Add-on rows */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {isLifetime && (
+          <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.9rem', marginBottom: 2 }}>Add-on +1 Workspace</div>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Berlaku lifetime. Khusus pengguna lifetime.</div>
+            </div>
+            <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#0f172a', flexShrink: 0 }}>{fmtPrice(config.addonWs)}</div>
+            <button
+              onClick={() => handleBuy('addon')}
+              disabled={!!loading}
+              style={{ padding: '10px 20px', borderRadius: 9, background: loading === 'addon' ? '#93c5fd' : '#1a73e8', color: '#fff', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}
+            >
+              {loading === 'addon' ? 'Memproses...' : 'Beli Add-on →'}
+            </button>
           </div>
-          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#0f172a', flexShrink: 0 }}>Rp49.000</div>
-          <button
-            onClick={() => handleBuy('addon')}
-            disabled={!!loading}
-            style={{ padding: '10px 20px', borderRadius: 9, background: loading === 'addon' ? '#93c5fd' : '#1a73e8', color: '#fff', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}
-          >
-            {loading === 'addon' ? 'Memproses...' : 'Beli Add-on →'}
+        )}
+        <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', opacity: 0.6 }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+              <div style={{ fontWeight: 700, color: '#2a3547', fontSize: '0.9rem' }}>Add-on Auto Schedule Post</div>
+              <span style={{ fontSize: '0.6rem', fontWeight: 800, background: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: 20, letterSpacing: '0.05em' }}>SEGERA HADIR</span>
+            </div>
+            <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Otomatis posting ke IG, TikTok, FB dari KreaFlow. Tidak perlu buka apps lain.</div>
+          </div>
+          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#0f172a', flexShrink: 0 }}>{fmtPrice(config.addonSchedule)}<span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94a3b8' }}>/bln</span></div>
+          <button disabled style={{ padding: '10px 20px', borderRadius: 9, background: '#e5eaf2', color: '#94a3b8', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'not-allowed' }}>
+            Segera Hadir
           </button>
         </div>
-      )}
+      </div>
 
       <div style={{ marginTop: 24, background: '#f8fafc', borderRadius: 12, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>

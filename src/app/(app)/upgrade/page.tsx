@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import UpgradeModule from './UpgradeModule'
 import { isSuperAdmin } from '@/lib/super-admins'
+import { fetchPricingConfig } from '@/lib/pricing'
 
 export default async function UpgradePage({ searchParams }: { searchParams: Promise<{ failed?: string }> }) {
   const supabase = await createClient()
@@ -41,5 +43,11 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
 
   const { failed } = await searchParams
 
-  return <UpgradeModule failed={failed === '1'} isLifetime={isLifetime} currentMaxWs={currentMaxWs} wsCount={wsCount} />
+  const adminClient = createAdmin(
+    process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  const pricing = await fetchPricingConfig(adminClient)
+
+  return <UpgradeModule failed={failed === '1'} isLifetime={isLifetime} currentMaxWs={currentMaxWs} wsCount={wsCount} pricing={pricing} />
 }

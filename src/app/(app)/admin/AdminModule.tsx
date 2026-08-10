@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import { DEFAULT_PRICING, type PricingConfig, type PricingTier } from '@/lib/pricing'
 
 type UserRow = {
   id: string
@@ -50,8 +51,8 @@ type SuperAdminRow = {
   created_at: string
 }
 
-const PLANS = ['free', 'lifetime']
-const PLAN_COLORS: Record<string, string> = { free: '#6b7280', lifetime: '#059669' }
+const PLANS = ['free', 'monthly', 'lifetime']
+const PLAN_COLORS: Record<string, string> = { free: '#6b7280', monthly: '#1a73e8', lifetime: '#059669' }
 
 function PlanBadge({ plan }: { plan: string }) {
   const color = PLAN_COLORS[plan] || '#6b7280'
@@ -63,9 +64,12 @@ function fmtDate(s: string) {
   return new Date(s).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
-export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string }) {
+export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail, savedPricing }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string; savedPricing: PricingConfig }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'users' | 'workspaces' | 'superadmins'>('users')
+  const [tab, setTab] = useState<'users' | 'workspaces' | 'superadmins' | 'pricing'>('users')
+  const [pricingConfig, setPricingConfig] = useState<PricingConfig>(savedPricing)
+  const [pricingSaving, setPricingSaving] = useState(false)
+  const [pricingMsg, setPricingMsg] = useState('')
   const [search, setSearch] = useState('')
   const [filterPlan, setFilterPlan] = useState('')
   const [expandedWs, setExpandedWs] = useState<string | null>(null)
@@ -146,6 +150,28 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
     setTimeout(() => setSaMsg(''), 3000)
   }
 
+  function updateTierField(tierId: string, field: keyof PricingTier, value: string | number) {
+    setPricingConfig(prev => ({
+      ...prev,
+      tiers: prev.tiers.map(t => t.id === tierId ? { ...t, [field]: value } : t),
+    }))
+  }
+
+  async function savePricing() {
+    setPricingSaving(true); setPricingMsg('')
+    const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pricing: pricingConfig }) })
+    const data = await res.json()
+    setPricingSaving(false)
+    if (!res.ok) { setPricingMsg('Error: ' + (data.error || 'Gagal menyimpan')); return }
+    setPricingMsg('Pricing disimpan! Refresh halaman upgrade/landing untuk melihat perubahan.')
+    setTimeout(() => setPricingMsg(''), 5000)
+  }
+
+  function resetPricing() {
+    setPricingConfig(DEFAULT_PRICING)
+    setPricingMsg('Reset ke default — klik Simpan untuk menyimpan.')
+  }
+
   async function removeSuperAdmin(email: string) {
     if (!confirm(`Hapus ${email} dari super admin?`)) return
     setSaLoading(true); setSaMsg('')
@@ -214,6 +240,10 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
             {label} <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 4 }}>{id === 'users' ? users.length : workspaces.length}</span>
           </button>
         ))}
+        <button onClick={() => setTab('pricing')}
+          style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === 'pricing' ? '2px solid #d97706' : '2px solid transparent', color: tab === 'pricing' ? '#d97706' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === 'pricing' ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
+          Pricing
+        </button>
         {isGodAdmin && (
           <button onClick={() => setTab('superadmins')}
             style={{ padding: '9px 16px', background: 'transparent', border: 'none', borderBottom: tab === 'superadmins' ? '2px solid #7c3aed' : '2px solid transparent', color: tab === 'superadmins' ? '#7c3aed' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === 'superadmins' ? 600 : 400, cursor: 'pointer', marginBottom: -1 }}>
@@ -385,6 +415,119 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pricing Tab */}
+      {tab === 'pricing' && (
+        <div>
+          <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: '0.8rem', color: '#92400e' }}>
+            Perubahan pricing akan langsung aktif di halaman Upgrade dan Landing page. Pastikan sudah sesuai sebelum simpan.
+          </div>
+
+          {/* Tier cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+            {pricingConfig.tiers.map(tier => (
+              <div key={tier.id} style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{tier.name}</span>
+                  <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: 20, background: tier.isMonthly ? 'rgba(26,115,232,0.1)' : 'rgba(5,150,105,0.1)', color: tier.isMonthly ? '#1a73e8' : '#059669', fontWeight: 700 }}>{tier.isMonthly ? 'BULANAN' : 'LIFETIME'}</span>
+                  {tier.badge && <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: 20, background: '#eff6ff', color: '#1a73e8', fontWeight: 700 }}>{tier.badge}</span>}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Nama Paket</label>
+                    <input
+                      value={tier.name}
+                      onChange={e => updateTierField(tier.id, 'name', e.target.value)}
+                      style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Harga (Rp)</label>
+                    <input
+                      type="number"
+                      value={tier.price}
+                      onChange={e => updateTierField(tier.id, 'price', parseInt(e.target.value) || 0)}
+                      style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Max Workspace</label>
+                    <input
+                      type="number"
+                      value={tier.maxWorkspaces}
+                      onChange={e => updateTierField(tier.id, 'maxWorkspaces', parseInt(e.target.value) || 1)}
+                      style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Badge (opsional)</label>
+                    <input
+                      value={tier.badge || ''}
+                      onChange={e => updateTierField(tier.id, 'badge', e.target.value || null as unknown as string)}
+                      placeholder="misal: PALING POPULER"
+                      style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div style={{ marginTop: 14 }}>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Fitur (1 per baris)</label>
+                  <textarea
+                    value={tier.features.join('\n')}
+                    onChange={e => updateTierField(tier.id, 'features', e.target.value.split('\n') as unknown as number)}
+                    rows={tier.features.length + 1}
+                    style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.8rem', color: '#111827', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add-on prices */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)', marginBottom: 20 }}>
+            <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem', marginBottom: 14 }}>Add-on Prices</div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Add-on +1 Workspace (Rp, lifetime)</label>
+                <input
+                  type="number"
+                  value={pricingConfig.addonWs}
+                  onChange={e => setPricingConfig(prev => ({ ...prev, addonWs: parseInt(e.target.value) || 0 }))}
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Add-on Auto Schedule Post (Rp/bln)</label>
+                <input
+                  type="number"
+                  value={pricingConfig.addonSchedule}
+                  onChange={e => setPricingConfig(prev => ({ ...prev, addonSchedule: parseInt(e.target.value) || 0 }))}
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {pricingMsg && (
+            <div style={{ marginBottom: 14, padding: '10px 16px', borderRadius: 10, background: pricingMsg.startsWith('Error') ? '#fef2f2' : '#f0fdf4', color: pricingMsg.startsWith('Error') ? '#dc2626' : '#059669', fontSize: '0.82rem', fontWeight: 500 }}>
+              {pricingMsg}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={savePricing} disabled={pricingSaving}
+              style={{ background: pricingSaving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: pricingSaving ? 'not-allowed' : 'pointer' }}>
+              {pricingSaving ? 'Menyimpan...' : 'Simpan Pricing'}
+            </button>
+            <button onClick={resetPricing}
+              style={{ background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '11px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>
+              Reset ke Default
+            </button>
+          </div>
         </div>
       )}
 

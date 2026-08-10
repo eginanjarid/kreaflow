@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import AdminModule from './AdminModule'
 import { isSuperAdmin, isGodAdmin, GOD_ADMIN } from '@/lib/super-admins'
+import { fetchPricingConfig } from '@/lib/pricing'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -15,12 +16,13 @@ export default async function AdminPage() {
 
   const godAdmin = isGodAdmin(user.email!)
 
-  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }, { data: superAdmins }] = await Promise.all([
+  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }, { data: superAdmins }, savedPricing] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 500 }),
     admin.from('kf_workspaces').select('id, name, plan, owner_id, created_at, modes, max_workspaces'),
     admin.from('kf_workspace_members').select('workspace_id, user_id, role, created_at'),
     admin.from('kf_invites').select('workspace_id, email, role, created_at, accepted_at, expires_at'),
     admin.from('kf_super_admins').select('email, added_by, created_at'),
+    fetchPricingConfig(admin),
   ])
 
   const userMap = Object.fromEntries(
@@ -130,5 +132,5 @@ export default async function AdminPage() {
     created_at: s.created_at as string,
   }))
 
-  return <AdminModule users={users} workspaces={workspaceList} stats={stats} isGodAdmin={godAdmin} superAdmins={superAdminList} godAdminEmail={GOD_ADMIN} />
+  return <AdminModule users={users} workspaces={workspaceList} stats={stats} isGodAdmin={godAdmin} superAdmins={superAdminList} godAdminEmail={GOD_ADMIN} savedPricing={savedPricing} />
 }

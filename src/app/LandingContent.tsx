@@ -315,16 +315,17 @@ const PLATFORM_TABS = [
 ]
 
 const TIERS = [
-  { id: 'starter', name: 'Starter', price: 'Rp99.000', maxWs: '1 Workspace', highlight: false, badge: null, features: ['1 Workspace / Brand', '1 owner + 3 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
-  { id: 'pro', name: 'Pro', price: 'Rp199.000', oldPrice: 'Rp399.000', maxWs: '4 Workspace', highlight: true, badge: 'PALING POPULER', features: ['4 Workspace / Brand', '1 owner + 5 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
-  { id: 'agency', name: 'Agency', price: 'Rp399.000', maxWs: '10 Workspace', highlight: false, badge: null, features: ['10 Workspace / Brand', '1 owner + 10 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
+  { id: 'bulanan', name: 'Bulanan', price: 'Rp99.000', priceNote: '/bulan', maxWs: '1 Workspace', highlight: false, badge: null, isMonthly: true, features: ['1 Workspace / Brand', '1 owner + 4 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Perpanjang tiap bulan'] },
+  { id: 'basic', name: 'Basic', price: 'Rp149.000', priceNote: 'sekali bayar', maxWs: '2 Workspace', highlight: false, badge: null, isMonthly: false, features: ['2 Workspace / Brand', '1 owner + 4 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
+  { id: 'pro', name: 'Pro', price: 'Rp199.000', priceNote: 'sekali bayar', maxWs: '4 Workspace', highlight: true, badge: 'PALING POPULER', isMonthly: false, features: ['4 Workspace / Brand', '1 owner + 5 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
+  { id: 'agency', name: 'Agency', price: 'Rp399.000', priceNote: 'sekali bayar', maxWs: '10 Workspace', highlight: false, badge: null, isMonthly: false, features: ['10 Workspace / Brand', '1 owner + 10 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
 ]
 
 const FAQS = [
   { q: 'Apa itu KreaFlow?', a: 'KreaFlow adalah platform manajemen konten end-to-end untuk content creator dan affiliator Indonesia. Mulai dari membangun brand, menyusun konten, menjadwalkan, hingga memantau performa, semua dalam satu platform.' },
-  { q: 'Apa perbedaan Starter, Pro, dan Agency?', a: 'Perbedaan utamanya ada di jumlah workspace dan anggota tim. Starter cocok untuk 1 brand, Pro untuk yang punya 4 brand/klien, Agency untuk agensi dengan banyak brand. Semua paket dapat akses ke semua modul.' },
-  { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga ini hanya tersedia selama masa launch.' },
-  { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa. Tersedia add-on +1 workspace seharga Rp49.000 (sekali bayar, lifetime). Atau upgrade ke paket lebih tinggi untuk dapat lebih banyak workspace sekaligus.' },
+  { q: 'Apa perbedaan Bulanan, Basic, Pro, dan Agency?', a: 'Bulanan (99k/bln) cocok untuk yang ingin coba dulu. Basic Lifetime (149k) dan Pro Lifetime (199k) untuk yang sudah komit — bayar sekali, pakai selamanya. Agency (399k) untuk agensi dengan banyak klien. Semua paket dapat akses semua 10 modul.' },
+  { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga lifetime jauh lebih hemat dibanding berlangganan jangka panjang.' },
+  { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa, khusus untuk paket lifetime (Basic/Pro/Agency). Tersedia add-on +1 workspace seharga Rp49.000 sekali bayar. User Bulanan tidak bisa beli add-on workspace — upgrade ke lifetime untuk akses fitur ini.' },
   { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule Post sedang dalam pengembangan dan akan segera hadir sebagai add-on Rp49.000/bulan. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
 ]
 
@@ -502,7 +503,7 @@ export default function LandingContent() {
             { num: '10', label: 'Modul terintegrasi' },
             { num: '3', label: 'Tipe brand workspace' },
             { num: '6', label: 'Platform sosmed' },
-            { num: '1x', label: 'Bayar, lifetime akses' },
+            { num: '1x', label: 'Bayar lifetime, akses selamanya' },
           ].map((s, i) => (
             <div key={i} className="lp-stat">
               <div className="lp-stat-num">{s.num}</div>
@@ -714,7 +715,7 @@ export default function LandingContent() {
         <div className="lp-sec-head reveal">
           <div className="lp-pill">Harga</div>
           <h2 className="lp-h2">Simple Pricing, Powerful Tools.</h2>
-          <p className="lp-sec-sub">Paket utama bayar sekali, lifetime. Add-on workspace tersedia berlangganan bulanan.</p>
+          <p className="lp-sec-sub">Mulai berlangganan atau beli lifetime — pilih sesuai kebutuhanmu.</p>
         </div>
         <div className="lp-pricing-grid">
           {TIERS.map((tier, i) => (
@@ -722,11 +723,13 @@ export default function LandingContent() {
               {tier.badge && <div className="lp-price-badge">{tier.badge}</div>}
               <div className="lp-price-tier">{tier.name}</div>
               <div className="lp-price-ws">{tier.maxWs}</div>
-              {tier.oldPrice && <div className="lp-price-orig">{tier.oldPrice}</div>}
-              <div style={{ fontSize:'2rem', fontWeight:900, color: tier.highlight?'#1a73e8':'#0f172a', letterSpacing:'-1px', lineHeight:1, marginBottom:4 }}>{tier.price}</div>
-              <div className="lp-price-note">Bayar sekali · Lifetime</div>
-              <Link href="/register" className={`lp-price-cta ${tier.highlight?'lp-price-cta-solid':'lp-price-cta-ghost'}`}>
-                Mulai {tier.name} →
+              <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:2 }}>
+                <div style={{ fontSize:'2rem', fontWeight:900, color: tier.highlight?'#1a73e8':'#0f172a', letterSpacing:'-1px', lineHeight:1 }}>{tier.price}</div>
+                {tier.isMonthly && <span style={{ fontSize:'0.85rem', color:'#64748b', fontWeight:600 }}>/bln</span>}
+              </div>
+              <div className="lp-price-note">{tier.isMonthly ? 'Berlangganan bulanan · bisa batal kapan saja' : 'Bayar sekali · Lifetime'}</div>
+              <Link href={`/register?plan=${tier.id}`} className={`lp-price-cta ${tier.highlight?'lp-price-cta-solid':'lp-price-cta-ghost'}`}>
+                {tier.isMonthly ? 'Mulai Berlangganan →' : `Beli ${tier.name} →`}
               </Link>
               <div className="lp-price-divider" />
               <div className="lp-price-feats">
@@ -819,7 +822,7 @@ export default function LandingContent() {
               <span style={{ fontSize:'0.8rem', color:'rgba(255,255,255,0.7)', fontWeight:500 }}>Bergabung bersama creator Indonesia</span>
             </div>
             <h2 className="lp-cta-block-h2">Mulai kelola konten<br />lebih terstruktur.</h2>
-            <p className="lp-cta-block-sub">Lifetime deal · Bayar sekali, pakai selamanya</p>
+            <p className="lp-cta-block-sub">Mulai berlangganan 99k/bln atau lifetime dari 149k — bayar sekali, pakai selamanya</p>
           </div>
           <div className="lp-cta-block-right">
             <Link href="/register" className="lp-btn-white">Mulai Sekarang →</Link>
