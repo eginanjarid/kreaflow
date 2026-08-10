@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { DEFAULT_PRICING, type PricingConfig } from '@/lib/pricing'
 
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -314,12 +315,6 @@ const PLATFORM_TABS = [
   },
 ]
 
-const TIERS = [
-  { id: 'bulanan', name: 'Bulanan', price: 'Rp99.000', priceNote: '/bulan', maxWs: '1 Workspace', highlight: false, badge: null, isMonthly: true, features: ['1 Workspace / Brand', '1 owner + 4 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Perpanjang tiap bulan'] },
-  { id: 'basic', name: 'Basic', price: 'Rp149.000', priceNote: 'sekali bayar', maxWs: '2 Workspace', highlight: false, badge: null, isMonthly: false, features: ['2 Workspace / Brand', '1 owner + 4 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
-  { id: 'pro', name: 'Pro', price: 'Rp199.000', priceNote: 'sekali bayar', maxWs: '4 Workspace', highlight: true, badge: 'PALING POPULER', isMonthly: false, features: ['4 Workspace / Brand', '1 owner + 5 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
-  { id: 'agency', name: 'Agency', price: 'Rp399.000', priceNote: 'sekali bayar', maxWs: '10 Workspace', highlight: false, badge: null, isMonthly: false, features: ['10 Workspace / Brand', '1 owner + 10 anggota tim', 'Semua 10 modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'] },
-]
 
 const FAQS = [
   { q: 'Apa itu KreaFlow?', a: 'KreaFlow adalah platform manajemen konten end-to-end untuk content creator dan affiliator Indonesia. Mulai dari membangun brand, menyusun konten, menjadwalkan, hingga memantau performa, semua dalam satu platform.' },
@@ -329,7 +324,25 @@ const FAQS = [
   { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule Post sedang dalam pengembangan dan akan segera hadir sebagai add-on Rp49.000/bulan. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
 ]
 
-export default function LandingContent() {
+function fmtLpPrice(n: number) {
+  return 'Rp' + n.toLocaleString('id-ID')
+}
+
+export default function LandingContent({ pricing }: { pricing?: PricingConfig }) {
+  const config = pricing ?? DEFAULT_PRICING
+
+  const TIERS_DYNAMIC = config.tiers.map(t => ({
+    id: t.id,
+    name: t.name,
+    price: fmtLpPrice(t.price),
+    priceNote: t.isMonthly ? '/bulan' : 'sekali bayar',
+    maxWs: `${t.maxWorkspaces} Workspace`,
+    highlight: t.highlight,
+    badge: t.badge,
+    isMonthly: t.isMonthly,
+    features: t.features,
+  }))
+
   const [phrase, setPhrase] = useState('')
   const [phraseIdx, setPhraseIdx] = useState(0)
   const [typing, setTyping] = useState(true)
@@ -718,7 +731,7 @@ export default function LandingContent() {
           <p className="lp-sec-sub">Mulai berlangganan atau beli lifetime — pilih sesuai kebutuhanmu.</p>
         </div>
         <div className="lp-pricing-grid">
-          {TIERS.map((tier, i) => (
+          {TIERS_DYNAMIC.map((tier, i) => (
             <div key={tier.id} className={`lp-price-card${tier.highlight?' lp-price-featured':''} reveal reveal-delay-${i+1}`}>
               {tier.badge && <div className="lp-price-badge">{tier.badge}</div>}
               <div className="lp-price-tier">{tier.name}</div>
@@ -756,7 +769,7 @@ export default function LandingContent() {
               <div style={{ fontSize:'0.78rem', color:'#64748b' }}>Tambah 1 workspace extra tanpa ganti paket. Bayar sekali, berlaku selamanya.</div>
             </div>
             <div style={{ flexShrink:0, textAlign:'right' }}>
-              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp49.000</div>
+              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>{fmtLpPrice(config.addonWs)}</div>
               <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>lifetime</div>
             </div>
             <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0, whiteSpace:'nowrap' }}>
@@ -780,7 +793,7 @@ export default function LandingContent() {
               <div style={{ fontSize:'0.78rem', color:'#64748b' }}>Jadwalkan &amp; posting otomatis ke TikTok, Instagram, dan YouTube Shorts langsung dari KreaFlow.</div>
             </div>
             <div style={{ flexShrink:0, textAlign:'right' }}>
-              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>Rp49.000</div>
+              <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>{fmtLpPrice(config.addonSchedule)}</div>
               <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>/bulan</div>
             </div>
             <div style={{ padding:'9px 18px', borderRadius:8, background:'#f1f5f9', color:'#94a3b8', fontSize:'0.85rem', fontWeight:700, flexShrink:0, cursor:'not-allowed', whiteSpace:'nowrap' }}>Segera Hadir</div>
