@@ -71,8 +71,8 @@ export default async function DashboardPage() {
       .gte('plan_completed_at', `${thirtyDaysAgoStr}T00:00:00`),
     supabase.from('kf_content_ideas').select('assigned_produksi, studio_started_at, studio_completed_at')
       .eq('workspace_id', wsId)
-      .not('studio_completed_at', 'is', null)
-      .gte('studio_completed_at', `${thirtyDaysAgoStr}T00:00:00`),
+      .not('assigned_produksi', 'is', null)
+      .or(`studio_completed_at.gte.${thirtyDaysAgoStr}T00:00:00,studio_completed_at.is.null`),
     supabase.from('kf_tasks').select('assigned_to, started_at, completed_at, nama')
       .eq('workspace_id', wsId)
       .not('completed_at', 'is', null)

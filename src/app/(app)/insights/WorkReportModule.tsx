@@ -62,7 +62,9 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
 
   // Filter entries to selected period
   const filteredPlan = planEntries.filter(e => (e.plan_completed_at?.slice(0, 10) ?? '') >= periodStartStr)
-  const filteredStudio = studioEntries.filter(e => (e.studio_completed_at?.slice(0, 10) ?? '') >= periodStartStr)
+  const filteredStudio = studioEntries.filter(e =>
+    e.studio_completed_at === null || (e.studio_completed_at?.slice(0, 10) ?? '') >= periodStartStr
+  )
   const filteredTask = taskEntries.filter(e => (e.completed_at?.slice(0, 10) ?? '') >= periodStartStr)
   const filteredCal = calendarEntries.filter(e => (e.calendar_completed_at?.slice(0, 10) ?? '') >= periodStartStr)
 
@@ -86,8 +88,8 @@ export default function WorkReportModule({ planEntries, studioEntries, taskEntri
   const stats = Array.from(allPeople).map(person => {
     const pd = filteredPlan.filter(e => e.assigned_naskah === person && e.plan_completed_at)
     const ph = pd.map(e => diffHours(e.plan_started_at, e.plan_completed_at)).filter((h): h is number => h !== null)
-    const sd = filteredStudio.filter(e => e.assigned_produksi === person && e.studio_completed_at)
-    const sh = sd.map(e => diffHours(e.studio_started_at, e.studio_completed_at)).filter((h): h is number => h !== null)
+    const sd = filteredStudio.filter(e => e.assigned_produksi === person)
+    const sh = sd.filter(e => !!e.studio_completed_at).map(e => diffHours(e.studio_started_at, e.studio_completed_at)).filter((h): h is number => h !== null)
     const td = filteredTask.filter(e => e.assigned_to === person && e.completed_at)
     const th = td.map(e => diffHours(e.started_at, e.completed_at)).filter((h): h is number => h !== null)
     const cd = filteredCal.filter(e => e.assigned_calendar === person && e.calendar_completed_at)
