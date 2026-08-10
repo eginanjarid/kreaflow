@@ -404,7 +404,9 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   )
 }
 
-function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; products: Product[]; onClick: () => void; onMulai?: () => void }) {
+function ContentCard({ item, products, onClick, onMulai, onRename }: { item: ContentItem; products: Product[]; onClick: () => void; onMulai?: () => void; onRename?: (id: string, newJudul: string) => void }) {
+  const [renaming, setRenaming] = useState(false)
+  const [renameVal, setRenameVal] = useState(item.judul || '')
   const thumb = getThumbnail(item)
   const product = products.find(p => p.id === item.product_id)
   const stage = STATUS_STAGE[item.status]
@@ -443,10 +445,22 @@ function ContentCard({ item, products, onClick, onMulai }: { item: ContentItem; 
         {!thumb && (
           <span style={{ fontSize: '0.62rem', fontWeight: 700, color: stageColor[stage], background: stageColor[stage] + '18', padding: '2px 7px', borderRadius: 4, alignSelf: 'flex-start' }}>{stageLabel[stage]}</span>
         )}
-        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#111827', lineHeight: 1.3 }}>{item.judul || '(Tanpa judul)'}</div>
-        {(item.hook || item.body || item.script) && (
-          <div style={{ fontSize: '0.72rem', color: '#6b7280', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-            {(item.hook || item.body || item.script || '').slice(0, 100)}
+        {renaming ? (
+          <input
+            autoFocus
+            value={renameVal}
+            onChange={e => setRenameVal(e.target.value)}
+            onBlur={() => { setRenaming(false); if (renameVal.trim() && renameVal !== item.judul) onRename?.(item.id, renameVal.trim()) }}
+            onKeyDown={e => { if (e.key === 'Enter') { e.currentTarget.blur() } if (e.key === 'Escape') { setRenameVal(item.judul || ''); setRenaming(false) } }}
+            onClick={e => e.stopPropagation()}
+            style={{ fontSize: '0.84rem', fontWeight: 700, color: '#111827', lineHeight: 1.3, border: '1.5px solid #1a73e8', borderRadius: 6, padding: '3px 7px', width: '100%', outline: 'none', background: '#f0f7ff' }}
+          />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5 }}>
+            <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#111827', lineHeight: 1.3, flex: 1 }}>{item.judul || '(Tanpa judul)'}</div>
+            <button onClick={e => { e.stopPropagation(); setRenameVal(item.judul || ''); setRenaming(true) }}
+              title="Ganti nama"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#d1d5db', padding: '0 1px', flexShrink: 0, lineHeight: 1, fontSize: '0.7rem', marginTop: 1 }}>✎</button>
           </div>
         )}
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
@@ -551,6 +565,11 @@ export default function StudioModule({ initialContents, products, initialNotific
   const [previewReels, setPreviewReels] = useState<ContentItem | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [showNotif, setShowNotif] = useState(false)
+
+  async function handleRename(id: string, newJudul: string) {
+    await supabase.from('kf_content_ideas').update({ judul: newJudul }).eq('id', id)
+    setContents(prev => prev.map(c => c.id === id ? { ...c, judul: newJudul } : c))
+  }
 
   useEffect(() => {
     const channel = supabase.channel('studio-content-changes')
@@ -694,7 +713,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                       <span style={{ fontSize: '0.72rem', color, fontWeight: 600 }}>{group.items.length} konten</span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} />)}
+                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} />)}
                     </div>
                   </div>
                 )
@@ -703,7 +722,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           )
         })() : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-            {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} />)}
+            {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} />)}
           </div>
         )
       ) : viewMode === 'platform' ? (

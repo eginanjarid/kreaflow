@@ -554,7 +554,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               const judulPrefix = isAffiliate
                 ? (produk ? produk.nama : null)
                 : (pillar ? pillar.nama : null)
-              const multiSuffix = activeSlots.length > 1 ? ` #${slotIdx}` : ''
+              const multiSuffix = activeSlots.length > 1 ? ` Konten ${slotIdx}` : ''
               items.push({
                 workspace_id: workspaceId,
                 sprint_id: sprint.id,
