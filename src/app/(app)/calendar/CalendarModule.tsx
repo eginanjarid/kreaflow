@@ -37,28 +37,7 @@ const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
 const STATUSES = ['Planned', 'Ready', 'Posted', 'Cancelled']
 const STATUS_COLOR: Record<string, string> = { Planned: '#1a73e8', Ready: '#d97706', Posted: '#059669', Cancelled: '#6b7280' }
-const FORMAT_COLOR: Record<string, string> = {
-  'video pendek': '#f97316', 'reels': '#ec4899', 'live': '#ef4444',
-  'carousel': '#8b5cf6', 'single post': '#1a73e8', 'story': '#06b6d4',
-  'thread': '#d97706', 'shorts': '#dc2626',
-}
-function getFormatColor(format: string | null): string {
-  if (!format) return '#6b7280'
-  const key = Object.keys(FORMAT_COLOR).find(k => format.toLowerCase().includes(k))
-  return key ? FORMAT_COLOR[key] : '#1a73e8'
-}
-function getDateUrgency(tanggal: string | null, jam?: string | null): { color: string; label: string } {
-  if (!tanggal) return { color: '#9ca3af', label: 'Belum dijadwalkan' }
-  const today = new Date(); today.setHours(0, 0, 0, 0)
-  const date = new Date(tanggal + 'T00:00:00')
-  const diff = Math.floor((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-  const timeStr = jam ? ` ${jam}` : ''
-  if (diff < 0) return { color: '#ef4444', label: `Lewat ${Math.abs(diff)} hari` }
-  if (diff === 0) return { color: '#f97316', label: `Hari ini${timeStr}` }
-  if (diff === 1) return { color: '#d97706', label: `Besok${timeStr}` }
-  if (diff <= 3) return { color: '#ca8a04', label: `${diff} hari lagi${timeStr}` }
-  return { color: '#059669', label: date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + timeStr }
-}
+const DAY_COLORS = ['#1a73e8', '#7c3aed', '#059669', '#d97706', '#0891b2', '#db2777', '#dc2626']
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 const DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
@@ -370,32 +349,62 @@ function prevMonth() {
             <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk jadwalkan</span>
           </div>
           <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {readyItems.map(item => {
-              const fc = getFormatColor(item.format)
-              const urgency = getDateUrgency(item.tanggal_tayang, item.jam_tayang)
-              return (
-                <button key={item.id} type="button" onClick={() => openSchedModal(item)}
-                  style={{ flexShrink: 0, width: 180, textAlign: 'left', background: `${fc}08`, border: `1.5px solid ${fc}25`, borderLeft: `3px solid ${fc}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'box-shadow 0.15s' }}>
-                  {/* Format badge */}
-                  <div style={{ marginBottom: 7 }}>
-                    <span style={{ fontSize: '0.6rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: `${fc}18`, color: fc, letterSpacing: '0.02em' }}>
-                      {item.format || 'KONTEN'}
-                    </span>
+            {(() => {
+              const sortedReady = [...readyItems].sort((a, b) => {
+                const da = a.tanggal_tayang || '9999', db = b.tanggal_tayang || '9999'
+                return da !== db ? da.localeCompare(db) : (a.jam_tayang || '').localeCompare(b.jam_tayang || '')
+              })
+              const sortedDates = [...new Set(sortedReady.map(i => i.tanggal_tayang || '__no_date__'))].sort()
+              const dateColorMap = new Map(sortedDates.map((d, i) => [d, DAY_COLORS[i % DAY_COLORS.length]]))
+              return sortedReady.map((item, idx) => {
+                const dayKey = item.tanggal_tayang || '__no_date__'
+                const dayColor = dateColorMap.get(dayKey) || '#1a73e8'
+                const prevKey = idx > 0 ? (sortedReady[idx - 1].tanggal_tayang || '__no_date__') : null
+                const isNewDay = prevKey !== dayKey
+                const dateObj = item.tanggal_tayang ? new Date(item.tanggal_tayang + 'T00:00:00') : null
+                return (
+                  <div key={item.id} style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+                    {/* Date separator card — same pattern as Plan */}
+                    {isNewDay && (
+                      <div style={{ flexShrink: 0, width: 60, borderRadius: 12, background: dayColor + '12', border: `1.5px solid ${dayColor}30`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 6px', gap: 2 }}>
+                        {dateObj ? (<>
+                          <div style={{ fontSize: '0.55rem', fontWeight: 700, color: dayColor, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>
+                            {dateObj.toLocaleDateString('id-ID', { weekday: 'short' })}
+                          </div>
+                          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: dayColor, lineHeight: 1 }}>
+                            {dateObj.getDate()}
+                          </div>
+                          <div style={{ fontSize: '0.55rem', fontWeight: 600, color: dayColor + 'cc', textAlign: 'center' }}>
+                            {dateObj.toLocaleDateString('id-ID', { month: 'short' })}
+                          </div>
+                        </>) : (
+                          <div style={{ fontSize: '0.55rem', fontWeight: 700, color: dayColor, textAlign: 'center' }}>Tanpa Tgl</div>
+                        )}
+                      </div>
+                    )}
+                    <button type="button" onClick={() => openSchedModal(item)}
+                      style={{ flexShrink: 0, width: 172, textAlign: 'left', background: '#f9fafb', border: `1.5px solid #f0f0f0`, borderTop: `3px solid ${dayColor}`, borderRadius: 12, padding: '10px 12px', cursor: 'pointer', transition: 'all 0.15s' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: dayColor + '18', color: dayColor }}>SIAP TAYANG</span>
+                        {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
+                      </div>
+                      <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
+                        {item.judul}
+                      </div>
+                      {item.tanggal_tayang && (
+                        <div style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                          <span>{dateObj!.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}</span>
+                        </div>
+                      )}
+                      {!item.tanggal_tayang && (
+                        <div style={{ fontSize: '0.65rem', color: '#9ca3af' }}>Belum dijadwalkan</div>
+                      )}
+                    </button>
                   </div>
-                  {/* Title */}
-                  <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }} title={item.judul}>
-                    {item.judul}
-                  </div>
-                  {/* Date with urgency dot */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: urgency.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.67rem', color: urgency.color, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {urgency.label}
-                    </span>
-                  </div>
-                </button>
-              )
-            })}
+                )
+              })
+            })()}
           </div>
         </div>
       )}
