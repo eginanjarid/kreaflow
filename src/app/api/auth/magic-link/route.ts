@@ -35,9 +35,12 @@ export async function POST(req: NextRequest) {
     options: { redirectTo: callbackUrl },
   })
 
-  if (error || !data?.properties?.action_link) {
+  if (error || !data?.properties?.hashed_token) {
     return NextResponse.json({ error: 'Gagal membuat link. Coba beberapa saat lagi.' }, { status: 500 })
   }
+
+  // Gunakan token_hash untuk server-side verification (hindari implicit flow)
+  const verifyUrl = `${appUrl}/auth/verify?token_hash=${data.properties.hashed_token}&type=email${nextPath !== '/sprints' ? `&next=${encodeURIComponent(nextPath)}` : ''}`
 
   // Ambil template dari DB, fallback ke default
   const { data: config } = await supabase
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await sendMagicLinkEmail(email, data.properties.action_link, settings)
+    await sendMagicLinkEmail(email, verifyUrl, settings)
   } catch (e) {
     console.error('[kreaflow/magic-link] Gagal kirim email:', e)
     return NextResponse.json({ error: 'Gagal mengirim email. Periksa konfigurasi SMTP.' }, { status: 500 })
