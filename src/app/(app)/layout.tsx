@@ -30,6 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
       role={role}
       jabatan={jabatan}
+      workspaceId={wsId}
     >
       {children}
     </AppShell>

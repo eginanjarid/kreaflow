@@ -26,32 +26,33 @@ type ContentIdea = {
   gdrive_url?: string
   preview_url?: string
   show_in_feed?: boolean
+  sprint_id?: string | null
 }
 
 type Product = { id: string; nama: string }
 type Pillar = { id: string; nama: string }
 type TaskSnap = { id: string; nama: string; due_date: string; percent_complete: number; priority: string }
+type Sprint = { id: string; nama: string; start_date: string; end_date: string }
+type Angle = { judul: string; hook: string; angle_type: string }
 
 const FORMATS = ['Video Pendek', 'Reels', 'Story', 'Carousel', 'Single Post', 'Thread', 'Live', 'Podcast', 'Blog']
 const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before-After', 'Story Telling', 'Tutorial']
-const STATUSES = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
+const PIPELINE_STATUSES = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
+const BANK_STATUSES = ['Ide', 'Kandidat']
+const ALL_STATUSES = [...BANK_STATUSES, ...PIPELINE_STATUSES]
 const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
+
 const STATUS_COLOR: Record<string, string> = {
-  Draft: '#6b7280',
-  'Naskah Siap': '#d97706',
-  Produksi: '#1a73e8',
-  'Siap Tayang': '#059669',
-  Terjadwal: '#a855f7',
-  Tayang: '#6b21a8',
+  Ide: '#7c3aed', Kandidat: '#d97706',
+  Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8',
+  'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8',
   Ready: '#166534', Scheduled: '#1e40af', Posted: '#6b21a8',
 }
 const STATUS_BG: Record<string, string> = {
-  Draft: '#f3f4f6',
-  'Naskah Siap': 'rgba(245,158,11,0.12)',
-  Produksi: 'rgba(59,130,246,0.12)',
-  'Siap Tayang': 'rgba(34,197,94,0.12)',
-  Terjadwal: 'rgba(168,85,247,0.12)',
-  Tayang: 'rgba(107,33,168,0.15)',
+  Ide: 'rgba(124,58,237,0.10)', Kandidat: 'rgba(217,119,6,0.12)',
+  Draft: '#f3f4f6', 'Naskah Siap': 'rgba(245,158,11,0.12)',
+  Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)',
+  Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)',
   Ready: 'rgba(22,101,52,0.15)', Scheduled: 'rgba(30,64,175,0.15)', Posted: 'rgba(107,33,168,0.15)',
 }
 
@@ -95,6 +96,11 @@ function getThumbnail(idea: ContentIdea): string | null {
   return null
 }
 
+function fmtDate(iso: string | null | undefined): string {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
+}
+
 function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
   idea: ContentIdea; workspaceName: string; onEdit: () => void; onClose: () => void
 }) {
@@ -110,267 +116,45 @@ function IGPostPreview({ idea, workspaceName, onEdit, onClose }: {
       onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
         style={{ width: 390, maxHeight: '92vh', overflowY: 'auto', background: '#000', borderRadius: 20, border: '1px solid #222', display: 'flex', flexDirection: 'column' }}>
-
-        {/* IG Post Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px' }}>
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#fff', flexShrink: 0 }}>
-            {initial}
-          </div>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827', lineHeight: 1 }}>{handle}</div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', lineHeight: 1 }}>{handle}</div>
             <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 2 }}>Original audio</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600, cursor: 'pointer' }}>Ikuti</span>
-            <span style={{ color: '#6b7280', fontSize: '1.1rem', cursor: 'pointer', lineHeight: 1 }}>···</span>
-          </div>
+          <span style={{ fontSize: '0.75rem', color: '#1a73e8', fontWeight: 600 }}>Ikuti</span>
         </div>
-
-        {/* Image */}
-        <div style={{ width: '100%', aspectRatio: '4 / 5', background: '#fff', position: 'relative', overflow: 'hidden' }}>
-          {thumb
-            ? <img src={thumb} alt={idea.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-            : <ThumbnailPlaceholder idea={idea} />
-          }
-          {/* dot indicator */}
-          <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
-          </div>
-        </div>
-
-        {/* Action bar */}
-        <div style={{ padding: '10px 14px 6px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
-            <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-          <div style={{ flex: 1 }} />
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}>
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-          </svg>
-        </div>
-
-        {/* Likes */}
-        <div style={{ paddingInline: 14, fontSize: '0.82rem', fontWeight: 700, color: '#111827', marginBottom: 4 }}>
-          {fakeLikes.toLocaleString()} suka
-        </div>
-
-        {/* Caption */}
-        {caption && (
-          <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#111827', lineHeight: 1.5, marginBottom: 4 }}>
-            <span style={{ fontWeight: 700, marginRight: 6 }}>{handle}</span>
-            <span style={{ whiteSpace: 'pre-wrap' }}>{caption.length > 150 ? caption.slice(0, 150) + '...' : caption}</span>
-          </div>
-        )}
-
-        {/* Hashtags */}
-        {hashtags && (
-          <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#1a73e8', marginBottom: 4, lineHeight: 1.5 }}>
-            {hashtags}
-          </div>
-        )}
-
-        {/* Status badge */}
-        <div style={{ paddingInline: 14, marginBottom: 6 }}>
-          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>
-            {idea.status}
-          </span>
-          {idea.format && <span style={{ marginLeft: 6, fontSize: '0.68rem', color: '#6b7280' }}>{idea.format}</span>}
-        </div>
-
-        <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingInline: 14, marginBottom: 10 }}>
-          {idea.scheduled_date ? `Dijadwalkan: ${idea.scheduled_date}` : 'Belum dijadwalkan'}
-        </div>
-
-        {/* Footer actions */}
-        <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #f3f4f6' }}>
-          <button onClick={onEdit}
-            style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>
-            Edit Konten
-          </button>
-          {idea.canva_url && (
-            <a href={idea.canva_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px', color: '#93c5fd', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
-              Buka Canva ↗
-            </a>
-          )}
-          {idea.gdrive_url && (
-            <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px', color: '#7dd3fc', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
-              Drive ↗
-            </a>
-          )}
-          <button onClick={onClose}
-            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '9px 12px', color: '#e5e7eb', fontSize: '0.82rem', cursor: 'pointer' }}>
-            ✕
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function IGReelsPreview({ idea, workspaceName, onEdit, onClose }: {
-  idea: ContentIdea; workspaceName: string; onEdit: () => void; onClose: () => void
-}) {
-  const thumb = getThumbnail(idea)
-  const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
-  const initial = workspaceName.charAt(0).toUpperCase()
-  const caption = [idea.hook, idea.body, idea.cta].filter(Boolean).join(' ') || idea.judul
-  const hashtags = (idea.hashtags || []).join(' ')
-  const fakeLikes = Math.floor(Math.random() * 9000) + 1000
-  const fakeComments = Math.floor(Math.random() * 500) + 50
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, flexDirection: 'column', gap: 12 }}
-      onClick={onClose}>
-      {/* Reel container */}
-      <div onClick={e => e.stopPropagation()}
-        style={{ position: 'relative', width: 340, height: 604, borderRadius: 18, overflow: 'hidden', background: '#000', border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
-
-        {/* Background thumbnail */}
-        {thumb
-          ? <img src={thumb} alt={idea.judul} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-          : <div style={{ position: 'absolute', inset: 0 }}><ThumbnailPlaceholder idea={idea} /></div>
-        }
-
-        {/* Gradient overlays */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.35) 100%)' }} />
-
-        {/* Top bar */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', padding: '14px 14px 0' }}>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          </button>
-          <span style={{ flex: 1, textAlign: 'center', color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>Reels</span>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ cursor: 'pointer' }}><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-        </div>
-
-        {/* Play button */}
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          </div>
-        </div>
-
-        {/* Right sidebar */}
-        <div style={{ position: 'absolute', right: 10, bottom: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <span style={{ color: '#fff', fontSize: '0.68rem', fontWeight: 600 }}>{fakeLikes.toLocaleString()}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span style={{ color: '#fff', fontSize: '0.68rem', fontWeight: 600 }}>{fakeComments}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span style={{ color: '#fff', fontSize: '0.68rem', fontWeight: 600 }}>Kirim</span>
-          </div>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-        </div>
-
-        {/* Bottom info */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 48, padding: '0 14px 18px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem', color: '#fff', flexShrink: 0 }}>
-              {initial}
-            </div>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>{handle}</span>
-            <span style={{ color: '#fff', fontSize: '0.75rem', border: '1px solid rgba(255,255,255,0.6)', borderRadius: 6, padding: '2px 10px', cursor: 'pointer' }}>Ikuti</span>
-          </div>
-          {caption && (
-            <div style={{ color: '#fff', fontSize: '0.78rem', lineHeight: 1.4, marginBottom: 6 }}>
-              {caption.length > 100 ? caption.slice(0, 100) + '…' : caption}
+        <div style={{ width: '100%', aspectRatio: '4/5', background: '#1e293b', position: 'relative', overflow: 'hidden' }}>
+          {thumb ? <img src={thumb} alt={idea.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: '2rem', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>{(idea.judul || '?').charAt(0).toUpperCase()}</span>
             </div>
           )}
-          {hashtags && (
-            <div style={{ color: '#1a73e8', fontSize: '0.73rem', marginBottom: 8 }}>
-              {hashtags.length > 60 ? hashtags.slice(0, 60) + '…' : hashtags}
-            </div>
-          )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            <span style={{ color: '#111827', fontSize: '0.7rem' }}>Audio original · {handle}</span>
-          </div>
+        </div>
+        <div style={{ padding: '10px 14px 6px', display: 'flex', gap: 14 }}>
+          {['heart', 'chat', 'send'].map(i => (
+            <svg key={i} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              {i === 'heart' && <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>}
+              {i === 'chat' && <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>}
+              {i === 'send' && <><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>}
+            </svg>
+          ))}
+        </div>
+        <div style={{ paddingInline: 14, fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>{fakeLikes.toLocaleString()} suka</div>
+        {caption && <div style={{ paddingInline: 14, fontSize: '0.82rem', color: '#f1f5f9', lineHeight: 1.5, marginBottom: 4, whiteSpace: 'pre-wrap' }}><span style={{ fontWeight: 700, marginRight: 6 }}>{handle}</span>{caption.length > 150 ? caption.slice(0, 150) + '...' : caption}</div>}
+        {hashtags && <div style={{ paddingInline: 14, fontSize: '0.8rem', color: '#1a73e8', marginBottom: 8 }}>{hashtags}</div>}
+        <div style={{ display: 'flex', gap: 8, padding: '10px 14px 16px', borderTop: '1px solid #222' }}>
+          <button onClick={onEdit} style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Edit Konten</button>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, padding: '9px 12px', color: '#e5e7eb', fontSize: '0.82rem', cursor: 'pointer' }}>✕</button>
         </div>
       </div>
-
-      {/* Action buttons below */}
-      <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <div style={{ background: 'rgba(30,30,30,0.9)', borderRadius: 8, padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: '0.68rem', color: STATUS_COLOR[idea.status], fontWeight: 600 }}>{idea.status}</span>
-          {idea.scheduled_date && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>· {idea.scheduled_date}</span>}
-        </div>
-        <button onClick={onEdit} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '6px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
-          Edit Konten
-        </button>
-        {idea.canva_url && (
-          <a href={idea.canva_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', color: '#93c5fd', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
-            Canva ↗
-          </a>
-        )}
-        {idea.gdrive_url && (
-          <a href={idea.gdrive_url} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', color: '#7dd3fc', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}>
-            Drive ↗
-          </a>
-        )}
-        <button onClick={onClose} style={{ background: 'rgba(30,30,30,0.9)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 12px', color: '#e5e7eb', fontSize: '0.78rem', cursor: 'pointer' }}>
-          ✕
-        </button>
-      </div>
-    </div>
-  )
-}
-
-const PREVIEW_RATIOS = [
-  { key: '1:1',     label: '1:1',      sub: 'IG Grid',    w: 160, h: 160 },
-  { key: '4:5',     label: '4:5',      sub: 'IG / TikTok', w: 128, h: 160 },
-  { key: '16:9',    label: '16:9',     sub: 'YouTube',    w: 200, h: 113 },
-  { key: '1.91:1',  label: '1.91:1',   sub: 'Landscape',  w: 200, h: 105 },
-]
-
-function MediaPreview({ idea }: { idea: ContentIdea }) {
-  const [ratio, setRatio] = useState('1:1')
-  const thumb = getThumbnail(idea)
-  const r = PREVIEW_RATIOS.find(x => x.key === ratio) || PREVIEW_RATIOS[0]
-
-  return (
-    <div style={{ marginTop: 4 }}>
-      <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 8 }}>Preview tampilan:</div>
-      {/* Ratio toggle */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
-        {PREVIEW_RATIOS.map(rx => (
-          <button key={rx.key} type="button" onClick={() => setRatio(rx.key)}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', borderRadius: 8, border: ratio === rx.key ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: ratio === rx.key ? 'rgba(26,115,232,0.10)' : '#f3f4f6', cursor: 'pointer', gap: 1 }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: ratio === rx.key ? 700 : 400, color: ratio === rx.key ? '#1a73e8' : '#6b7280' }}>{rx.label}</span>
-            <span style={{ fontSize: '0.7rem', color: ratio === rx.key ? '#1a73e8' : '#6b7280' }}>{rx.sub}</span>
-          </button>
-        ))}
-      </div>
-      {/* Preview box */}
-      <div style={{ width: r.w, height: r.h, borderRadius: 8, overflow: 'hidden', border: 'none', background: '#f3f4f6', transition: 'all 0.2s' }}>
-        {thumb
-          ? <img src={thumb} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-          : <ThumbnailPlaceholder idea={idea} />
-        }
-      </div>
-      <div style={{ marginTop: 5, fontSize: '0.68rem', color: '#6b7280' }}>{r.w}×{r.h}px · {r.label} · {r.sub}</div>
     </div>
   )
 }
 
 function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName: string }) {
-  const sprintTasks = tasks
-    .filter(t => t.nama.includes(' — ') && t.nama.endsWith('— ' + productName))
-    .sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''))
+  const sprintTasks = tasks.filter(t => t.nama.includes(' — ') && t.nama.endsWith('— ' + productName)).sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''))
   if (sprintTasks.length === 0) return null
-
   return (
     <div style={{ marginTop: 10, padding: '8px 10px', background: 'rgba(26,115,232,0.06)', border: '1px solid rgba(26,115,232,0.18)', borderRadius: 8 }}>
       <div style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, marginBottom: 6, letterSpacing: '0.04em' }}>SPRINT TIMELINE</div>
@@ -383,7 +167,7 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
           const dotColor = pct === 100 ? '#059669' : pct > 0 ? '#d97706' : '#6b7280'
           const dateStr = t.due_date ? t.due_date.slice(5).replace('-', '/') : ''
           return (
-            <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f3f4f6', border: 'none', color: '#6b7280' }}>
+            <span key={t.id} title={`${stepName} — ${t.due_date}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, background: '#f3f4f6', color: '#6b7280' }}>
               <span style={{ color: dotColor, fontSize: '0.7rem' }}>{dot}</span>
               <span>{stepName}</span>
               {dateStr && <span style={{ color: '#6b7280', marginLeft: 1 }}>{dateStr}</span>}
@@ -395,31 +179,285 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
   )
 }
 
-function ThumbnailPlaceholder({ idea }: { idea: ContentIdea }) {
-  const letter = (idea.judul || '?').charAt(0).toUpperCase()
-  const gradients: Record<string, string> = {
-    Draft: 'linear-gradient(135deg, #1e293b, #334155)',
-    Ready: 'linear-gradient(135deg, #14532d, #166534)',
-    Scheduled: 'linear-gradient(135deg, #1e3a8a, #1d4ed8)',
-    Posted: 'linear-gradient(135deg, #3b0764, #6b21a8)',
+// ── Bank Ide ─────────────────────────────────────────────────────────────────
+
+function BankIdeTab({
+  ideas, workspaceId, sprints, onIdeaUpdate, onIdeaDelete,
+}: {
+  ideas: ContentIdea[]
+  workspaceId: string
+  sprints: Sprint[]
+  onIdeaUpdate: (updated: ContentIdea) => void
+  onIdeaDelete: (id: string) => void
+}) {
+  const [bankFilter, setBankFilter] = useState<'Semua' | 'Ide' | 'Kandidat'>('Semua')
+  const [sprintModal, setSprintModal] = useState<{ open: boolean; idea: ContentIdea | null }>({ open: false, idea: null })
+  const [expandModal, setExpandModal] = useState<{ open: boolean; idea: ContentIdea | null; angles: Angle[]; loading: boolean }>({ open: false, idea: null, angles: [], loading: false })
+  const [selectedSprint, setSelectedSprint] = useState('')
+  const [promoting, setPromoting] = useState<string | null>(null)
+
+  const bankIdeas = ideas.filter(i => BANK_STATUSES.includes(i.status))
+  const filtered = bankFilter === 'Semua' ? bankIdeas : bankIdeas.filter(i => i.status === bankFilter)
+
+  async function upgradeStatus(idea: ContentIdea, newStatus: string) {
+    setPromoting(idea.id!)
+    const supabase = createClient()
+    const { error } = await supabase.from('kf_content_ideas').update({ status: newStatus }).eq('id', idea.id)
+    if (error) { showToast('Gagal update status'); setPromoting(null); return }
+    onIdeaUpdate({ ...idea, status: newStatus })
+    showToast(`Status diubah ke ${newStatus}`, 'success')
+    setPromoting(null)
   }
+
+  async function promoteToSprint() {
+    if (!sprintModal.idea || !selectedSprint) return
+    setPromoting(sprintModal.idea.id!)
+    const supabase = createClient()
+    const { error } = await supabase.from('kf_content_ideas').update({ sprint_id: selectedSprint, status: 'Draft' }).eq('id', sprintModal.idea.id)
+    if (error) { showToast('Gagal masukkan ke sprint'); setPromoting(null); return }
+    onIdeaUpdate({ ...sprintModal.idea, sprint_id: selectedSprint, status: 'Draft' })
+    showToast('Ide dimasukkan ke sprint!', 'success')
+    setSprintModal({ open: false, idea: null })
+    setSelectedSprint('')
+    setPromoting(null)
+  }
+
+  async function expandWithAI(idea: ContentIdea) {
+    setExpandModal({ open: true, idea, angles: [], loading: true })
+    try {
+      const res = await fetch('/api/ai/expand-idea', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ judul: idea.judul, notes: idea.hook, platform: idea.platform }),
+      })
+      const data = await res.json()
+      setExpandModal(prev => ({ ...prev, angles: data.angles || [], loading: false }))
+    } catch {
+      showToast('Gagal expand AI')
+      setExpandModal(prev => ({ ...prev, loading: false }))
+    }
+  }
+
+  async function applyAngle(angle: Angle) {
+    if (!expandModal.idea) return
+    const supabase = createClient()
+    await supabase.from('kf_content_ideas').update({ judul: angle.judul, hook: angle.hook }).eq('id', expandModal.idea.id)
+    onIdeaUpdate({ ...expandModal.idea, judul: angle.judul, hook: angle.hook })
+    showToast('Angle diterapkan!', 'success')
+    setExpandModal({ open: false, idea: null, angles: [], loading: false })
+  }
+
+  const ideCount = bankIdeas.filter(i => i.status === 'Ide').length
+  const kandidatCount = bankIdeas.filter(i => i.status === 'Kandidat').length
+
   return (
-    <div style={{ width: '100%', height: '100%', background: gradients[idea.status] || gradients.Draft, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-      <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', fontFamily: 'sans-serif' }}>{letter}</span>
-      {idea.canva_url && <span style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: 4 }}>Canva</span>}
-    </div>
+    <>
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+        {[
+          { label: 'Total Ide', value: bankIdeas.length, color: '#7c3aed', bg: 'rgba(124,58,237,0.07)' },
+          { label: 'Ide Baru', value: ideCount, color: '#7c3aed', bg: 'rgba(124,58,237,0.07)' },
+          { label: 'Kandidat', value: kandidatCount, color: '#d97706', bg: 'rgba(217,119,6,0.07)' },
+        ].map(s => (
+          <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)' }}>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
+            <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 4 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter tabs */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        {(['Semua', 'Ide', 'Kandidat'] as const).map(f => (
+          <button key={f} onClick={() => setBankFilter(f)}
+            style={{ padding: '6px 16px', borderRadius: 20, fontSize: '0.8rem', fontWeight: bankFilter === f ? 600 : 400, border: bankFilter === f ? '1px solid #7c3aed' : '1px solid #e5e7eb', background: bankFilter === f ? 'rgba(124,58,237,0.10)' : '#f3f4f6', color: bankFilter === f ? '#7c3aed' : '#6b7280', cursor: 'pointer' }}>
+            {f} {f !== 'Semua' && <span style={{ fontWeight: 700 }}>({f === 'Ide' ? ideCount : kandidatCount})</span>}
+          </button>
+        ))}
+        <div style={{ flex: 1 }} />
+        <div style={{ fontSize: '0.72rem', color: '#9ca3af', alignSelf: 'center' }}>
+          Klik tombol + (kanan bawah) untuk simpan ide baru
+        </div>
+      </div>
+
+      {/* Empty state */}
+      {filtered.length === 0 && (
+        <div style={{ background: '#fff', borderRadius: 16, padding: '48px 24px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div style={{ fontSize: '2rem', marginBottom: 10 }}>💡</div>
+          <div style={{ fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+            {bankIdeas.length === 0 ? 'Bank ide masih kosong' : 'Tidak ada ide dengan filter ini'}
+          </div>
+          <div style={{ fontSize: '0.82rem', color: '#9ca3af' }}>
+            Klik tombol <strong>+</strong> di kanan bawah untuk simpan ide kapanpun dan dimanapun
+          </div>
+        </div>
+      )}
+
+      {/* Idea cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {filtered.map(idea => (
+          <div key={idea.id} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)', borderLeft: `3px solid ${STATUS_COLOR[idea.status] || '#e5e7eb'}` }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {/* Title + status */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.92rem' }}>{idea.judul}</span>
+                  <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>{idea.status}</span>
+                </div>
+
+                {/* Notes */}
+                {idea.hook && (
+                  <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, lineHeight: 1.5, fontStyle: 'italic' }}>
+                    {idea.hook.length > 140 ? idea.hook.slice(0, 140) + '...' : idea.hook}
+                  </div>
+                )}
+
+                {/* Platform + date */}
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+                  {(idea.platform || []).map(p => (
+                    <span key={p} style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>
+                  ))}
+                  {idea.id && (
+                    <span style={{ fontSize: '0.65rem', color: '#c4c4c4', marginLeft: 2 }}>{fmtDate((idea as any).created_at)}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                {idea.status === 'Ide' && (
+                  <button
+                    onClick={() => upgradeStatus(idea, 'Kandidat')}
+                    disabled={promoting === idea.id}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #d97706', background: 'rgba(217,119,6,0.08)', color: '#d97706', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    → Kandidat
+                  </button>
+                )}
+                <button
+                  onClick={() => expandWithAI(idea)}
+                  style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #7c3aed', background: 'rgba(124,58,237,0.08)', color: '#7c3aed', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  AI Expand
+                </button>
+                <button
+                  onClick={() => upgradeStatus(idea, 'Draft')}
+                  disabled={promoting === idea.id}
+                  style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #1a73e8', background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  Ke Plan
+                </button>
+                {sprints.length > 0 && (
+                  <button
+                    onClick={() => { setSprintModal({ open: true, idea }); setSelectedSprint(sprints[0]?.id || '') }}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #059669', background: 'rgba(5,150,105,0.08)', color: '#059669', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Ke Sprint
+                  </button>
+                )}
+                <button
+                  onClick={() => { if (confirm('Hapus ide ini?')) onIdeaDelete(idea.id!) }}
+                  style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: '#f9fafb', color: '#9ca3af', fontSize: '0.72rem', cursor: 'pointer' }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Sprint Modal */}
+      {sprintModal.open && sprintModal.idea && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setSprintModal({ open: false, idea: null })}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: '24px', width: '100%', maxWidth: 400 }}>
+            <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827', marginBottom: 6 }}>Masukkan ke Sprint</div>
+            <div style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 16 }}>
+              Ide "<strong>{sprintModal.idea.judul}</strong>" akan masuk ke sprint sebagai konten Draft.
+            </div>
+
+            <label style={{ fontSize: '0.8rem', color: '#6b7280', display: 'block', marginBottom: 6, fontWeight: 500 }}>Pilih Sprint</label>
+            <select
+              value={selectedSprint}
+              onChange={e => setSelectedSprint(e.target.value)}
+              style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', marginBottom: 18 }}>
+              {sprints.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.nama} ({s.start_date.slice(5).replace('-', '/')} – {s.end_date.slice(5).replace('-', '/')})
+                </option>
+              ))}
+            </select>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setSprintModal({ open: false, idea: null })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+              <button onClick={promoteToSprint} disabled={!selectedSprint || !!promoting} style={{ flex: 1, background: '#059669', border: 'none', borderRadius: 10, padding: '10px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                {promoting ? 'Memproses...' : 'Masukkan ke Sprint'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Expand Modal */}
+      {expandModal.open && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setExpandModal({ open: false, idea: null, angles: [], loading: false })}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 520, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6' }}>
+              <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827' }}>AI Angle Expander</div>
+              <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: 3 }}>Ide: {expandModal.idea?.judul}</div>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+              {expandModal.loading ? (
+                <div style={{ textAlign: 'center', padding: '32px 0', color: '#7c3aed' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>AI sedang mengembangkan angle...</div>
+                  <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 6 }}>Biasanya 3-5 detik</div>
+                </div>
+              ) : expandModal.angles.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px 0', color: '#dc2626', fontSize: '0.85rem' }}>Gagal generate. Coba lagi.</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {expandModal.angles.map((a, i) => (
+                    <div key={i} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+                        <div>
+                          <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: 'rgba(124,58,237,0.1)', color: '#7c3aed', display: 'inline-block', marginBottom: 4 }}>{a.angle_type}</span>
+                          <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.88rem' }}>{a.judul}</div>
+                        </div>
+                        <button
+                          onClick={() => applyAngle(a)}
+                          style={{ flexShrink: 0, padding: '5px 12px', borderRadius: 8, border: '1px solid #1a73e8', background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}>
+                          Pakai
+                        </button>
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: '#6b7280', fontStyle: 'italic', borderLeft: '2px solid #e5e7eb', paddingLeft: 10 }}>
+                        "{a.hook}"
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div style={{ padding: '14px 24px', borderTop: '1px solid #f3f4f6', display: 'flex', gap: 8 }}>
+              {!expandModal.loading && expandModal.idea && (
+                <button onClick={() => expandWithAI(expandModal.idea!)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Coba Lagi</button>
+              )}
+              <button onClick={() => setExpandModal({ open: false, idea: null, angles: [], loading: false })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Tutup</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
-export default function LibraryModule({ initialIdeas, workspaceId, workspaceName = 'workspace', products, pillars, tasks = [] }: {
+// ── Main Module ───────────────────────────────────────────────────────────────
+
+export default function LibraryModule({ initialIdeas, workspaceId, workspaceName = 'workspace', products, pillars, tasks = [], sprints = [] }: {
   initialIdeas: ContentIdea[]
   workspaceId: string
   workspaceName?: string
   products: Product[]
   pillars: Pillar[]
   tasks?: TaskSnap[]
+  sprints?: Sprint[]
 }) {
   const [ideas, setIdeas] = useState<ContentIdea[]>(initialIdeas)
+  const [activeTab, setActiveTab] = useState<'bank' | 'naskah'>('bank')
   const [modal, setModal] = useState<{ open: boolean; idea: ContentIdea; tab: string }>({
     open: false, idea: emptyIdea(workspaceId), tab: 'basic',
   })
@@ -429,7 +467,10 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
   const [filterPlatform, setFilterPlatform] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
   const [expandedScript, setExpandedScript] = useState<string | null>(null)
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [previewModal, setPreviewModal] = useState<ContentIdea | null>(null)
+
+  const bankIdeas = ideas.filter(i => BANK_STATUSES.includes(i.status))
+  const naskhahIdeas = ideas.filter(i => !BANK_STATUSES.includes(i.status))
 
   function openAdd() {
     setModal({ open: true, idea: emptyIdea(workspaceId), tab: 'basic' })
@@ -498,7 +539,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
     }
   }
 
-  const filtered = ideas.filter(c =>
+  const filtered = naskhahIdeas.filter(c =>
     (!filterStatus || c.status === filterStatus) &&
     (!filterPlatform || c.platform.includes(filterPlatform))
   )
@@ -515,111 +556,155 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
   return (
     <div>
       {/* Header */}
-      <div className="kf-page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 4 }}>Library</h1>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Bank konten — hook, body, CTA, dan script siap pakai</p>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Bank ide & konten siap produksi</p>
         </div>
+        {activeTab === 'naskah' && (
+          <button onClick={openAdd} style={{ background: '#1a73e8', border: 'none', borderRadius: 10, padding: '9px 18px', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}>
+            + Tambah Konten
+          </button>
+        )}
       </div>
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
-        {STATUSES.map(s => (
-          <div key={s} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#111827' }}>{ideas.filter(c => c.status === s).length}</div>
-            <div style={{ fontSize: '0.75rem', color: STATUS_COLOR[s], marginTop: 2, fontWeight: 500 }}>{s}</div>
-          </div>
+      {/* Top tabs */}
+      <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '2px solid #f3f4f6' }}>
+        {[
+          { key: 'bank', label: 'Bank Ide', count: bankIdeas.length, color: '#7c3aed' },
+          { key: 'naskah', label: 'Naskah & Pipeline', count: naskhahIdeas.length, color: '#1a73e8' },
+        ].map(t => (
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key as 'bank' | 'naskah')}
+            style={{
+              padding: '10px 20px', background: 'transparent', border: 'none', borderBottom: activeTab === t.key ? `2px solid ${t.color}` : '2px solid transparent',
+              color: activeTab === t.key ? t.color : '#6b7280', fontSize: '0.88rem', fontWeight: activeTab === t.key ? 700 : 400,
+              cursor: 'pointer', marginBottom: -2, display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+            {t.label}
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, padding: '1px 7px', borderRadius: 20, background: activeTab === t.key ? t.color + '18' : '#f3f4f6', color: activeTab === t.key ? t.color : '#9ca3af' }}>{t.count}</span>
+          </button>
         ))}
       </div>
 
-      {/* Filters + View Toggle */}
-      {ideas.length > 0 && (
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
-          {['', ...STATUSES].map(s => (
-            <button key={s} onClick={() => setFilterStatus(s)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterStatus === s ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterStatus === s ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
-              {s || 'Semua'}
-            </button>
-          ))}
-          <div style={{ width: 1, background: '#e5e7eb', margin: '0 4px', alignSelf: 'stretch' }} />
-          {['', ...PLATFORMS].map(p => (
-            <button key={p} onClick={() => setFilterPlatform(p)}
-              style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterPlatform === p ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterPlatform === p ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
-              {p || 'Semua Platform'}
-            </button>
-          ))}
-        </div>
+      {/* Bank Ide Tab */}
+      {activeTab === 'bank' && (
+        <BankIdeTab
+          ideas={ideas}
+          workspaceId={workspaceId}
+          sprints={sprints}
+          onIdeaUpdate={updated => setIdeas(prev => prev.map(i => i.id === updated.id ? updated : i))}
+          onIdeaDelete={id => setIdeas(prev => prev.filter(i => i.id !== id))}
+        />
       )}
 
-      {/* Content */}
-      {filtered.length === 0 ? (
-        <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
-          <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
-          <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>{ideas.length === 0 ? 'Library kosong' : 'Tidak ada konten'}</div>
-          <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>{ideas.length === 0 ? 'Naskah akan muncul di sini setelah copywriter simpan dari modul Plan' : 'Coba filter lain'}</div>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {filtered.map(c => (
-            <div key={c.id} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '16px 20px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
-                    <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>{c.status}</span>
-                    {c.format && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#6b7280', background: '#f3f4f6', border: 'none' }}>{c.format}</span>}
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {c.platform.map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>)}
-                    {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f3f4f6' }}>{pillarMap[c.pillar_id]}</span>}
-                    {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f3f4f6' }}>{productMap[c.product_id]}</span>}
-                  </div>
-                  {c.hook && (
-                    <div style={{ marginTop: 8, fontSize: '0.82rem', color: '#6b7280', fontStyle: 'italic', borderLeft: '2px solid #1a73e8', paddingLeft: 10 }}>
-                      "{c.hook.length > 120 ? c.hook.slice(0, 120) + '...' : c.hook}"
-                    </div>
-                  )}
-                  {c.product_id && productMap[c.product_id] && (
-                    <SprintTimeline tasks={tasks} productName={productMap[c.product_id]} />
-                  )}
-                  {c.script && expandedScript === c.id && (
-                    <div style={{ marginTop: 10, background: '#f9fafb', borderRadius: 8, padding: 14, fontSize: '0.8rem', color: '#6b7280', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 200, overflowY: 'auto' }}>
-                      {c.script}
-                    </div>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                  {c.script && (
-                    <button onClick={() => setExpandedScript(expandedScript === c.id ? null : c.id!)}
-                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
-                      {expandedScript === c.id ? 'Tutup' : 'Script'}
-                    </button>
-                  )}
-                  <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>
-                    Edit
-                  </button>
-                  <button onClick={() => deleteIdea(c.id!)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
-                </div>
+      {/* Naskah & Pipeline Tab */}
+      {activeTab === 'naskah' && (
+        <>
+          {/* Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+            {PIPELINE_STATUSES.slice(0, 4).map(s => (
+              <div key={s} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#111827' }}>{naskhahIdeas.filter(c => c.status === s).length}</div>
+                <div style={{ fontSize: '0.75rem', color: STATUS_COLOR[s], marginTop: 2, fontWeight: 500 }}>{s}</div>
               </div>
+            ))}
+          </div>
+
+          {/* Filters */}
+          {naskhahIdeas.length > 0 && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+              {['', ...PIPELINE_STATUSES].map(s => (
+                <button key={s} onClick={() => setFilterStatus(s)}
+                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterStatus === s ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterStatus === s ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterStatus === s ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
+                  {s || 'Semua'}
+                </button>
+              ))}
+              <div style={{ width: 1, background: '#e5e7eb', margin: '0 4px', alignSelf: 'stretch' }} />
+              {['', ...PLATFORMS].map(p => (
+                <button key={p} onClick={() => setFilterPlatform(p)}
+                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 500, border: filterPlatform === p ? '1px solid #1a73e8' : '1px solid #e5e7eb', background: filterPlatform === p ? 'rgba(26,115,232,0.10)' : '#f3f4f6', color: filterPlatform === p ? '#1a73e8' : '#6b7280', cursor: 'pointer' }}>
+                  {p || 'Semua Platform'}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+
+          {/* Content list */}
+          {filtered.length === 0 ? (
+            <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: 48, textAlign: 'center', color: '#6b7280' }}>
+              <div style={{ marginBottom: 12 }}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+              <div style={{ fontWeight: 600, color: '#6b7280', marginBottom: 6 }}>{naskhahIdeas.length === 0 ? 'Belum ada naskah' : 'Tidak ada konten'}</div>
+              <div style={{ fontSize: '0.85rem', color: '#9ca3af' }}>{naskhahIdeas.length === 0 ? 'Buat naskah dari modul Plan, atau promosikan ide dari Bank Ide' : 'Coba filter lain'}</div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {filtered.map(c => (
+                <div key={c.id} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)', borderRadius: 16, padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{c.judul || '(Tanpa judul)'}</span>
+                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: STATUS_COLOR[c.status], background: STATUS_BG[c.status], fontWeight: 600 }}>{c.status}</span>
+                        {c.format && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#6b7280', background: '#f3f4f6' }}>{c.format}</span>}
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {c.platform.map(p => <span key={p} style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#1a73e8', background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>)}
+                        {c.pillar_id && pillarMap[c.pillar_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f3f4f6' }}>{pillarMap[c.pillar_id]}</span>}
+                        {c.product_id && productMap[c.product_id] && <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: 3, color: '#6b7280', background: '#f3f4f6' }}>{productMap[c.product_id]}</span>}
+                      </div>
+                      {c.hook && (
+                        <div style={{ marginTop: 8, fontSize: '0.82rem', color: '#6b7280', fontStyle: 'italic', borderLeft: '2px solid #1a73e8', paddingLeft: 10 }}>
+                          "{c.hook.length > 120 ? c.hook.slice(0, 120) + '...' : c.hook}"
+                        </div>
+                      )}
+                      {c.product_id && productMap[c.product_id] && <SprintTimeline tasks={tasks} productName={productMap[c.product_id]} />}
+                      {c.script && expandedScript === c.id && (
+                        <div style={{ marginTop: 10, background: '#f9fafb', borderRadius: 8, padding: 14, fontSize: '0.8rem', color: '#6b7280', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 200, overflowY: 'auto' }}>
+                          {c.script}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                      {c.script && (
+                        <button onClick={() => setExpandedScript(expandedScript === c.id ? null : c.id!)}
+                          style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
+                          {expandedScript === c.id ? 'Tutup' : 'Script'}
+                        </button>
+                      )}
+                      <button onClick={() => setPreviewModal(c)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>Preview</button>
+                      <button onClick={() => openEdit(c)} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid #1a73e8', borderRadius: 8, padding: '6px 12px', color: '#1a73e8', fontSize: '0.78rem', fontWeight: 500, cursor: 'pointer' }}>Edit</button>
+                      <button onClick={() => deleteIdea(c.id!)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#6b7280', fontSize: '0.78rem', cursor: 'pointer' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
+      {/* Preview Modal */}
+      {previewModal && (
+        <IGPostPreview
+          idea={previewModal}
+          workspaceName={workspaceName}
+          onEdit={() => { openEdit(previewModal); setPreviewModal(null) }}
+          onClose={() => setPreviewModal(null)}
+        />
+      )}
 
-      {/* Modal */}
+      {/* Edit/Add Modal */}
       {modal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
-            {/* Modal Header */}
+          <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>
-                {modal.idea.id ? 'Edit Konten' : 'Tambah Konten'}
-              </h2>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827' }}>{modal.idea.id ? 'Edit Konten' : 'Tambah Konten'}</h2>
               <button onClick={closeModal} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.3rem', cursor: 'pointer' }}>×</button>
             </div>
-
-            {/* Modal Tabs */}
             <div className="kf-tabs-wrap" style={{ '--tabs-bg': '#fff' } as React.CSSProperties}>
               <div className="kf-tabs-scroll" style={{ display: 'flex', borderBottom: '1px solid #f3f4f6', flexShrink: 0 }}>
                 {MODAL_TABS.map(t => (
@@ -630,11 +715,9 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 ))}
               </div>
             </div>
-
             <form onSubmit={handleSave} style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{error}</div>}
 
-              {/* Tab: Basic */}
               {modal.tab === 'basic' && <>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Judul Konten *</label>
@@ -684,13 +767,12 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                   </div>
                 </div>
                 {['Reels', 'Video Pendek', 'Live'].includes(modal.idea.format) && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f9fafb', border: 'none', borderRadius: 8, padding: '10px 14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f9fafb', borderRadius: 8, padding: '10px 14px' }}>
                     <div>
                       <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#111827' }}>Tampil di Feed</div>
                       <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: 2 }}>Seperti opsi "Bagikan ke Feed" di Instagram Reels</div>
                     </div>
-                    <button type="button"
-                      onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
+                    <button type="button" onClick={() => setField('show_in_feed', !(modal.idea.show_in_feed !== false))}
                       style={{ width: 44, height: 24, borderRadius: 20, border: 'none', cursor: 'pointer', background: modal.idea.show_in_feed !== false ? '#1a73e8' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: modal.idea.show_in_feed !== false ? 23 : 3, transition: 'left 0.2s' }} />
                     </button>
@@ -709,7 +791,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 </div>
               </>}
 
-              {/* Tab: Content */}
               {modal.tab === 'content' && <>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>Isi komponen konten atau generate otomatis</div>
@@ -734,7 +815,6 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 </div>
               </>}
 
-              {/* Tab: Script */}
               {modal.tab === 'script' && <>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Prompt Script (untuk AI generator)</label>
@@ -752,12 +832,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
                 </div>
               </>}
 
-
-              {/* Footer */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4, borderTop: '1px solid #f3f4f6', marginTop: 4 }}>
-                <button type="button" onClick={closeModal} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>
-                  Batal
-                </button>
+                <button type="button" onClick={closeModal} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button type="submit" disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
                   {saving ? 'Menyimpan...' : modal.idea.id ? 'Update' : 'Simpan'}
                 </button>

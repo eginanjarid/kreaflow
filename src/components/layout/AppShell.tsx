@@ -4,6 +4,7 @@ import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import BottomNav from './BottomNav'
 import Toast from '@/components/ui/Toast'
+import QuickCapture from '@/components/QuickCapture'
 
 type Workspace = { id: string; name: string; plan: string; brand_type: string }
 
@@ -14,10 +15,11 @@ type Props = {
   user: { email: string; nama: string }
   role: string
   jabatan: string
+  workspaceId?: string
   children: React.ReactNode
 }
 
-export default function AppShell({ workspace, workspaces, isSuperAdmin, user, role, jabatan, children }: Props) {
+export default function AppShell({ workspace, workspaces, isSuperAdmin, user, role, jabatan, workspaceId, children }: Props) {
   return (
     <div className="kf-app-shell">
       <Sidebar
@@ -45,6 +47,7 @@ export default function AppShell({ workspace, workspaces, isSuperAdmin, user, ro
         </main>
       </div>
       <BottomNav isSuperAdmin={isSuperAdmin} workspaceId={workspace?.id} role={role} jabatan={jabatan} />
+      {workspaceId && <QuickCapture workspaceId={workspaceId} />}
       <Toast />
     </div>
   )
