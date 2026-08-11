@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await sendMagicLinkEmail(email, verifyUrl, settings)
+    await sendMagicLinkEmail(email, verifyUrl, settings, data.properties.email_otp)
   } catch (e) {
     console.error('[kreaflow/magic-link] Gagal kirim email:', e)
     return NextResponse.json({ error: 'Gagal mengirim email. Periksa konfigurasi SMTP.' }, { status: 500 })
