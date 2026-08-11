@@ -1,28 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { createServiceClient } from '@/lib/supabase/server'
+import { sendMagicLinkEmail } from '@/lib/smtp-mailer'
+import { DEFAULT_MAGIC_LINK_SETTINGS, APP_CONFIG_KEY, type MagicLinkSettings } from '@/lib/email-config'
 
 export async function POST(req: NextRequest) {
   const { email, redirectTo } = await req.json()
   if (!email) return NextResponse.json({ error: 'Email wajib diisi' }, { status: 400 })
 
-  const response = NextResponse.json({ success: true })
+  const supabase = createServiceClient()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return req.cookies.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
+  // Check user exists (shouldCreateUser = false)
+  const { data: { users } } = await supabase.auth.admin.listUsers()
+  const exists = users.some(u => u.email === email)
+  if (!exists) {
+    return NextResponse.json(
+      { error: 'Email ini belum terdaftar. Silakan beli akses KreaFlow terlebih dahulu.' },
+      { status: 400 }
+    )
+  }
 
-  // Always use server-side APP_URL — never trust client origin (could be localhost)
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
   let nextPath = '/sprints'
   try {
@@ -32,17 +28,35 @@ export async function POST(req: NextRequest) {
   } catch {}
   const callbackUrl = `${appUrl}/auth/callback${nextPath !== '/sprints' ? `?next=${encodeURIComponent(nextPath)}` : ''}`
 
-  const { error } = await supabase.auth.signInWithOtp({
+  // Generate magic link via admin API — kita yang kirim emailnya
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: 'magiclink',
     email,
-    options: {
-      emailRedirectTo: callbackUrl,
-      shouldCreateUser: false,
-    },
+    options: { redirectTo: callbackUrl },
   })
 
-  if (error) {
-    return NextResponse.json({ error: error.message || 'Gagal mengirim link. Pastikan email terdaftar.' }, { status: 400 })
+  if (error || !data?.properties?.action_link) {
+    return NextResponse.json({ error: 'Gagal membuat link. Coba beberapa saat lagi.' }, { status: 500 })
   }
 
-  return response
+  // Ambil template dari DB, fallback ke default
+  const { data: config } = await supabase
+    .from('app_config')
+    .select('value')
+    .eq('key', APP_CONFIG_KEY)
+    .maybeSingle()
+
+  const settings: MagicLinkSettings = {
+    ...DEFAULT_MAGIC_LINK_SETTINGS,
+    ...(config?.value ?? {}),
+  }
+
+  try {
+    await sendMagicLinkEmail(email, data.properties.action_link, settings)
+  } catch (e) {
+    console.error('[kreaflow/magic-link] Gagal kirim email:', e)
+    return NextResponse.json({ error: 'Gagal mengirim email. Periksa konfigurasi SMTP.' }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true })
 }
