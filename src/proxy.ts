@@ -32,7 +32,7 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname === '/payment/success' ||
     request.nextUrl.pathname === '/email-magic-link.html' ||
     request.nextUrl.pathname.startsWith('/invite') ||
-    request.nextUrl.pathname.startsWith('/auth/callback')
+    request.nextUrl.pathname.startsWith('/auth/')
 
   if (!user && !isAuthRoute && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
