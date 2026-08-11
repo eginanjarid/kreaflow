@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   // Check user exists (shouldCreateUser = false)
   const { data: { users } } = await supabase.auth.admin.listUsers()
-  const exists = users.some(u => u.email === email)
+  const exists = users.some((u: { email?: string }) => u.email === email)
   if (!exists) {
     return NextResponse.json(
       { error: 'Email ini belum terdaftar. Silakan beli akses KreaFlow terlebih dahulu.' },
