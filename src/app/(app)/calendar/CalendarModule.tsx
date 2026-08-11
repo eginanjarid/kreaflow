@@ -391,13 +391,12 @@ function prevMonth() {
                       <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.8rem', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
                         {item.judul}
                       </div>
-                      {item.tanggal_tayang && (
-                        <div style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+                      {item.tanggal_tayang ? (
+                        <div style={{ fontSize: '0.65rem', color: dayColor, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3 }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                           <span>{dateObj!.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}{item.jam_tayang ? ` · ${item.jam_tayang}` : ''}</span>
                         </div>
-                      )}
-                      {!item.tanggal_tayang && (
+                      ) : (
                         <div style={{ fontSize: '0.65rem', color: '#9ca3af' }}>Belum dijadwalkan</div>
                       )}
                     </button>
