@@ -8,8 +8,10 @@ const PLATFORMS = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee']
 
 declare global {
   interface Window {
-    SpeechRecognition: new () => SpeechRecognition
-    webkitSpeechRecognition: new () => SpeechRecognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    SpeechRecognition: new () => any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    webkitSpeechRecognition: new () => any
   }
 }
 
@@ -21,7 +23,8 @@ export default function QuickCapture({ workspaceId }: { workspaceId: string }) {
   const [saving, setSaving] = useState(false)
   const [listening, setListening] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null)
   const judulRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -55,7 +58,8 @@ export default function QuickCapture({ workspaceId }: { workspaceId: string }) {
     rec.lang = 'id-ID'
     rec.continuous = false
     rec.interimResults = false
-    rec.onresult = (e: SpeechRecognitionEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => {
       const t = e.results[0][0].transcript
       setJudul(prev => prev ? prev + ' ' + t : t)
       setListening(false)
