@@ -107,8 +107,9 @@ export default function QuickCapture({ workspaceId }: { workspaceId: string }) {
       <button
         onClick={() => setOpen(true)}
         title="Simpan Ide Cepat"
+        className="kf-quick-capture-btn"
         style={{
-          position: 'fixed', bottom: 28, right: 28, zIndex: 200,
+          position: 'fixed', zIndex: 200,
           width: 52, height: 52, borderRadius: '50%',
           background: 'linear-gradient(135deg, #1a73e8 0%, #1558b0 100%)',
           border: 'none', cursor: 'pointer',

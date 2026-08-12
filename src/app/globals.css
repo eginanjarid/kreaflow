@@ -94,6 +94,18 @@ body {
 }
 .kf-bottom-nav-item.active { color: #1a73e8; }
 
+/* ── Quick Capture FAB ── */
+.kf-quick-capture-btn {
+  bottom: 28px;
+  right: 28px;
+}
+@media (max-width: 768px) {
+  .kf-quick-capture-btn {
+    bottom: calc(60px + 20px); /* above bottom nav (60px) */
+    right: 20px;
+  }
+}
+
 /* Mobile brand in topbar (hidden on desktop) */
 .kf-topbar-brand { display: none; }
 
