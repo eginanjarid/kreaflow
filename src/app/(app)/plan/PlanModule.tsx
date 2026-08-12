@@ -131,6 +131,54 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
   useEffect(() => { setLocalQueue(queue) }, [queue])
   const sprintLockedItem = activeQueueId ? localQueue.find(q => q.id === activeQueueId && q.sprint_id) ?? null : null
 
+  // Realtime: sync approval queue dan status naskah tanpa reload
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase.channel('plan-content-changes')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'kf_content_ideas',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, (payload) => {
+        const updated = payload.new as { id: string; status: string; judul: string; script: string | null; assigned_naskah: string | null; tanggal_tayang: string | null; format: string | null; sprint_id: string | null; revisi_notes: string | null }
+        const oldStatus = (payload.old as { status?: string }).status
+
+        // Item baru masuk ke approval queue
+        if (updated.status === 'Menunggu Approval') {
+          setPendingApprovalLocal(prev =>
+            prev.some(p => p.id === updated.id)
+              ? prev.map(p => p.id === updated.id ? { ...p, judul: updated.judul, script: updated.script } : p)
+              : [...prev, { id: updated.id, judul: updated.judul, script: updated.script, assigned_naskah: updated.assigned_naskah, tanggal_tayang: updated.tanggal_tayang, format: updated.format, sprint_id: updated.sprint_id, sprint_nama: null }]
+          )
+        }
+
+        // Item keluar dari approval queue (approved atau revisi)
+        if (oldStatus === 'Menunggu Approval' && updated.status !== 'Menunggu Approval') {
+          setPendingApprovalLocal(prev => prev.filter(p => p.id !== updated.id))
+        }
+
+        // Item dikembalikan sebagai Revisi — masuk lagi ke queue copywriter
+        if (updated.status === 'Revisi') {
+          setLocalQueue(prev => {
+            if (prev.some(q => q.id === updated.id)) {
+              return prev.map(q => q.id === updated.id ? { ...q, status: 'Revisi', revisi_notes: updated.revisi_notes } : q)
+            }
+            return [...prev, {
+              id: updated.id, judul: updated.judul, status: 'Revisi',
+              product_id: '', sprint_id: updated.sprint_id, sprint_nama: null,
+              format: updated.format, platform: [], assigned_naskah: updated.assigned_naskah,
+              script: updated.script, revisi_notes: updated.revisi_notes,
+              tanggal_tayang: updated.tanggal_tayang, jam_tayang: null,
+              naskah_days_before: null, plan_started_at: null, plan_completed_at: null,
+            }]
+          })
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [workspaceId])
+
   function removeFromQueue(id: string | null) {
     if (!id) return
     setLocalQueue(prev => prev.filter(q => q.id !== id))
