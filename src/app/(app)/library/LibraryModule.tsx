@@ -33,7 +33,6 @@ type Product = { id: string; nama: string }
 type Pillar = { id: string; nama: string }
 type TaskSnap = { id: string; nama: string; due_date: string; percent_complete: number; priority: string }
 type Sprint = { id: string; nama: string; start_date: string; end_date: string }
-type Angle = { judul: string; hook: string; angle_type: string }
 
 const FORMATS = ['Video Pendek', 'Reels', 'Story', 'Carousel', 'Single Post', 'Thread', 'Live', 'Podcast', 'Blog']
 const FORMULAS = ['AIDA', 'PAS', 'BAB', 'Hook-Story-Offer', 'FAB', '4C', 'Before-After', 'Story Telling', 'Tutorial']
@@ -191,8 +190,7 @@ function BankIdeTab({
   onIdeaDelete: (id: string) => void
 }) {
   const [bankFilter, setBankFilter] = useState<'Semua' | 'Ide' | 'Kandidat'>('Semua')
-  const [sprintModal, setSprintModal] = useState<{ open: boolean; idea: ContentIdea | null }>({ open: false, idea: null })
-  const [expandModal, setExpandModal] = useState<{ open: boolean; idea: ContentIdea | null; angles: Angle[]; loading: boolean }>({ open: false, idea: null, angles: [], loading: false })
+  const [sprintModal, setSprintModal] = useState<{ open: boolean; idea: ContentIdea | null; format: string; tanggal: string }>({ open: false, idea: null, format: '', tanggal: '' })
   const [selectedSprint, setSelectedSprint] = useState('')
   const [promoting, setPromoting] = useState<string | null>(null)
 
@@ -209,46 +207,34 @@ function BankIdeTab({
     setPromoting(null)
   }
 
+  function openSprintModal(idea: ContentIdea) {
+    setSelectedSprint(sprints[0]?.id || '')
+    setSprintModal({ open: true, idea, format: idea.format || '', tanggal: '' })
+  }
+
   async function promoteToSprint() {
     if (!sprintModal.idea || !selectedSprint) return
+    if (!sprintModal.format) { showToast('Pilih format konten dulu'); return }
+    if (!sprintModal.tanggal) { showToast('Pilih tanggal tayang dulu'); return }
     setPromoting(sprintModal.idea.id!)
     const supabase = createClient()
-    const { error } = await supabase.from('kf_content_ideas').update({ sprint_id: selectedSprint, status: 'Draft' }).eq('id', sprintModal.idea.id)
+    const { error } = await supabase.from('kf_content_ideas').update({
+      sprint_id: selectedSprint,
+      status: 'Draft',
+      format: sprintModal.format,
+      tanggal_tayang: sprintModal.tanggal,
+    }).eq('id', sprintModal.idea.id)
     if (error) { showToast('Gagal masukkan ke sprint'); setPromoting(null); return }
-    onIdeaUpdate({ ...sprintModal.idea, sprint_id: selectedSprint, status: 'Draft' })
-    showToast('Ide dimasukkan ke sprint!', 'success')
-    setSprintModal({ open: false, idea: null })
+    onIdeaUpdate({ ...sprintModal.idea, sprint_id: selectedSprint, status: 'Draft', format: sprintModal.format })
+    showToast('Ide masuk ke Sprint Board!', 'success')
+    setSprintModal({ open: false, idea: null, format: '', tanggal: '' })
     setSelectedSprint('')
     setPromoting(null)
   }
 
-  async function expandWithAI(idea: ContentIdea) {
-    setExpandModal({ open: true, idea, angles: [], loading: true })
-    try {
-      const res = await fetch('/api/ai/expand-idea', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ judul: idea.judul, notes: idea.hook, platform: idea.platform }),
-      })
-      const data = await res.json()
-      setExpandModal(prev => ({ ...prev, angles: data.angles || [], loading: false }))
-    } catch {
-      showToast('Gagal expand AI')
-      setExpandModal(prev => ({ ...prev, loading: false }))
-    }
-  }
-
-  async function applyAngle(angle: Angle) {
-    if (!expandModal.idea) return
-    const supabase = createClient()
-    await supabase.from('kf_content_ideas').update({ judul: angle.judul, hook: angle.hook }).eq('id', expandModal.idea.id)
-    onIdeaUpdate({ ...expandModal.idea, judul: angle.judul, hook: angle.hook })
-    showToast('Angle diterapkan!', 'success')
-    setExpandModal({ open: false, idea: null, angles: [], loading: false })
-  }
-
   const ideCount = bankIdeas.filter(i => i.status === 'Ide').length
   const kandidatCount = bankIdeas.filter(i => i.status === 'Kandidat').length
+  const activeSprint = sprints.find(s => s.id === selectedSprint)
 
   return (
     <>
@@ -295,148 +281,137 @@ function BankIdeTab({
 
       {/* Idea cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {filtered.map(idea => (
-          <div key={idea.id} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)', borderLeft: `3px solid ${STATUS_COLOR[idea.status] || '#e5e7eb'}` }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                {/* Title + status */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.92rem' }}>{idea.judul}</span>
-                  <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>{idea.status}</span>
-                </div>
-
-                {/* Notes */}
-                {idea.hook && (
-                  <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, lineHeight: 1.5, fontStyle: 'italic' }}>
-                    {idea.hook.length > 140 ? idea.hook.slice(0, 140) + '...' : idea.hook}
+        {filtered.map(idea => {
+          const ideaSprint = idea.sprint_id ? sprints.find(s => s.id === idea.sprint_id) : null
+          return (
+            <div key={idea.id} style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.05)', borderLeft: `3px solid ${STATUS_COLOR[idea.status] || '#e5e7eb'}` }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Title + status */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.92rem' }}>{idea.judul}</span>
+                    <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>{idea.status}</span>
                   </div>
-                )}
 
-                {/* Platform + date */}
-                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
-                  {(idea.platform || []).map(p => (
-                    <span key={p} style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>
-                  ))}
-                  {idea.id && (
-                    <span style={{ fontSize: '0.65rem', color: '#c4c4c4', marginLeft: 2 }}>{fmtDate((idea as any).created_at)}</span>
+                  {/* Notes */}
+                  {idea.hook && (
+                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 8, lineHeight: 1.5, fontStyle: 'italic' }}>
+                      {idea.hook.length > 140 ? idea.hook.slice(0, 140) + '...' : idea.hook}
+                    </div>
                   )}
-                </div>
-              </div>
 
-              {/* Actions */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                {idea.status === 'Ide' && (
+                  {/* Platform + date */}
+                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {(idea.platform || []).map(p => (
+                      <span key={p} style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)' }}>{p}</span>
+                    ))}
+                    {idea.id && (
+                      <span style={{ fontSize: '0.65rem', color: '#c4c4c4', marginLeft: 2 }}>{fmtDate((idea as any).created_at)}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                  {idea.status === 'Ide' && (
+                    <button
+                      onClick={() => upgradeStatus(idea, 'Kandidat')}
+                      disabled={promoting === idea.id}
+                      style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #d97706', background: 'rgba(217,119,6,0.08)', color: '#d97706', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      → Kandidat
+                    </button>
+                  )}
+                  {ideaSprint ? (
+                    <span style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #059669', background: 'rgba(5,150,105,0.08)', color: '#059669', fontSize: '0.68rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                      ✓ {ideaSprint.nama}
+                    </span>
+                  ) : sprints.length > 0 ? (
+                    <button
+                      onClick={() => openSprintModal(idea)}
+                      style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #059669', background: 'rgba(5,150,105,0.08)', color: '#059669', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      Ke Sprint
+                    </button>
+                  ) : null}
                   <button
-                    onClick={() => upgradeStatus(idea, 'Kandidat')}
-                    disabled={promoting === idea.id}
-                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #d97706', background: 'rgba(217,119,6,0.08)', color: '#d97706', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                    → Kandidat
+                    onClick={() => { if (confirm('Hapus ide ini?')) onIdeaDelete(idea.id!) }}
+                    style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: '#f9fafb', color: '#9ca3af', fontSize: '0.72rem', cursor: 'pointer' }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
                   </button>
-                )}
-                <button
-                  onClick={() => expandWithAI(idea)}
-                  style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #7c3aed', background: 'rgba(124,58,237,0.08)', color: '#7c3aed', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  AI Expand
-                </button>
-                <button
-                  onClick={() => upgradeStatus(idea, 'Draft')}
-                  disabled={promoting === idea.id}
-                  style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #1a73e8', background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  Ke Plan
-                </button>
-                {sprints.length > 0 && (
-                  <button
-                    onClick={() => { setSprintModal({ open: true, idea }); setSelectedSprint(sprints[0]?.id || '') }}
-                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #059669', background: 'rgba(5,150,105,0.08)', color: '#059669', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                    Ke Sprint
-                  </button>
-                )}
-                <button
-                  onClick={() => { if (confirm('Hapus ide ini?')) onIdeaDelete(idea.id!) }}
-                  style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: '#f9fafb', color: '#9ca3af', fontSize: '0.72rem', cursor: 'pointer' }}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
-                </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Sprint Modal */}
       {sprintModal.open && sprintModal.idea && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setSprintModal({ open: false, idea: null })}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: '24px', width: '100%', maxWidth: 400 }}>
-            <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827', marginBottom: 6 }}>Masukkan ke Sprint</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 16 }}>
-              Ide "<strong>{sprintModal.idea.judul}</strong>" akan masuk ke sprint sebagai konten Draft.
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setSprintModal({ open: false, idea: null, format: '', tanggal: '' })}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: '24px', width: '100%', maxWidth: 420 }}>
+            <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827', marginBottom: 4 }}>Masukkan ke Sprint</div>
+            <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 20 }}>
+              <strong>{sprintModal.idea.judul}</strong>
             </div>
 
-            <label style={{ fontSize: '0.8rem', color: '#6b7280', display: 'block', marginBottom: 6, fontWeight: 500 }}>Pilih Sprint</label>
-            <select
-              value={selectedSprint}
-              onChange={e => setSelectedSprint(e.target.value)}
-              style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', marginBottom: 18 }}>
-              {sprints.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.nama} ({s.start_date.slice(5).replace('-', '/')} – {s.end_date.slice(5).replace('-', '/')})
-                </option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Sprint selector */}
+              {sprints.length > 1 && (
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Sprint</label>
+                  <select
+                    value={selectedSprint}
+                    onChange={e => { setSelectedSprint(e.target.value); setSprintModal(m => ({ ...m, tanggal: '' })) }}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}>
+                    {sprints.map(s => (
+                      <option key={s.id} value={s.id}>
+                        {s.nama} ({s.start_date.slice(5).replace('-', '/')} – {s.end_date.slice(5).replace('-', '/')})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {sprints.length === 1 && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '10px 14px', fontSize: '0.82rem', color: '#059669', fontWeight: 600 }}>
+                  Sprint: {sprints[0].nama} ({sprints[0].start_date.slice(5).replace('-', '/')} – {sprints[0].end_date.slice(5).replace('-', '/')})
+                </div>
+              )}
 
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setSprintModal({ open: false, idea: null })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+              {/* Format */}
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Format Konten *</label>
+                <select
+                  value={sprintModal.format}
+                  onChange={e => setSprintModal(m => ({ ...m, format: e.target.value }))}
+                  style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: sprintModal.format ? '#111827' : '#9ca3af', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}>
+                  <option value="">— Pilih format —</option>
+                  {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+
+              {/* Tanggal Tayang */}
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang *</label>
+                <input
+                  type="date"
+                  value={sprintModal.tanggal}
+                  min={activeSprint?.start_date}
+                  max={activeSprint?.end_date}
+                  onChange={e => setSprintModal(m => ({ ...m, tanggal: e.target.value }))}
+                  style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                />
+                {activeSprint && (
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 4 }}>
+                    Rentang sprint: {activeSprint.start_date.slice(5).replace('-', '/')} – {activeSprint.end_date.slice(5).replace('-', '/')}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
+              <button onClick={() => setSprintModal({ open: false, idea: null, format: '', tanggal: '' })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
               <button onClick={promoteToSprint} disabled={!selectedSprint || !!promoting} style={{ flex: 1, background: '#059669', border: 'none', borderRadius: 10, padding: '10px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
-                {promoting ? 'Memproses...' : 'Masukkan ke Sprint'}
+                {promoting ? 'Memproses...' : 'Masukkan ke Sprint →'}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* AI Expand Modal */}
-      {expandModal.open && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setExpandModal({ open: false, idea: null, angles: [], loading: false })}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 520, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6' }}>
-              <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827' }}>AI Angle Expander</div>
-              <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: 3 }}>Ide: {expandModal.idea?.judul}</div>
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
-              {expandModal.loading ? (
-                <div style={{ textAlign: 'center', padding: '32px 0', color: '#7c3aed' }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>AI sedang mengembangkan angle...</div>
-                  <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 6 }}>Biasanya 3-5 detik</div>
-                </div>
-              ) : expandModal.angles.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '20px 0', color: '#dc2626', fontSize: '0.85rem' }}>Gagal generate. Coba lagi.</div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {expandModal.angles.map((a, i) => (
-                    <div key={i} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
-                        <div>
-                          <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: 'rgba(124,58,237,0.1)', color: '#7c3aed', display: 'inline-block', marginBottom: 4 }}>{a.angle_type}</span>
-                          <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.88rem' }}>{a.judul}</div>
-                        </div>
-                        <button
-                          onClick={() => applyAngle(a)}
-                          style={{ flexShrink: 0, padding: '5px 12px', borderRadius: 8, border: '1px solid #1a73e8', background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}>
-                          Pakai
-                        </button>
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: '#6b7280', fontStyle: 'italic', borderLeft: '2px solid #e5e7eb', paddingLeft: 10 }}>
-                        "{a.hook}"
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div style={{ padding: '14px 24px', borderTop: '1px solid #f3f4f6', display: 'flex', gap: 8 }}>
-              {!expandModal.loading && expandModal.idea && (
-                <button onClick={() => expandWithAI(expandModal.idea!)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Coba Lagi</button>
-              )}
-              <button onClick={() => setExpandModal({ open: false, idea: null, angles: [], loading: false })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Tutup</button>
             </div>
           </div>
         </div>
