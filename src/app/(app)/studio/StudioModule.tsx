@@ -374,54 +374,35 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
             <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Input Hasil Produksi</div>
             {getThumbnail(item) && <div style={{ marginBottom: 16, borderRadius: 8, overflow: 'hidden', aspectRatio: '16/9', background: '#fff' }}><img src={getThumbnail(item)!} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
 
-            {/* Talent & Produksi Video */}
-            <div style={{ marginBottom: 16, background: 'rgba(124,58,237,0.04)', border: '1px solid rgba(124,58,237,0.15)', borderRadius: 12, padding: '14px 14px 12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{isVideo ? 'Talent & Tim Produksi' : 'Tim Produksi'}</span>
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Assign ke Tim Produksi</label>
-                <select value={assignedProduksi} onChange={e => setAssignedProduksi(e.target.value)} style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: assignedProduksi ? '#111827' : '#9ca3af', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }}>
-                  <option value=''>— Pilih anggota tim —</option>
-                  {produksiMembers.length > 0 && (
-                    <optgroup label='Tim Produksi'>
-                      {produksiMembers.map(m => <option key={m.id} value={m.nama || m.email}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>)}
-                    </optgroup>
-                  )}
-                  {otherMembers.length > 0 && (
-                    <optgroup label='Lainnya'>
-                      {otherMembers.map(m => <option key={m.id} value={m.nama || m.email}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>)}
-                    </optgroup>
-                  )}
-                </select>
-              </div>
-              {isVideo && (
+            {/* Talent section — video only */}
+            {isVideo && (
+              <div style={{ marginBottom: 16, background: 'rgba(124,58,237,0.04)', border: '1px solid rgba(124,58,237,0.15)', borderRadius: 12, padding: '14px 14px 12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Talent & Produksi</span>
+                </div>
                 <div style={{ marginBottom: 10 }}>
                   <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Nama Talent / Pemeran</label>
                   <input value={talentName} onChange={e => setTalentName(e.target.value)} placeholder="Nama talent atau pemeran konten ini..." style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
-              )}
-              {isVideo && (
-                <>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 10 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                      <input type="checkbox" checked={talentBriefed} onChange={e => setTalentBriefed(e.target.checked)} style={{ width: 15, height: 15, accentColor: '#7c3aed', cursor: 'pointer', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.82rem', color: talentBriefed ? '#059669' : '#374151', fontWeight: talentBriefed ? 600 : 400, flex: 1 }}>Brief ke talent selesai</span>
-                      {item.step_log?.talent_briefed_at && <span style={{ fontSize: '0.62rem', color: '#9ca3af' }}>{new Date(item.step_log.talent_briefed_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>}
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                      <input type="checkbox" checked={shootDone} onChange={e => setShootDone(e.target.checked)} style={{ width: 15, height: 15, accentColor: '#7c3aed', cursor: 'pointer', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.82rem', color: shootDone ? '#059669' : '#374151', fontWeight: shootDone ? 600 : 400, flex: 1 }}>Shoot / Take selesai</span>
-                      {item.step_log?.shoot_done_at && <span style={{ fontSize: '0.62rem', color: '#9ca3af' }}>{new Date(item.step_log.shoot_done_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>}
-                    </label>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Link Mentahan Video</label>
-                    <input value={linkMentahan} onChange={e => setLinkMentahan(e.target.value)} placeholder="GDrive / Dropbox link raw footage..." style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
-                  </div>
-                </>
-              )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 10 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={talentBriefed} onChange={e => setTalentBriefed(e.target.checked)} style={{ width: 15, height: 15, accentColor: '#7c3aed', cursor: 'pointer', flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.82rem', color: talentBriefed ? '#059669' : '#374151', fontWeight: talentBriefed ? 600 : 400, flex: 1 }}>Brief ke talent selesai</span>
+                    {item.step_log?.talent_briefed_at && <span style={{ fontSize: '0.62rem', color: '#9ca3af' }}>{new Date(item.step_log.talent_briefed_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>}
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={shootDone} onChange={e => setShootDone(e.target.checked)} style={{ width: 15, height: 15, accentColor: '#7c3aed', cursor: 'pointer', flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.82rem', color: shootDone ? '#059669' : '#374151', fontWeight: shootDone ? 600 : 400, flex: 1 }}>Shoot / Take selesai</span>
+                    {item.step_log?.shoot_done_at && <span style={{ fontSize: '0.62rem', color: '#9ca3af' }}>{new Date(item.step_log.shoot_done_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>}
+                  </label>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Link Mentahan Video</label>
+                  <input value={linkMentahan} onChange={e => setLinkMentahan(e.target.value)} placeholder="GDrive / Dropbox link raw footage..." style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+            )}
             </div>
 
             {/* Editor section */}
