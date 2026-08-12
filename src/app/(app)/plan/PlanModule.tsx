@@ -176,7 +176,10 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
           })
         }
       })
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) console.error('[Plan RT] subscribe error:', err)
+        else console.log('[Plan RT] status:', status)
+      })
     return () => { supabase.removeChannel(channel) }
   }, [workspaceId])
 
