@@ -2040,26 +2040,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <input type="date" style={fieldStyle()} value={addForm.tanggal_tayang} onChange={e => setAddForm(f => ({ ...f, tanggal_tayang: e.target.value }))} />
                 </div>
               </div>
-              {workspaceMembers.length > 1 && (
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Assign Tim (opsional)</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    {[
-                      { key: 'assigned_naskah', label: 'Naskah' },
-                      { key: 'assigned_produksi', label: 'Produksi' },
-                      { key: 'assigned_schedule', label: 'Schedule' },
-                    ].map(({ key, label }) => (
-                      <div key={key}>
-                        <div style={{ fontSize: '0.68rem', color: '#6b7280', marginBottom: 3 }}>{label}</div>
-                        <input style={fieldStyle({ fontSize: '0.8rem', padding: '7px 10px' })}
-                          value={(addForm as Record<string, string>)[key] || ''}
-                          onChange={e => setAddForm(f => ({ ...f, [key]: e.target.value }))}
-                          placeholder="Nama anggota..." />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={saveContent} disabled={savingAdd}
