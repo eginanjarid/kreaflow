@@ -378,7 +378,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
             <div style={{ marginBottom: 16, background: 'rgba(124,58,237,0.04)', border: '1px solid rgba(124,58,237,0.15)', borderRadius: 12, padding: '14px 14px 12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Talent &amp; Tim Produksi</span>
+                <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{isVideo ? 'Talent & Tim Produksi' : 'Tim Produksi'}</span>
               </div>
               <div style={{ marginBottom: 10 }}>
                 <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Assign ke Tim Produksi</label>
@@ -396,10 +396,12 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
                   )}
                 </select>
               </div>
-              <div style={{ marginBottom: isVideo ? 10 : 0 }}>
-                <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Nama Talent / Pemeran</label>
-                <input value={talentName} onChange={e => setTalentName(e.target.value)} placeholder="Nama talent atau pemeran konten ini..." style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
-              </div>
+              {isVideo && (
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, marginBottom: 5, textTransform: 'uppercase' }}>Nama Talent / Pemeran</label>
+                  <input value={talentName} onChange={e => setTalentName(e.target.value)} placeholder="Nama talent atau pemeran konten ini..." style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              )}
               {isVideo && (
                 <>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 10 }}>
