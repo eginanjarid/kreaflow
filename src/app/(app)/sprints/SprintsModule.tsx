@@ -402,6 +402,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
   } | null>(null)
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ sprintId: string; sprintName: string; inProgressCount: number } | null>(null)
   const [deleteConfirmChecked, setDeleteConfirmChecked] = useState(false)
+  const [editSprintModal, setEditSprintModal] = useState(false)
+  const [editSprintForm, setEditSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35 })
+  const [savingEditSprint, setSavingEditSprint] = useState(false)
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
@@ -784,6 +787,36 @@ export default function SprintsModule({ initialSprints, initialContents, product
     setContents(prev => [...prev, ...deleteUndo.contents])
     setSelectedSprintId(deleteUndo.sprintId)
     setDeleteUndo(null)
+  }
+
+  function openEditSprintModal() {
+    if (!selectedSprint) return
+    setEditSprintForm({
+      nama: selectedSprint.nama,
+      start_date: selectedSprint.start_date,
+      end_date: selectedSprint.end_date,
+      target_konten: selectedSprint.target_konten,
+    })
+    setEditSprintModal(true)
+  }
+
+  async function updateSprint() {
+    if (!selectedSprint) return
+    if (!editSprintForm.nama.trim()) { showToast('Nama sprint wajib diisi'); return }
+    setSavingEditSprint(true)
+    const patch = {
+      nama: editSprintForm.nama.trim(),
+      start_date: editSprintForm.start_date,
+      end_date: editSprintForm.end_date,
+      target_konten: editSprintForm.target_konten,
+    }
+    const { error } = await supabase.from('kf_sprints').update(patch).eq('id', selectedSprint.id)
+    if (!error) {
+      setSprints(prev => prev.map(s => s.id === selectedSprint.id ? { ...s, ...patch } : s))
+      showToast('Sprint diperbarui!', 'success')
+      setEditSprintModal(false)
+    }
+    setSavingEditSprint(false)
   }
 
   async function requestRevisi(item: ContentItem) {
@@ -1561,6 +1594,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{selectedSprint.nama}</span>
+                    {canEdit && (
+                      <button onClick={openEditSprintModal} title="Edit sprint"
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                      </button>
+                    )}
                     {selectedSprint.platform && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280' }}>{selectedSprint.platform}</span>}
                     {selectedSprint.akun && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
@@ -1661,6 +1703,47 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
       </div>
     )}
+
+      {/* ── Sprint Edit Modal ──────────────────────────────────────────────── */}
+      {editSprintModal && selectedSprint && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '20px' }}>
+          <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 440, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '18px 22px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem' }}>Edit Sprint</div>
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 2 }}>{selectedSprint.nama}</div>
+              </div>
+              <button onClick={() => setEditSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Nama Sprint</label>
+                <input style={fieldStyle()} value={editSprintForm.nama} onChange={e => setEditSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint W3 17–23 Agu" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Mulai</label>
+                  <input type="date" style={fieldStyle()} value={editSprintForm.start_date} onChange={e => setEditSprintForm(f => ({ ...f, start_date: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
+                  <input type="date" style={fieldStyle()} value={editSprintForm.end_date} onChange={e => setEditSprintForm(f => ({ ...f, end_date: e.target.value }))} />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Target Konten</label>
+                <input type="number" min={1} style={fieldStyle()} value={editSprintForm.target_konten} onChange={e => setEditSprintForm(f => ({ ...f, target_konten: parseInt(e.target.value) || 1 }))} />
+              </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4 }}>
+                <button onClick={() => setEditSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+                <button onClick={updateSprint} disabled={savingEditSprint} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+                  {savingEditSprint ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Sprint Create Modal ─────────────────────────────────────────────── */}
       {sprintModal && (
