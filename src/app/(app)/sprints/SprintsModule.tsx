@@ -298,9 +298,54 @@ export default function SprintsModule({ initialSprints, initialContents, product
     if (searchParams.get('tab') === 'tasks') setActiveTab('tasks')
   }, [searchParams])
 
-  // Realtime: update kanban saat content idea status berubah dari modul lain (Plan, dll)
+  // Realtime: sync sprint list dan kanban untuk semua member di workspace
   useEffect(() => {
-    const channel = supabase.channel('sprint-content-changes')
+    const sprintChannel = supabase.channel('sprint-list-changes')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'kf_sprints',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, (payload) => {
+        const added = payload.new as Sprint
+        setSprints(prev => prev.some(s => s.id === added.id) ? prev : [...prev, added])
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'kf_sprints',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, (payload) => {
+        const updated = payload.new as Sprint
+        setSprints(prev => prev.map(s => s.id === updated.id ? { ...s, ...updated } : s))
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'kf_sprints',
+      }, (payload) => {
+        const deletedId = payload.old.id as string
+        setSprints(prev => {
+          const next = prev.filter(s => s.id !== deletedId)
+          setSelectedSprintId(cur => cur === deletedId ? (next[0]?.id || null) : cur)
+          return next
+        })
+        setContents(prev => prev.filter(c => c.sprint_id !== deletedId))
+      })
+      .subscribe()
+
+    const contentChannel = supabase.channel('sprint-content-changes')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'kf_content_ideas',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, (payload) => {
+        const added = payload.new as ContentItem
+        if (added.sprint_id) {
+          setContents(prev => prev.some(c => c.id === added.id) ? prev : [...prev, added])
+        }
+      })
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -310,8 +355,21 @@ export default function SprintsModule({ initialSprints, initialContents, product
         const updated = payload.new as ContentItem
         setContents(prev => prev.map(c => c.id === updated.id ? { ...c, ...updated } : c))
       })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'kf_content_ideas',
+      }, (payload) => {
+        const deletedId = payload.old.id as string
+        setContents(prev => prev.filter(c => c.id !== deletedId))
+        setDetailItem(prev => prev?.id === deletedId ? null : prev)
+      })
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
+
+    return () => {
+      supabase.removeChannel(sprintChannel)
+      supabase.removeChannel(contentChannel)
+    }
   }, [workspaceId])
 
   // Backfill notif untuk sprint lama yang belum punya "Sprint Dimulai" notif
