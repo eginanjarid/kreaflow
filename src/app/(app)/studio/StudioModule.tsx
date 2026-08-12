@@ -977,7 +977,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                   const code = c.id.charCodeAt(0) + c.id.charCodeAt(c.id.length - 1)
                   const fakeLikes = `${(code % 90 + 10)}.${code % 10}K`
                   return (
-                    <div key={c.id} style={{ position: 'relative', aspectRatio: '9 / 16', background: '#111', cursor: 'pointer', overflow: 'hidden' }}
+                    <div key={c.id} style={{ position: 'relative', aspectRatio: '4 / 5', background: '#111', cursor: 'pointer', overflow: 'hidden' }}
                       onMouseEnter={() => setHoveredId(c.id)} onMouseLeave={() => setHoveredId(null)}
                       onClick={() => isVid ? setPreviewReels(c) : setPreviewPost(c)}>
                       {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
