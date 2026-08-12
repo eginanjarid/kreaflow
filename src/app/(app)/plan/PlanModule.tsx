@@ -142,7 +142,6 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
         table: 'kf_content_ideas',
         filter: `workspace_id=eq.${workspaceId}`,
       }, (payload) => {
-        console.log('[Plan RT] event received:', payload.eventType, (payload.new as { status?: string }).status)
         const updated = payload.new as { id: string; status: string; judul: string; script: string | null; assigned_naskah: string | null; tanggal_tayang: string | null; format: string | null; sprint_id: string | null; revisi_notes: string | null }
         const oldStatus = (payload.old as { status?: string }).status
 
@@ -177,10 +176,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
           })
         }
       })
-      .subscribe((status, err) => {
-        if (err) console.error('[Plan RT] subscribe error:', err)
-        else console.log('[Plan RT] status:', status)
-      })
+      .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [workspaceId])
 
