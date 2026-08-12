@@ -224,6 +224,9 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const [carouselSlides, setCarouselSlides] = useState<string[]>(
     item.carousel_slides?.length ? item.carousel_slides : ['']
   )
+  const [folderUrl, setFolderUrl] = useState('')
+  const [fetchingFolder, setFetchingFolder] = useState(false)
+  const [folderError, setFolderError] = useState('')
   const [notes, setNotes] = useState(item.studio_notes || '')
   const [saving, setSaving] = useState(false)
   const [marking, setMarking] = useState(false)
@@ -239,6 +242,21 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const PRODUKSI_JABATAN = ['Videografer', 'Editor', 'Desainer', 'Art Director', 'Content Creator']
   const produksiMembers = workspaceMembers.filter(m => PRODUKSI_JABATAN.includes(m.jabatan))
   const otherMembers = workspaceMembers.filter(m => !PRODUKSI_JABATAN.includes(m.jabatan))
+
+  async function fetchFolderSlides() {
+    const match = folderUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/)
+    if (!match) { setFolderError('URL folder tidak valid'); return }
+    const folderId = match[1]
+    setFetchingFolder(true)
+    setFolderError('')
+    const res = await fetch(`/api/gdrive?folder=${folderId}`)
+    const data = await res.json()
+    setFetchingFolder(false)
+    if (!res.ok || data.error) { setFolderError(data.error || 'Gagal ambil folder'); return }
+    if (!data.files?.length) { setFolderError('Folder kosong atau tidak ada gambar'); return }
+    setCarouselSlides(data.files.map((f: { url: string }) => f.url))
+    setFolderUrl('')
+  }
 
   function buildStepLog(): Record<string, string> {
     const log: Record<string, string> = { ...(item.step_log || {}) }
@@ -408,9 +426,28 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Canva Link</label><input value={canvaUrl} onChange={e => setCanvaUrl(e.target.value)} placeholder="https://www.canva.com/design/..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
             {isCarouselModal ? (
               <div style={{ marginBottom: 12 }}>
+                {/* Folder auto-import */}
+                <div style={{ marginBottom: 10, background: 'rgba(26,115,232,0.05)', border: '1px solid rgba(26,115,232,0.15)', borderRadius: 10, padding: '10px 12px' }}>
+                  <label style={{ display: 'block', fontSize: '0.68rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>Import dari Folder Google Drive</label>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input
+                      value={folderUrl}
+                      onChange={e => { setFolderUrl(e.target.value); setFolderError('') }}
+                      placeholder="https://drive.google.com/drive/folders/..."
+                      style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }}
+                    />
+                    <button type="button" onClick={fetchFolderSlides} disabled={!folderUrl || fetchingFolder}
+                      style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: (!folderUrl || fetchingFolder) ? 'not-allowed' : 'pointer', opacity: (!folderUrl || fetchingFolder) ? 0.6 : 1, whiteSpace: 'nowrap' as const }}>
+                      {fetchingFolder ? '...' : 'Ambil Slides'}
+                    </button>
+                  </div>
+                  {folderError && <div style={{ fontSize: '0.72rem', color: '#ef4444', marginTop: 5 }}>{folderError}</div>}
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 5 }}>Folder harus di-share publik (Anyone with link)</div>
+                </div>
+                {/* Manual slide inputs */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <label style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase' }}>Slide URLs (Google Drive)</label>
-                  <button type="button" onClick={() => setCarouselSlides(prev => [...prev, ''])} style={{ fontSize: '0.7rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: 'none', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontWeight: 600 }}>+ Tambah Slide</button>
+                  <label style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase' }}>Slide URLs ({carouselSlides.filter(s => s.trim()).length} slide)</label>
+                  <button type="button" onClick={() => setCarouselSlides(prev => [...prev, ''])} style={{ fontSize: '0.7rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: 'none', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontWeight: 600 }}>+ Tambah</button>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {carouselSlides.map((url, idx) => (
