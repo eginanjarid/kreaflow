@@ -163,26 +163,29 @@ function getTemplateColor(template_type: string): string {
 
 const STATUS_ORDER = ['Draft', 'Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
 const DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
-type DaySlot = { format: string; pillar_id: string; product_id: string; jam: string }
+type DaySlot = { format: string; pillar_id: string; product_id: string; jam: string; platforms: string[] }
 type DayPattern = { active: boolean; slots: DaySlot[] }
-const defaultSlot = (): DaySlot => ({ format: '', pillar_id: '', product_id: '', jam: '18:00' })
+const defaultSlot = (): DaySlot => ({ format: '', pillar_id: '', product_id: '', jam: '18:00', platforms: [] })
 const defaultDayPattern = (): DayPattern => ({ active: false, slots: [defaultSlot()] })
 const PLATFORMS_CREATOR = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Twitter/X', 'Threads']
 const PLATFORMS_AFFILIATE = ['TikTok', 'Instagram', 'YouTube', 'Facebook', 'Shopee', 'TikTok Shop']
-const FORMATS_CREATOR = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Thread/Caption', 'Lainnya']
-const FORMATS_AFFILIATE = ['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Long Video', 'Live', 'Lainnya']
+const FORMATS_CREATOR = ['Video Pendek', 'Video Panjang', 'Carousel', 'Single Post', 'Text', 'Story', 'Live Script', 'Lainnya']
+const FORMATS_AFFILIATE = ['Video Pendek', 'Video Panjang', 'Carousel', 'Single Post', 'Story', 'Live', 'Lainnya']
 
 // Format → platforms yang relevan (auto-derive saat buat content idea)
 const CONTENT_TYPE_PLATFORMS: Record<string, string[]> = {
   'Video Pendek':   ['TikTok', 'Instagram', 'YouTube'],
-  'Reels':          ['Instagram', 'YouTube'],
+  'Video Panjang':  ['YouTube'],
   'Carousel':       ['Instagram', 'Facebook'],
   'Single Post':    ['Instagram', 'Facebook'],
   'Story':          ['Instagram', 'Facebook'],
+  'Text':           ['Twitter/X', 'Threads', 'Facebook'],
+  'Live Script':    ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
+  'Live':           ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
+  // legacy keys — agar content lama tetap terbaca
+  'Reels':          ['Instagram', 'YouTube'],
   'Long Video':     ['YouTube'],
   'Thread/Caption': ['Twitter/X', 'Threads'],
-  'Live':           ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
-  'Live Script':    ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
   'TikTok Video':   ['TikTok'],
   'Shorts':         ['YouTube'],
   'Feed/Carousel':  ['Instagram', 'Facebook'],
@@ -560,7 +563,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   : `${slot.format} — ${dayLabel}${multiSuffix}`,
                 status: 'Draft',
                 format: slot.format,
-                platform: activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : []),
+                platform: slot.platforms.length > 0 ? slot.platforms : (activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : [])),
                 tanggal_tayang: dateStr,
                 jam_tayang: slot.jam || null,
                 product_id: isAffiliate ? (slot.product_id || null) : null,
@@ -2027,11 +2030,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                         <span style={{ fontSize: '0.62rem', color: '#9ca3af', width: 14, flexShrink: 0 }}>{si + 1}.</span>
                                         <select value={slot.format} onChange={e => setWeeklyPattern(p => {
-                                          const slots = p[idx].slots.map((s, j) => j === si ? { ...s, format: e.target.value } : s)
+                                          const fmt = e.target.value
+                                          const autoPlatforms = activePlatformsFor(fmt, true)
+                                          const slots = p[idx].slots.map((s, j) => j === si ? { ...s, format: fmt, platforms: autoPlatforms } : s)
                                           return { ...p, [idx]: { ...p[idx], slots } }
                                         })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
                                           <option value="">— Format —</option>
-                                          {['Video Pendek', 'Reels', 'Carousel', 'Single Post', 'Story', 'Live Script', 'Long Video', 'Thread/Caption'].map(f => <option key={f} value={f}>{f}</option>)}
+                                          {(isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR).map(f => <option key={f} value={f}>{f}</option>)}
                                         </select>
                                         {isAffiliate && (
                                           <select value={slot.product_id} onChange={e => setWeeklyPattern(p => {
@@ -2063,11 +2068,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                         )}
                                       </div>
                                       {slot.format && CONTENT_TYPE_PLATFORMS[slot.format] && (
-                                        <div style={{ display: 'flex', gap: 3, marginTop: 3, marginLeft: 19, flexWrap: 'wrap' }}>
+                                        <div style={{ display: 'flex', gap: 3, marginTop: 4, marginLeft: 19, flexWrap: 'wrap', alignItems: 'center' }}>
+                                          <span style={{ fontSize: '0.58rem', color: '#9ca3af', marginRight: 2 }}>Post ke:</span>
                                           {CONTENT_TYPE_PLATFORMS[slot.format].map(plt => {
                                             const selPlt = selectedAkunIds.length > 0 ? accounts.filter(a => selectedAkunIds.includes(a.id)).map(a => a.platform) : registeredPlatforms
                                             const hasAkun = selPlt.length === 0 || selPlt.includes(plt)
-                                            return <span key={plt} style={{ fontSize: '0.58rem', padding: '1px 5px', borderRadius: 8, background: hasAkun ? 'rgba(26,115,232,0.08)' : '#f3f4f6', border: `1px solid ${hasAkun ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, color: hasAkun ? '#1a73e8' : '#9ca3af', fontWeight: 600 }}>{plt}{!hasAkun && ' ✕'}</span>
+                                            const isSelected = slot.platforms.includes(plt)
+                                            return (
+                                              <button key={plt} type="button"
+                                                onClick={() => setWeeklyPattern(p => {
+                                                  const newPlatforms = isSelected ? slot.platforms.filter(x => x !== plt) : [...slot.platforms, plt]
+                                                  const slots = p[idx].slots.map((s, j) => j === si ? { ...s, platforms: newPlatforms } : s)
+                                                  return { ...p, [idx]: { ...p[idx], slots } }
+                                                })}
+                                                style={{ fontSize: '0.6rem', padding: '2px 7px', borderRadius: 8, border: `1.5px solid ${isSelected ? '#1a73e8' : hasAkun ? '#d1d5db' : '#e5e7eb'}`, background: isSelected ? 'rgba(26,115,232,0.1)' : '#f9fafb', color: isSelected ? '#1a73e8' : hasAkun ? '#374151' : '#c4c9d4', fontWeight: isSelected ? 700 : 400, cursor: 'pointer', transition: 'all 0.1s' }}>
+                                                {plt}
+                                              </button>
+                                            )
                                           })}
                                         </div>
                                       )}
