@@ -329,41 +329,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [filterProduct, setFilterProduct] = useState('')
   const [filterPillar, setFilterPillar] = useState('')
 
-  // Bank Ide modal
-  type BankIdea = { id: string; judul: string; status: string; platform: string[] | null; hook: string | null }
-  const [bankIdeOpen, setBankIdeOpen] = useState(false)
-  const [bankIdeas, setBankIdeas] = useState<BankIdea[]>([])
-  const [bankLoading, setBankLoading] = useState(false)
-  const [bankSelected, setBankSelected] = useState<Set<string>>(new Set())
-  const [bankImporting, setBankImporting] = useState(false)
-
-  async function openBankIde() {
-    setBankIdeOpen(true)
-    setBankSelected(new Set())
-    setBankLoading(true)
-    const { data } = await supabase.from('kf_content_ideas')
-      .select('id, judul, status, platform, hook')
-      .eq('workspace_id', workspaceId)
-      .in('status', ['Ide', 'Kandidat'])
-      .is('sprint_id', null)
-      .order('created_at', { ascending: false })
-    setBankIdeas((data || []) as BankIdea[])
-    setBankLoading(false)
-  }
-
-  async function importBankIdeas() {
-    if (!selectedSprintId || bankSelected.size === 0) return
-    setBankImporting(true)
-    const ids = Array.from(bankSelected)
-    await supabase.from('kf_content_ideas').update({ sprint_id: selectedSprintId, status: 'Draft' }).in('id', ids)
-    const { data: newItems } = await supabase.from('kf_content_ideas').select('*').in('id', ids)
-    setContents(prev => [...prev, ...((newItems || []) as ContentItem[])])
-    showToast(`${ids.length} ide berhasil ditambahkan ke sprint!`, 'success')
-    setBankIdeOpen(false)
-    setBankSelected(new Set())
-    setBankImporting(false)
-  }
-
   // Sprint create modal
   const isAffiliate = brandType === 'affiliate'
   const PLATFORMS = isAffiliate ? PLATFORMS_AFFILIATE : PLATFORMS_CREATOR
@@ -1621,12 +1586,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
                     style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
-                  {canEdit && (
-                    <button onClick={openBankIde}
-                      style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 8, padding: '6px 12px', color: '#7c3aed', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                      💡 Dari Bank Ide
-                    </button>
-                  )}
                   <button onClick={() => setReportOpen(true)}
                     style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', color: '#374151', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                     Laporan Tim
@@ -2465,70 +2424,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
       )}
 
       {/* Bank Ide Modal */}
-      {bankIdeOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }}
-          onClick={() => setBankIdeOpen(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '18px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#111827' }}>Tambah dari Bank Ide</div>
-                <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: 2 }}>Pilih ide untuk dimasukkan ke sprint ini sebagai konten Draft</div>
-              </div>
-              <button onClick={() => setBankIdeOpen(false)} style={{ background: '#f3f4f6', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', color: '#6b7280', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
-            </div>
-
-            <div style={{ flex: 1, overflowY: 'auto', padding: '14px 20px' }}>
-              {bankLoading ? (
-                <div style={{ textAlign: 'center', padding: '32px 0', color: '#9ca3af', fontSize: '0.85rem' }}>Memuat ide...</div>
-              ) : bankIdeas.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                  <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>💡</div>
-                  <div style={{ fontWeight: 600, color: '#374151', marginBottom: 4 }}>Bank Ide masih kosong</div>
-                  <div style={{ fontSize: '0.78rem', color: '#9ca3af' }}>Simpan ide dari tombol + di pojok kanan bawah, lalu masukkan ke sprint di sini</div>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {bankIdeas.map(idea => {
-                    const checked = bankSelected.has(idea.id)
-                    return (
-                      <div key={idea.id}
-                        onClick={() => setBankSelected(prev => { const s = new Set(prev); checked ? s.delete(idea.id) : s.add(idea.id); return s })}
-                        style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, cursor: 'pointer', background: checked ? 'rgba(124,58,237,0.06)' : '#f9fafb', border: checked ? '1.5px solid #7c3aed' : '1.5px solid transparent', transition: 'all 0.12s' }}>
-                        <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${checked ? '#7c3aed' : '#d1d5db'}`, background: checked ? '#7c3aed' : '#fff', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, transition: 'all 0.12s' }}>
-                          {checked && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.85rem', marginBottom: 3 }}>{idea.judul}</div>
-                          {idea.hook && <div style={{ fontSize: '0.75rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{idea.hook}</div>}
-                          <div style={{ display: 'flex', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '0.62rem', padding: '1px 7px', borderRadius: 20, color: idea.status === 'Kandidat' ? '#d97706' : '#7c3aed', background: idea.status === 'Kandidat' ? 'rgba(217,119,6,0.1)' : 'rgba(124,58,237,0.1)', fontWeight: 600 }}>{idea.status}</span>
-                            {(idea.platform || []).map(p => <span key={p} style={{ fontSize: '0.62rem', padding: '1px 7px', borderRadius: 20, color: '#1a73e8', background: 'rgba(26,115,232,0.08)' }}>{p}</span>)}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {bankIdeas.length > 0 && (
-              <div style={{ padding: '14px 20px', borderTop: '1px solid #f3f4f6', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: '0.78rem', color: '#6b7280', flex: 1 }}>
-                  {bankSelected.size > 0 ? `${bankSelected.size} ide dipilih` : 'Pilih ide di atas'}
-                </span>
-                <button onClick={() => setBankIdeOpen(false)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 16px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Batal</button>
-                <button
-                  onClick={importBankIdeas}
-                  disabled={bankSelected.size === 0 || bankImporting}
-                  style={{ background: bankSelected.size === 0 ? '#e5e7eb' : '#7c3aed', border: 'none', borderRadius: 10, padding: '9px 18px', color: bankSelected.size === 0 ? '#9ca3af' : '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: bankSelected.size === 0 ? 'not-allowed' : 'pointer' }}>
-                  {bankImporting ? 'Memproses...' : `Tambahkan (${bankSelected.size})`}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
