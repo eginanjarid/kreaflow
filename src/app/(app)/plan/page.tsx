@@ -7,6 +7,8 @@ export default async function PlanPage() {
   const { supabase, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'plan')) redirect(firstAccessibleRoute(role, jabatan))
 
+  const isApprover = role === 'owner' || role === 'admin' || jabatan === 'Manager'
+
   const [
     { data: wsData },
     { data: brandProfile },
@@ -15,14 +17,18 @@ export default async function PlanPage() {
     { data: sprintDrafts },
     { data: pillars },
     { count: productCount },
+    { data: pendingApprovalRaw },
   ] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_brand_profiles').select('niche,micro_niche,premis,tone_of_voice,target_audiens,platform_utama,affiliate_tipe,affiliate_kategori_fokus,affiliate_positioning,affiliate_promo_style,affiliate_content_pillars,affiliate_micro_niche,biz_nama_brand,biz_kategori').eq('workspace_id', wsId).maybeSingle(),
     supabase.from('kf_products').select('id,nama,kategori,tipe_produk,platform_affiliate,harga_normal,komisi_tipe,komisi_nilai,deskripsi').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_tasks').select('id,nama,due_date,percent_complete,priority').eq('workspace_id', wsId).not('due_date', 'is', null),
-    supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,plan_started_at,plan_completed_at,kf_sprints(nama,step_config)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
+    supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,plan_started_at,plan_completed_at,revisi_notes,kf_sprints(nama,step_config)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
     supabase.from('kf_content_pillars').select('id,nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
     supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
+    isApprover
+      ? supabase.from('kf_content_ideas').select('id,judul,script,assigned_naskah,tanggal_tayang,format,sprint_id,kf_sprints(nama)').eq('workspace_id', wsId).eq('status', 'Menunggu Approval').order('created_at', { ascending: true })
+      : Promise.resolve({ data: [] }),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
@@ -39,6 +45,8 @@ export default async function PlanPage() {
       brandProfile={brandProfile}
       products={products || []}
       modes={modes}
+      role={role}
+      jabatan={jabatan || ''}
       tasks={tasks || []}
       pillars={(pillars || []).map(p => ({ id: p.id as string, nama: p.nama as string }))}
       queue={(sprintDrafts || []).map(d => ({
@@ -53,10 +61,21 @@ export default async function PlanPage() {
         platform: (d.platform as string[] | null) || [],
         assigned_naskah: (d.assigned_naskah as string | null) || null,
         script: (d.script as string | null) || null,
+        revisi_notes: (d.revisi_notes as string | null) || null,
         tanggal_tayang: (d.tanggal_tayang as string | null) || null,
         jam_tayang: (d.jam_tayang as string | null) || null,
         plan_started_at: (d.plan_started_at as string | null) || null,
         plan_completed_at: (d.plan_completed_at as string | null) || null,
+      }))}
+      pendingApproval={(pendingApprovalRaw || []).map(d => ({
+        id: d.id as string,
+        judul: d.judul as string,
+        script: (d.script as string | null) || null,
+        assigned_naskah: (d.assigned_naskah as string | null) || null,
+        tanggal_tayang: (d.tanggal_tayang as string | null) || null,
+        format: (d.format as string | null) || null,
+        sprint_id: (d.sprint_id as string | null) || null,
+        sprint_nama: (d.kf_sprints as unknown as { nama: string } | null)?.nama || null,
       }))}
     />
   )

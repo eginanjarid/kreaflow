@@ -93,20 +93,33 @@ function SprintBanner({ tasks, productName }: { tasks: TaskSnap[]; productName: 
 }
 
 type SprintDraft = { id: string; judul: string; product_id: string; sprint_id: string }
-type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; tanggal_tayang: string | null; jam_tayang: string | null; naskah_days_before: number | null; plan_started_at: string | null; plan_completed_at: string | null }
+type QueueItem = { id: string; judul: string; status: 'Draft' | 'Revisi'; product_id: string; sprint_id: string | null; sprint_nama: string | null; format: string | null; platform: string[]; assigned_naskah: string | null; script: string | null; revisi_notes: string | null; tanggal_tayang: string | null; jam_tayang: string | null; naskah_days_before: number | null; plan_started_at: string | null; plan_completed_at: string | null }
+type PendingApproval = { id: string; judul: string; script: string | null; assigned_naskah: string | null; tanggal_tayang: string | null; format: string | null; sprint_id: string | null; sprint_nama: string | null }
 
-export default function PlanModule({ workspaceId, brandProfile, products, modes, tasks = [], queue = [], pillars = [] }: {
+export default function PlanModule({ workspaceId, brandProfile, products, modes, role = '', jabatan = '', tasks = [], queue = [], pillars = [], pendingApproval = [] }: {
   workspaceId: string
   brandProfile: BrandSnap
   products: Product[]
   modes: string[]
+  role?: string
+  jabatan?: string
   tasks?: TaskSnap[]
   queue?: QueueItem[]
   pillars?: { id: string; nama: string }[]
+  pendingApproval?: PendingApproval[]
 }) {
   const isAffiliate = modes.includes('affiliate')
+  const isApprover = role === 'owner' || role === 'admin' || jabatan === 'Manager'
+  const needsApproval = !isApprover && !!jabatan
+
   const TABS = TABS_BASE
   const [tab, setTab] = useState('naskah')
+
+  // Approval state
+  const [pendingApprovalLocal, setPendingApprovalLocal] = useState<PendingApproval[]>(pendingApproval)
+  const [revisiModal, setRevisiModal] = useState<{ item: PendingApproval; note: string } | null>(null)
+  const [savingApproval, setSavingApproval] = useState<string | null>(null)
+  const [expandedScript, setExpandedScript] = useState<string | null>(null)
 
   // Derive sprintDrafts (for existing form-link logic) from queue
   const sprintDrafts: SprintDraft[] = queue
@@ -197,7 +210,8 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
       if (item.platform.length > 0) setNF('platform', item.platform[0])
       if (item.product_id) setNF('product_id', item.product_id)
       if (item.status === 'Revisi' && item.script) {
-        setGeneratedNaskah(`[REVISI — edit naskah lama di bawah ini]\n\n${item.script}`)
+        const notesHeader = item.revisi_notes ? `⚠️ CATATAN REVISI: ${item.revisi_notes}\n\n` : ''
+        setGeneratedNaskah(`${notesHeader}[REVISI — edit naskah lama di bawah ini]\n\n${item.script}`)
       } else if (item.status !== 'Revisi') {
         setGeneratedNaskah('')
       }
@@ -494,26 +508,37 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     tanggal_tayang?: string | null, jam_tayang?: string | null
   ) {
     const supabase = createClient()
+    const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
     const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
       judul,
       platform: [platform],
       format: tipe,
       script: naskah,
-      status: 'Naskah Siap',
+      status: targetStatus,
       product_id: productId || null,
       tanggal_tayang: tanggal_tayang || null,
       jam_tayang: jam_tayang || null,
       plan_completed_at: new Date().toISOString(),
     }).select('id').single()
     if (!err && inserted) {
-      await supabase.from('kf_notifications').insert({
-        workspace_id: workspaceId,
-        type: 'produksi',
-        title: `Mulai Produksi — ${judul}`,
-        message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
-        content_idea_id: inserted.id,
-      })
+      if (needsApproval) {
+        await supabase.from('kf_notifications').insert({
+          workspace_id: workspaceId,
+          type: 'naskah',
+          title: `Naskah Menunggu Approval — ${judul}`,
+          message: `Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.`,
+          content_idea_id: inserted.id,
+        })
+      } else {
+        await supabase.from('kf_notifications').insert({
+          workspace_id: workspaceId,
+          type: 'produksi',
+          title: `Mulai Produksi — ${judul}`,
+          message: `Naskah sudah siap. Buka Studio untuk mulai desain/produksi.`,
+          content_idea_id: inserted.id,
+        })
+      }
       removeFromQueue(activeQueueId)
       if (mode === 'affiliate') {
         setAffSavedToLibrary(true)
@@ -522,7 +547,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
         setSavedToLibrary(true)
         setTimeout(() => setSavedToLibrary(false), 3000)
       }
-      if (productId) {
+      if (!needsApproval && productId) {
         const selectedProduct = products.find(p => p.id === productId)
         if (selectedProduct) {
           const naskahTask = tasks.find(t =>
@@ -548,8 +573,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (activeQueueId) {
       const activeItem = localQueue.find(q => q.id === activeQueueId)
       const judulAktif = activeItem?.judul || `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform}`
-      await supabase.from('kf_content_ideas').update({ script: affNaskah, status: 'Naskah Siap', judul: judulAktif, plan_completed_at: new Date().toISOString() }).eq('id', activeQueueId)
-      await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
+      const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
+      await supabase.from('kf_content_ideas').update({ script: affNaskah, status: targetStatus, judul: judulAktif, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', activeQueueId)
+      if (needsApproval) {
+        await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'naskah', title: `Naskah Menunggu Approval — ${judulAktif}`, message: 'Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.', content_idea_id: activeQueueId })
+      } else {
+        await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
+      }
       removeFromQueue(activeQueueId)
       setAffSavedToLibrary(true)
       setTimeout(() => setAffSavedToLibrary(false), 3000)
@@ -577,8 +607,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (activeQueueId) {
       const activeItem = localQueue.find(q => q.id === activeQueueId)
       const judulAktif = activeItem?.judul || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten}`
-      await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: 'Naskah Siap', judul: judulAktif, plan_completed_at: new Date().toISOString() }).eq('id', activeQueueId)
-      await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
+      const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
+      await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: targetStatus, judul: judulAktif, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', activeQueueId)
+      if (needsApproval) {
+        await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'naskah', title: `Naskah Menunggu Approval — ${judulAktif}`, message: 'Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.', content_idea_id: activeQueueId })
+      } else {
+        await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
+      }
       removeFromQueue(activeQueueId)
       setSavedToLibrary(true)
       setTimeout(() => setSavedToLibrary(false), 3000)
@@ -602,14 +637,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     setSprintLinkSaving(true)
     const { draft, naskah, mode } = sprintLinkModal
     const supabase = createClient()
-    await supabase.from('kf_content_ideas').update({ script: naskah, status: 'Naskah Siap', judul: sprintLinkModal.judul, plan_completed_at: new Date().toISOString() }).eq('id', draft.id)
-    await supabase.from('kf_notifications').insert({
-      workspace_id: workspaceId,
-      type: 'produksi',
-      title: `Naskah Siap — ${sprintLinkModal.judul}`,
-      message: `Naskah selesai dibuat. Lanjut ke Take Video / Produksi di Studio.`,
-      content_idea_id: draft.id,
-    })
+    const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
+    await supabase.from('kf_content_ideas').update({ script: naskah, status: targetStatus, judul: sprintLinkModal.judul, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', draft.id)
+    if (needsApproval) {
+      await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'naskah', title: `Naskah Menunggu Approval — ${sprintLinkModal.judul}`, message: 'Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.', content_idea_id: draft.id })
+    } else {
+      await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${sprintLinkModal.judul}`, message: `Naskah selesai dibuat. Lanjut ke Take Video / Produksi di Studio.`, content_idea_id: draft.id })
+    }
     setSprintLinkSaving(false)
     setSprintLinkModal(null)
     removeFromQueue(activeQueueId)
@@ -647,6 +681,39 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     }
   }
 
+  async function approveNaskah(item: PendingApproval) {
+    setSavingApproval(item.id)
+    const supabase = createClient()
+    await supabase.from('kf_content_ideas').update({ status: 'Naskah Siap', revisi_notes: null }).eq('id', item.id)
+    await supabase.from('kf_notifications').insert({
+      workspace_id: workspaceId,
+      type: 'produksi',
+      title: `Naskah Diapprove — ${item.judul}`,
+      message: `Naskah kamu sudah disetujui. Lanjut ke produksi di Studio.`,
+      content_idea_id: item.id,
+    })
+    setPendingApprovalLocal(prev => prev.filter(p => p.id !== item.id))
+    setSavingApproval(null)
+  }
+
+  async function sendRevisi() {
+    if (!revisiModal) return
+    const { item, note } = revisiModal
+    setSavingApproval(item.id)
+    const supabase = createClient()
+    await supabase.from('kf_content_ideas').update({ status: 'Revisi', revisi_notes: note.trim() || null }).eq('id', item.id)
+    await supabase.from('kf_notifications').insert({
+      workspace_id: workspaceId,
+      type: 'naskah',
+      title: `Naskah Perlu Direvisi — ${item.judul}`,
+      message: note.trim() ? `Catatan: ${note.trim()}` : 'Naskah perlu diperbaiki. Buka Plan untuk revisi.',
+      content_idea_id: item.id,
+    })
+    setPendingApprovalLocal(prev => prev.filter(p => p.id !== item.id))
+    setRevisiModal(null)
+    setSavingApproval(null)
+  }
+
   function copyPrompt(prompt: string) {
     navigator.clipboard.writeText(prompt)
     setPromptCopied(true)
@@ -676,6 +743,74 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       {/* ── Naskah Generator ── */}
       {tab === 'naskah' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {/* ── Approval Queue (Manager/Owner/Admin only) ── */}
+          {isApprover && pendingApprovalLocal.length > 0 && (
+            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #d97706', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', borderBottom: '1px solid #fef3c7', background: '#fffbeb' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span style={{ fontWeight: 700, color: '#92400e', fontSize: '0.875rem' }}>Naskah Menunggu Approval</span>
+                <span style={{ background: '#d97706', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px' }}>{pendingApprovalLocal.length}</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {pendingApprovalLocal.map((item, idx) => (
+                  <div key={item.id} style={{ padding: '14px 16px', borderBottom: idx < pendingApprovalLocal.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                          <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.875rem' }}>{item.judul}</span>
+                          {item.format && <span style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 4, padding: '1px 6px' }}>{item.format}</span>}
+                          {item.sprint_nama && <span style={{ fontSize: '0.65rem', color: '#1a73e8', background: '#eff6ff', borderRadius: 4, padding: '1px 6px' }}>{item.sprint_nama}</span>}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                          {item.assigned_naskah && (
+                            <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                              {item.assigned_naskah}
+                            </span>
+                          )}
+                          {item.tanggal_tayang && (
+                            <span style={{ fontSize: '0.75rem', color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                              Tayang {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                        {item.script && (
+                          <div style={{ marginTop: 8 }}>
+                            <div style={{ background: '#f9fafb', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap', maxHeight: expandedScript === item.id ? 'none' : 80, overflow: 'hidden', position: 'relative' }}>
+                              {item.script}
+                              {expandedScript !== item.id && item.script.length > 200 && (
+                                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 32, background: 'linear-gradient(transparent, #f9fafb)' }} />
+                              )}
+                            </div>
+                            <button onClick={() => setExpandedScript(expandedScript === item.id ? null : item.id)}
+                              style={{ background: 'none', border: 'none', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', padding: '4px 0', marginTop: 2 }}>
+                              {expandedScript === item.id ? '▲ Sembunyikan' : '▼ Lihat naskah lengkap'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                        <button
+                          onClick={() => setRevisiModal({ item, note: '' })}
+                          disabled={savingApproval === item.id}
+                          style={{ padding: '7px 14px', borderRadius: 8, border: '1.5px solid #d97706', background: '#fff', color: '#d97706', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                          Revisi
+                        </button>
+                        <button
+                          onClick={() => approveNaskah(item)}
+                          disabled={savingApproval === item.id}
+                          style={{ padding: '7px 14px', borderRadius: 8, border: 'none', background: savingApproval === item.id ? '#d1d5db' : '#059669', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: savingApproval === item.id ? 'default' : 'pointer' }}>
+                          {savingApproval === item.id ? '...' : '✓ Approve'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {!brandProfile && (
             <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: '0.8rem', color: '#d97706' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Lengkapi modul <a href="/brand" style={{ color: '#d97706', fontWeight: 700 }}>Brand</a> dulu agar prompt AI lebih akurat dan sesuai identitas kamu.
@@ -744,6 +879,11 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                           </span>
                           {item.format && <span style={{ fontSize: '0.58rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 3, padding: '1px 5px' }}>{item.format}</span>}
                         </div>
+                        {isRevisi && item.revisi_notes && (
+                          <div style={{ fontSize: '0.65rem', color: '#dc2626', background: '#fef2f2', borderRadius: 5, padding: '3px 7px', marginBottom: 4, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }} title={item.revisi_notes}>
+                            ⚠️ {item.revisi_notes}
+                          </div>
+                        )}
                         <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.8rem', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.judul}>
                           {pillarName}
                         </div>
@@ -1528,6 +1668,35 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                 disabled={sprintLinkSaving}
                 style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '0.8rem', cursor: 'pointer', padding: '6px 0' }}
               >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Revisi Modal ── */}
+      {revisiModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: 28, maxWidth: 440, width: '100%' }}>
+            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', marginBottom: 4 }}>Kirim Catatan Revisi</div>
+            <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 16 }}>{revisiModal.item.judul}</div>
+            <textarea
+              value={revisiModal.note}
+              onChange={e => setRevisiModal(prev => prev ? { ...prev, note: e.target.value } : null)}
+              placeholder="Tulis catatan untuk copywriter... (opsional)"
+              style={{ width: '100%', height: 100, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 12px', fontSize: '0.875rem', resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+            />
+            <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+              <button
+                onClick={sendRevisi}
+                disabled={savingApproval === revisiModal.item.id}
+                style={{ flex: 1, background: '#d97706', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '11px 0', cursor: 'pointer' }}>
+                {savingApproval === revisiModal.item.id ? 'Mengirim...' : 'Kirim Revisi'}
+              </button>
+              <button
+                onClick={() => setRevisiModal(null)}
+                style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, color: '#374151', fontSize: '0.875rem', fontWeight: 600, padding: '11px 0', cursor: 'pointer' }}>
                 Batal
               </button>
             </div>
