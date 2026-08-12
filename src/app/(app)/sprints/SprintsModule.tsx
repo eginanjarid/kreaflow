@@ -405,11 +405,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
-  // Unique pillar names derived from judul for creator filter
-  const sprintPillarNames = useMemo(() => {
-    const names = sprintContents.map(c => c.judul.split(' — ')[0]).filter(Boolean)
-    return [...new Set(names)]
-  }, [sprintContents])
+  // Unique pillars in this sprint — use pillar_id (not title parsing)
+  const sprintPillarsForFilter = useMemo(() => {
+    const ids = [...new Set(sprintContents.map(c => c.pillar_id).filter(Boolean) as string[])]
+    return ids.map(id => pillars.find(p => p.id === id)).filter(Boolean) as { id: string; nama: string }[]
+  }, [sprintContents, pillars])
   const steps = selectedSprint ? getTemplateSteps(selectedSprint.template_type) : []
   // Merge step_config (deadline + memberName) into steps for display
   type StepWithMeta = StepDef & { deadline?: string; memberName?: string }
@@ -432,7 +432,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const filtered = sprintContents.filter(c => {
     if (filterProduct && c.product_id !== filterProduct) return false
-    if (filterPillar && !c.judul.startsWith(filterPillar + ' —')) return false
+    if (filterPillar && c.pillar_id !== filterPillar) return false
     if (search && !c.judul.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
@@ -1585,11 +1585,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
                   )}
-                  {!isAffiliate && sprintPillarNames.length > 1 && (
+                  {!isAffiliate && sprintPillarsForFilter.length > 1 && (
                     <select value={filterPillar} onChange={e => setFilterPillar(e.target.value)}
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterPillar ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
                       <option value="">Semua Pilar</option>
-                      {sprintPillarNames.map(p => <option key={p} value={p}>{p}</option>)}
+                      {sprintPillarsForFilter.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
                   )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
