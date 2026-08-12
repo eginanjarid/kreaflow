@@ -143,20 +143,20 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
         filter: `workspace_id=eq.${workspaceId}`,
       }, (payload) => {
         const updated = payload.new as { id: string; status: string; judul: string; script: string | null; assigned_naskah: string | null; tanggal_tayang: string | null; format: string | null; sprint_id: string | null; revisi_notes: string | null }
-        const oldStatus = (payload.old as { status?: string }).status
 
-        // Item baru masuk ke approval queue
         if (updated.status === 'Menunggu Approval') {
           setPendingApprovalLocal(prev =>
             prev.some(p => p.id === updated.id)
               ? prev.map(p => p.id === updated.id ? { ...p, judul: updated.judul, script: updated.script } : p)
               : [...prev, { id: updated.id, judul: updated.judul, script: updated.script, assigned_naskah: updated.assigned_naskah, tanggal_tayang: updated.tanggal_tayang, format: updated.format, sprint_id: updated.sprint_id, sprint_nama: null }]
           )
-        }
-
-        // Item keluar dari approval queue (approved atau revisi)
-        if (oldStatus === 'Menunggu Approval' && updated.status !== 'Menunggu Approval') {
-          setPendingApprovalLocal(prev => prev.filter(p => p.id !== updated.id))
+        } else {
+          // Status bukan Menunggu Approval lagi (approved/revisi) → hapus dari queue
+          // Tidak bisa andalkan oldStatus karena DEFAULT replica identity tidak menyertakan old values
+          setPendingApprovalLocal(prev => {
+            if (!prev.some(p => p.id === updated.id)) return prev
+            return prev.filter(p => p.id !== updated.id)
+          })
         }
 
         // Item dikembalikan sebagai Revisi — masuk lagi ke queue copywriter
