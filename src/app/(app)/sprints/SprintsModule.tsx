@@ -953,10 +953,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
   }
 
   const [filterAssignee, setFilterAssignee] = useState('')
+  const [taskSearch, setTaskSearch] = useState('')
 
   const rootTasks  = tasks.filter(t => !t.parent_id)
   const allAssignees = [...new Set(rootTasks.map(t => t.assigned_to).filter(Boolean))] as string[]
-  const filteredRootTasks = filterAssignee ? rootTasks.filter(t => t.assigned_to === filterAssignee) : rootTasks
+  const filteredRootTasks = rootTasks.filter(t => {
+    if (filterAssignee && t.assigned_to !== filterAssignee) return false
+    if (taskSearch && !t.nama.toLowerCase().includes(taskSearch.toLowerCase())) return false
+    return true
+  })
   const tasksTodo  = filteredRootTasks.filter(t => t.percent_complete === 0)
   const tasksDoing = filteredRootTasks.filter(t => t.percent_complete > 0 && t.percent_complete < 100)
   const tasksDone  = filteredRootTasks.filter(t => t.percent_complete === 100)
@@ -1096,6 +1101,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
             <span style={{ fontSize: '0.72rem', color: '#6b7280', marginLeft: 10 }}>Non-konten · beli alat, meeting, admin, dll</span>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginLeft: 'auto' }}>
+            <input value={taskSearch} onChange={e => setTaskSearch(e.target.value)} placeholder="Cari task..."
+              style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
             {allAssignees.length > 0 && (
               <select value={filterAssignee} onChange={e => setFilterAssignee(e.target.value)}
                 style={{ background: '#f8fafc', border: `1px solid ${filterAssignee ? '#1a73e8' : '#e5eaf2'}`, borderRadius: 8, padding: '6px 10px', color: filterAssignee ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', fontWeight: filterAssignee ? 600 : 400, outline: 'none', cursor: 'pointer' }}>
@@ -1619,40 +1626,39 @@ export default function SprintsModule({ initialSprints, initialContents, product
             </div>
           ) : (
             <>
-              {/* Sprint header bar */}
-              <div className="kf-sprint-header" style={{ padding: '10px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap' }}>
+              {/* Sprint header bar — DESKTOP */}
+              <div className="kf-sprint-header-desktop" style={{ padding: '10px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span className="kf-sprint-name" style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{selectedSprint.nama}</span>
+                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedSprint.nama}</span>
                     {canEdit && (
                       <button onClick={openEditSprintModal} title="Edit sprint"
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4 }}>
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4, flexShrink: 0 }}>
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
                           <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
                         </svg>
                       </button>
                     )}
-                    {selectedSprint.platform && <span className="kf-sprint-badge" style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280' }}>{selectedSprint.platform}</span>}
-                    {selectedSprint.akun && <span className="kf-sprint-badge" style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
+                    {selectedSprint.platform && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280', flexShrink: 0 }}>{selectedSprint.platform}</span>}
+                    {selectedSprint.akun && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600, flexShrink: 0 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
                     <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
                     <span style={{ fontSize: '0.72rem', color: '#d1d5db' }}>·</span>
                     <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{totalDone}/{sprintContents.length} konten selesai</span>
                     <span style={{ fontSize: '0.72rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8' }}>{totalPct}%</span>
-                    <div className="kf-sprint-progbar" style={{ width: 60, height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ width: 60, height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${totalPct}%`, background: totalPct === 100 ? '#059669' : '#1a73e8', borderRadius: 4, transition: 'width 0.3s' }} />
                     </div>
-                    <span className="kf-sprint-steps" style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                       {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#9ca3af', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
                     </span>
                   </div>
                 </div>
-                <div className="kf-sprint-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                   {isAffiliate && products.length > 0 && (
                     <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                      className="kf-sprint-filter-select"
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', width: 130 }}>
                       <option value="">Semua Produk</option>
                       {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
@@ -1660,7 +1666,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   )}
                   {!isAffiliate && sprintPillarsForFilter.length > 1 && (
                     <select value={filterPillar} onChange={e => setFilterPillar(e.target.value)}
-                      className="kf-sprint-filter-select"
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterPillar ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', width: 130 }}>
                       <option value="">Semua Pilar</option>
                       {sprintPillarsForFilter.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
@@ -1672,10 +1677,41 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </span>
                   )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
-                    className="kf-sprint-search"
                     style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
                   <button onClick={() => setReportOpen(true)}
                     style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', color: '#374151', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Laporan Tim
+                  </button>
+                </div>
+              </div>
+
+              {/* Sprint header bar — MOBILE (clean 3-row) */}
+              <div className="kf-sprint-header-mobile" style={{ display: 'none', padding: '8px 12px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', flexShrink: 0, flexDirection: 'column', gap: 5 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{selectedSprint.nama}</span>
+                  {!isAffiliate && sprintPillarsForFilter.length === 1 && (
+                    <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600, border: '1px solid rgba(26,115,232,0.15)', whiteSpace: 'nowrap', flexShrink: 0 }}>{sprintPillarsForFilter[0].nama}</span>
+                  )}
+                  {canEdit && (
+                    <button onClick={openEditSprintModal} title="Edit sprint" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4, flexShrink: 0 }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: '0.7rem', color: '#6b7280', whiteSpace: 'nowrap' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
+                  <span style={{ fontSize: '0.7rem', color: '#d1d5db' }}>·</span>
+                  <span style={{ fontSize: '0.7rem', color: '#6b7280', whiteSpace: 'nowrap' }}>{totalDone}/{sprintContents.length} selesai</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8', whiteSpace: 'nowrap' }}>{totalPct}%</span>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
+                    style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none' }} />
+                  <button onClick={() => setReportOpen(true)}
+                    style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 10px', color: '#374151', fontSize: '0.72rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
                     Laporan Tim
                   </button>
                 </div>
