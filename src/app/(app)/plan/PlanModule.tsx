@@ -116,6 +116,8 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
   const [tab, setTab] = useState('naskah')
 
   // Approval state
+  const supabase = createClient()
+
   const [pendingApprovalLocal, setPendingApprovalLocal] = useState<PendingApproval[]>(pendingApproval)
   const [revisiModal, setRevisiModal] = useState<{ item: PendingApproval; note: string } | null>(null)
   const [savingApproval, setSavingApproval] = useState<string | null>(null)
@@ -133,7 +135,6 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
 
   // Realtime: sync approval queue dan status naskah tanpa reload
   useEffect(() => {
-    const supabase = createClient()
     const channel = supabase.channel('plan-content-changes')
       .on('postgres_changes', {
         event: 'UPDATE',
@@ -245,7 +246,6 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     setActiveQueueId(item.id)
     if (!item.plan_started_at) {
       const now = new Date().toISOString()
-      const supabase = createClient()
       await supabase.from('kf_content_ideas').update({ plan_started_at: now }).eq('id', item.id)
       setLocalQueue(prev => prev.map(q => q.id === item.id ? { ...q, plan_started_at: now } : q))
     }
@@ -555,7 +555,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     platform: string, tipe: string, mode: 'affiliate' | 'creator',
     tanggal_tayang?: string | null, jam_tayang?: string | null
   ) {
-    const supabase = createClient()
     const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
     const { data: inserted, error: err } = await supabase.from('kf_content_ideas').insert({
       workspace_id: workspaceId,
@@ -613,7 +612,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
   async function saveAffToLibrary() {
     if (!affNaskah.trim()) return
     setAffSavedToLibrary(false)
-    const supabase = createClient()
     const selectedProduct = products.find(p => p.id === affForm.product_id)
     if (!activeQueueId && localQueue.length > 0) {
       setSaveWithoutQueueModal('affiliate')
@@ -647,7 +645,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
   async function saveToLibrary() {
     if (!generatedNaskah.trim()) return
     setSavedToLibrary(false)
-    const supabase = createClient()
     // Warn user if they try to save without selecting a queue item
     if (!activeQueueId && localQueue.length > 0) {
       setSaveWithoutQueueModal('creator')
@@ -687,7 +684,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (!sprintLinkModal) return
     setSprintLinkSaving(true)
     const { draft, naskah, mode } = sprintLinkModal
-    const supabase = createClient()
     const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
     await supabase.from('kf_content_ideas').update({ script: naskah, status: targetStatus, judul: sprintLinkModal.judul, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', draft.id)
     if (needsApproval) {
@@ -716,11 +712,9 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     const mode = saveWithoutQueueModal!
     setSaveWithoutQueueModal(null)
     if (mode === 'creator') {
-      const supabase = createClient()
       const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
       await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator', null, null)
     } else {
-      const supabase = createClient()
       const selectedProduct = products.find(p => p.id === affForm.product_id)
       const judul = `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform} — ${new Date().toLocaleDateString('id-ID')}`
       const matchingDraft = affForm.product_id ? sprintDrafts.find(d => d.product_id === affForm.product_id) : null
@@ -734,7 +728,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
 
   async function approveNaskah(item: PendingApproval) {
     setSavingApproval(item.id)
-    const supabase = createClient()
     await supabase.from('kf_content_ideas').update({ status: 'Naskah Siap', revisi_notes: null }).eq('id', item.id)
     await supabase.from('kf_notifications').insert({
       workspace_id: workspaceId,
@@ -751,7 +744,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     if (!revisiModal) return
     const { item, note } = revisiModal
     setSavingApproval(item.id)
-    const supabase = createClient()
     await supabase.from('kf_content_ideas').update({ status: 'Revisi', revisi_notes: note.trim() || null }).eq('id', item.id)
     await supabase.from('kf_notifications').insert({
       workspace_id: workspaceId,
