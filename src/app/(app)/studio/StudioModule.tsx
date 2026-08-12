@@ -719,6 +719,7 @@ export default function StudioModule({ initialContents, products, initialNotific
 
   const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
   const initial = workspaceName.charAt(0).toUpperCase()
+  const youtubeShorts = filtered.filter(c => c.format === 'Reels' || c.format === 'Video Pendek')
 
   return (
     <div>
@@ -921,96 +922,214 @@ export default function StudioModule({ initialContents, products, initialNotific
 
           {/* ─── TIKTOK ─── */}
           {platformTab === 'tiktok' && (
-            <div style={{ maxWidth: 400, margin: '0 auto' }}>
-              {/* TikTok header */}
-              <div style={{ background: '#010101', borderRadius: '16px 16px 0 0', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <svg width="70" height="20" viewBox="0 0 70 20"><text y="16" fontSize="16" fontWeight="800" fill="#fff" fontFamily="system-ui">TikTok</text></svg>
-                <span style={{ color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}>@{handle}</span>
+            <div style={{ maxWidth: 340, margin: '0 auto', background: '#000', borderRadius: 36, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', border: '8px solid #111' }}>
+              {/* Status bar */}
+              <div style={{ background: '#000', padding: '10px 20px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#fff', fontSize: '0.7rem', fontWeight: 700 }}>9:41</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <svg width="15" height="11" viewBox="0 0 15 11"><rect x="0" y="7" width="3" height="4" rx="0.5" fill="white"/><rect x="4" y="4.5" width="3" height="6.5" rx="0.5" fill="white"/><rect x="8" y="2" width="3" height="9" rx="0.5" fill="white"/><rect x="12" y="0" width="3" height="11" rx="0.5" fill="white"/></svg>
+                  <svg width="15" height="11" viewBox="0 0 22 16"><path d="M11 13a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="white"/><path d="M5 9a9 9 0 0112 0" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/><path d="M1 5a15 15 0 0120 0" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                  <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0" y="0.5" width="18" height="10" rx="2" stroke="white" strokeWidth="1.2" fill="none"/><rect x="1.5" y="2" width="14" height="7" rx="1" fill="white"/><path d="M19.5 3.5v4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                </div>
               </div>
-              {/* Profile row */}
-              <div style={{ background: '#010101', padding: '0 16px 14px', display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#1a1a1a', border: '2px solid #ff0050', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.3rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem' }}>@{handle}</div>
-                  <div style={{ display: 'flex', gap: 14, marginTop: 4 }}>
-                    {[['Video', filtered.length], ['Suka', '12.3K']].map(([k, v]) => (
-                      <div key={k as string} style={{ textAlign: 'center' }}>
-                        <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}>{v}</div>
-                        <div style={{ color: '#9ca3af', fontSize: '0.65rem' }}>{k}</div>
-                      </div>
-                    ))}
+              {/* For You / Following tabs */}
+              <div style={{ background: '#000', padding: '6px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem', fontWeight: 600 }}>Following</span>
+                  <span style={{ color: '#fff', fontSize: '0.88rem', fontWeight: 800, borderBottom: '2.5px solid #fff', paddingBottom: 2 }}>For You</span>
+                  <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem', fontWeight: 600 }}>LIVE</span>
+                </div>
+                <svg style={{ position: 'absolute', right: 16, top: 8 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              </div>
+              {/* Profile */}
+              <div style={{ background: '#000', padding: '12px 16px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#1a1a1a', border: '3px solid #fe2c55', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.8rem', color: '#fff' }}>{initial}</div>
+                <div style={{ color: '#fff', fontWeight: 800, fontSize: '0.95rem' }}>@{handle}</div>
+                <div style={{ display: 'flex', gap: 24 }}>
+                  {[['124', 'Following'], ['12.3K', 'Followers'], [String(filtered.length), 'Video']].map(([v, k]) => (
+                    <div key={k} style={{ textAlign: 'center' as const }}>
+                      <div style={{ color: '#fff', fontWeight: 800, fontSize: '0.95rem' }}>{v}</div>
+                      <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.6rem', marginTop: 1 }}>{k}</div>
+                    </div>
+                  ))}
+                </div>
+                <button style={{ background: '#fe2c55', border: 'none', borderRadius: 4, padding: '7px 48px', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}>Follow</button>
+                {/* Profile nav tabs */}
+                <div style={{ display: 'flex', width: '100%', borderBottom: '1px solid #1f1f1f', marginTop: 4 }}>
+                  <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '8px 0', borderBottom: '2px solid #fff' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   </div>
                 </div>
-                <button style={{ background: '#ff0050', border: 'none', borderRadius: 4, padding: '7px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>Ikuti</button>
               </div>
-              {/* 2-col 9:16 grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: '#010101', padding: '2px 0 12px' }}>
-                {filtered.map(c => {
+              {/* 3-col grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: '#1a1a1a' }}>
+                {filtered.length === 0 ? (
+                  <div style={{ gridColumn: '1 / -1', padding: '40px 20px', textAlign: 'center' as const, color: '#4b5563', fontSize: '0.75rem', background: '#000' }}>Belum ada konten</div>
+                ) : filtered.map(c => {
                   const t = getThumbnail(c)
                   const isVid = VIDEO_FORMATS.includes(c.format)
-                  const fakeLike = `${Math.floor(Math.random() * 9) + 1}.${Math.floor(Math.random() * 9)}K`
+                  const code = c.id.charCodeAt(0) + c.id.charCodeAt(c.id.length - 1)
+                  const fakeLikes = `${(code % 90 + 10)}.${code % 10}K`
                   return (
-                    <div key={c.id} style={{ position: 'relative', aspectRatio: '9/16', overflow: 'hidden', cursor: 'pointer', background: '#1a1a1a' }}
+                    <div key={c.id} style={{ position: 'relative', aspectRatio: '9 / 16', background: '#111', cursor: 'pointer', overflow: 'hidden' }}
                       onMouseEnter={() => setHoveredId(c.id)} onMouseLeave={() => setHoveredId(null)}
                       onClick={() => isVid ? setPreviewReels(c) : setPreviewPost(c)}>
-                      {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 6px 6px', background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-                        <div style={{ fontSize: '0.55rem', color: '#fff', lineHeight: 1.3, marginBottom: 3 }}>{(c.judul || '').slice(0, 28)}</div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                          <span style={{ fontSize: '0.5rem', color: '#fff' }}>{fakeLike}</span>
+                      {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '18px 5px 5px', background: 'linear-gradient(to top, rgba(0,0,0,0.82), transparent)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                          <span style={{ fontSize: '0.5rem', color: '#fff', fontWeight: 600 }}>{fakeLikes}</span>
                         </div>
                       </div>
-                      <div style={{ position: 'absolute', top: 4, right: 4, width: 5, height: 5, borderRadius: '50%', background: STATUS_COLOR[c.status] || '#6b7280' }} />
+                      {hoveredId === c.id && (
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(254,44,85,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: '0.52rem', color: '#fff', fontWeight: 700, background: 'rgba(0,0,0,0.65)', padding: '3px 7px', borderRadius: 4 }}>{c.status}</span>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
-                {filtered.length === 0 && (
-                  <div style={{ gridColumn: '1/-1', padding: '40px 20px', textAlign: 'center', color: '#4b5563', fontSize: '0.78rem' }}>Belum ada konten</div>
-                )}
+              </div>
+              {/* Bottom navigation */}
+              <div style={{ background: '#000', borderTop: '1px solid #1a1a1a', padding: '10px 0 20px', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                  <span style={{ color: '#fff', fontSize: '0.5rem', fontWeight: 700 }}>Home</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.5rem' }}>Friends</span>
+                </div>
+                {/* Create */}
+                <div style={{ background: 'linear-gradient(to right, #69C9D0, #fff, #EE1D52)', borderRadius: 10, padding: 2 }}>
+                  <div style={{ background: '#000', borderRadius: 8, padding: '4px 10px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.5rem' }}>Inbox</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{initial}</div>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.5rem' }}>Me</span>
+                </div>
               </div>
             </div>
           )}
 
           {/* ─── YOUTUBE ─── */}
           {platformTab === 'youtube' && (
-            <div style={{ maxWidth: 560, margin: '0 auto' }}>
-              {/* YT header */}
-              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '14px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.1rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
-                <div>
-                  <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{workspaceName}</div>
-                  <div style={{ fontSize: '0.72rem', color: '#6b7280' }}>@{handle} · {filtered.length} video</div>
+            <div style={{ maxWidth: 390, margin: '0 auto', background: '#f9f9f9', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+              {/* YouTube header */}
+              <div style={{ background: '#fff', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #e5e5e5' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                  <svg width="26" height="18" viewBox="0 0 26 18"><rect width="26" height="18" rx="5" fill="#FF0000"/><polygon points="10,5 10,13 18,9" fill="white"/></svg>
+                  <span style={{ fontWeight: 800, fontSize: '0.82rem', color: '#0f0f0f', letterSpacing: '-0.3px' }}>YouTube</span>
                 </div>
-                <button style={{ marginLeft: 'auto', background: '#111827', border: 'none', borderRadius: 20, padding: '7px 16px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>Subscribe</button>
+                <div style={{ flex: 1, background: '#f2f2f2', borderRadius: 20, padding: '5px 10px', display: 'flex', alignItems: 'center', gap: 5, border: '1px solid #e0e0e0' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                  <span style={{ color: '#aaa', fontSize: '0.7rem' }}>Search</span>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
               </div>
-              {/* Video list */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {filtered.map(c => {
+              {/* Filter chips */}
+              <div style={{ background: '#fff', padding: '7px 0 7px 12px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: 7, overflowX: 'auto' as const }}>
+                {['All', 'Music', 'Gaming', 'Fashion', 'Live', 'Podcasts'].map((chip, i) => (
+                  <span key={chip} style={{ padding: '4px 11px', borderRadius: 20, background: i === 0 ? '#0f0f0f' : '#f2f2f2', color: i === 0 ? '#fff' : '#0f0f0f', fontSize: '0.65rem', fontWeight: 600, whiteSpace: 'nowrap' as const, flexShrink: 0, cursor: 'pointer' }}>{chip}</span>
+                ))}
+              </div>
+              {/* Shorts section */}
+              {youtubeShorts.length > 0 && (
+                <div style={{ background: '#fff', paddingTop: 12, marginBottom: 6, borderBottom: '6px solid #f9f9f9' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 14, marginBottom: 8 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0000"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4zm1 3H9v4H5v2h4v4h2v-4h4v-2h-4V7z"/></svg>
+                    <span style={{ fontWeight: 800, fontSize: '0.85rem', color: '#0f0f0f' }}>Shorts</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#606060" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, paddingLeft: 14, paddingRight: 14, overflowX: 'auto' as const, paddingBottom: 12 }}>
+                    {youtubeShorts.map(c => {
+                      const t = getThumbnail(c)
+                      const code = c.id.charCodeAt(0) + c.id.charCodeAt(c.id.length - 1)
+                      const fakeViews = `${(code % 900 + 100)}K`
+                      return (
+                        <div key={c.id} style={{ width: 96, flexShrink: 0, cursor: 'pointer' }} onClick={() => setPreviewReels(c)}>
+                          <div style={{ aspectRatio: '9 / 16', background: '#e5e5e5', borderRadius: 10, overflow: 'hidden', position: 'relative' }}>
+                            {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
+                            <div style={{ position: 'absolute', bottom: 6, left: 6, display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                              <span style={{ color: '#fff', fontSize: '0.48rem', fontWeight: 700 }}>{fakeViews}</span>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: '0.6rem', fontWeight: 600, color: '#0f0f0f', marginTop: 5, lineHeight: 1.3 }}>{(c.judul || '').slice(0, 24)}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {/* Regular video feed */}
+              <div style={{ display: 'flex', flexDirection: 'column' as const }}>
+                {filtered.length === 0 ? (
+                  <div style={{ padding: '40px 20px', textAlign: 'center' as const, color: '#606060', fontSize: '0.82rem' }}>Belum ada konten</div>
+                ) : filtered.map(c => {
                   const t = getThumbnail(c)
-                  const fakeViews = `${Math.floor(Math.random() * 90) + 10}K`
+                  const code = c.id.charCodeAt(0) + c.id.charCodeAt(c.id.length - 1)
+                  const fakeViews = `${(code % 900 + 100)}K views`
+                  const fakeMin = (code % 8) + 1
+                  const fakeSec = String(code % 60).padStart(2, '0')
+                  const isVid = VIDEO_FORMATS.includes(c.format)
                   return (
-                    <div key={c.id} style={{ display: 'flex', gap: 10, cursor: 'pointer', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
-                      onClick={() => setSelectedItem(c)}>
-                      <div style={{ width: 160, height: 90, flexShrink: 0, background: '#f3f4f6', position: 'relative', overflow: 'hidden' }}>
-                        {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
-                        <div style={{ position: 'absolute', bottom: 4, right: 4, background: 'rgba(0,0,0,0.8)', borderRadius: 3, padding: '1px 5px', fontSize: '0.58rem', color: '#fff', fontWeight: 600 }}>
-                          {c.format || 'Video'}
-                        </div>
+                    <div key={c.id} style={{ background: '#fff', cursor: 'pointer', borderBottom: '6px solid #f9f9f9' }} onClick={() => setSelectedItem(c)}>
+                      <div style={{ position: 'relative', aspectRatio: '16 / 9', background: '#e5e5e5', overflow: 'hidden' }}>
+                        {t ? <img src={t} alt={c.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /> : <ThumbnailPlaceholder item={c} />}
+                        {isVid && <div style={{ position: 'absolute', bottom: 6, right: 8, background: 'rgba(0,0,0,0.85)', borderRadius: 3, padding: '1px 5px', fontSize: '0.58rem', color: '#fff', fontWeight: 700 }}>{fakeMin}:{fakeSec}</div>}
                       </div>
-                      <div style={{ flex: 1, padding: '10px 12px 10px 0' }}>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827', lineHeight: 1.35, marginBottom: 4 }}>{c.judul || '(Tanpa judul)'}</div>
-                        <div style={{ fontSize: '0.68rem', color: '#6b7280' }}>{handle} · {fakeViews} views</div>
-                        <div style={{ marginTop: 5 }}>
-                          <span style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#6b7280', background: STATUS_BG[c.status] || '#f3f4f6', fontWeight: 600 }}>{c.status}</span>
+                      <div style={{ display: 'flex', gap: 10, padding: '10px 14px 12px' }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.75rem', color: '#fff', flexShrink: 0 }}>{initial}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0f0f0f', lineHeight: 1.35, marginBottom: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{c.judul || '(Tanpa judul)'}</div>
+                          <div style={{ fontSize: '0.62rem', color: '#606060' }}>{workspaceName} · {fakeViews} · 2 hari lalu</div>
+                          <div style={{ marginTop: 4 }}>
+                            <span style={{ fontSize: '0.57rem', padding: '1px 6px', borderRadius: 3, color: STATUS_COLOR[c.status] || '#6b7280', background: STATUS_BG[c.status] || '#f3f4f6', fontWeight: 600 }}>{c.status}</span>
+                          </div>
                         </div>
+                        <div style={{ color: '#606060', fontSize: '1.1rem', flexShrink: 0, lineHeight: 1, alignSelf: 'flex-start', marginTop: 2 }}>⋮</div>
                       </div>
                     </div>
                   )
                 })}
-                {filtered.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280', fontSize: '0.82rem' }}>Belum ada konten</div>
-                )}
+              </div>
+              {/* Bottom navigation */}
+              <div style={{ background: '#fff', borderTop: '1px solid #e5e5e5', padding: '10px 0 16px', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#0f0f0f"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22" fill="#fff" stroke="#0f0f0f" strokeWidth="1"/></svg>
+                  <span style={{ color: '#0f0f0f', fontSize: '0.5rem', fontWeight: 700 }}>Home</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#ff0000"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 3v4h4v2h-4v4H9v-4H5v-2h4V5h2z"/></svg>
+                  <span style={{ color: '#606060', fontSize: '0.5rem' }}>Shorts</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#606060" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#606060" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                  <span style={{ color: '#606060', fontSize: '0.5rem' }}>Subscriptions</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 2 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#ff0000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.58rem', color: '#fff' }}>{initial}</div>
+                  <span style={{ color: '#606060', fontSize: '0.5rem' }}>You</span>
+                </div>
               </div>
             </div>
           )}
