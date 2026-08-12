@@ -1633,17 +1633,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </span>
                   </div>
                 </div>
-                <div className="kf-sprint-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <div className="kf-sprint-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap', justifyContent: 'flex-end' }}>
                   {isAffiliate && products.length > 0 && (
                     <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
-                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
+                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', width: 130 }}>
                       <option value="">Semua Produk</option>
                       {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
                   )}
                   {!isAffiliate && sprintPillarsForFilter.length > 1 && (
                     <select value={filterPillar} onChange={e => setFilterPillar(e.target.value)}
-                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterPillar ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
+                      style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterPillar ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', width: 130 }}>
                       <option value="">Semua Pilar</option>
                       {sprintPillarsForFilter.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
