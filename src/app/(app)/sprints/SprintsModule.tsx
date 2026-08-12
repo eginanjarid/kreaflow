@@ -1652,6 +1652,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <div className="kf-sprint-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap', justifyContent: 'flex-end' }}>
                   {isAffiliate && products.length > 0 && (
                     <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
+                      className="kf-sprint-filter-select"
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', width: 130 }}>
                       <option value="">Semua Produk</option>
                       {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
@@ -1659,6 +1660,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   )}
                   {!isAffiliate && sprintPillarsForFilter.length > 1 && (
                     <select value={filterPillar} onChange={e => setFilterPillar(e.target.value)}
+                      className="kf-sprint-filter-select"
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterPillar ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer', width: 130 }}>
                       <option value="">Semua Pilar</option>
                       {sprintPillarsForFilter.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
@@ -1670,6 +1672,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     </span>
                   )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
+                    className="kf-sprint-search"
                     style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
                   <button onClick={() => setReportOpen(true)}
                     style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', color: '#374151', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}>
