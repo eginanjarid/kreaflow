@@ -13,7 +13,7 @@ export default async function StudioPage() {
   const [{ data: wsData }, { data: brandCheck }, { data: contents }, { data: products }, { data: notifications }, { data: membersRaw }, { data: authUsersData }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type, name').eq('id', wsId).maybeSingle(),
     supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche, biz_nama_brand, biz_kategori').eq('workspace_id', wsId).maybeSingle(),
-    supabase.from('kf_content_ideas').select('*, kf_sprints!sprint_id(nama,step_config)').eq('workspace_id', wsId).in('status', ['Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']).order('created_at', { ascending: false }),
+    supabase.from('kf_content_ideas').select('*, kf_sprints!sprint_id(nama,step_config)').eq('workspace_id', wsId).in('status', ['Naskah Siap', 'Produksi', 'Menunggu Review', 'Siap Tayang', 'Terjadwal', 'Tayang']).order('created_at', { ascending: false }),
     supabase.from('kf_products').select('id, nama').eq('workspace_id', wsId).eq('is_active', true),
     supabase.from('kf_notifications').select('*').eq('workspace_id', wsId).eq('is_read', false).order('created_at', { ascending: false }),
     admin.from('kf_workspace_members').select('id, user_id, role, jabatan').eq('workspace_id', wsId),
@@ -52,6 +52,8 @@ export default async function StudioPage() {
       workspaceId={wsId}
       workspaceName={wsData?.name || 'studio'}
       workspaceMembers={workspaceMembers}
+      role={role}
+      jabatan={jabatan}
     />
   )
 }

@@ -24,14 +24,14 @@ type ContentItem = {
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
-type Tab = 'antrian' | 'dikerjakan' | 'selesai'
+type Tab = 'antrian' | 'dikerjakan' | 'review' | 'selesai'
 type ViewMode = 'cards' | 'platform'
 type IGTab = 'grid' | 'reels' | 'tagged'
 type PlatformTab = 'ig' | 'tiktok' | 'youtube'
 
-const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Siap Tayang': 'selesai', 'Terjadwal': 'selesai', 'Tayang': 'selesai' }
-const STATUS_COLOR: Record<string, string> = { Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
-const STATUS_BG: Record<string, string> = { Draft: '#f3f4f6', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
+const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Menunggu Review': 'review', 'Siap Tayang': 'selesai', 'Terjadwal': 'selesai', 'Tayang': 'selesai' }
+const STATUS_COLOR: Record<string, string> = { Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Menunggu Review': '#8b5cf6', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
+const STATUS_BG: Record<string, string> = { Draft: '#f3f4f6', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Menunggu Review': 'rgba(139,92,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
 const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
 
 function extractGdriveId(url: string): string | null {
@@ -215,7 +215,7 @@ function IGReelsPreview({ item, workspaceName, onEdit, onClose }: { item: Conten
   )
 }
 
-function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { item: ContentItem; products: Product[]; workspaceMembers: WorkspaceMember[]; onClose: () => void; onUpdate: (updated: ContentItem) => void }) {
+function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isApprover }: { item: ContentItem; products: Product[]; workspaceMembers: WorkspaceMember[]; onClose: () => void; onUpdate: (updated: ContentItem) => void; isApprover?: boolean }) {
   const supabase = createClient()
   const router = useRouter()
   const [canvaUrl, setCanvaUrl] = useState(item.canva_url || '')
@@ -239,6 +239,8 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const [assignedProduksi, setAssignedProduksi] = useState(item.assigned_produksi || '')
   const [naskahFullscreen, setNaskahFullscreen] = useState(false)
   const [tpFontSize, setTpFontSize] = useState(22)
+  const [revisiInput, setRevisiInput] = useState('')
+  const [showRevisiInput, setShowRevisiInput] = useState(false)
   const product = products.find(p => p.id === item.product_id)
   const isVideo = VIDEO_FORMATS.includes(item.format)
   const PRODUKSI_JABATAN = ['Videografer', 'Editor', 'Desainer', 'Art Director', 'Content Creator']
@@ -284,11 +286,45 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
     setMarking(true)
     const now = new Date().toISOString()
     const cleanSlides = isCarouselModal ? carouselSlides.filter(s => s.trim()) : null
-    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null, carousel_slides: cleanSlides?.length ? cleanSlides : null }
+    if (isApprover) {
+      const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null, carousel_slides: cleanSlides?.length ? cleanSlides : null }
+      await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
+      await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
+      await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
+      setMarking(false)
+      onUpdate({ ...item, ...payload })
+      onClose()
+    } else {
+      const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Menunggu Review', step_log: buildStepLog(), assigned_produksi: assignedProduksi || null, carousel_slides: cleanSlides?.length ? cleanSlides : null }
+      await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
+      await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'review', title: `Perlu Review — ${item.judul}`, message: 'Desainer telah submit hasil, mohon lakukan review.', content_idea_id: item.id })
+      await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
+      setMarking(false)
+      onUpdate({ ...item, ...payload })
+      onClose()
+    }
+    router.refresh()
+  }
+
+  async function handleApprove() {
+    setMarking(true)
+    const now = new Date().toISOString()
+    const payload = { status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now }
     await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
-    await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
-    await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
+    await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Diapprove — ${item.judul}`, message: 'Konten telah diapprove, siap dijadwalkan.', content_idea_id: item.id })
     setMarking(false)
+    onUpdate({ ...item, ...payload })
+    onClose()
+    router.refresh()
+  }
+
+  async function handleRevisiSubmit() {
+    if (!revisiInput.trim()) return
+    setSaving(true)
+    const payload = { status: 'Produksi', revisi_notes: revisiInput.trim() }
+    await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
+    await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'produksi', title: `Revisi diperlukan — ${item.judul}`, message: revisiInput.trim(), content_idea_id: item.id })
+    setSaving(false)
     onUpdate({ ...item, ...payload })
     onClose()
     router.refresh()
@@ -488,8 +524,35 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
             )}
             <div style={{ marginBottom: 20 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Catatan Studio</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Revisi, catatan untuk scheduler..." rows={3} style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} /></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f3f4f6', border: 'none', borderRadius: 8, color: '#111827', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : 'Simpan Progress'}</button>
-              <button onClick={handleSelesai} disabled={marking} style={{ padding: 10, background: '#059669', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : 'Tandai Selesai'}</button>
+              {item.status === 'Menunggu Review' ? (
+                isApprover ? (
+                  <>
+                    <div style={{ padding: '8px 12px', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: '0.78rem', color: '#7c3aed', fontWeight: 600, textAlign: 'center' }}>Konten menunggu review Anda</div>
+                    <button onClick={handleApprove} disabled={marking} style={{ padding: 10, background: '#059669', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : '✓ Approve — Siap Tayang'}</button>
+                    {!showRevisiInput ? (
+                      <button onClick={() => setShowRevisiInput(true)} style={{ padding: 10, background: '#fff', border: '1px solid #f87171', borderRadius: 8, color: '#dc2626', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>✎ Kirim Revisi</button>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <textarea value={revisiInput} onChange={e => setRevisiInput(e.target.value)} placeholder="Catatan revisi untuk desainer..." rows={3} style={{ width: '100%', background: '#fff5f5', border: '1px solid #fca5a5', borderRadius: 8, padding: '8px 10px', fontSize: '0.82rem', color: '#111827', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }} />
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={() => setShowRevisiInput(false)} style={{ flex: 1, padding: 8, background: '#f3f4f6', border: 'none', borderRadius: 8, fontSize: '0.78rem', cursor: 'pointer', color: '#6b7280' }}>Batal</button>
+                          <button onClick={handleRevisiSubmit} disabled={saving || !revisiInput.trim()} style={{ flex: 2, padding: 8, background: '#dc2626', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: saving || !revisiInput.trim() ? 'not-allowed' : 'pointer', opacity: saving || !revisiInput.trim() ? 0.6 : 1 }}>{saving ? 'Mengirim...' : 'Kirim Revisi'}</button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ padding: '12px', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#7c3aed', marginBottom: 4 }}>Sedang direview manager</div>
+                    <div style={{ fontSize: '0.75rem', color: '#8b5cf6' }}>Tunggu hasil review sebelum melanjutkan</div>
+                  </div>
+                )
+              ) : (
+                <>
+                  <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f3f4f6', border: 'none', borderRadius: 8, color: '#111827', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : 'Simpan Progress'}</button>
+                  <button onClick={handleSelesai} disabled={marking} style={{ padding: 10, background: isApprover ? '#059669' : '#8b5cf6', border: 'none', borderRadius: 8, color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.6 : 1 }}>{marking ? 'Memproses...' : isApprover ? 'Tandai Selesai' : 'Submit untuk Review'}</button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -504,8 +567,8 @@ function ContentCard({ item, products, onClick, onMulai, onRename, bulkMode, sel
   const thumb = getThumbnail(item)
   const product = products.find(p => p.id === item.product_id)
   const stage = STATUS_STAGE[item.status]
-  const stageColor: Record<Tab, string> = { antrian: '#d97706', dikerjakan: '#1a73e8', selesai: '#059669' }
-  const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', selesai: 'Selesai' }
+  const stageColor: Record<Tab, string> = { antrian: '#d97706', dikerjakan: '#1a73e8', review: '#8b5cf6', selesai: '#059669' }
+  const stageLabel: Record<Tab, string> = { antrian: 'Antrian', dikerjakan: 'Dikerjakan', review: 'Review', selesai: 'Selesai' }
   // Step deadline: Antrian → step desain/produksi/talent, Dikerjakan → step editing
   const STEP_FOR_STAGE: Record<string, string[]> = {
     antrian: ['desain', 'produksi', 'talent'],
@@ -670,9 +733,10 @@ function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Not
   )
 }
 
-export default function StudioModule({ initialContents, products, initialNotifications, workspaceId, workspaceName = 'studio', workspaceMembers = [] }: {
-  initialContents: ContentItem[]; products: Product[]; initialNotifications: Notification[]; workspaceId: string; workspaceName?: string; workspaceMembers?: WorkspaceMember[]
+export default function StudioModule({ initialContents, products, initialNotifications, workspaceId, workspaceName = 'studio', workspaceMembers = [], role = '', jabatan = '' }: {
+  initialContents: ContentItem[]; products: Product[]; initialNotifications: Notification[]; workspaceId: string; workspaceName?: string; workspaceMembers?: WorkspaceMember[]; role?: string; jabatan?: string
 }) {
+  const isApprover = role === 'owner' || role === 'admin' || jabatan === 'Manager'
   const supabase = createClient()
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
@@ -704,7 +768,7 @@ export default function StudioModule({ initialContents, products, initialNotific
     const channel = supabase.channel('studio-content-changes')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'kf_content_ideas', filter: `workspace_id=eq.${workspaceId}` }, payload => {
         const updated = payload.new as ContentItem
-        const studioStatuses = ['Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
+        const studioStatuses = ['Naskah Siap', 'Produksi', 'Menunggu Review', 'Siap Tayang', 'Terjadwal', 'Tayang']
         setContents(prev => {
           const exists = prev.some(c => c.id === updated.id)
           if (exists) {
@@ -741,10 +805,17 @@ export default function StudioModule({ initialContents, products, initialNotific
     if (!selectedIds.size) return
     const now = new Date().toISOString()
     const ids = [...selectedIds]
-    await Promise.all(ids.map(id =>
-      supabase.from('kf_content_ideas').update({ status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now }).eq('id', id)
-    ))
-    setContents(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now } : c))
+    if (isApprover) {
+      await Promise.all(ids.map(id =>
+        supabase.from('kf_content_ideas').update({ status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now }).eq('id', id)
+      ))
+      setContents(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now } : c))
+    } else {
+      await Promise.all(ids.map(id =>
+        supabase.from('kf_content_ideas').update({ status: 'Menunggu Review' }).eq('id', id)
+      ))
+      setContents(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'Menunggu Review' } : c))
+    }
     setSelectedIds(new Set())
     setBulkMode(false)
   }
@@ -779,11 +850,13 @@ export default function StudioModule({ initialContents, products, initialNotific
   const TAB_CONFIG = [
     { key: 'antrian' as Tab, label: 'Antrian', color: '#d97706' },
     { key: 'dikerjakan' as Tab, label: 'Sedang Dikerjakan', color: '#1a73e8' },
+    { key: 'review' as Tab, label: 'Review', color: '#8b5cf6' },
     { key: 'selesai' as Tab, label: 'Selesai', color: '#059669' },
   ]
 
   const antriCount = contents.filter(c => STATUS_STAGE[c.status] === 'antrian').length
   const dikerjakanCount = contents.filter(c => STATUS_STAGE[c.status] === 'dikerjakan').length
+  const reviewCount = contents.filter(c => STATUS_STAGE[c.status] === 'review').length
 
   const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
   const initial = workspaceName.charAt(0).toUpperCase()
@@ -813,6 +886,7 @@ export default function StudioModule({ initialContents, products, initialNotific
               {t.label}
               {t.key === 'antrian' && antriCount > 0 && <span style={{ marginLeft: 6, background: '#d97706', color: '#000', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{antriCount}</span>}
               {t.key === 'dikerjakan' && dikerjakanCount > 0 && <span style={{ marginLeft: 6, background: '#1a73e8', color: '#fff', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{dikerjakanCount}</span>}
+              {t.key === 'review' && reviewCount > 0 && <span style={{ marginLeft: 6, background: '#8b5cf6', color: '#fff', fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{reviewCount}</span>}
             </button>
           ))}
         </div>
@@ -870,13 +944,14 @@ export default function StudioModule({ initialContents, products, initialNotific
           {(searchQ || filterFormat || filterPlatform) ? (
             <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>Tidak ada konten yang cocok</div>
           ) : (
-            <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Belum ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Belum ada konten sedang dikerjakan' : tab === 'review' ? 'Tidak ada konten menunggu review' : 'Belum ada konten selesai'}</div>
           )}
           <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>
             {(searchQ || filterFormat || filterPlatform) && 'Coba ubah filter atau kata kunci pencarian'}
             {!searchQ && !filterFormat && !filterPlatform && tab === 'antrian' && 'Setelah copywriter simpan naskah di Plan, konten akan muncul di sini'}
             {!searchQ && !filterFormat && !filterPlatform && tab === 'dikerjakan' && 'Buka konten di Antrian → klik "Simpan Progress" untuk memindahkannya ke sini'}
-            {!searchQ && !filterFormat && !filterPlatform && tab === 'selesai' && 'Buka konten di Antrian atau Dikerjakan → klik "Tandai Selesai" untuk memindahkannya ke sini'}
+            {!searchQ && !filterFormat && !filterPlatform && tab === 'review' && (isApprover ? 'Belum ada konten yang menunggu review Anda' : 'Konten yang kamu submit akan muncul di sini')}
+            {!searchQ && !filterFormat && !filterPlatform && tab === 'selesai' && 'Konten yang sudah diapprove dan siap dijadwalkan muncul di sini'}
           </div>
         </div>
       ) : viewMode === 'cards' ? (
@@ -920,9 +995,23 @@ export default function StudioModule({ initialContents, products, initialNotific
             </div>
           )
         })() : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-            {displayItems.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} bulkMode={bulkMode} selected={selectedIds.has(item.id)} onToggleSelect={() => toggleSelect(item.id)} />)}
-          </div>
+          <>
+            {tab === 'review' && isApprover && displayItems.length > 0 && (
+              <div style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span style={{ fontSize: '0.82rem', color: '#7c3aed', fontWeight: 600 }}>{displayItems.length} konten menunggu review. Klik konten untuk Approve atau Kirim Revisi.</span>
+              </div>
+            )}
+            {tab === 'review' && !isApprover && displayItems.length > 0 && (
+              <div style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span style={{ fontSize: '0.82rem', color: '#7c3aed' }}>Kontenmu sedang menunggu review manager. Kamu akan mendapat notifikasi setelah direview.</span>
+              </div>
+            )}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+              {displayItems.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} bulkMode={bulkMode} selected={selectedIds.has(item.id)} onToggleSelect={() => toggleSelect(item.id)} />)}
+            </div>
+          </>
         )
       ) : viewMode === 'platform' ? (
         /* Platform Preview */
@@ -1247,8 +1336,8 @@ export default function StudioModule({ initialContents, products, initialNotific
         <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 400, background: '#1e1b4b', color: '#fff', borderRadius: 14, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.25)', whiteSpace: 'nowrap' }}>
           <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{selectedIds.size} konten dipilih</span>
           <button onClick={handleBulkSelesai}
-            style={{ padding: '8px 18px', borderRadius: 8, background: '#059669', border: 'none', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}>
-            Tandai Selesai
+            style={{ padding: '8px 18px', borderRadius: 8, background: isApprover ? '#059669' : '#8b5cf6', border: 'none', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}>
+            {isApprover ? 'Approve Selesai' : 'Submit untuk Review'}
           </button>
           <button onClick={() => { setSelectedIds(new Set()); setBulkMode(false) }}
             style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
@@ -1258,7 +1347,7 @@ export default function StudioModule({ initialContents, products, initialNotific
       )}
 
       {/* Modals */}
-      {selectedItem && <NaskahModal item={selectedItem} products={products} workspaceMembers={workspaceMembers} onClose={() => setSelectedItem(null)} onUpdate={handleUpdate} />}
+      {selectedItem && <NaskahModal item={selectedItem} products={products} workspaceMembers={workspaceMembers} onClose={() => setSelectedItem(null)} onUpdate={handleUpdate} isApprover={isApprover} />}
       {previewPost && <IGPostPreview item={previewPost} workspaceName={workspaceName} onEdit={() => { setPreviewPost(null); setSelectedItem(previewPost) }} onClose={() => setPreviewPost(null)} />}
       {previewReels && <IGReelsPreview item={previewReels} workspaceName={workspaceName} onEdit={() => { setPreviewReels(null); setSelectedItem(previewReels) }} onClose={() => setPreviewReels(null)} />}
       {showNotif && (<><div style={{ position: 'fixed', inset: 0, zIndex: 299 }} onClick={() => setShowNotif(false)} /><NotifPanel notifications={notifications} onClose={() => setShowNotif(false)} onMarkRead={markRead} /></>)}
