@@ -20,6 +20,7 @@ type ContentItem = {
   sprint_step_config?: { id: string; daysBefore: number }[] | null
   studio_started_at?: string | null
   studio_completed_at?: string | null
+  revisi_notes?: string | null
 }
 type Product = { id: string; nama: string }
 type Notification = { id: string; type: string; title: string; message: string | null; content_idea_id: string | null; is_read: boolean; created_at: string }
@@ -322,6 +323,12 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
             {item.cta && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>CTA</div><div style={{ fontSize: '0.85rem', color: '#111827', lineHeight: 1.6, background: '#fff', padding: '10px 12px', borderRadius: 8 }}>{item.cta}</div></div>}
             {item.script && <div style={{ marginBottom: 12 }}><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Script Lengkap</div><div style={{ fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.7, background: '#fff', padding: '10px 12px', borderRadius: 8, whiteSpace: 'pre-wrap', maxHeight: 200, overflowY: 'auto' }}>{item.script}</div></div>}
             {(item.hashtags || []).length > 0 && <div><div style={{ fontSize: '0.68rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 }}>Hashtag</div><div style={{ fontSize: '0.78rem', color: '#1a73e8', lineHeight: 1.6 }}>{item.hashtags.join(' ')}</div></div>}
+            {item.revisi_notes && (
+              <div style={{ marginTop: 12, background: 'rgba(251,146,60,0.08)', border: '1.5px solid rgba(251,146,60,0.3)', borderRadius: 10, padding: '10px 12px' }}>
+                <div style={{ fontSize: '0.65rem', color: '#d97706', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 5 }}>⚠ Catatan Revisi dari Manager</div>
+                <div style={{ fontSize: '0.82rem', color: '#92400e', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{item.revisi_notes}</div>
+              </div>
+            )}
           </div>
 
           {/* Teleprompter fullscreen overlay */}
@@ -491,7 +498,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   )
 }
 
-function ContentCard({ item, products, onClick, onMulai, onRename }: { item: ContentItem; products: Product[]; onClick: () => void; onMulai?: () => void; onRename?: (id: string, newJudul: string) => void }) {
+function ContentCard({ item, products, onClick, onMulai, onRename, bulkMode, selected, onToggleSelect }: { item: ContentItem; products: Product[]; onClick: () => void; onMulai?: () => void; onRename?: (id: string, newJudul: string) => void; bulkMode?: boolean; selected?: boolean; onToggleSelect?: () => void }) {
   const [renaming, setRenaming] = useState(false)
   const [renameVal, setRenameVal] = useState(item.judul || '')
   const thumb = getThumbnail(item)
@@ -518,10 +525,21 @@ function ContentCard({ item, products, onClick, onMulai, onRename }: { item: Con
     : null
   const STEP_LABEL: Record<string, string> = { desain: 'Desain', produksi: 'Produksi', talent: 'Talent', editing: 'Editing', schedule: 'Schedule' }
 
+  const isVideo = VIDEO_FORMATS.includes(item.format)
+  const stepLog = item.step_log || {}
+  const steps = isVideo
+    ? [{ key: 'talent_briefed_at', label: 'Brief' }, { key: 'shoot_done_at', label: 'Shoot' }, { key: 'editing_done_at', label: 'Edit' }]
+    : [{ key: 'editing_done_at', label: 'Desain' }]
+
   return (
-    <div onClick={onClick}
-      style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)', borderRadius: 14, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.15s', display: 'flex', flexDirection: 'column', borderTop: thumb ? 'none' : `3px solid ${stageColor[stage]}` }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(26,115,232,0.14)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)')}>
+    <div onClick={bulkMode ? onToggleSelect : onClick}
+      style={{ background: selected ? 'rgba(26,115,232,0.06)' : '#fff', boxShadow: selected ? '0 0 0 2px #1a73e8' : '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)', borderRadius: 14, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.15s', display: 'flex', flexDirection: 'column', borderTop: thumb ? 'none' : `3px solid ${stageColor[stage]}`, position: 'relative' as const }}
+      onMouseEnter={e => { if (!selected) e.currentTarget.style.boxShadow = '0 4px 20px rgba(26,115,232,0.14)' }} onMouseLeave={e => { if (!selected) e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)' }}>
+      {bulkMode && (
+        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, width: 20, height: 20, borderRadius: 6, border: `2px solid ${selected ? '#1a73e8' : '#d1d5db'}`, background: selected ? '#1a73e8' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {selected && <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        </div>
+      )}
       {thumb && (
         <div style={{ height: 96, position: 'relative', overflow: 'hidden', flexShrink: 0, background: '#f3f4f6' }}>
           <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).closest('div')!.style.display = 'none' }} />
@@ -591,6 +609,23 @@ function ContentCard({ item, products, onClick, onMulai, onRename }: { item: Con
             <span style={{ fontSize: '0.67rem', color: '#d1d5db' }}>Belum dijadwalkan</span>
           )}
           {item.sprint_nama && <span style={{ fontSize: '0.62rem', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.sprint_nama}</span>}
+          {/* Step checklist dots */}
+          {stage !== 'antrian' && steps.length > 0 && (
+            <div style={{ display: 'flex', gap: 5, alignItems: 'center', marginTop: 2 }}>
+              {steps.map(s => {
+                const done = !!stepLog[s.key]
+                return (
+                  <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: done ? '#059669' : '#e5e7eb', flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.57rem', color: done ? '#059669' : '#9ca3af', fontWeight: done ? 700 : 400 }}>{s.label}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {item.revisi_notes && (
+            <div style={{ fontSize: '0.6rem', color: '#d97706', fontWeight: 700, background: 'rgba(251,146,60,0.1)', padding: '2px 6px', borderRadius: 4, alignSelf: 'flex-start' as const }}>⚠ Ada catatan revisi</div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
             {stage === 'antrian' && onMulai ? (
               <button
@@ -599,7 +634,7 @@ function ContentCard({ item, products, onClick, onMulai, onRename }: { item: Con
                 ▶ Mulai
               </button>
             ) : <span />}
-            <span style={{ fontSize: '0.67rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>
+            {!bulkMode && <span style={{ fontSize: '0.67rem', color: '#1a73e8', fontWeight: 600 }}>Buka →</span>}
           </div>
         </div>
       </div>
@@ -652,6 +687,13 @@ export default function StudioModule({ initialContents, products, initialNotific
   const [previewReels, setPreviewReels] = useState<ContentItem | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [showNotif, setShowNotif] = useState(false)
+  // Search + filter
+  const [searchQ, setSearchQ] = useState('')
+  const [filterFormat, setFilterFormat] = useState('')
+  const [filterPlatform, setFilterPlatform] = useState('')
+  // Bulk select
+  const [bulkMode, setBulkMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   async function handleRename(id: string, newJudul: string) {
     await supabase.from('kf_content_ideas').update({ judul: newJudul }).eq('id', id)
@@ -684,6 +726,32 @@ export default function StudioModule({ initialContents, products, initialNotific
 
   const filtered = contents.filter(c => STATUS_STAGE[c.status] === tab)
   const unread = notifications.filter(n => !n.is_read).length
+
+  // Search + filter derived
+  const allFormats = [...new Set(contents.map(c => c.format).filter(Boolean))]
+  const allPlatforms = [...new Set(contents.flatMap(c => c.platform || []))]
+  const displayItems = filtered.filter(c => {
+    if (searchQ && !(c.judul || '').toLowerCase().includes(searchQ.toLowerCase())) return false
+    if (filterFormat && c.format !== filterFormat) return false
+    if (filterPlatform && !(c.platform || []).includes(filterPlatform)) return false
+    return true
+  })
+
+  async function handleBulkSelesai() {
+    if (!selectedIds.size) return
+    const now = new Date().toISOString()
+    const ids = [...selectedIds]
+    await Promise.all(ids.map(id =>
+      supabase.from('kf_content_ideas').update({ status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now }).eq('id', id)
+    ))
+    setContents(prev => prev.map(c => ids.includes(c.id) ? { ...c, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now } : c))
+    setSelectedIds(new Set())
+    setBulkMode(false)
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
 
   // IG view filtering
   const igFiltered = igTab === 'reels'
@@ -759,24 +827,65 @@ export default function StudioModule({ initialContents, products, initialNotific
               {v.label}
             </button>
           ))}
+          {viewMode === 'cards' && (
+            <button onClick={() => { setBulkMode(v => !v); setSelectedIds(new Set()) }}
+              style={{ padding: '5px 12px', borderRadius: 8, fontSize: '0.78rem', border: bulkMode ? '1px solid #7c3aed' : '1px solid #e5e7eb', background: bulkMode ? 'rgba(124,58,237,0.10)' : '#f3f4f6', color: bulkMode ? '#7c3aed' : '#6b7280', cursor: 'pointer', fontWeight: 600 }}>
+              {bulkMode ? `Batal (${selectedIds.size})` : 'Pilih'}
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Search + Filter bar — cards view only */}
+      {viewMode === 'cards' && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ position: 'relative', flex: '1 1 180px', minWidth: 140 }}>
+            <svg style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Cari judul..."
+              style={{ width: '100%', paddingLeft: 32, paddingRight: 10, paddingTop: 7, paddingBottom: 7, border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.82rem', color: '#111827', outline: 'none', background: '#fff', boxSizing: 'border-box' }} />
+          </div>
+          <select value={filterFormat} onChange={e => setFilterFormat(e.target.value)}
+            style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.82rem', color: filterFormat ? '#111827' : '#9ca3af', background: '#fff', cursor: 'pointer' }}>
+            <option value="">Semua Format</option>
+            {allFormats.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+          <select value={filterPlatform} onChange={e => setFilterPlatform(e.target.value)}
+            style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.82rem', color: filterPlatform ? '#111827' : '#9ca3af', background: '#fff', cursor: 'pointer' }}>
+            <option value="">Semua Platform</option>
+            {allPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+          {(searchQ || filterFormat || filterPlatform) && (
+            <button onClick={() => { setSearchQ(''); setFilterFormat(''); setFilterPlatform('') }}
+              style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.78rem', color: '#6b7280', background: '#f3f4f6', cursor: 'pointer' }}>
+              Reset
+            </button>
+          )}
+          {(searchQ || filterFormat || filterPlatform) && (
+            <span style={{ fontSize: '0.78rem', color: '#6b7280' }}>{displayItems.length} konten</span>
+          )}
+        </div>
+      )}
+
       {/* Content area */}
-      {filtered.length === 0 ? (
+      {displayItems.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
           <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5"/></svg></div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Belum ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
+          {(searchQ || filterFormat || filterPlatform) ? (
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>Tidak ada konten yang cocok</div>
+          ) : (
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Belum ada konten sedang dikerjakan' : 'Belum ada konten selesai'}</div>
+          )}
           <div style={{ fontSize: '0.82rem', color: '#6b7280' }}>
-            {tab === 'antrian' && 'Setelah copywriter simpan naskah di Plan, konten akan muncul di sini'}
-            {tab === 'dikerjakan' && 'Buka konten di Antrian → klik "Simpan Progress" untuk memindahkannya ke sini'}
-            {tab === 'selesai' && 'Buka konten di Antrian atau Dikerjakan → klik "Tandai Selesai" untuk memindahkannya ke sini'}
+            {(searchQ || filterFormat || filterPlatform) && 'Coba ubah filter atau kata kunci pencarian'}
+            {!searchQ && !filterFormat && !filterPlatform && tab === 'antrian' && 'Setelah copywriter simpan naskah di Plan, konten akan muncul di sini'}
+            {!searchQ && !filterFormat && !filterPlatform && tab === 'dikerjakan' && 'Buka konten di Antrian → klik "Simpan Progress" untuk memindahkannya ke sini'}
+            {!searchQ && !filterFormat && !filterPlatform && tab === 'selesai' && 'Buka konten di Antrian atau Dikerjakan → klik "Tandai Selesai" untuk memindahkannya ke sini'}
           </div>
         </div>
       ) : viewMode === 'cards' ? (
         tab === 'antrian' ? (() => {
           const DAY_COLORS = ['#1a73e8', '#7c3aed', '#059669', '#d97706', '#0891b2', '#db2777', '#dc2626']
-          const sorted = [...filtered].sort((a, b) => {
+          const sorted = [...displayItems].sort((a, b) => {
             const da = a.tanggal_tayang || '9999', db = b.tanggal_tayang || '9999'
             return da !== db ? da.localeCompare(db) : (a.jam_tayang || '').localeCompare(b.jam_tayang || '')
           })
@@ -806,7 +915,7 @@ export default function StudioModule({ initialContents, products, initialNotific
                       <span style={{ fontSize: '0.72rem', color, fontWeight: 600 }}>{group.items.length} konten</span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} />)}
+                      {group.items.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} bulkMode={bulkMode} selected={selectedIds.has(item.id)} onToggleSelect={() => toggleSelect(item.id)} />)}
                     </div>
                   </div>
                 )
@@ -815,7 +924,7 @@ export default function StudioModule({ initialContents, products, initialNotific
           )
         })() : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-            {filtered.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} />)}
+            {displayItems.map(item => <ContentCard key={item.id} item={item} products={products} onClick={() => setSelectedItem(item)} onMulai={() => handleMulai(item)} onRename={handleRename} bulkMode={bulkMode} selected={selectedIds.has(item.id)} onToggleSelect={() => toggleSelect(item.id)} />)}
           </div>
         )
       ) : viewMode === 'platform' ? (
@@ -1135,6 +1244,21 @@ export default function StudioModule({ initialContents, products, initialNotific
           )}
         </div>
       ) : null}
+
+      {/* Floating bulk action bar */}
+      {bulkMode && selectedIds.size > 0 && (
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 400, background: '#1e1b4b', color: '#fff', borderRadius: 14, padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.25)', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{selectedIds.size} konten dipilih</span>
+          <button onClick={handleBulkSelesai}
+            style={{ padding: '8px 18px', borderRadius: 8, background: '#059669', border: 'none', color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}>
+            Tandai Selesai
+          </button>
+          <button onClick={() => { setSelectedIds(new Set()); setBulkMode(false) }}
+            style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
+            Batal
+          </button>
+        </div>
+      )}
 
       {/* Modals */}
       {selectedItem && <NaskahModal item={selectedItem} products={products} workspaceMembers={workspaceMembers} onClose={() => setSelectedItem(null)} onUpdate={handleUpdate} />}
