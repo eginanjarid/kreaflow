@@ -13,6 +13,7 @@ type ContentItem = {
   cta: string; hashtags: string[]; script: string; prompt_script: string
   status: string; scheduled_date: string; canva_url?: string; gdrive_url?: string
   preview_url?: string; studio_notes?: string; studio_done_at?: string; show_in_feed?: boolean
+  carousel_slides?: string[] | null
   sprint_id?: string | null; step_log?: Record<string, string> | null
   tanggal_tayang?: string | null; jam_tayang?: string | null; sprint_nama?: string | null
   assigned_produksi?: string | null
@@ -38,15 +39,23 @@ function extractGdriveId(url: string): string | null {
   return m ? m[1] : null
 }
 function getThumbnail(item: ContentItem): string | null {
-  if (item.preview_url) {
-    const id = extractGdriveId(item.preview_url)
-    if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w400`
-    return item.preview_url
+  // For carousel, first slide is the thumbnail
+  const firstSlide = item.carousel_slides?.[0]
+  const src = firstSlide || item.preview_url || item.gdrive_url
+  if (!src) return null
+  const id = extractGdriveId(src)
+  if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w400`
+  return src
+}
+
+function getSlideUrl(item: ContentItem, idx: number): string | null {
+  if (item.carousel_slides && item.carousel_slides[idx]) {
+    const src = item.carousel_slides[idx]
+    const id = extractGdriveId(src)
+    return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w800` : src
   }
-  if (item.gdrive_url) {
-    const id = extractGdriveId(item.gdrive_url)
-    if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w400`
-  }
+  // Fallback for slide 0 only
+  if (idx === 0) return getThumbnail(item)
   return null
 }
 
@@ -67,7 +76,7 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
   const hashtags = (item.hashtags || []).join(' ')
   const fakeLikes = Math.floor(Math.random() * 900) + 100
   const isCarousel = (item.format || '').toLowerCase().includes('carousel')
-  const SLIDE_COUNT = isCarousel ? 3 : 1
+  const SLIDE_COUNT = isCarousel ? Math.max(1, item.carousel_slides?.length || 1) : 1
   const [slideIdx, setSlideIdx] = useState(0)
 
   return (
@@ -84,14 +93,15 @@ function IGPostPreview({ item, workspaceName, onEdit, onClose }: { item: Content
         </div>
         {/* Image / Carousel */}
         <div style={{ width: '100%', aspectRatio: '4/5', background: '#1a1a1a', position: 'relative', overflow: 'hidden' }}>
-          {slideIdx === 0 ? (
-            thumb ? <img src={thumb} alt={item.judul} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ThumbnailPlaceholder item={item} />
-          ) : (
-            <div style={{ width: '100%', height: '100%', background: '#2a2a2a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>Slide {slideIdx + 1}</span>
-            </div>
-          )}
+          {(() => {
+            const slideUrl = getSlideUrl(item, slideIdx)
+            return slideUrl
+              ? <img src={slideUrl} alt={`Slide ${slideIdx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <div style={{ width: '100%', height: '100%', background: '#2a2a2a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>Slide {slideIdx + 1}</span>
+                </div>
+          })()}
           {/* Slide counter */}
           {isCarousel && (
             <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', borderRadius: 20, padding: '2px 8px', fontSize: '0.68rem', color: '#fff', fontWeight: 600 }}>
@@ -210,6 +220,10 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const [canvaUrl, setCanvaUrl] = useState(item.canva_url || '')
   const [gdriveUrl, setGdriveUrl] = useState(item.gdrive_url || '')
   const [previewUrl, setPreviewUrl] = useState(item.preview_url || '')
+  const isCarouselModal = (item.format || '').toLowerCase().includes('carousel')
+  const [carouselSlides, setCarouselSlides] = useState<string[]>(
+    item.carousel_slides?.length ? item.carousel_slides : ['']
+  )
   const [notes, setNotes] = useState(item.studio_notes || '')
   const [saving, setSaving] = useState(false)
   const [marking, setMarking] = useState(false)
@@ -237,7 +251,8 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
 
   async function handleSave() {
     setSaving(true)
-    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Produksi', step_log: buildStepLog(), assigned_produksi: assignedProduksi || null }
+    const cleanSlides = isCarouselModal ? carouselSlides.filter(s => s.trim()) : null
+    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Produksi', step_log: buildStepLog(), assigned_produksi: assignedProduksi || null, carousel_slides: cleanSlides?.length ? cleanSlides : null }
     await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
     setSaving(false)
@@ -248,7 +263,8 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   async function handleSelesai() {
     setMarking(true)
     const now = new Date().toISOString()
-    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null }
+    const cleanSlides = isCarouselModal ? carouselSlides.filter(s => s.trim()) : null
+    const payload = { canva_url: canvaUrl || undefined, gdrive_url: gdriveUrl || undefined, preview_url: previewUrl || undefined, studio_notes: notes || undefined, status: 'Siap Tayang', studio_done_at: now, studio_completed_at: now, step_log: { ...buildStepLog(), editing_done_at: now }, assigned_produksi: assignedProduksi || null, carousel_slides: cleanSlides?.length ? cleanSlides : null }
     await supabase.from('kf_content_ideas').update(payload).eq('id', item.id)
     await supabase.from('kf_notifications').insert({ workspace_id: item.workspace_id, type: 'schedule', title: `Siap Schedule — ${item.judul}`, message: item.scheduled_date ? `Jadwal tayang: ${item.scheduled_date}` : 'Belum ada jadwal tayang', content_idea_id: item.id })
     await supabase.from('kf_notifications').update({ is_read: true }).eq('content_idea_id', item.id).eq('type', 'produksi')
@@ -390,8 +406,35 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
 
             {/* Editor section */}
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Canva Link</label><input value={canvaUrl} onChange={e => setCanvaUrl(e.target.value)} placeholder="https://www.canva.com/design/..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
-            <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Google Drive Link</label><input value={gdriveUrl} onChange={e => setGdriveUrl(e.target.value)} placeholder="https://drive.google.com/file/d/..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
-            <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Preview URL (thumbnail)</label><input value={previewUrl} onChange={e => setPreviewUrl(e.target.value)} placeholder="Link GDrive thumbnail..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
+            {isCarouselModal ? (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <label style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase' }}>Slide URLs (Google Drive)</label>
+                  <button type="button" onClick={() => setCarouselSlides(prev => [...prev, ''])} style={{ fontSize: '0.7rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: 'none', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontWeight: 600 }}>+ Tambah Slide</button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {carouselSlides.map((url, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#9ca3af', fontWeight: 700, minWidth: 20, textAlign: 'center' }}>{idx + 1}</span>
+                      <input
+                        value={url}
+                        onChange={e => setCarouselSlides(prev => prev.map((s, i) => i === idx ? e.target.value : s))}
+                        placeholder={`Link GDrive slide ${idx + 1}...`}
+                        style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' as const }}
+                      />
+                      {carouselSlides.length > 1 && (
+                        <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>×</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Google Drive Link</label><input value={gdriveUrl} onChange={e => setGdriveUrl(e.target.value)} placeholder="https://drive.google.com/file/d/..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
+                <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Preview URL (thumbnail)</label><input value={previewUrl} onChange={e => setPreviewUrl(e.target.value)} placeholder="Link GDrive thumbnail..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
+              </>
+            )}
             <div style={{ marginBottom: 20 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Catatan Studio</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Revisi, catatan untuk scheduler..." rows={3} style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} /></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <button onClick={handleSave} disabled={saving} style={{ padding: 10, background: '#f3f4f6', border: 'none', borderRadius: 8, color: '#111827', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Menyimpan...' : 'Simpan Progress'}</button>
