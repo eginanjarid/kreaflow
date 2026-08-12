@@ -530,6 +530,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
           message: `Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.`,
           content_idea_id: inserted.id,
         })
+        setPendingApprovalLocal(prev => [...prev, { id: inserted.id, judul, script: naskah, assigned_naskah: null, tanggal_tayang: tanggal_tayang || null, format: tipe, sprint_id: null, sprint_nama: null }])
       } else {
         await supabase.from('kf_notifications').insert({
           workspace_id: workspaceId,
@@ -577,6 +578,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       await supabase.from('kf_content_ideas').update({ script: affNaskah, status: targetStatus, judul: judulAktif, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', activeQueueId)
       if (needsApproval) {
         await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'naskah', title: `Naskah Menunggu Approval — ${judulAktif}`, message: 'Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.', content_idea_id: activeQueueId })
+        setPendingApprovalLocal(prev => [...prev, { id: activeQueueId, judul: judulAktif, script: affNaskah, assigned_naskah: activeItem?.assigned_naskah || null, tanggal_tayang: activeItem?.tanggal_tayang || null, format: activeItem?.format || null, sprint_id: activeItem?.sprint_id || null, sprint_nama: activeItem?.sprint_nama || null }])
       } else {
         await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
       }
@@ -611,6 +613,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: targetStatus, judul: judulAktif, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', activeQueueId)
       if (needsApproval) {
         await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'naskah', title: `Naskah Menunggu Approval — ${judulAktif}`, message: 'Naskah sudah ditulis dan menunggu review. Buka Plan untuk mereview.', content_idea_id: activeQueueId })
+        setPendingApprovalLocal(prev => [...prev, { id: activeQueueId, judul: judulAktif, script: generatedNaskah, assigned_naskah: activeItem?.assigned_naskah || null, tanggal_tayang: activeItem?.tanggal_tayang || null, format: activeItem?.format || null, sprint_id: activeItem?.sprint_id || null, sprint_nama: activeItem?.sprint_nama || null }])
       } else {
         await supabase.from('kf_notifications').insert({ workspace_id: workspaceId, type: 'produksi', title: `Naskah Siap — ${judulAktif}`, message: 'Naskah sudah siap. Buka Studio untuk mulai desain/produksi.', content_idea_id: activeQueueId })
       }
@@ -805,6 +808,33 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                         </button>
                       </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Tracking Naskah (non-approver: lihat status submission mereka) ── */}
+          {!isApprover && pendingApprovalLocal.length > 0 && (
+            <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f59e0b', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', borderBottom: '1px solid #fef3c7', background: '#fffbeb' }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span style={{ fontWeight: 700, color: '#92400e', fontSize: '0.875rem' }}>Menunggu Approval</span>
+                <span style={{ background: '#f59e0b', color: '#fff', borderRadius: 10, fontSize: '0.65rem', fontWeight: 700, padding: '1px 7px' }}>{pendingApprovalLocal.length}</span>
+                <span style={{ fontSize: '0.72rem', color: '#b45309', marginLeft: 'auto' }}>Naskah ini sedang direview oleh Manager</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {pendingApprovalLocal.map((item, idx) => (
+                  <div key={item.id} style={{ padding: '12px 16px', borderBottom: idx < pendingApprovalLocal.length - 1 ? '1px solid #f3f4f6' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.judul}</div>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+                        {item.format && <span style={{ fontSize: '0.65rem', color: '#6b7280', background: '#f3f4f6', borderRadius: 4, padding: '1px 6px' }}>{item.format}</span>}
+                        {item.sprint_nama && <span style={{ fontSize: '0.65rem', color: '#1a73e8', background: '#eff6ff', borderRadius: 4, padding: '1px 6px' }}>{item.sprint_nama}</span>}
+                        {item.tanggal_tayang && <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>📅 {new Date(item.tanggal_tayang + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#d97706', background: '#fef3c7', borderRadius: 6, padding: '3px 10px', flexShrink: 0, whiteSpace: 'nowrap' }}>⏳ Menunggu Review</span>
                   </div>
                 ))}
               </div>
@@ -1144,7 +1174,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {generatedNaskah && (
                     <button type="button" onClick={saveToLibrary}
                       style={{ background: savedToLibrary ? 'rgba(52,211,153,0.15)' : 'rgba(26,115,232,0.12)', border: `1px solid ${savedToLibrary ? '#059669' : '#1a73e8'}`, borderRadius: 8, padding: '7px 14px', color: savedToLibrary ? '#059669' : '#1a73e8', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-                      {savedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
+                      {savedToLibrary ? (needsApproval ? '✓ Terkirim, menunggu approval' : '✓ Tersimpan di Library') : (needsApproval ? 'Submit untuk Review' : 'Simpan ke Library')}
                     </button>
                   )}
                 </div>
@@ -1452,7 +1482,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   {affNaskah && (
                     <button type="button" onClick={saveAffToLibrary}
                       style={{ background: affSavedToLibrary ? '#059669' : '#6366f1', border: 'none', borderRadius: 8, padding: '7px 14px', color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-                      {affSavedToLibrary ? '✓ Tersimpan di Library' : 'Simpan ke Library'}
+                      {affSavedToLibrary ? (needsApproval ? '✓ Terkirim, menunggu approval' : '✓ Tersimpan di Library') : (needsApproval ? 'Submit untuk Review' : 'Simpan ke Library')}
                     </button>
                   )}
                 </div>

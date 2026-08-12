@@ -26,9 +26,7 @@ export default async function PlanPage() {
     supabase.from('kf_content_ideas').select('id,judul,status,product_id,sprint_id,format,platform,assigned_naskah,script,tanggal_tayang,jam_tayang,plan_started_at,plan_completed_at,revisi_notes,kf_sprints(nama,step_config)').eq('workspace_id', wsId).in('status', ['Draft', 'Revisi']),
     supabase.from('kf_content_pillars').select('id,nama').eq('workspace_id', wsId).order('urutan', { ascending: true }),
     supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
-    isApprover
-      ? supabase.from('kf_content_ideas').select('id,judul,script,assigned_naskah,tanggal_tayang,format,sprint_id,kf_sprints(nama)').eq('workspace_id', wsId).eq('status', 'Menunggu Approval').order('created_at', { ascending: true })
-      : Promise.resolve({ data: [] }),
+    supabase.from('kf_content_ideas').select('id,judul,script,assigned_naskah,tanggal_tayang,format,sprint_id,kf_sprints(nama)').eq('workspace_id', wsId).eq('status', 'Menunggu Approval').order('created_at', { ascending: true }),
   ])
 
   if (wsData?.plan !== 'lifetime') redirect('/upgrade')
