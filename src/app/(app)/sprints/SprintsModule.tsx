@@ -2169,9 +2169,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
       {/* ── Detail Modal ────────────────────────────────────────────────────── */}
       {detailItem && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 440 }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 76px) 16px' }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, width: '100%', maxWidth: 440, display: 'flex', flexDirection: 'column', maxHeight: 'calc(100dvh - 32px)', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
               <div>
                 {detailItem.product_id && (
                   <div style={{ fontSize: '0.68rem', fontWeight: 700, color: productColorMap[detailItem.product_id], marginBottom: 4 }}>
@@ -2188,6 +2188,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <button onClick={() => setDetailItem(null)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
 
+            <div style={{ overflowY: 'auto', flex: 1 }}>
             {/* Step checklist */}
             <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5eaf2' }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Checklist</div>
@@ -2325,6 +2326,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 style={{ width: '100%', background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer' }}>
                 Hapus dari Sprint
               </button>
+            </div>
             </div>
           </div>
         </div>
