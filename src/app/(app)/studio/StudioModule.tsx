@@ -575,13 +575,18 @@ export default function StudioModule({ initialContents, products, initialNotific
     const channel = supabase.channel('studio-content-changes')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'kf_content_ideas', filter: `workspace_id=eq.${workspaceId}` }, payload => {
         const updated = payload.new as ContentItem
+        const studioStatuses = ['Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang']
         setContents(prev => {
-          const exists = prev.find(c => c.id === updated.id)
+          const exists = prev.some(c => c.id === updated.id)
           if (exists) {
-            if (['Naskah Siap', 'Produksi', 'Siap Tayang', 'Terjadwal', 'Tayang'].includes(updated.status)) {
+            if (studioStatuses.includes(updated.status)) {
               return prev.map(c => c.id === updated.id ? { ...c, ...updated } : c)
             }
             return prev.filter(c => c.id !== updated.id)
+          }
+          // Item baru masuk Studio (baru di-approve dari Plan)
+          if (studioStatuses.includes(updated.status)) {
+            return [...prev, updated]
           }
           return prev
         })
