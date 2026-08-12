@@ -408,10 +408,16 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
-  // Unique pillars in this sprint — use pillar_id (not title parsing)
+  // Unique pillars in this sprint — use pillar_id; fallback to title-prefix matching against known pillars
   const sprintPillarsForFilter = useMemo(() => {
-    const ids = [...new Set(sprintContents.map(c => c.pillar_id).filter(Boolean) as string[])]
-    return ids.map(id => pillars.find(p => p.id === id)).filter(Boolean) as { id: string; nama: string }[]
+    const withId = sprintContents.filter(c => c.pillar_id)
+    if (withId.length > 0) {
+      const ids = [...new Set(withId.map(c => c.pillar_id) as string[])]
+      return ids.map(id => pillars.find(p => p.id === id)).filter(Boolean) as { id: string; nama: string }[]
+    }
+    // Fallback: extract prefix before em/en dash, match against known pillar names
+    const prefixes = [...new Set(sprintContents.map(c => c.judul.split(/\s*[—–]\s*/)[0].trim()))]
+    return prefixes.map(name => pillars.find(p => p.nama === name)).filter(Boolean) as { id: string; nama: string }[]
   }, [sprintContents, pillars])
   const steps = selectedSprint ? getTemplateSteps(selectedSprint.template_type) : []
   // Merge step_config (deadline + memberName) into steps for display
@@ -435,7 +441,15 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   const filtered = sprintContents.filter(c => {
     if (filterProduct && c.product_id !== filterProduct) return false
-    if (filterPillar && c.pillar_id !== filterPillar) return false
+    if (filterPillar) {
+      if (c.pillar_id) {
+        if (c.pillar_id !== filterPillar) return false
+      } else {
+        const pillar = pillars.find(p => p.id === filterPillar)
+        const prefix = c.judul.split(/\s*[—–]\s*/)[0].trim()
+        if (!pillar || prefix !== pillar.nama) return false
+      }
+    }
     if (search && !c.judul.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
