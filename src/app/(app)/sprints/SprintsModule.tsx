@@ -1609,7 +1609,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
                     <span style={{ fontSize: '0.72rem', color: '#d1d5db' }}>·</span>
-                    <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{sprintContents.length}/{selectedSprint.target_konten} konten</span>
+                    <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{totalDone}/{sprintContents.length} konten selesai</span>
                     <span style={{ fontSize: '0.72rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8' }}>{totalPct}%</span>
                     <div style={{ width: 60, height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${totalPct}%`, background: totalPct === 100 ? '#059669' : '#1a73e8', borderRadius: 4, transition: 'width 0.3s' }} />
@@ -1729,10 +1729,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
                   <input type="date" style={fieldStyle()} value={editSprintForm.end_date} onChange={e => setEditSprintForm(f => ({ ...f, end_date: e.target.value }))} />
                 </div>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Target Konten</label>
-                <input type="number" min={1} style={fieldStyle()} value={editSprintForm.target_konten} onChange={e => setEditSprintForm(f => ({ ...f, target_konten: parseInt(e.target.value) || 1 }))} />
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4 }}>
                 <button onClick={() => setEditSprintModal(false)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 16px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
