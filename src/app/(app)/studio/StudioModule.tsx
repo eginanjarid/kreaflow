@@ -227,6 +227,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const [folderUrl, setFolderUrl] = useState('')
   const [fetchingFolder, setFetchingFolder] = useState(false)
   const [folderError, setFolderError] = useState('')
+  const [manualSlideInput, setManualSlideInput] = useState('')
   const [notes, setNotes] = useState(item.studio_notes || '')
   const [saving, setSaving] = useState(false)
   const [marking, setMarking] = useState(false)
@@ -403,7 +404,6 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
                 </div>
               </div>
             )}
-            </div>
 
             {/* Editor section */}
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Canva Link</label><input value={canvaUrl} onChange={e => setCanvaUrl(e.target.value)} placeholder="https://www.canva.com/design/..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
@@ -436,18 +436,19 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
                       <button type="button" onClick={() => setCarouselSlides([])} style={{ fontSize: '0.68rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Hapus semua</button>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 8 }}>
-                      {carouselSlides.map((url, idx) => url.trim() ? (
-                        <div key={idx} style={{ position: 'relative', aspectRatio: '1 / 1', borderRadius: 7, overflow: 'hidden', background: '#f3f4f6' }}>
-                          <img
-                            src={(() => { const id = extractGdriveId(url); return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w200` : url })()}
-                            alt={`Slide ${idx + 1}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          />
-                          <div style={{ position: 'absolute', top: 3, left: 4, background: 'rgba(0,0,0,0.55)', borderRadius: 4, padding: '1px 5px', fontSize: '0.58rem', color: '#fff', fontWeight: 700 }}>{idx + 1}</div>
-                          <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== idx))}
-                            style={{ position: 'absolute', top: 3, right: 3, background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: 4, width: 18, height: 18, color: '#fff', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>×</button>
-                        </div>
-                      ) : null)}
+                      {carouselSlides.map((url, idx) => {
+                        if (!url.trim()) return null
+                        const gid = extractGdriveId(url)
+                        const thumbSrc = gid ? `https://drive.google.com/thumbnail?id=${gid}&sz=w200` : url
+                        return (
+                          <div key={idx} style={{ position: 'relative', aspectRatio: '1 / 1', borderRadius: 7, overflow: 'hidden', background: '#f3f4f6' }}>
+                            <img src={thumbSrc} alt={`Slide ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <div style={{ position: 'absolute', top: 3, left: 4, background: 'rgba(0,0,0,0.55)', borderRadius: 4, padding: '1px 5px', fontSize: '0.58rem', color: '#fff', fontWeight: 700 }}>{idx + 1}</div>
+                            <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== idx))}
+                              style={{ position: 'absolute', top: 3, right: 3, background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: 4, width: 18, height: 18, color: '#fff', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>×</button>
+                          </div>
+                        )
+                      })}
                     </div>
                   </>
                 ) : (
@@ -457,25 +458,18 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
                 )}
 
                 {/* Manual add (secondary) */}
-                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 5 }}>
-                  {carouselSlides.filter(s => !s.trim()).map((_, emptyCount) => {
-                    let seen = 0
-                    const realIdx = carouselSlides.findIndex(s => { if (!s.trim()) { if (seen === emptyCount) return true; seen++ } return false })
-                    return (
-                      <div key={emptyCount} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <input
-                          value={carouselSlides[realIdx] || ''}
-                          onChange={e => setCarouselSlides(prev => prev.map((s, i) => i === realIdx ? e.target.value : s))}
-                          placeholder="Link GDrive slide individual..."
-                          style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' as const }}
-                        />
-                        <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== realIdx))} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>×</button>
-                      </div>
-                    )
-                  })}
-                  <button type="button" onClick={() => setCarouselSlides(prev => [...prev, ''])}
-                    style={{ background: 'none', border: '1px dashed #d1d5db', borderRadius: 8, padding: '6px', color: '#9ca3af', fontSize: '0.72rem', cursor: 'pointer', textAlign: 'center' as const, width: '100%' }}>
-                    + Tambah slide manual
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <input
+                    value={manualSlideInput}
+                    onChange={e => setManualSlideInput(e.target.value)}
+                    placeholder="+ Tambah link GDrive slide manual..."
+                    style={{ flex: 1, background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: 8, padding: '7px 10px', color: '#374151', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }}
+                  />
+                  <button type="button"
+                    onClick={() => { if (manualSlideInput.trim()) { setCarouselSlides(prev => [...prev, manualSlideInput.trim()]); setManualSlideInput('') } }}
+                    disabled={!manualSlideInput.trim()}
+                    style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#374151', fontSize: '0.75rem', fontWeight: 600, cursor: manualSlideInput.trim() ? 'pointer' : 'not-allowed', opacity: manualSlideInput.trim() ? 1 : 0.5 }}>
+                    Tambah
                   </button>
                 </div>
               </div>
