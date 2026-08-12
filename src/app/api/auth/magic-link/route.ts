@@ -9,13 +9,35 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServiceClient()
 
-  // Check user exists (shouldCreateUser = false)
-  const { data: { users } } = await supabase.auth.admin.listUsers()
-  const exists = users.some((u: { email?: string }) => u.email === email)
-  if (!exists) {
+  const { data: { users } } = await supabase.auth.admin.listUsers({ perPage: 1000 })
+  const existingUser = users.find((u: { email?: string }) => u.email === email)
+
+  if (!existingUser) {
     return NextResponse.json(
       { error: 'Email ini belum terdaftar. Silakan beli akses KreaFlow terlebih dahulu.' },
       { status: 400 }
+    )
+  }
+
+  // Cek apakah user punya product_access kreaflow
+  const { data: userAccess } = await supabase
+    .from('product_access')
+    .select('app, expires_at')
+    .eq('user_id', existingUser.id)
+    .eq('app', 'kreaflow')
+    .maybeSingle()
+
+  if (!userAccess) {
+    return NextResponse.json(
+      { error: 'Akun ini belum punya akses KreaFlow. Silakan beli akses terlebih dahulu.' },
+      { status: 403 }
+    )
+  }
+
+  if (userAccess.expires_at && new Date(userAccess.expires_at) < new Date()) {
+    return NextResponse.json(
+      { error: 'Akses KreaFlow sudah kedaluwarsa.' },
+      { status: 403 }
     )
   }
 
