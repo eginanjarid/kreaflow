@@ -6,8 +6,10 @@ import { fetchPricingConfig } from '@/lib/pricing'
 
 export default async function LandingPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (user) redirect('/sprints')
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) redirect('/sprints')
+  } catch { /* expired/invalid token — stay on landing */ }
 
   const admin = createAdmin(
     process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
