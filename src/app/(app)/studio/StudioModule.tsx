@@ -838,30 +838,27 @@ export default function StudioModule({ initialContents, products, initialNotific
 
       {/* Search + Filter bar — cards view only */}
       {viewMode === 'cards' && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ position: 'relative', flex: '1 1 180px', minWidth: 140 }}>
-            <svg style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 14, alignItems: 'center' }}>
+          <div style={{ position: 'relative', flex: '1 1 0', minWidth: 0 }}>
+            <svg style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Cari judul..."
-              style={{ width: '100%', paddingLeft: 32, paddingRight: 10, paddingTop: 7, paddingBottom: 7, border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.82rem', color: '#111827', outline: 'none', background: '#fff', boxSizing: 'border-box' }} />
+              style={{ width: '100%', paddingLeft: 28, paddingRight: 8, paddingTop: 6, paddingBottom: 6, border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.8rem', color: '#111827', outline: 'none', background: '#fff', boxSizing: 'border-box' }} />
           </div>
           <select value={filterFormat} onChange={e => setFilterFormat(e.target.value)}
-            style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.82rem', color: filterFormat ? '#111827' : '#9ca3af', background: '#fff', cursor: 'pointer' }}>
-            <option value="">Semua Format</option>
+            style={{ padding: '6px 8px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.78rem', color: filterFormat ? '#111827' : '#9ca3af', background: '#fff', cursor: 'pointer', flexShrink: 0 }}>
+            <option value="">Format</option>
             {allFormats.map(f => <option key={f} value={f}>{f}</option>)}
           </select>
           <select value={filterPlatform} onChange={e => setFilterPlatform(e.target.value)}
-            style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.82rem', color: filterPlatform ? '#111827' : '#9ca3af', background: '#fff', cursor: 'pointer' }}>
-            <option value="">Semua Platform</option>
+            style={{ padding: '6px 8px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.78rem', color: filterPlatform ? '#111827' : '#9ca3af', background: '#fff', cursor: 'pointer', flexShrink: 0 }}>
+            <option value="">Platform</option>
             {allPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
           {(searchQ || filterFormat || filterPlatform) && (
             <button onClick={() => { setSearchQ(''); setFilterFormat(''); setFilterPlatform('') }}
-              style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.78rem', color: '#6b7280', background: '#f3f4f6', cursor: 'pointer' }}>
+              style={{ padding: '6px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.75rem', color: '#6b7280', background: '#f3f4f6', cursor: 'pointer', flexShrink: 0 }}>
               Reset
             </button>
-          )}
-          {(searchQ || filterFormat || filterPlatform) && (
-            <span style={{ fontSize: '0.78rem', color: '#6b7280' }}>{displayItems.length} konten</span>
           )}
         </div>
       )}
