@@ -4,7 +4,7 @@ import { ISearch, IPen, IVideo, IFilm, IScissors, ICalendar, STEP_ICON_MAP } fro
 import { showToast } from '@/components/ui/Toast'
 import { getAccess } from '@/lib/jabatan-access'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -308,6 +308,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         filter: `workspace_id=eq.${workspaceId}`,
       }, (payload) => {
         const added = payload.new as Sprint
+        if (pendingDeleteIds.current.has(added.id)) return
         setSprints(prev => prev.some(s => s.id === added.id) ? prev : [...prev, added])
       })
       .on('postgres_changes', {
@@ -396,6 +397,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
     }
     backfillSprintNotifs()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track sprint IDs yang sedang dalam proses delete (undo window) — ignore realtime INSERT untuk ID ini
+  const pendingDeleteIds = useRef<Set<string>>(new Set())
 
   const [sprints, setSprints] = useState<Sprint[]>(initialSprints)
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
@@ -835,10 +839,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
   function doDeleteSprint(sprintId: string, sprintName: string, sprint: Sprint, sprintContentsToDelete: ContentItem[]) {
     if (deleteUndo) {
       clearTimeout(deleteUndo.timeoutId)
+      pendingDeleteIds.current.delete(deleteUndo.sprintId)
       supabase.from('kf_content_ideas').delete().eq('sprint_id', deleteUndo.sprintId)
       supabase.from('kf_sprints').delete().eq('id', deleteUndo.sprintId)
     }
 
+    pendingDeleteIds.current.add(sprintId)
     setSprints(prev => prev.filter(s => s.id !== sprintId))
     setContents(prev => prev.filter(c => c.sprint_id !== sprintId))
     if (selectedSprintId === sprintId) setSelectedSprintId(sprints.find(s => s.id !== sprintId)?.id || null)
@@ -847,6 +853,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
       ;(async () => {
         await supabase.from('kf_content_ideas').delete().eq('sprint_id', sprintId)
         await supabase.from('kf_sprints').delete().eq('id', sprintId)
+        pendingDeleteIds.current.delete(sprintId)
         setDeleteUndo(null)
       })()
     }, 5000)
@@ -871,6 +878,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   function cancelDelete() {
     if (!deleteUndo) return
     clearTimeout(deleteUndo.timeoutId)
+    pendingDeleteIds.current.delete(deleteUndo.sprintId)
     setSprints(prev => [...prev, deleteUndo.sprint].sort((a, b) => b.start_date.localeCompare(a.start_date)))
     setContents(prev => [...prev, ...deleteUndo.contents])
     setSelectedSprintId(deleteUndo.sprintId)
