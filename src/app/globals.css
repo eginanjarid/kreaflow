@@ -193,6 +193,9 @@ body {
   .kf-drawer { width: 100vw !important; max-width: 340px; }
   /* Topbar: reduce side padding on mobile */
   .kf-topbar { padding: 0 14px !important; }
+  /* Detail modal: shrink to fit above bottom nav */
+  .kf-detail-modal-overlay { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px) !important; }
+  .kf-detail-modal { max-height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px) - 32px) !important; }
 }
 
 input, textarea, select {
