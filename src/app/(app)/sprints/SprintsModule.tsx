@@ -190,6 +190,19 @@ const CONTENT_TYPE_PLATFORMS: Record<string, string[]> = {
   'Shorts':         ['YouTube'],
   'Feed/Carousel':  ['Instagram', 'Facebook'],
 }
+
+// Label platform per format — karena setiap platform punya nama konten berbeda
+const FORMAT_PLATFORM_LABEL: Record<string, Record<string, string>> = {
+  'Video Pendek': { 'TikTok': 'TikTok', 'Instagram': 'Reels', 'YouTube': 'Shorts' },
+  'Video Panjang': { 'YouTube': 'YouTube' },
+  'Live Script':  { 'TikTok': 'TikTok Live', 'Instagram': 'IG Live', 'YouTube': 'YT Live', 'Facebook': 'FB Live' },
+  'Live':         { 'TikTok': 'TikTok Live', 'Instagram': 'IG Live', 'YouTube': 'YT Live', 'Facebook': 'FB Live' },
+  'Story':        { 'Instagram': 'IG Story', 'Facebook': 'FB Story' },
+  'Text':         { 'Twitter/X': 'Thread', 'Threads': 'Threads', 'Facebook': 'Facebook Post' },
+  'Carousel':     { 'Instagram': 'IG Carousel', 'Facebook': 'FB Carousel' },
+  'Single Post':  { 'Instagram': 'IG Post', 'Facebook': 'FB Post' },
+}
+
 const PRIORITIES = ['High', 'Medium', 'Low']
 const PRIORITY_COLOR: Record<string, string> = { High: '#dc2626', Medium: '#d97706', Low: '#059669' }
 const PRODUCT_COLORS = ['#1a73e8','#059669','#dc2626','#d97706','#0284c7','#be185d','#047857','#0369a1']
@@ -2082,7 +2095,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                                   return { ...p, [idx]: { ...p[idx], slots } }
                                                 })}
                                                 style={{ fontSize: '0.6rem', padding: '2px 7px', borderRadius: 8, border: `1.5px solid ${isSelected ? '#1a73e8' : hasAkun ? '#d1d5db' : '#e5e7eb'}`, background: isSelected ? 'rgba(26,115,232,0.1)' : '#f9fafb', color: isSelected ? '#1a73e8' : hasAkun ? '#374151' : '#c4c9d4', fontWeight: isSelected ? 700 : 400, cursor: 'pointer', transition: 'all 0.1s' }}>
-                                                {plt}
+                                                {FORMAT_PLATFORM_LABEL[slot.format]?.[plt] || plt}
                                               </button>
                                             )
                                           })}
