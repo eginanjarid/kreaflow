@@ -12,6 +12,18 @@ export async function POST(req: NextRequest) {
 
   const superAdmin = await isSuperAdmin(user.email!)
 
+  // Non-superadmin harus punya product_access kreaflow
+  if (!superAdmin) {
+    const { data: access } = await supabase
+      .from('product_access')
+      .select('app')
+      .eq('user_id', user.id)
+      .eq('app', 'kreaflow')
+      .maybeSingle()
+
+    if (!access) return NextResponse.json({ error: 'Akses KreaFlow diperlukan' }, { status: 403 })
+  }
+
   if (!superAdmin) {
     // Enforce workspace limit: find user's owned workspaces
     const { data: memberRows } = await supabase
