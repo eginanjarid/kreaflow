@@ -441,7 +441,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   })
 
   const colItems = (colId: string) => filtered.filter(c => getColFromStatus(c.status) === colId)
-  const totalDone = sprintContents.filter(c => c.status === 'Tayang').length
+  const totalDone = sprintContents.filter(c => c.status === 'Tayang' || c.status === 'Terjadwal').length
   const totalPct = sprintContents.length > 0 ? Math.round((totalDone / sprintContents.length) * 100) : 0
 
   function initStepsFromTemplate(tpl: string) {
@@ -1524,7 +1524,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
             {sprints.length === 0 && <div style={{ fontSize: '0.78rem', color: '#9ca3af', padding: '24px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
             {sprints.map(s => {
               const sc = contents.filter(c => c.sprint_id === s.id)
-              const done = sc.filter(c => c.status === 'Tayang').length
+              const done = sc.filter(c => c.status === 'Tayang' || c.status === 'Terjadwal').length
               const active = s.id === selectedSprintId
               const today = localToday()
               const isCurrent = s.start_date <= today && s.end_date >= today
