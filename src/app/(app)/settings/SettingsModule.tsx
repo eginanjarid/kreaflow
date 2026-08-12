@@ -28,6 +28,7 @@ type Props = {
   userEmail: string
   userName: string
   plan: string
+  googleDriveApiKey: string
   myRole: string
   members: Member[]
   pendingInvites: PendingInvite[]
@@ -38,8 +39,12 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
+export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
   const [tab, setTab] = useState('workspace')
+  const [gdKey, setGdKey] = useState(initialGDKey)
+  const [gdKeySaving, setGdKeySaving] = useState(false)
+  const [gdKeyMsg, setGdKeyMsg] = useState('')
+  const [gdKeyVisible, setGdKeyVisible] = useState(false)
   const [wsName, setWsName] = useState(workspaceName)
   const [displayName, setDisplayName] = useState(userName === userEmail ? '' : userName)
   const [wsSaving, setWsSaving] = useState(false)
@@ -172,6 +177,18 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     setTimeout(() => setPwdMsg(''), 4000)
   }
 
+  async function saveGdKey() {
+    setGdKeySaving(true)
+    setGdKeyMsg('')
+    const supabase = createClient()
+    const { error } = await supabase.from('kf_workspaces').update({ google_drive_api_key: gdKey.trim() || null }).eq('id', workspaceId)
+    setGdKeySaving(false)
+    if (error) { setGdKeyMsg('Gagal menyimpan'); return }
+    showToast('API key tersimpan!', 'success')
+    setGdKeyMsg('Tersimpan!')
+    setTimeout(() => setGdKeyMsg(''), 3000)
+  }
+
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
@@ -182,7 +199,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Tabs */}
       <div className="kf-tabs-wrap">
         <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #e5eaf2' }}>
-          {[{ id: 'workspace', label: 'Workspace' }, { id: 'tim', label: 'Tim' }, { id: 'akun', label: 'Akun' }].map(t => (
+          {[{ id: 'workspace', label: 'Workspace' }, { id: 'tim', label: 'Tim' }, { id: 'integrasi', label: 'Integrasi' }, { id: 'akun', label: 'Akun' }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1, flexShrink: 0, whiteSpace: 'nowrap' }}>
               {t.label}
@@ -388,6 +405,51 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Integrasi Tab */}
+      {tab === 'integrasi' && (
+        <div style={{ maxWidth: 480 }}>
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="#4285F4"/></svg>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111827' }}>Google Drive API</div>
+            </div>
+            <p style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 16, lineHeight: 1.6 }}>
+              Digunakan untuk import slide carousel langsung dari folder Google Drive. Folder harus di-share publik (Anyone with link).
+            </p>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>API Key</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  type={gdKeyVisible ? 'text' : 'password'}
+                  value={gdKey}
+                  onChange={e => setGdKey(e.target.value)}
+                  placeholder="AIzaSy..."
+                  style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, fontFamily: gdKeyVisible ? 'monospace' : 'inherit' }}
+                />
+                <button type="button" onClick={() => setGdKeyVisible(v => !v)}
+                  style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '0 14px', cursor: 'pointer', color: '#6b7280', fontSize: '0.78rem', flexShrink: 0 }}>
+                  {gdKeyVisible ? 'Sembunyikan' : 'Lihat'}
+                </button>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button onClick={saveGdKey} disabled={gdKeySaving}
+                style={{ background: gdKeySaving ? '#9ca3af' : '#1a73e8', border: 'none', borderRadius: 10, padding: '10px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: gdKeySaving ? 'not-allowed' : 'pointer' }}>
+                {gdKeySaving ? 'Menyimpan...' : 'Simpan'}
+              </button>
+              {gdKeyMsg && <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 600 }}>{gdKeyMsg}</span>}
+              {gdKey && <button type="button" onClick={() => { setGdKey(''); saveGdKey() }} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.78rem', cursor: 'pointer' }}>Hapus key</button>}
+            </div>
+            <div style={{ marginTop: 16, padding: '12px 14px', background: '#f8fafc', borderRadius: 10, fontSize: '0.75rem', color: '#6b7280', lineHeight: 1.7 }}>
+              <strong>Cara dapat API key:</strong><br />
+              1. Buka <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" style={{ color: '#1a73e8' }}>Google Cloud Console</a><br />
+              2. Enable Google Drive API → Create Credentials → API Key<br />
+              3. Restrict ke "Google Drive API" → Create → Copy
+            </div>
+          </div>
         </div>
       )}
 
