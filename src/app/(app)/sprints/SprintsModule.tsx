@@ -683,6 +683,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
     }})
   }
 
+  function deleteContent(id: string) {
+    setConfirmModal({ message: 'Hapus konten ini? Tindakan ini tidak bisa dibatalkan.', onConfirm: async () => {
+      await supabase.from('kf_content_ideas').delete().eq('id', id)
+      setContents(prev => prev.filter(c => c.id !== id))
+      if (detailItem?.id === id) setDetailItem(null)
+    }})
+  }
+
   async function saveJadwal() {
     if (!detailItem) return
     setSavingJadwal(true)
@@ -1623,7 +1631,8 @@ export default function SprintsModule({ initialSprints, initialContents, product
                               setDetailJadwal({ date: item.tanggal_tayang || '', time: item.jam_tayang || '18:00' })
                               setDetailPerf({ views: String(item.perf_views || ''), likes: String(item.perf_likes || ''), komentar: String(item.perf_komentar || ''), shares: String(item.perf_shares || '') })
                             }}
-                            onStepDone={(step) => advanceToStep(item, step)} />
+                            onStepDone={(step) => advanceToStep(item, step)}
+                            onDelete={canEdit ? () => deleteContent(item.id) : undefined} />
                         ))}
                         {items.length === 0 && col.id === 'todo' && sprintContents.length === 0 && (
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '28px 16px', border: '2px dashed #e5e7eb', borderRadius: 12, margin: '4px 0' }}>
@@ -2435,18 +2444,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
   )
 }
 
-function ContentCard({ item, steps, productName, productColor, onClick, onStepDone }: {
+function ContentCard({ item, steps, productName, productColor, onClick, onStepDone, onDelete }: {
   item: ContentItem
   steps: (StepDef & { deadline?: string; memberName?: string })[]
   productName: string | null
   productColor: string
   onClick: () => void
   onStepDone: (step: StepDef) => void
+  onDelete?: () => void
 }) {
   const nextStepIdx = steps.findIndex(s => !isStepDone(item.status, s.doneAt))
 
   return (
-    <div className="kf-card" style={{ background: '#fff', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)' }}>
+    <div className="kf-card" style={{ position: 'relative', background: '#fff', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)' }}>
+      {onDelete && (
+        <button type="button" onClick={e => { e.stopPropagation(); onDelete() }} title="Hapus konten"
+          style={{ position: 'absolute', top: 8, right: 8, background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.7rem', cursor: 'pointer', padding: '2px 5px', borderRadius: 4, lineHeight: 1, zIndex: 1 }}>
+          ✕
+        </button>
+      )}
       <div onClick={onClick}>
         {productName && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5 }}>
