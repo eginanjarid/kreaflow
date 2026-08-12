@@ -2459,11 +2459,11 @@ function ContentCard({ item, steps, productName, productColor, onClick, onStepDo
     <div className="kf-card" style={{ position: 'relative', background: '#fff', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06)' }}>
       {onDelete && (
         <button type="button" onClick={e => { e.stopPropagation(); onDelete() }} title="Hapus konten"
-          style={{ position: 'absolute', top: 8, right: 8, background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.7rem', cursor: 'pointer', padding: '2px 5px', borderRadius: 4, lineHeight: 1, zIndex: 1 }}>
+          style={{ position: 'absolute', top: 10, right: 10, background: '#f3f4f6', border: 'none', color: '#9ca3af', fontSize: '0.65rem', cursor: 'pointer', padding: '3px 6px', borderRadius: 4, lineHeight: 1, zIndex: 1 }}>
           ✕
         </button>
       )}
-      <div onClick={onClick}>
+      <div onClick={onClick} style={{ paddingRight: onDelete ? 22 : 0 }}>
         {productName && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5 }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: productColor, flexShrink: 0 }} />
