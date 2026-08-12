@@ -1634,6 +1634,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
                       {sprintPillarsForFilter.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
                   )}
+                  {!isAffiliate && sprintPillarsForFilter.length === 1 && (
+                    <span style={{ fontSize: '0.72rem', padding: '4px 10px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600, border: '1px solid rgba(26,115,232,0.15)', whiteSpace: 'nowrap' }}>
+                      {sprintPillarsForFilter[0].nama}
+                    </span>
+                  )}
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari konten..."
                     style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: '#111827', fontSize: '0.75rem', outline: 'none', width: 130 }} />
                   <button onClick={() => setReportOpen(true)}
