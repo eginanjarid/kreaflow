@@ -222,7 +222,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
   const [previewUrl, setPreviewUrl] = useState(item.preview_url || '')
   const isCarouselModal = (item.format || '').toLowerCase().includes('carousel')
   const [carouselSlides, setCarouselSlides] = useState<string[]>(
-    item.carousel_slides?.length ? item.carousel_slides : ['']
+    item.carousel_slides?.filter(s => s && !s.includes('/folders/')) || []
   )
   const [folderUrl, setFolderUrl] = useState('')
   const [fetchingFolder, setFetchingFolder] = useState(false)
@@ -426,9 +426,9 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
             <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Canva Link</label><input value={canvaUrl} onChange={e => setCanvaUrl(e.target.value)} placeholder="https://www.canva.com/design/..." style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '9px 12px', color: '#111827', fontSize: '0.82rem', outline: 'none', boxSizing: 'border-box' }} /></div>
             {isCarouselModal ? (
               <div style={{ marginBottom: 12 }}>
-                {/* Folder auto-import */}
+                {/* Folder import — primary */}
                 <div style={{ marginBottom: 10, background: 'rgba(26,115,232,0.05)', border: '1px solid rgba(26,115,232,0.15)', borderRadius: 10, padding: '10px 12px' }}>
-                  <label style={{ display: 'block', fontSize: '0.68rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>Import dari Folder Google Drive</label>
+                  <label style={{ display: 'block', fontSize: '0.68rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>Import Slides dari Google Drive</label>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <input
                       value={folderUrl}
@@ -438,32 +438,62 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate }: { 
                     />
                     <button type="button" onClick={fetchFolderSlides} disabled={!folderUrl || fetchingFolder}
                       style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: (!folderUrl || fetchingFolder) ? 'not-allowed' : 'pointer', opacity: (!folderUrl || fetchingFolder) ? 0.6 : 1, whiteSpace: 'nowrap' as const }}>
-                      {fetchingFolder ? '...' : 'Ambil Slides'}
+                      {fetchingFolder ? 'Memuat...' : 'Ambil Slides'}
                     </button>
                   </div>
                   {folderError && <div style={{ fontSize: '0.72rem', color: '#ef4444', marginTop: 5 }}>{folderError}</div>}
-                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 5 }}>Folder harus di-share publik (Anyone with link)</div>
+                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 5 }}>API key otomatis dari Settings → Integrasi · Folder harus publik (Anyone with link)</div>
                 </div>
-                {/* Manual slide inputs */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <label style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase' }}>Slide URLs ({carouselSlides.filter(s => s.trim()).length} slide)</label>
-                  <button type="button" onClick={() => setCarouselSlides(prev => [...prev, ''])} style={{ fontSize: '0.7rem', color: '#1a73e8', background: 'rgba(26,115,232,0.08)', border: 'none', borderRadius: 6, padding: '3px 9px', cursor: 'pointer', fontWeight: 600 }}>+ Tambah</button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {carouselSlides.map((url, idx) => (
-                    <div key={idx} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.68rem', color: '#9ca3af', fontWeight: 700, minWidth: 20, textAlign: 'center' }}>{idx + 1}</span>
-                      <input
-                        value={url}
-                        onChange={e => setCarouselSlides(prev => prev.map((s, i) => i === idx ? e.target.value : s))}
-                        placeholder={`Link GDrive slide ${idx + 1}...`}
-                        style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' as const }}
-                      />
-                      {carouselSlides.length > 1 && (
-                        <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>×</button>
-                      )}
+
+                {/* Slides — thumbnail grid */}
+                {carouselSlides.filter(s => s.trim()).length > 0 ? (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span style={{ fontSize: '0.72rem', color: '#374151', fontWeight: 600 }}>{carouselSlides.filter(s => s.trim()).length} Slide Siap</span>
+                      <button type="button" onClick={() => setCarouselSlides([])} style={{ fontSize: '0.68rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Hapus semua</button>
                     </div>
-                  ))}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 8 }}>
+                      {carouselSlides.map((url, idx) => url.trim() ? (
+                        <div key={idx} style={{ position: 'relative', aspectRatio: '1 / 1', borderRadius: 7, overflow: 'hidden', background: '#f3f4f6' }}>
+                          <img
+                            src={(() => { const id = extractGdriveId(url); return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w200` : url })()}
+                            alt={`Slide ${idx + 1}`}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                          <div style={{ position: 'absolute', top: 3, left: 4, background: 'rgba(0,0,0,0.55)', borderRadius: 4, padding: '1px 5px', fontSize: '0.58rem', color: '#fff', fontWeight: 700 }}>{idx + 1}</div>
+                          <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== idx))}
+                            style={{ position: 'absolute', top: 3, right: 3, background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: 4, width: 18, height: 18, color: '#fff', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>×</button>
+                        </div>
+                      ) : null)}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ textAlign: 'center' as const, padding: '14px 0', color: '#9ca3af', fontSize: '0.78rem', background: '#f9fafb', borderRadius: 8, marginBottom: 8 }}>
+                    Belum ada slide — import dari folder di atas
+                  </div>
+                )}
+
+                {/* Manual add (secondary) */}
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 5 }}>
+                  {carouselSlides.filter(s => !s.trim()).map((_, emptyCount) => {
+                    let seen = 0
+                    const realIdx = carouselSlides.findIndex(s => { if (!s.trim()) { if (seen === emptyCount) return true; seen++ } return false })
+                    return (
+                      <div key={emptyCount} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <input
+                          value={carouselSlides[realIdx] || ''}
+                          onChange={e => setCarouselSlides(prev => prev.map((s, i) => i === realIdx ? e.target.value : s))}
+                          placeholder="Link GDrive slide individual..."
+                          style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '8px 11px', color: '#111827', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' as const }}
+                        />
+                        <button type="button" onClick={() => setCarouselSlides(prev => prev.filter((_, i) => i !== realIdx))} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>×</button>
+                      </div>
+                    )
+                  })}
+                  <button type="button" onClick={() => setCarouselSlides(prev => [...prev, ''])}
+                    style={{ background: 'none', border: '1px dashed #d1d5db', borderRadius: 8, padding: '6px', color: '#9ca3af', fontSize: '0.72rem', cursor: 'pointer', textAlign: 'center' as const, width: '100%' }}>
+                    + Tambah slide manual
+                  </button>
                 </div>
               </div>
             ) : (
