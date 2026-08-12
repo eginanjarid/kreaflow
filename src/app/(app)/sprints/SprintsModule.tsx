@@ -176,9 +176,9 @@ const FORMATS_AFFILIATE = ['Video Pendek', 'Video Panjang', 'Carousel', 'Single 
 const CONTENT_TYPE_PLATFORMS: Record<string, string[]> = {
   'Video Pendek':   ['TikTok', 'Instagram', 'YouTube'],
   'Video Panjang':  ['YouTube'],
-  'Carousel':       ['Instagram', 'Facebook'],
-  'Single Post':    ['Instagram', 'Facebook'],
-  'Story':          ['Instagram', 'Facebook'],
+  'Carousel':       ['TikTok', 'Instagram', 'Facebook'],
+  'Single Post':    ['TikTok', 'Instagram', 'Facebook'],
+  'Story':          ['TikTok', 'Instagram', 'Facebook'],
   'Text':           ['Twitter/X', 'Threads', 'Facebook'],
   'Live Script':    ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
   'Live':           ['TikTok', 'Instagram', 'YouTube', 'Facebook'],
@@ -197,10 +197,10 @@ const FORMAT_PLATFORM_LABEL: Record<string, Record<string, string>> = {
   'Video Panjang': { 'YouTube': 'YouTube' },
   'Live Script':  { 'TikTok': 'TikTok Live', 'Instagram': 'IG Live', 'YouTube': 'YT Live', 'Facebook': 'FB Live' },
   'Live':         { 'TikTok': 'TikTok Live', 'Instagram': 'IG Live', 'YouTube': 'YT Live', 'Facebook': 'FB Live' },
-  'Story':        { 'Instagram': 'IG Story', 'Facebook': 'FB Story' },
-  'Text':         { 'Twitter/X': 'Thread', 'Threads': 'Threads', 'Facebook': 'Facebook Post' },
-  'Carousel':     { 'Instagram': 'IG Carousel', 'Facebook': 'FB Carousel' },
-  'Single Post':  { 'Instagram': 'IG Post', 'Facebook': 'FB Post' },
+  'Story':        { 'TikTok': 'TikTok Story', 'Instagram': 'IG Story', 'Facebook': 'FB Story' },
+  'Text':         { 'Twitter/X': 'Thread', 'Threads': 'Threads', 'Facebook': 'FB Post' },
+  'Carousel':     { 'TikTok': 'TikTok Carousel', 'Instagram': 'IG Carousel', 'Facebook': 'FB Carousel' },
+  'Single Post':  { 'TikTok': 'TikTok Photo', 'Instagram': 'IG Post', 'Facebook': 'FB Post' },
 }
 
 const PRIORITIES = ['High', 'Medium', 'Low']
