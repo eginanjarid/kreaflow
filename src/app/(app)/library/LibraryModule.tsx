@@ -181,11 +181,13 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
 // ── Bank Ide ─────────────────────────────────────────────────────────────────
 
 function BankIdeTab({
-  ideas, workspaceId, sprints, onIdeaUpdate, onIdeaDelete,
+  ideas, workspaceId, sprints, products, pillars, onIdeaUpdate, onIdeaDelete,
 }: {
   ideas: ContentIdea[]
   workspaceId: string
   sprints: Sprint[]
+  products: Product[]
+  pillars: Pillar[]
   onIdeaUpdate: (updated: ContentIdea) => void
   onIdeaDelete: (id: string) => void
 }) {
@@ -611,6 +613,8 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
           ideas={ideas}
           workspaceId={workspaceId}
           sprints={sprints}
+          products={products}
+          pillars={pillars}
           onIdeaUpdate={updated => setIdeas(prev => prev.map(i => i.id === updated.id ? updated : i))}
           onIdeaDelete={id => setIdeas(prev => prev.filter(i => i.id !== id))}
         />
