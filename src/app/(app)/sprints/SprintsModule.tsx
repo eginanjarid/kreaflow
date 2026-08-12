@@ -266,7 +266,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const canEdit = getAccess(role, jabatan, 'sprints') === 'full'
   const supabase = createClient()
   const [importantDates, setImportantDates] = useState<{ nama: string; tanggal: string; tipe: string; is_repeating: boolean }[]>([])
-  const [holidayWarning, setHolidayWarning] = useState<{ dates: string[]; onProceed: () => void } | null>(null)
 
   // Fetch important dates client-side only (useEffect avoids SSR network calls)
   useEffect(() => {
@@ -512,26 +511,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
       : sprintForm.nama.trim()
     if (!autoNama) { showToast('Nama sprint wajib diisi atau pilih tanggal agar nama otomatis terbentuk.'); return }
 
-    // Check holiday overlap before saving
-    if (weeklyStart && importantDates.length > 0) {
-      const cur = new Date(weeklyStart + 'T00:00:00')
-      const endD = new Date((weeklyEnd || weeklyStart) + 'T00:00:00')
-      const conflictSet = new Set<string>()
-      while (cur <= endD) {
-        const dayIdx = cur.getDay()
-        if (weeklyPattern[dayIdx]?.active) {
-          const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
-          const hit = importantDates.find(d => d.is_repeating ? d.tanggal.slice(5) === dateStr.slice(5) : d.tanggal === dateStr)
-          if (hit) conflictSet.add(`${dateStr} — ${hit.nama}`)
-        }
-        cur.setDate(cur.getDate() + 1)
-      }
-      if (conflictSet.size > 0 && !holidayWarning) {
-        setHolidayWarning({ dates: Array.from(conflictSet), onProceed: () => { setHolidayWarning(null); createSprint() } })
-        return
-      }
-    }
-    setHolidayWarning(null)
     setSavingSprint(true)
     const stepIds = sprintSteps.map(s => s.step.id)
     const tplType = stepIds.length > 0
@@ -1917,6 +1896,39 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </div>
                       )
                     })()}
+                    {/* Important dates in range — inline info */}
+                    {weeklyStart && weeklyEnd && importantDates.length > 0 && (() => {
+                      const cur = new Date(weeklyStart + 'T00:00:00')
+                      const endD = new Date(weeklyEnd + 'T00:00:00')
+                      const hits: { dateStr: string; nama: string; tipe: string }[] = []
+                      while (cur <= endD) {
+                        const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
+                        const hit = importantDates.find(d => d.is_repeating ? d.tanggal.slice(5) === dateStr.slice(5) : d.tanggal === dateStr)
+                        if (hit) hits.push({ dateStr, nama: hit.nama, tipe: hit.tipe })
+                        cur.setDate(cur.getDate() + 1)
+                      }
+                      if (!hits.length) return null
+                      return (
+                        <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#92400e', display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <span>📅</span>
+                            <span>Momen penting dalam periode ini:</span>
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                            {hits.map((h, i) => {
+                              const d = new Date(h.dateStr + 'T00:00:00')
+                              const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+                              const isLibur = h.tipe === 'libur_nasional' || h.tipe === 'hari_besar'
+                              return (
+                                <span key={i} style={{ fontSize: '0.65rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: isLibur ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.12)', color: isLibur ? '#dc2626' : '#b45309', border: `1px solid ${isLibur ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.25)'}` }}>
+                                  {label} — {h.nama}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })()}
                     {/* Day rows — dynamic order from weeklyStart */}
                     {weeklyStart && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -2026,26 +2038,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
         </div>
       )}
 
-      {/* ── Holiday Warning Modal ──────────────────────────────────────────── */}
-      {holidayWarning && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}>
-          <div style={{ background: '#fff', borderRadius: 16, padding: 24, width: '100%', maxWidth: 420 }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>⚠️</div>
-            <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827', marginBottom: 6 }}>Konten Jatuh di Tanggal Penting</div>
-            <div style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 12 }}>Beberapa konten sprint ini jatuh di hari libur atau tanggal penting:</div>
-            <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {holidayWarning.dates.map((d, i) => (
-                <div key={i} style={{ fontSize: '0.8rem', color: '#dc2626', fontWeight: 600 }}>• {d}</div>
-              ))}
-            </div>
-            <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 20 }}>Tetap buat sprint dan sesuaikan jadwal di Calendar nanti, atau batalkan untuk atur ulang pola mingguan.</div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button onClick={() => setHolidayWarning(null)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Atur Ulang</button>
-              <button onClick={holidayWarning.onProceed} style={{ background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px 22px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>Tetap Buat Sprint</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Add Content Modal ───────────────────────────────────────────────── */}
       {addModal && (
