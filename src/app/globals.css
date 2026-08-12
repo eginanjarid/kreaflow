@@ -196,6 +196,13 @@ body {
   /* Detail modal: shrink to fit above bottom nav */
   .kf-detail-modal-overlay { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px) !important; }
   .kf-detail-modal { max-height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px) - 32px) !important; }
+  /* Sprint header: compact on mobile — hide secondary elements */
+  .kf-sprint-header { flex-direction: column !important; gap: 4px !important; padding: 8px 12px !important; align-items: stretch !important; }
+  .kf-sprint-header-actions { display: none !important; }
+  .kf-sprint-badge { display: none !important; }
+  .kf-sprint-steps { display: none !important; }
+  .kf-sprint-progbar { display: none !important; }
+  .kf-sprint-name { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
 }
 
 input, textarea, select {

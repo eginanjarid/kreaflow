@@ -1590,10 +1590,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
           ) : (
             <>
               {/* Sprint header bar */}
-              <div style={{ padding: '10px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap' }}>
+              <div className="kf-sprint-header" style={{ padding: '10px 16px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{selectedSprint.nama}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span className="kf-sprint-name" style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem' }}>{selectedSprint.nama}</span>
                     {canEdit && (
                       <button onClick={openEditSprintModal} title="Edit sprint"
                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4 }}>
@@ -1603,23 +1603,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
                         </svg>
                       </button>
                     )}
-                    {selectedSprint.platform && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280' }}>{selectedSprint.platform}</span>}
-                    {selectedSprint.akun && <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
+                    {selectedSprint.platform && <span className="kf-sprint-badge" style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280' }}>{selectedSprint.platform}</span>}
+                    {selectedSprint.akun && <span className="kf-sprint-badge" style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600 }}>@{selectedSprint.akun.replace(/^@/, '')}</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{fmtDate(selectedSprint.start_date)} – {fmtDate(selectedSprint.end_date)}</span>
                     <span style={{ fontSize: '0.72rem', color: '#d1d5db' }}>·</span>
                     <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>{totalDone}/{sprintContents.length} konten selesai</span>
                     <span style={{ fontSize: '0.72rem', fontWeight: 700, color: totalPct === 100 ? '#059669' : '#1a73e8' }}>{totalPct}%</span>
-                    <div style={{ width: 60, height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
+                    <div className="kf-sprint-progbar" style={{ width: 60, height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${totalPct}%`, background: totalPct === 100 ? '#059669' : '#1a73e8', borderRadius: 4, transition: 'width 0.3s' }} />
                     </div>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <span className="kf-sprint-steps" style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                       {steps.map(s => <span key={s.id} title={s.nama} style={{ color: '#9ca3af', display: 'flex' }}>{STEP_ICON_MAP[s.id] || null}</span>)}
                     </span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <div className="kf-sprint-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                   {isAffiliate && products.length > 0 && (
                     <select value={filterProduct} onChange={e => setFilterProduct(e.target.value)}
                       style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '7px 10px', color: filterProduct ? '#1a73e8' : '#6b7280', fontSize: '0.75rem', outline: 'none', cursor: 'pointer' }}>
