@@ -199,6 +199,8 @@ body {
   /* Sprint header: desktop hidden, mobile shown */
   .kf-sprint-header-desktop { display: none !important; }
   .kf-sprint-header-mobile { display: flex !important; }
+  /* + Sprint button moves to tab bar on mobile */
+  .kf-sprint-add-mobile { display: flex !important; }
 }
 
 input, textarea, select {

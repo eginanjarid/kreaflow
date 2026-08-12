@@ -1089,6 +1089,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
             )}
           </button>
         ))}
+        {/* + Sprint button on mobile — lives in tab bar, not sprint scroll area */}
+        {canEdit && activeTab === 'board' && (
+          <button onClick={openSprintModal} className="kf-sprint-add-mobile"
+            style={{ display: 'none', marginLeft: 'auto', background: '#1a73e8', border: 'none', borderRadius: 8, padding: '6px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            + Sprint
+          </button>
+        )}
       </div>
 
     {activeTab === 'tasks' ? (
@@ -1603,12 +1610,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 </button>
               ))}
             </div>
-            {canEdit && (
-              <button onClick={openSprintModal}
-                style={{ flexShrink: 0, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '7px 12px', color: '#fff', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
-                + Sprint
-              </button>
-            )}
           </div>
 
           {!selectedSprint ? (
@@ -1687,18 +1688,21 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
               {/* Sprint header bar — MOBILE (clean 3-row) */}
               <div className="kf-sprint-header-mobile" style={{ display: 'none', padding: '8px 12px', background: '#fff', boxShadow: '0 1px 0 rgba(0,0,0,0.06)', flexShrink: 0, flexDirection: 'column', gap: 5 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
-                  <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{selectedSprint.nama}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                  {/* Name + edit grouped — truncation keeps them together */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, flex: 1 }}>
+                    <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{selectedSprint.nama}</span>
+                    {canEdit && (
+                      <button onClick={openEditSprintModal} title="Edit sprint" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4, flexShrink: 0 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   {!isAffiliate && sprintPillarsForFilter.length === 1 && (
                     <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: 20, background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontWeight: 600, border: '1px solid rgba(26,115,232,0.15)', whiteSpace: 'nowrap', flexShrink: 0 }}>{sprintPillarsForFilter[0].nama}</span>
-                  )}
-                  {canEdit && (
-                    <button onClick={openEditSprintModal} title="Edit sprint" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: '2px', display: 'flex', alignItems: 'center', borderRadius: 4, flexShrink: 0 }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                      </svg>
-                    </button>
                   )}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
