@@ -190,7 +190,7 @@ function BankIdeTab({
   onIdeaDelete: (id: string) => void
 }) {
   const [bankFilter, setBankFilter] = useState<'Semua' | 'Ide' | 'Kandidat'>('Semua')
-  const [sprintModal, setSprintModal] = useState<{ open: boolean; idea: ContentIdea | null; format: string; tanggal: string }>({ open: false, idea: null, format: '', tanggal: '' })
+  const [sprintModal, setSprintModal] = useState<{ open: boolean; idea: ContentIdea | null; format: string; tanggal: string; jam: string; pillar_id: string; product_id: string }>({ open: false, idea: null, format: '', tanggal: '', jam: '18:00', pillar_id: '', product_id: '' })
   const [selectedSprint, setSelectedSprint] = useState('')
   const [promoting, setPromoting] = useState<string | null>(null)
 
@@ -209,7 +209,7 @@ function BankIdeTab({
 
   function openSprintModal(idea: ContentIdea) {
     setSelectedSprint(sprints[0]?.id || '')
-    setSprintModal({ open: true, idea, format: idea.format || '', tanggal: '' })
+    setSprintModal({ open: true, idea, format: idea.format || '', tanggal: '', jam: '18:00', pillar_id: idea.pillar_id || '', product_id: idea.product_id || '' })
   }
 
   async function promoteToSprint() {
@@ -223,11 +223,14 @@ function BankIdeTab({
       status: 'Draft',
       format: sprintModal.format,
       tanggal_tayang: sprintModal.tanggal,
+      jam_tayang: sprintModal.jam || null,
+      pillar_id: sprintModal.pillar_id || null,
+      product_id: sprintModal.product_id || null,
     }).eq('id', sprintModal.idea.id)
     if (error) { showToast('Gagal masukkan ke sprint'); setPromoting(null); return }
-    onIdeaUpdate({ ...sprintModal.idea, sprint_id: selectedSprint, status: 'Draft', format: sprintModal.format })
+    onIdeaUpdate({ ...sprintModal.idea, sprint_id: selectedSprint, status: 'Draft', format: sprintModal.format, pillar_id: sprintModal.pillar_id, product_id: sprintModal.product_id })
     showToast('Ide masuk ke Sprint Board!', 'success')
-    setSprintModal({ open: false, idea: null, format: '', tanggal: '' })
+    setSprintModal({ open: false, idea: null, format: '', tanggal: '', jam: '18:00', pillar_id: '', product_id: '' })
     setSelectedSprint('')
     setPromoting(null)
   }
@@ -346,8 +349,8 @@ function BankIdeTab({
 
       {/* Sprint Modal */}
       {sprintModal.open && sprintModal.idea && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setSprintModal({ open: false, idea: null, format: '', tanggal: '' })}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: '24px', width: '100%', maxWidth: 420 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={() => setSprintModal({ open: false, idea: null, format: '', tanggal: '', jam: '18:00', pillar_id: '', product_id: '' })}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: '24px', width: '100%', maxWidth: 420, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ fontWeight: 700, fontSize: '1rem', color: '#111827', marginBottom: 4 }}>Masukkan ke Sprint</div>
             <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 20 }}>
               <strong>{sprintModal.idea.judul}</strong>
@@ -388,27 +391,66 @@ function BankIdeTab({
                 </select>
               </div>
 
-              {/* Tanggal Tayang */}
-              <div>
-                <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang *</label>
-                <input
-                  type="date"
-                  value={sprintModal.tanggal}
-                  min={activeSprint?.start_date}
-                  max={activeSprint?.end_date}
-                  onChange={e => setSprintModal(m => ({ ...m, tanggal: e.target.value }))}
-                  style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
-                />
-                {activeSprint && (
-                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 4 }}>
-                    Rentang sprint: {activeSprint.start_date.slice(5).replace('-', '/')} – {activeSprint.end_date.slice(5).replace('-', '/')}
-                  </div>
-                )}
+              {/* Produk (jika ada) */}
+              {products.length > 0 && (
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Produk</label>
+                  <select
+                    value={sprintModal.product_id}
+                    onChange={e => setSprintModal(m => ({ ...m, product_id: e.target.value }))}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}>
+                    <option value="">— Tanpa produk —</option>
+                    {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {/* Pillar (jika ada) */}
+              {pillars.length > 0 && (
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Pillar Konten</label>
+                  <select
+                    value={sprintModal.pillar_id}
+                    onChange={e => setSprintModal(m => ({ ...m, pillar_id: e.target.value }))}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', cursor: 'pointer' }}>
+                    <option value="">— Tanpa pillar —</option>
+                    {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {/* Tanggal + Jam */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang *</label>
+                  <input
+                    type="date"
+                    value={sprintModal.tanggal}
+                    min={activeSprint?.start_date}
+                    max={activeSprint?.end_date}
+                    onChange={e => setSprintModal(m => ({ ...m, tanggal: e.target.value }))}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                  {activeSprint && (
+                    <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: 3 }}>
+                      {activeSprint.start_date.slice(5).replace('-', '/')} – {activeSprint.end_date.slice(5).replace('-', '/')}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 600 }}>Jam Tayang</label>
+                  <input
+                    type="time"
+                    value={sprintModal.jam}
+                    onChange={e => setSprintModal(m => ({ ...m, jam: e.target.value }))}
+                    style={{ width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-              <button onClick={() => setSprintModal({ open: false, idea: null, format: '', tanggal: '' })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
+              <button onClick={() => setSprintModal({ open: false, idea: null, format: '', tanggal: '', jam: '18:00', pillar_id: '', product_id: '' })} style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
               <button onClick={promoteToSprint} disabled={!selectedSprint || !!promoting} style={{ flex: 1, background: '#059669', border: 'none', borderRadius: 10, padding: '10px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                 {promoting ? 'Memproses...' : 'Masukkan ke Sprint →'}
               </button>

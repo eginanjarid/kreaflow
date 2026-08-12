@@ -35,6 +35,7 @@ type ContentItem = {
   platform: string[] | string | null
   status: string
   product_id: string | null
+  pillar_id: string | null
   tanggal_tayang: string | null
   jam_tayang: string | null
   assigned_riset: string | null
@@ -369,7 +370,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // Content add modal
   const [addModal, setAddModal] = useState(false)
-  const [addForm, setAddForm] = useState({ judul: '', product_id: '', format: '', platform: '', tanggal_tayang: '', assigned_naskah: '', assigned_produksi: '', assigned_schedule: '' })
+  const [addForm, setAddForm] = useState({ judul: '', product_id: '', pillar_id: '', format: '', platform: '', tanggal_tayang: '', jam_tayang: '18:00' })
   const [savingAdd, setSavingAdd] = useState(false)
 
   // Detail modal
@@ -576,7 +577,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
 
   // ── Add content ───────────────────────────────────────────────────────────
   function openAddModal() {
-    setAddForm({ judul: '', product_id: '', format: '', platform: '', tanggal_tayang: '', assigned_naskah: '', assigned_produksi: '', assigned_schedule: '' })
+    setAddForm({ judul: '', product_id: '', pillar_id: '', format: '', platform: '', tanggal_tayang: '', jam_tayang: '18:00' })
     setAddModal(true)
   }
 
@@ -592,10 +593,9 @@ export default function SprintsModule({ initialSprints, initialContents, product
       platform: addForm.platform ? [addForm.platform] : [],
       status: 'Draft',
       product_id: addForm.product_id || null,
+      pillar_id: addForm.pillar_id || null,
       tanggal_tayang: addForm.tanggal_tayang || null,
-      assigned_naskah: addForm.assigned_naskah || null,
-      assigned_produksi: addForm.assigned_produksi || null,
-      assigned_schedule: addForm.assigned_schedule || null,
+      jam_tayang: addForm.jam_tayang || null,
     }).select('*').single()
     if (!error && data) {
       setContents(prev => [data, ...prev])
@@ -603,7 +603,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
         workspace_id: workspaceId,
         type: 'naskah',
         title: `Mulai Naskah — ${data.judul}`,
-        message: `Konten baru di sprint. ${addForm.assigned_naskah ? 'Assign: ' + addForm.assigned_naskah + '.' : 'Buka Plan untuk buat naskah.'}`,
+        message: 'Konten baru di sprint. Buka Plan untuk buat naskah.',
         content_idea_id: data.id,
       })
       setAddModal(false)
@@ -2012,14 +2012,23 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <input style={fieldStyle()} value={addForm.judul} onChange={e => setAddForm(f => ({ ...f, judul: e.target.value }))} placeholder="cth: Review Serum Vit C — Drama Version" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                {isAffiliate && (
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Produk</label>
-                  <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.product_id} onChange={e => setAddForm(f => ({ ...f, product_id: e.target.value }))}>
-                    <option value="">— Pilih produk —</option>
-                    {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
-                  </select>
-                </div>
+                {isAffiliate && products.length > 0 && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Produk</label>
+                    <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.product_id} onChange={e => setAddForm(f => ({ ...f, product_id: e.target.value }))}>
+                      <option value="">— Pilih produk —</option>
+                      {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                    </select>
+                  </div>
+                )}
+                {!isAffiliate && pillars.length > 0 && (
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Pillar Konten</label>
+                    <select style={{ ...fieldStyle(), cursor: 'pointer' }} value={addForm.pillar_id} onChange={e => setAddForm(f => ({ ...f, pillar_id: e.target.value }))}>
+                      <option value="">— Pillar —</option>
+                      {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                    </select>
+                  </div>
                 )}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Format</label>
@@ -2039,7 +2048,25 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Tanggal Tayang</label>
                   <input type="date" style={fieldStyle()} value={addForm.tanggal_tayang} onChange={e => setAddForm(f => ({ ...f, tanggal_tayang: e.target.value }))} />
                 </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Jam Tayang</label>
+                  <input type="time" style={fieldStyle()} value={addForm.jam_tayang} onChange={e => setAddForm(f => ({ ...f, jam_tayang: e.target.value }))} />
+                </div>
               </div>
+              {(() => {
+                if (!addForm.tanggal_tayang || !addForm.jam_tayang || !selectedSprintId) return null
+                const conflicts = contents.filter(c =>
+                  c.sprint_id === selectedSprintId &&
+                  c.tanggal_tayang === addForm.tanggal_tayang &&
+                  c.jam_tayang === addForm.jam_tayang
+                )
+                if (conflicts.length === 0) return null
+                return (
+                  <div style={{ background: '#fffbeb', border: '1px solid #fbbf24', borderRadius: 8, padding: '8px 12px', fontSize: '0.75rem', color: '#92400e' }}>
+                    ⚠️ Sudah ada {conflicts.length} konten dijadwalkan di tanggal ini pukul {addForm.jam_tayang} — pastikan beda platform.
+                  </div>
+                )
+              })()}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => setAddModal(false)} style={{ background: 'transparent', border: '1px solid #e5e7eb', borderRadius: 8, padding: '9px 18px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer' }}>Batal</button>
                 <button onClick={saveContent} disabled={savingAdd}
