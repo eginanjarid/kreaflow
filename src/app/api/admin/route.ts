@@ -24,8 +24,6 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === 'deleteUser') {
-    // Only god admin can delete users
-    if (!isGodAdmin(user.email!)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     if (!userId) return NextResponse.json({ error: 'userId wajib diisi' }, { status: 400 })
 
     // Get user's email to prevent deleting super admins

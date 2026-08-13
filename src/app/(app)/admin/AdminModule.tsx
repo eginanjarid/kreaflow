@@ -246,6 +246,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   const [saLoading, setSaLoading] = useState(false)
   const [deletingUser, setDeletingUser] = useState<string | null>(null)
   const [confirmDeleteUser, setConfirmDeleteUser] = useState<UserRow | null>(null)
+  const [deleteError, setDeleteError] = useState('')
   const [userList, setUserList] = useState<UserRow[]>(users)
 
   // Akses tab state
@@ -401,7 +402,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
     const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'deleteUser', userId: u.id }) })
     const data = await res.json()
     setDeletingUser(null)
-    if (!res.ok) { alert('Gagal: ' + (data.error || 'Unknown error')); return }
+    if (!res.ok) { setDeleteError(data.error || 'Gagal menghapus user'); return }
     setUserList(prev => prev.filter(x => x.id !== u.id))
   }
 
@@ -1342,19 +1343,22 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
       )}
 
       {/* Action Modal */}
-      {confirmDeleteUser && (
+      {(confirmDeleteUser || deleteError) && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}>
           <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 380, padding: '28px 24px', boxShadow: '0 8px 40px rgba(0,0,0,0.18)' }}>
             <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(220,38,38,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
             </div>
             <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem', marginBottom: 6 }}>Hapus Akun?</div>
-            <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 24, lineHeight: 1.6 }}>
-              Akun <strong style={{ color: '#111827' }}>{confirmDeleteUser.email}</strong> dan semua workspace-nya akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.
+            <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: deleteError ? 12 : 24, lineHeight: 1.6 }}>
+              Akun <strong style={{ color: '#111827' }}>{confirmDeleteUser?.email}</strong> dan semua workspace-nya akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.
             </p>
+            {deleteError && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.8rem', marginBottom: 16 }}>{deleteError}</div>
+            )}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setConfirmDeleteUser(null)} style={{ flex: 1, background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 500 }}>Batal</button>
-              <button onClick={confirmAndDeleteUser} style={{ flex: 1, background: '#dc2626', border: 'none', borderRadius: 10, padding: '10px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>Ya, Hapus</button>
+              <button onClick={() => { setConfirmDeleteUser(null); setDeleteError('') }} style={{ flex: 1, background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '10px', color: '#6b7280', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 500 }}>Batal</button>
+              {confirmDeleteUser && <button onClick={confirmAndDeleteUser} style={{ flex: 1, background: '#dc2626', border: 'none', borderRadius: 10, padding: '10px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>Ya, Hapus</button>}
             </div>
           </div>
         </div>
