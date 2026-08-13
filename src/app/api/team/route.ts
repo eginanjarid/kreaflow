@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { sendInviteEmail } from '@/lib/mailer'
+import { sendMagicLinkEmail } from '@/lib/smtp-mailer'
+import { DEFAULT_MAGIC_LINK_SETTINGS, APP_CONFIG_KEY, type MagicLinkSettings } from '@/lib/email-config'
 
 function adminClient() {
   return createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -45,37 +47,66 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: msg, limit: true }, { status: 403 })
   }
 
-  // Check if already member
+  const cleanEmail = email.toLowerCase().trim()
+  const inviterName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Tim KreaFlow'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
+
+  // Cari atau buat user di Supabase auth
   const { data: authUsers } = await admin.auth.admin.listUsers()
-  const targetUser = authUsers?.users.find(u => u.email === email.toLowerCase().trim())
+  let targetUser = authUsers?.users.find(u => u.email === cleanEmail) ?? null
+
   if (targetUser) {
     const { data: alreadyMember } = await admin.from('kf_workspace_members')
       .select('id').eq('workspace_id', workspaceId).eq('user_id', targetUser.id).single()
     if (alreadyMember) return NextResponse.json({ error: 'User sudah jadi member' }, { status: 400 })
+  } else {
+    // Buat akun baru otomatis — email langsung terverifikasi
+    const { data: created, error: createErr } = await admin.auth.admin.createUser({
+      email: cleanEmail,
+      email_confirm: true,
+    })
+    if (createErr || !created?.user) return NextResponse.json({ error: 'Gagal membuat akun tim: ' + (createErr?.message || 'unknown') }, { status: 500 })
+    targetUser = created.user
   }
 
-  // Delete existing pending invite for same email+workspace
-  await admin.from('kf_invites').delete().eq('workspace_id', workspaceId).eq('email', email.toLowerCase().trim()).is('accepted_at', null)
-
-  // Create invite
-  const { data: invite, error } = await admin.from('kf_invites').insert({
+  // Langsung tambahkan ke workspace
+  await admin.from('kf_workspace_members').insert({
     workspace_id: workspaceId,
-    email: email.toLowerCase().trim(),
+    user_id: targetUser.id,
     role,
     jabatan: jabatan || null,
-    invited_by: user.id,
-  }).select('token').single()
+  })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  // Generate magic link agar tim member bisa langsung login tanpa password
+  const callbackUrl = `${appUrl}/auth/callback`
+  const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+    type: 'magiclink',
+    email: cleanEmail,
+    options: { redirectTo: callbackUrl },
+  })
 
-  const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${(invite as { token: string }).token}`
+  if (linkErr || !linkData?.properties?.hashed_token) {
+    // Fallback: kirim invite email biasa jika magic link gagal
+    const { data: invite } = await admin.from('kf_invites').insert({
+      workspace_id: workspaceId, email: cleanEmail, role, jabatan: jabatan || null, invited_by: user.id,
+    }).select('token').single()
+    const inviteUrl = `${appUrl}/invite/${(invite as { token: string })?.token}`
+    sendInviteEmail({ to: cleanEmail, workspaceName, inviteUrl, inviterName })
+      .catch(err => console.error('[invite] Fallback email error:', err))
+    return NextResponse.json({ success: true, method: 'invite' })
+  }
 
-  // Kirim invite email via Mailketing (fire-and-forget, jangan block response)
-  const inviterName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Tim KreaFlow'
-  sendInviteEmail({ to: email.toLowerCase().trim(), workspaceName, inviteUrl, inviterName })
-    .catch(err => console.error('[invite] Email error:', err))
+  const loginUrl = `${appUrl}/auth/verify?token_hash=${linkData.properties.hashed_token}&type=email`
 
-  return NextResponse.json({ token: (invite as { token: string }).token, url: inviteUrl })
+  // Ambil SMTP settings dari DB
+  const { data: config } = await admin.from('app_config').select('value').eq('key', APP_CONFIG_KEY).maybeSingle()
+  const settings: MagicLinkSettings = { ...DEFAULT_MAGIC_LINK_SETTINGS, ...(config?.value ?? {}), subject: `Kamu diundang ke tim ${workspaceName} — KreaFlow` }
+
+  // Kirim via SMTP dengan magic link
+  sendMagicLinkEmail(cleanEmail, loginUrl, settings, undefined)
+    .catch(err => console.error('[invite] SMTP error:', err))
+
+  return NextResponse.json({ success: true, method: 'magic_link' })
 }
 
 // DELETE /api/team — remove member
