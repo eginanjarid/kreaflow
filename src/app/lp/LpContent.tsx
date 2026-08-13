@@ -157,7 +157,7 @@ export default function LpContent() {
           </div>
           <span className="lp-logo-name">KreaFlow</span>
         </a>
-        <a href="https://kreaflow.id/login" className="lp-nav-cta" onClick={handleCta}>Mulai Gratis →</a>
+        <a href="https://kreaflow.id/login" className="lp-nav-cta" onClick={handleCta}>Masuk →</a>
       </nav>
 
       {/* HERO */}
@@ -165,8 +165,8 @@ export default function LpContent() {
         <div className="lp-badge">🔥 LIFETIME DEAL · HARGA TERBATAS</div>
         <h1>Berhenti Pusing<br />Soal Konten.<br /><span>KreaFlow Urus Semua.</span></h1>
         <p>Satu platform end-to-end untuk kreator, UMKM, dan affiliator Indonesia — dari riset brand sampai jadwal posting, tanpa pindah-pindah tools.</p>
-        <a href="https://kreaflow.id/login" className="lp-cta-main" onClick={handleCta}>Coba Gratis Sekarang →</a>
-        <p className="lp-cta-sub">✓ Tanpa kartu kredit &nbsp;·&nbsp; ✓ Setup 5 menit &nbsp;·&nbsp; ✓ Lifetime sekali bayar</p>
+        <a href={SCALEV.basic} className="lp-cta-main" onClick={handleCta}>Ambil Lifetime Deal Sekarang →</a>
+        <p className="lp-cta-sub">✓ Sekali bayar &nbsp;·&nbsp; ✓ Setup 5 menit &nbsp;·&nbsp; ✓ Akses selamanya</p>
       </section>
 
       {/* STATS */}
@@ -341,7 +341,7 @@ export default function LpContent() {
           {[
             { q: 'Lifetime deal artinya apa?', a: 'Bayar sekali, pakai selamanya. Tidak ada biaya bulanan atau tahunan. Kamu juga dapat semua update fitur baru secara gratis.' },
             { q: 'Apakah bisa untuk tim?', a: 'Bisa. Starter support 3 anggota, Pro 5 anggota, Agency 10 anggota per workspace. Kamu bisa assign role berbeda ke setiap member.' },
-            { q: 'Apakah ada free trial?', a: 'Kamu bisa daftar dan explore platform secara gratis. Untuk akses penuh semua fitur, pilih salah satu paket lifetime.' },
+            { q: 'Apakah ada free trial?', a: 'Tidak ada free trial — KreaFlow langsung bisa dipakai setelah beli. Harga lifetime-nya sudah sangat terjangkau untuk akses selamanya.' },
             { q: 'Cocok untuk jenis bisnis apa?', a: 'KreaFlow cocok untuk kreator konten, pemilik UMKM, affiliator TikTok Shop, dan agensi digital yang butuh manage konten untuk beberapa klien sekaligus.' },
             { q: 'Bagaimana kalau butuh workspace lebih?', a: 'Bisa tambah workspace extra seharga Rp49.000 per workspace kapan saja, tanpa perlu ganti paket.' },
           ].map((item, i) => (
