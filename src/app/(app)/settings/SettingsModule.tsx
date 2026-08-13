@@ -65,7 +65,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
   async function sendInvite(e: React.FormEvent) {
     e.preventDefault()
-    setInviting(true); setInviteError(''); setInviteLink(''); setTeamMsg('')
+    setInviting(true); setInviteError(''); setTeamMsg('')
     const sentEmail = inviteEmail
     const res = await fetch('/api/team', {
       method: 'POST',
