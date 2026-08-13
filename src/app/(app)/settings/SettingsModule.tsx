@@ -60,7 +60,6 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
   const [inviteRole, setInviteRole] = useState('member')
   const [inviteJabatan, setInviteJabatan] = useState('')
   const [inviting, setInviting] = useState(false)
-  const [inviteLink, setInviteLink] = useState('')
   const [inviteError, setInviteError] = useState('')
   const [teamMsg, setTeamMsg] = useState('')
 
@@ -75,12 +74,16 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     })
     const data = await res.json()
     setInviting(false)
-    if (!res.ok) { setInviteError(data.error || 'Gagal'); return }
+    if (!res.ok) { setInviteError(data.error || 'Gagal mengirim undangan'); return }
     setInviteEmail('')
     setInviteJabatan('')
-    setTeamMsg(`Email magic link berhasil dikirim ke ${sentEmail}!`)
-    setTimeout(() => setTeamMsg(''), 6000)
-    // Reload server data so new member appears in the list immediately
+    setInviteRole('member')
+    const isNew = !data.existing
+    setTeamMsg(isNew
+      ? `Akun baru dibuat & magic link dikirim ke ${sentEmail}. Member bisa langsung login!`
+      : `Magic link dikirim ke ${sentEmail}. Cek inbox atau spam!`
+    )
+    setTimeout(() => setTeamMsg(''), 8000)
     startRefresh(() => router.refresh())
   }
 
@@ -389,18 +392,6 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
                 </button>
               </form>
 
-              {inviteLink && (
-                <div style={{ marginTop: 16, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Link backup (valid 7 hari)</div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <code style={{ flex: 1, fontSize: '0.72rem', color: '#6b7280', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
-                    <button
-                      onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
-                      style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
-                    >Salin</button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>

@@ -62,6 +62,8 @@ export async function POST(req: NextRequest) {
   const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 })
   let targetUser = authUsers?.users.find(u => u.email === cleanEmail) ?? null
 
+  const isExistingUser = !!targetUser
+
   if (targetUser) {
     const { data: alreadyMember } = await admin.from('kf_workspace_members')
       .select('id').eq('workspace_id', workspaceId).eq('user_id', targetUser.id).single()
@@ -114,7 +116,7 @@ export async function POST(req: NextRequest) {
     const inviteUrl = `${appUrl}/invite/${(invite as { token: string })?.token}`
     sendInviteEmail({ to: cleanEmail, workspaceName, inviteUrl, inviterName })
       .catch(err => console.error('[invite] Fallback email error:', err))
-    return NextResponse.json({ success: true, method: 'invite' })
+    return NextResponse.json({ success: true, method: 'invite', existing: isExistingUser })
   }
 
   const loginUrl = `${appUrl}/auth/verify?token_hash=${linkData.properties.hashed_token}&type=email`
@@ -127,7 +129,7 @@ export async function POST(req: NextRequest) {
   sendMagicLinkEmail(cleanEmail, loginUrl, settings, undefined)
     .catch(err => console.error('[invite] SMTP error:', err))
 
-  return NextResponse.json({ success: true, method: 'magic_link' })
+  return NextResponse.json({ success: true, method: 'magic_link', existing: isExistingUser })
 }
 
 // DELETE /api/team — remove member

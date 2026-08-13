@@ -29,15 +29,27 @@ export async function POST(req: NextRequest) {
     if (!access) return NextResponse.json({ error: 'Akses KreaFlow diperlukan' }, { status: 403 })
   }
 
+  // Ambil workspace pertama milik user untuk inherit limits
+  const { data: firstWs } = await admin
+    .from('kf_workspaces')
+    .select('plan, max_workspaces, max_members')
+    .eq('owner_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  const inheritMaxMembers = (firstWs?.max_members as number) ?? 4
+  const inheritMaxWorkspaces = (firstWs?.max_workspaces as number) ?? 1
+
   if (!superAdmin) {
-    // Enforce workspace limit: find user's owned workspaces
+    const wsIds: string[] = []
     const { data: memberRows } = await supabase
       .from('kf_workspace_members')
       .select('workspace_id')
       .eq('user_id', user.id)
       .eq('role', 'owner')
 
-    const wsIds = memberRows?.map(r => r.workspace_id) || []
+    memberRows?.forEach(r => wsIds.push(r.workspace_id))
     const wsCount = wsIds.length
 
     if (wsIds.length > 0) {
@@ -66,7 +78,14 @@ export async function POST(req: NextRequest) {
 
   const { data: ws, error } = await admin
     .from('kf_workspaces')
-    .insert({ name, owner_id: user.id, plan: superAdmin ? 'lifetime' : 'free', brand_type })
+    .insert({
+      name,
+      owner_id: user.id,
+      plan: 'lifetime',
+      brand_type,
+      max_members: superAdmin ? 999 : inheritMaxMembers,
+      max_workspaces: superAdmin ? 999 : inheritMaxWorkspaces,
+    })
     .select('id')
     .single()
 

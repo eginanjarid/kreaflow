@@ -125,7 +125,7 @@ function BarChart({ data, color = '#1a73e8', height = 56 }: { data: number[]; co
 
 export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail, savedPricing }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string; savedPricing: PricingConfig }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'dashboard' | 'users' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'users' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses'>('dashboard')
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>(savedPricing)
   const [pricingSaving, setPricingSaving] = useState(false)
   const [pricingMsg, setPricingMsg] = useState('')
@@ -181,6 +181,11 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
 
   useEffect(() => {
     if (tab === 'dashboard') fetchDashTx()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
+
+  useEffect(() => {
+    if (tab === 'akses') fetchAccess(accessSearch)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
 
@@ -240,6 +245,63 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   const [saLoading, setSaLoading] = useState(false)
   const [deletingUser, setDeletingUser] = useState<string | null>(null)
   const [userList, setUserList] = useState<UserRow[]>(users)
+
+  // Akses tab state
+  type AccessUser = { user_id: string; email: string; name: string; expires_at: string | null; created_at: string; plan: string; max_members: number; max_workspaces: number; is_active: boolean }
+  const [accessList, setAccessList] = useState<AccessUser[]>([])
+  const [accessLoading, setAccessLoading] = useState(false)
+  const [accessSearch, setAccessSearch] = useState('')
+  const [grantEmail, setGrantEmail] = useState('')
+  const [grantName, setGrantName] = useState('')
+  const [grantPlan, setGrantPlan] = useState('basic')
+  const [grantSendEmail, setGrantSendEmail] = useState(true)
+  const [grantLoading, setGrantLoading] = useState(false)
+  const [grantMsg, setGrantMsg] = useState('')
+
+  async function fetchAccess(q = '') {
+    setAccessLoading(true)
+    const res = await fetch(`/api/admin/access${q ? `?q=${encodeURIComponent(q)}` : ''}`)
+    const data = await res.json()
+    setAccessLoading(false)
+    if (res.ok) setAccessList(data.users || [])
+  }
+
+  async function grantAccess() {
+    if (!grantEmail.trim()) { setGrantMsg('Email wajib diisi'); return }
+    setGrantLoading(true); setGrantMsg('')
+    const res = await fetch('/api/admin/access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: grantEmail.trim(), name: grantName.trim(), plan: grantPlan, sendEmail: grantSendEmail }),
+    })
+    const data = await res.json()
+    setGrantLoading(false)
+    if (!res.ok) { setGrantMsg('Error: ' + (data.error || 'Gagal')); return }
+    setGrantMsg(data.is_new
+      ? `Akun baru dibuat untuk ${grantEmail}. ${data.email_sent ? 'Magic link terkirim!' : 'Email tidak dikirim.'}`
+      : `Akses diperbarui untuk ${grantEmail}. ${data.email_sent ? 'Magic link terkirim!' : ''}`
+    )
+    setGrantEmail(''); setGrantName('')
+    setTimeout(() => setGrantMsg(''), 6000)
+    fetchAccess(accessSearch)
+  }
+
+  async function revokeAccess(userId: string, email: string) {
+    if (!confirm(`Cabut akses KreaFlow dari ${email}?`)) return
+    await fetch('/api/admin/access', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId }) })
+    setAccessList(prev => prev.filter(u => u.user_id !== userId))
+  }
+
+  async function extendAccess(userId: string) {
+    const exp = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()
+    await fetch('/api/admin/access', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, expires_at: exp }) })
+    setAccessList(prev => prev.map(u => u.user_id === userId ? { ...u, expires_at: exp, is_active: true } : u))
+  }
+
+  async function makeLifetime(userId: string) {
+    await fetch('/api/admin/access', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, expires_at: null }) })
+    setAccessList(prev => prev.map(u => u.user_id === userId ? { ...u, expires_at: null, is_active: true } : u))
+  }
 
   const superAdminEmailSet = new Set([godAdminEmail, ...saList.map(s => s.email)])
 
@@ -395,6 +457,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           ['transaksi', 'Transaksi', '#059669'],
           ['kupon', 'Kupon', '#d97706'],
           ['pricing', 'Pricing', '#d97706'],
+          ['akses', 'Grant Akses', '#059669'],
         ] as [string, string, string][]).map(([id, label, color]) => (
           <button key={id} onClick={() => setTab(id as typeof tab)}
             style={{ padding: '9px 14px', background: 'transparent', border: 'none', borderBottom: tab === id ? `2px solid ${color}` : '2px solid transparent', color: tab === id ? color : '#6b7280', fontSize: '0.82rem', fontWeight: tab === id ? 700 : 400, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -1018,6 +1081,108 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Grant Akses Tab */}
+      {tab === 'akses' && (
+        <div>
+          {/* Form grant */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', marginBottom: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111827', marginBottom: 14 }}>Grant Akses KreaFlow</div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Email *</label>
+                <input value={grantEmail} onChange={e => setGrantEmail(e.target.value)} placeholder="user@email.com"
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Nama (opsional)</label>
+                <input value={grantName} onChange={e => setGrantName(e.target.value)} placeholder="Nama user"
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Plan</label>
+                <select value={grantPlan} onChange={e => setGrantPlan(e.target.value)}
+                  style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
+                  <option value="bulanan">Bulanan (1ws, 4 member, 31 hari)</option>
+                  <option value="basic">Basic Lifetime (2ws, 4 member)</option>
+                  <option value="pro">Pro Lifetime (4ws, 6 member)</option>
+                  <option value="agency">Agency Lifetime (10ws, 11 member)</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '0.82rem', color: '#374151' }}>
+                <input type="checkbox" checked={grantSendEmail} onChange={e => setGrantSendEmail(e.target.checked)} />
+                Kirim magic link welcome email ke user
+              </label>
+            </div>
+            {grantMsg && <div style={{ marginBottom: 10, fontSize: '0.8rem', color: grantMsg.startsWith('Error') ? '#dc2626' : '#059669', fontWeight: 500 }}>{grantMsg}</div>}
+            <button onClick={grantAccess} disabled={grantLoading}
+              style={{ background: grantLoading ? '#047857' : '#059669', border: 'none', borderRadius: 10, padding: '10px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: grantLoading ? 'not-allowed' : 'pointer' }}>
+              {grantLoading ? 'Memproses...' : '✓ Grant Akses'}
+            </button>
+          </div>
+
+          {/* Search */}
+          <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+            <input placeholder="Cari email atau nama..." value={accessSearch} onChange={e => setAccessSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && fetchAccess(accessSearch)}
+              style={{ flex: 1, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
+            <button onClick={() => fetchAccess(accessSearch)}
+              style={{ background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: '0.82rem', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>Cari</button>
+          </div>
+
+          {/* List */}
+          <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            {accessLoading && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Memuat...</div>}
+            {!accessLoading && !accessList.length && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Belum ada data. Klik Cari untuk load semua.</div>}
+            {accessList.map((u, i) => (
+              <div key={u.user_id} style={{ padding: '13px 18px', borderBottom: i < accessList.length - 1 ? '1px solid #f3f4f6' : 'none', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 3 }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>{u.email}</span>
+                    <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, fontWeight: 700,
+                      background: u.is_active ? '#f0fdf4' : '#fef2f2',
+                      color: u.is_active ? '#059669' : '#dc2626' }}>
+                      {u.is_active ? 'AKTIF' : 'EXPIRED'}
+                    </span>
+                    <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, fontWeight: 700, background: '#f8fafc', color: '#6b7280', textTransform: 'uppercase' }}>
+                      {u.plan}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    {u.name && <span>{u.name}</span>}
+                    <span>{u.max_workspaces}ws · {u.max_members} member</span>
+                    {u.expires_at
+                      ? <span>Exp: {fmtDate(u.expires_at)}</span>
+                      : <span style={{ color: '#059669', fontWeight: 600 }}>Lifetime</span>}
+                    <span>Diberi: {fmtDate(u.created_at)}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
+                  {u.expires_at && (
+                    <button onClick={() => extendAccess(u.user_id)}
+                      style={{ padding: '5px 10px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: '1px solid rgba(26,115,232,0.3)', background: '#eff6ff', color: '#1a73e8', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      +31 hari
+                    </button>
+                  )}
+                  {u.expires_at && (
+                    <button onClick={() => makeLifetime(u.user_id)}
+                      style={{ padding: '5px 10px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: '1px solid rgba(5,150,105,0.3)', background: '#f0fdf4', color: '#059669', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      → Lifetime
+                    </button>
+                  )}
+                  <button onClick={() => revokeAccess(u.user_id, u.email)}
+                    style={{ padding: '5px 10px', borderRadius: 8, fontSize: '0.72rem', fontWeight: 600, border: '1px solid rgba(220,38,38,0.2)', background: 'rgba(220,38,38,0.06)', color: '#dc2626', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Cabut
+                  </button>
+                </div>
+              </div>
+            ))}
+            {accessList.length > 0 && <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.7rem', color: '#9ca3af' }}>{accessList.length} user</div>}
           </div>
         </div>
       )}
