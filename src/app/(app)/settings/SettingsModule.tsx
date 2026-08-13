@@ -41,6 +41,29 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
+function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px 24px', maxWidth: 360, width: '100%', boxShadow: '0 20px 60px rgba(15,23,42,0.2)', textAlign: 'center' }}>
+        <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <p style={{ color: '#111827', fontSize: '0.9rem', fontWeight: 600, margin: '0 0 22px', lineHeight: 1.5 }}>{message}</p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid #e5eaf2', background: '#f8fafc', color: '#374151', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+            Batal
+          </button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: '#dc2626', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer' }}>
+            Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, maxMembers, pendingInvites: initialPending, appUrl }: Props) {
   const router = useRouter()
   const [, startRefresh] = useTransition()
@@ -62,6 +85,11 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
   const [inviting, setInviting] = useState(false)
   const [inviteError, setInviteError] = useState('')
   const [teamMsg, setTeamMsg] = useState('')
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null)
+
+  function showConfirm(message: string, onConfirm: () => void) {
+    setConfirmModal({ message, onConfirm })
+  }
 
   async function sendInvite(e: React.FormEvent) {
     e.preventDefault()
@@ -94,24 +122,28 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     setTimeout(() => setTeamMsg(''), 3000)
   }
 
-  async function cancelInvite(inviteId: string) {
-    if (!confirm('Batalkan undangan ini?')) return
-    const res = await fetch('/api/team', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workspaceId, inviteId }),
+  function cancelInvite(inviteId: string) {
+    showConfirm('Batalkan undangan ini?', async () => {
+      setConfirmModal(null)
+      const res = await fetch('/api/team', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workspaceId, inviteId }),
+      })
+      if (res.ok) { setPending(prev => prev.filter(i => i.id !== inviteId)); setTeamMsg('Undangan dibatalkan.'); setTimeout(() => setTeamMsg(''), 3000) }
     })
-    if (res.ok) { setPending(prev => prev.filter(i => i.id !== inviteId)); setTeamMsg('Undangan dibatalkan.'); setTimeout(() => setTeamMsg(''), 3000) }
   }
 
-  async function removeMember(memberId: string) {
-    if (!confirm('Hapus member ini dari workspace?')) return
-    const res = await fetch('/api/team', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workspaceId, memberId }),
+  function removeMember(memberId: string) {
+    showConfirm('Hapus member ini dari workspace?', async () => {
+      setConfirmModal(null)
+      const res = await fetch('/api/team', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workspaceId, memberId }),
+      })
+      if (res.ok) { setMembers(prev => prev.filter(m => m.id !== memberId)); setTeamMsg('Member dihapus.'); setTimeout(() => setTeamMsg(''), 3000) }
     })
-    if (res.ok) { setMembers(prev => prev.filter(m => m.id !== memberId)); setTeamMsg('Member dihapus.'); setTimeout(() => setTeamMsg(''), 3000) }
   }
 
   async function changeRole(memberId: string, role: string) {
@@ -477,6 +509,14 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
             </div>
           </form>
         </div>
+      )}
+
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   )
