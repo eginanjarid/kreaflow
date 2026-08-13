@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
 
   const link = links.find(l => l.token === token)
   if (!link || !link.active) return NextResponse.json({ valid: false, reason: 'invalid' })
+  if (link.starts_at && new Date(link.starts_at) > new Date()) return NextResponse.json({ valid: false, reason: 'notyet', starts_at: link.starts_at })
   if (link.expires_at && new Date(link.expires_at) < new Date()) return NextResponse.json({ valid: false, reason: 'expired' })
   if (link.max_uses !== null && link.claimed_emails.length >= link.max_uses) return NextResponse.json({ valid: false, reason: 'maxed' })
 
@@ -65,6 +66,7 @@ export async function POST(req: NextRequest) {
   if (idx === -1 || !links[idx].active) return NextResponse.json({ error: 'Link tidak valid atau sudah tidak aktif' }, { status: 400 })
 
   const link = links[idx]
+  if (link.starts_at && new Date(link.starts_at) > new Date()) return NextResponse.json({ error: 'Promo ini belum dimulai' }, { status: 400 })
   if (link.expires_at && new Date(link.expires_at) < new Date()) return NextResponse.json({ error: 'Link sudah kadaluarsa' }, { status: 400 })
   if (link.max_uses !== null && link.claimed_emails.length >= link.max_uses) return NextResponse.json({ error: 'Kuota link sudah habis' }, { status: 400 })
   if (link.claimed_emails.includes(cleanEmail)) return NextResponse.json({ error: 'Email ini sudah pernah klaim link ini' }, { status: 400 })

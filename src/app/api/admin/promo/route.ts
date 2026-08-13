@@ -11,6 +11,7 @@ export type PromoLink = {
   max_uses: number | null
   claimed_emails: string[]
   active: boolean
+  starts_at: string | null
   expires_at: string | null
   created_at: string
 }
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
   const caller = await requireSuperAdmin()
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
 
-  const { token, label, plan = 'basic', max_uses, expires_at } = await req.json()
+  const { token, label, plan = 'basic', max_uses, starts_at, expires_at } = await req.json()
 
   const admin = adminClient()
   const links = await loadLinks(admin)
@@ -80,6 +81,7 @@ export async function POST(req: NextRequest) {
     max_uses: max_uses ? parseInt(max_uses) : null,
     claimed_emails: [],
     active: true,
+    starts_at: starts_at || null,
     expires_at: expires_at || null,
     created_at: new Date().toISOString(),
   }
@@ -95,7 +97,7 @@ export async function PATCH(req: NextRequest) {
   const caller = await requireSuperAdmin()
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
 
-  const { id, active, max_uses, expires_at } = await req.json()
+  const { id, active, max_uses, starts_at, expires_at } = await req.json()
   const admin = adminClient()
   const links = await loadLinks(admin)
 
@@ -104,6 +106,7 @@ export async function PATCH(req: NextRequest) {
 
   if (typeof active === 'boolean') links[idx].active = active
   if (max_uses !== undefined) links[idx].max_uses = max_uses ? parseInt(max_uses) : null
+  if (starts_at !== undefined) links[idx].starts_at = starts_at || null
   if (expires_at !== undefined) links[idx].expires_at = expires_at || null
 
   await saveLinks(admin, links)

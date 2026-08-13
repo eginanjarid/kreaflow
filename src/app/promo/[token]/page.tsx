@@ -10,7 +10,7 @@ const PLAN_FEATURES: Record<string, string[]> = {
   agency:   ['10 Workspace / Brand', '1 owner + 10 anggota tim', 'Semua modul lengkap', 'Unlimited konten & jadwal', 'Update fitur selamanya'],
 }
 
-type TokenInfo = { valid: boolean; plan?: string; plan_name?: string; label?: string; remaining?: number | null; reason?: string }
+type TokenInfo = { valid: boolean; plan?: string; plan_name?: string; label?: string; remaining?: number | null; reason?: string; starts_at?: string }
 
 export default function PromoPage({ params }: { params: Promise<{ token: string }> }) {
   const [token, setToken] = useState('')
@@ -83,16 +83,18 @@ export default function PromoPage({ params }: { params: Promise<{ token: string 
         {!info.valid && (
           <div style={{ background: '#fff', borderRadius: 20, padding: '32px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.09)', textAlign: 'center' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>
-              {info.reason === 'expired' ? '⏰' : info.reason === 'maxed' ? '🔒' : '❌'}
+              {info.reason === 'notyet' ? '🗓️' : info.reason === 'expired' ? '⏰' : info.reason === 'maxed' ? '🔒' : '❌'}
             </div>
             <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#0f172a', marginBottom: 8 }}>
-              {info.reason === 'expired' ? 'Link sudah kadaluarsa'
-                : info.reason === 'maxed' ? 'Kuota link sudah habis'
+              {info.reason === 'expired' ? 'Promo sudah berakhir'
+                : info.reason === 'maxed' ? 'Kuota promo sudah habis'
+                : info.reason === 'notyet' ? 'Promo belum dimulai'
                 : 'Link tidak valid'}
             </div>
             <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: 24 }}>
-              {info.reason === 'expired' ? 'Link promo ini sudah tidak berlaku.'
-                : info.reason === 'maxed' ? 'Link ini sudah digunakan maksimum kali.'
+              {info.reason === 'expired' ? 'Promo ini sudah tidak berlaku.'
+                : info.reason === 'maxed' ? 'Semua slot promo sudah diambil.'
+                : info.reason === 'notyet' ? `Promo ini baru bisa diklaim mulai ${info.starts_at ? new Date(info.starts_at).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) : ''}.`
                 : 'Link yang kamu gunakan tidak ditemukan atau sudah tidak aktif.'}
             </p>
             <Link href="/login" style={{ display: 'inline-block', padding: '11px 24px', background: '#1a73e8', color: '#fff', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: '0.875rem' }}>

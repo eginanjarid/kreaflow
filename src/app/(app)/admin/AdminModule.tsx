@@ -305,11 +305,11 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   }
 
   // Promo Link tab state
-  type PromoLink = { id: string; token: string; label: string; plan: string; max_uses: number | null; claimed_emails: string[]; active: boolean; expires_at: string | null; created_at: string }
+  type PromoLink = { id: string; token: string; label: string; plan: string; max_uses: number | null; claimed_emails: string[]; active: boolean; starts_at: string | null; expires_at: string | null; created_at: string }
   const [promoList, setPromoList] = useState<PromoLink[]>([])
   const [promoLoading, setPromoLoading] = useState(false)
   const [promoMsg, setPromoMsg] = useState('')
-  const [newPromo, setNewPromo] = useState({ token: '', label: '', plan: 'basic', max_uses: '', expires_at: '' })
+  const [newPromo, setNewPromo] = useState({ token: '', label: '', plan: 'basic', max_uses: '', starts_at: '', expires_at: '' })
   const [promoSaving, setPromoSaving] = useState(false)
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
 
@@ -326,13 +326,13 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
     const res = await fetch('/api/admin/promo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: newPromo.token, label: newPromo.label, plan: newPromo.plan, max_uses: newPromo.max_uses || null, expires_at: newPromo.expires_at || null }),
+      body: JSON.stringify({ token: newPromo.token, label: newPromo.label, plan: newPromo.plan, max_uses: newPromo.max_uses || null, starts_at: newPromo.starts_at || null, expires_at: newPromo.expires_at || null }),
     })
     const data = await res.json()
     setPromoSaving(false)
     if (!res.ok) { setPromoMsg('Error: ' + (data.error || 'Gagal')); return }
     setPromoMsg('Link berhasil dibuat!')
-    setNewPromo({ token: '', label: '', plan: 'basic', max_uses: '', expires_at: '' })
+    setNewPromo({ token: '', label: '', plan: 'basic', max_uses: '', starts_at: '', expires_at: '' })
     fetchPromo()
   }
 
@@ -1272,7 +1272,11 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                 <input type="number" value={newPromo.max_uses} onChange={e => setNewPromo(p => ({ ...p, max_uses: e.target.value }))} placeholder="misal: 50" min={1} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Kadaluarsa (opsional)</label>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Mulai dari (opsional)</label>
+                <input type="datetime-local" value={newPromo.starts_at} onChange={e => setNewPromo(p => ({ ...p, starts_at: e.target.value }))} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Berakhir (opsional)</label>
                 <input type="datetime-local" value={newPromo.expires_at} onChange={e => setNewPromo(p => ({ ...p, expires_at: e.target.value }))} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
               </div>
             </div>
@@ -1292,6 +1296,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
             {promoList.map((link, i) => {
               const promoUrl = `${APP_URL}/promo/${link.token}`
               const used = link.claimed_emails.length
+              const isNotYet = link.starts_at && new Date(link.starts_at) > new Date()
               const isExpired = link.expires_at && new Date(link.expires_at) < new Date()
               const isMaxed = link.max_uses !== null && used >= link.max_uses
               return (
@@ -1299,15 +1304,16 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                       <code style={{ fontWeight: 800, fontSize: '0.9rem', color: '#7c3aed', letterSpacing: '1px' }}>{link.token}</code>
-                      <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, background: link.active && !isExpired && !isMaxed ? '#f0fdf4' : '#fef2f2', color: link.active && !isExpired && !isMaxed ? '#059669' : '#dc2626', fontWeight: 700 }}>
-                        {isExpired ? 'KADALUARSA' : isMaxed ? 'HABIS' : link.active ? 'AKTIF' : 'NONAKTIF'}
+                      <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, background: link.active && !isExpired && !isMaxed && !isNotYet ? '#f0fdf4' : isNotYet ? '#fffbeb' : '#fef2f2', color: link.active && !isExpired && !isMaxed && !isNotYet ? '#059669' : isNotYet ? '#92400e' : '#dc2626', fontWeight: 700 }}>
+                        {isExpired ? 'KADALUARSA' : isMaxed ? 'HABIS' : isNotYet ? 'BELUM MULAI' : link.active ? 'AKTIF' : 'NONAKTIF'}
                       </span>
                       <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, background: '#eff6ff', color: '#1a73e8', fontWeight: 600 }}>{link.plan}</span>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 2 }}>{link.label}</div>
                     <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                       Dipakai: {used}{link.max_uses !== null ? `/${link.max_uses}` : ''} kali
-                      {link.expires_at && <span style={{ marginLeft: 8 }}>· Exp: {new Date(link.expires_at).toLocaleDateString('id-ID')}</span>}
+                      {link.starts_at && <span style={{ marginLeft: 8 }}>· Mulai: {new Date(link.starts_at).toLocaleDateString('id-ID')}</span>}
+                      {link.expires_at && <span style={{ marginLeft: 8 }}>· Berakhir: {new Date(link.expires_at).toLocaleDateString('id-ID')}</span>}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
