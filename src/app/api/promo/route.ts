@@ -78,6 +78,10 @@ export async function POST(req: NextRequest) {
   if (link.claimed_emails.includes(cleanEmail)) return NextResponse.json({ error: 'Email ini sudah pernah klaim link ini' }, { status: 400 })
 
   const limits = getPlanLimits(link.plan)
+  // Kalau promo punya expires_at, akses user juga dibatasi sampai tanggal itu (end of day WIB)
+  const effectiveExpiresAt = link.expires_at
+    ? new Date(link.expires_at.slice(0, 10) + 'T23:59:59+07:00').toISOString()
+    : limits.expiresAt
 
   // Cari atau buat user
   let userId: string | null = null
@@ -99,9 +103,9 @@ export async function POST(req: NextRequest) {
   // Upsert product_access
   const { data: existingAccess } = await admin.from('product_access').select('user_id').eq('user_id', userId).eq('app', 'kreaflow').maybeSingle()
   if (existingAccess) {
-    await admin.from('product_access').update({ expires_at: limits.expiresAt }).eq('user_id', userId).eq('app', 'kreaflow')
+    await admin.from('product_access').update({ expires_at: effectiveExpiresAt }).eq('user_id', userId).eq('app', 'kreaflow')
   } else {
-    await admin.from('product_access').insert({ user_id: userId, app: 'kreaflow', expires_at: limits.expiresAt })
+    await admin.from('product_access').insert({ user_id: userId, app: 'kreaflow', expires_at: effectiveExpiresAt })
   }
 
   // Workspace

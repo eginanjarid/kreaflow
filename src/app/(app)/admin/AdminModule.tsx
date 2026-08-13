@@ -12,6 +12,7 @@ type UserRow = {
   last_sign_in: string
   workspaces: { id: string; name: string; plan: string; role: string }[]
   plan: string
+  access_expires_at: string | null
 }
 
 type WorkspaceMember = {
@@ -92,7 +93,17 @@ type NewCoupon = {
 const PLANS = ['free', 'monthly', 'lifetime']
 const PLAN_COLORS: Record<string, string> = { free: '#6b7280', monthly: '#1a73e8', lifetime: '#059669' }
 
-function PlanBadge({ plan }: { plan: string }) {
+function PlanBadge({ plan, expiresAt }: { plan: string; expiresAt?: string | null }) {
+  if (expiresAt) {
+    const exp = new Date(expiresAt)
+    const now = new Date()
+    const expired = exp < now
+    const label = expired
+      ? 'Expired ' + exp.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
+      : 's/d ' + exp.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
+    const color = expired ? '#dc2626' : '#d97706'
+    return <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10, background: color + '18', color, fontWeight: 700, letterSpacing: '0.02em' }}>{label}</span>
+  }
   const color = PLAN_COLORS[plan] || '#6b7280'
   return <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 10, background: color + '20', color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{plan || 'free'}</span>
 }
@@ -694,7 +705,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                     </span>
                   )}
                   <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>
-                  <PlanBadge plan={u.plan} />
+                  <PlanBadge plan={u.plan} expiresAt={u.access_expires_at} />
                   <span style={{ color: '#d1d5db', fontSize: '0.75rem' }}>·</span>
                   <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>{fmtDate(u.created_at)}</span>
                 </div>
@@ -738,7 +749,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                       <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: 1 }}>+{u.workspaces.length - 1} workspace lain</div>
                     )}
                   </div>
-                  <div style={{ paddingLeft: 12 }}><PlanBadge plan={u.plan} /></div>
+                  <div style={{ paddingLeft: 12 }}><PlanBadge plan={u.plan} expiresAt={u.access_expires_at} /></div>
                   <div style={{ fontSize: '0.7rem', color: '#6b7280', paddingLeft: 12, whiteSpace: 'nowrap' }}>{fmtDate(u.created_at)}</div>
                   <div style={{ display: 'flex', gap: 6, paddingLeft: 12 }}>
                     <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>

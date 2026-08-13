@@ -16,17 +16,21 @@ export default async function AdminPage() {
 
   const godAdmin = isGodAdmin(user.email!)
 
-  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }, { data: superAdmins }, savedPricing] = await Promise.all([
+  const [{ data: authUsers }, { data: workspaces }, { data: members }, { data: invites }, { data: superAdmins }, { data: productAccess }, savedPricing] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 500 }),
     admin.from('kf_workspaces').select('id, name, plan, owner_id, created_at, modes, max_workspaces'),
     admin.from('kf_workspace_members').select('workspace_id, user_id, role, created_at'),
     admin.from('kf_invites').select('workspace_id, email, role, created_at, accepted_at, expires_at'),
     admin.from('kf_super_admins').select('email, added_by, created_at'),
+    admin.from('product_access').select('user_id, expires_at').eq('app', 'kreaflow'),
     fetchPricingConfig(admin),
   ])
 
   const userMap = Object.fromEntries(
     (authUsers?.users || []).map(u => [u.id, { email: u.email || '', nama: (u.user_metadata?.nama as string) || '', created_at: u.created_at, last_sign_in: u.last_sign_in_at || '' }])
+  )
+  const accessMap = Object.fromEntries(
+    (productAccess || []).map(a => [a.user_id as string, a.expires_at as string | null])
   )
 
   // Only KreaFlow users — must have at least one kf_workspace_members record
@@ -61,6 +65,7 @@ export default async function AdminPage() {
         last_sign_in: u.last_sign_in_at || '',
         workspaces: userWorkspaces,
         plan: ownedWs?.plan || 'free',
+        access_expires_at: accessMap[u.id] ?? null,
       }
     }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
