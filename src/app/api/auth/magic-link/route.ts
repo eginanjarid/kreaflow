@@ -28,13 +28,22 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (!userAccess) {
-    return NextResponse.json(
-      { error: 'Akun ini belum punya akses KreaFlow. Silakan beli akses terlebih dahulu.' },
-      { status: 403 }
-    )
-  }
+    // Fallback: cek apakah user adalah member di workspace manapun (diundang oleh owner)
+    const { data: membership } = await supabase
+      .from('kf_workspace_members')
+      .select('id')
+      .eq('user_id', existingUser.id)
+      .limit(1)
+      .maybeSingle()
 
-  if (userAccess.expires_at && new Date(userAccess.expires_at) < new Date()) {
+    if (!membership) {
+      return NextResponse.json(
+        { error: 'Akun ini belum punya akses KreaFlow. Silakan beli akses terlebih dahulu.' },
+        { status: 403 }
+      )
+    }
+    // Member workspace → boleh login, lanjut
+  } else if (userAccess.expires_at && new Date(userAccess.expires_at) < new Date()) {
     return NextResponse.json(
       { error: 'Akses KreaFlow sudah kedaluwarsa.' },
       { status: 403 }
