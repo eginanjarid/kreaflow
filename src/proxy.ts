@@ -36,7 +36,9 @@ export async function proxy(request: NextRequest) {
     pathname === '/payment/success' ||
     pathname === '/email-magic-link.html' ||
     pathname.startsWith('/invite') ||
-    pathname.startsWith('/auth/')
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/promo') ||
+    pathname.startsWith('/lp')
 
   const isNoAccess = pathname.startsWith('/no-access')
   const isExpired  = pathname.startsWith('/expired')

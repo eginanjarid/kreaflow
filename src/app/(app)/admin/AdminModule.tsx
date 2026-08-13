@@ -125,7 +125,7 @@ function BarChart({ data, color = '#1a73e8', height = 56 }: { data: number[]; co
 
 export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail, savedPricing }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string; savedPricing: PricingConfig }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'dashboard' | 'users' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'users' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses' | 'promo'>('dashboard')
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>(savedPricing)
   const [pricingSaving, setPricingSaving] = useState(false)
   const [pricingMsg, setPricingMsg] = useState('')
@@ -186,6 +186,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
 
   useEffect(() => {
     if (tab === 'akses') fetchAccess(accessSearch)
+    if (tab === 'promo') fetchPromo()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
 
@@ -301,6 +302,49 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   async function makeLifetime(userId: string) {
     await fetch('/api/admin/access', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId, expires_at: null }) })
     setAccessList(prev => prev.map(u => u.user_id === userId ? { ...u, expires_at: null, is_active: true } : u))
+  }
+
+  // Promo Link tab state
+  type PromoLink = { id: string; token: string; label: string; plan: string; max_uses: number | null; claimed_emails: string[]; active: boolean; expires_at: string | null; created_at: string }
+  const [promoList, setPromoList] = useState<PromoLink[]>([])
+  const [promoLoading, setPromoLoading] = useState(false)
+  const [promoMsg, setPromoMsg] = useState('')
+  const [newPromo, setNewPromo] = useState({ token: '', label: '', plan: 'basic', max_uses: '', expires_at: '' })
+  const [promoSaving, setPromoSaving] = useState(false)
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
+
+  async function fetchPromo() {
+    setPromoLoading(true)
+    const res = await fetch('/api/admin/promo')
+    const data = await res.json()
+    setPromoLoading(false)
+    if (res.ok) setPromoList(data.links || [])
+  }
+
+  async function createPromo() {
+    setPromoSaving(true); setPromoMsg('')
+    const res = await fetch('/api/admin/promo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: newPromo.token, label: newPromo.label, plan: newPromo.plan, max_uses: newPromo.max_uses || null, expires_at: newPromo.expires_at || null }),
+    })
+    const data = await res.json()
+    setPromoSaving(false)
+    if (!res.ok) { setPromoMsg('Error: ' + (data.error || 'Gagal')); return }
+    setPromoMsg('Link berhasil dibuat!')
+    setNewPromo({ token: '', label: '', plan: 'basic', max_uses: '', expires_at: '' })
+    fetchPromo()
+  }
+
+  async function togglePromo(id: string, active: boolean) {
+    await fetch('/api/admin/promo', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, active }) })
+    setPromoList(prev => prev.map(l => l.id === id ? { ...l, active } : l))
+  }
+
+  async function deletePromo(id: string, token: string) {
+    if (!confirm(`Hapus promo link "${token}"?`)) return
+    await fetch('/api/admin/promo', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    setPromoList(prev => prev.filter(l => l.id !== id))
   }
 
   const superAdminEmailSet = new Set([godAdminEmail, ...saList.map(s => s.email)])
@@ -458,6 +502,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           ['kupon', 'Kupon', '#d97706'],
           ['pricing', 'Pricing', '#d97706'],
           ['akses', 'Grant Akses', '#059669'],
+          ['promo', 'Promo Link', '#7c3aed'],
         ] as [string, string, string][]).map(([id, label, color]) => (
           <button key={id} onClick={() => setTab(id as typeof tab)}
             style={{ padding: '9px 14px', background: 'transparent', border: 'none', borderBottom: tab === id ? `2px solid ${color}` : '2px solid transparent', color: tab === id ? color : '#6b7280', fontSize: '0.82rem', fontWeight: tab === id ? 700 : 400, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -1194,6 +1239,91 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
               </div>
             ))}
             {accessList.length > 0 && <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.7rem', color: '#9ca3af' }}>{accessList.length} user</div>}
+          </div>
+        </div>
+      )}
+
+      {/* PROMO LINK TAB */}
+      {tab === 'promo' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Create form */}
+          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem', marginBottom: 16 }}>Buat Promo Link Baru</div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Token (kosongkan = random)</label>
+                <input value={newPromo.token} onChange={e => setNewPromo(p => ({ ...p, token: e.target.value.toUpperCase() }))} placeholder="misal: SPESIAL2026" style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box', fontFamily: 'monospace', letterSpacing: '0.5px' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Label (internal)</label>
+                <input value={newPromo.label} onChange={e => setNewPromo(p => ({ ...p, label: e.target.value }))} placeholder="misal: Promo Launch Agustus" style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Plan</label>
+                <select value={newPromo.plan} onChange={e => setNewPromo(p => ({ ...p, plan: e.target.value }))} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}>
+                  <option value="basic">Basic Lifetime</option>
+                  <option value="pro">Pro Lifetime</option>
+                  <option value="agency">Agency Lifetime</option>
+                  <option value="bulanan">Bulanan (1 bln)</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Maks. Klaim (kosong = unlimited)</label>
+                <input type="number" value={newPromo.max_uses} onChange={e => setNewPromo(p => ({ ...p, max_uses: e.target.value }))} placeholder="misal: 50" min={1} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Kadaluarsa (opsional)</label>
+                <input type="datetime-local" value={newPromo.expires_at} onChange={e => setNewPromo(p => ({ ...p, expires_at: e.target.value }))} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+            {promoMsg && <div style={{ marginTop: 12, padding: '8px 14px', borderRadius: 9, background: promoMsg.startsWith('Error') ? '#fef2f2' : '#f0fdf4', color: promoMsg.startsWith('Error') ? '#dc2626' : '#059669', fontSize: '0.8rem', fontWeight: 500 }}>{promoMsg}</div>}
+            <button onClick={createPromo} disabled={promoSaving} style={{ marginTop: 14, background: promoSaving ? '#c4b5fd' : '#7c3aed', border: 'none', borderRadius: 9, padding: '10px 20px', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: promoSaving ? 'not-allowed' : 'pointer' }}>
+              {promoSaving ? 'Membuat...' : '+ Buat Promo Link'}
+            </button>
+          </div>
+
+          {/* List */}
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid #f3f4f6', fontWeight: 700, color: '#111827', fontSize: '0.85rem' }}>
+              Daftar Promo Link {promoList.length > 0 && <span style={{ color: '#9ca3af', fontWeight: 400 }}>({promoList.length})</span>}
+            </div>
+            {promoLoading && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Loading...</div>}
+            {!promoLoading && promoList.length === 0 && <div style={{ padding: 28, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Belum ada promo link.</div>}
+            {promoList.map((link, i) => {
+              const promoUrl = `${APP_URL}/promo/${link.token}`
+              const used = link.claimed_emails.length
+              const isExpired = link.expires_at && new Date(link.expires_at) < new Date()
+              const isMaxed = link.max_uses !== null && used >= link.max_uses
+              return (
+                <div key={link.id} style={{ padding: '14px 18px', borderBottom: i < promoList.length - 1 ? '1px solid #f3f4f6' : 'none', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                      <code style={{ fontWeight: 800, fontSize: '0.9rem', color: '#7c3aed', letterSpacing: '1px' }}>{link.token}</code>
+                      <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, background: link.active && !isExpired && !isMaxed ? '#f0fdf4' : '#fef2f2', color: link.active && !isExpired && !isMaxed ? '#059669' : '#dc2626', fontWeight: 700 }}>
+                        {isExpired ? 'KADALUARSA' : isMaxed ? 'HABIS' : link.active ? 'AKTIF' : 'NONAKTIF'}
+                      </span>
+                      <span style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 20, background: '#eff6ff', color: '#1a73e8', fontWeight: 600 }}>{link.plan}</span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 2 }}>{link.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                      Dipakai: {used}{link.max_uses !== null ? `/${link.max_uses}` : ''} kali
+                      {link.expires_at && <span style={{ marginLeft: 8 }}>· Exp: {new Date(link.expires_at).toLocaleDateString('id-ID')}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
+                    <button onClick={() => { navigator.clipboard.writeText(promoUrl); alert('Link disalin!') }} style={{ padding: '6px 10px', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: '#374151' }}>
+                      Salin Link
+                    </button>
+                    <button onClick={() => togglePromo(link.id, !link.active)} style={{ padding: '6px 10px', background: link.active ? '#fef3c7' : '#f0fdf4', border: '1px solid ' + (link.active ? '#fde68a' : '#bbf7d0'), borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: link.active ? '#92400e' : '#065f46' }}>
+                      {link.active ? 'Nonaktifkan' : 'Aktifkan'}
+                    </button>
+                    <button onClick={() => deletePromo(link.id, link.token)} style={{ padding: '6px 10px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: '#dc2626' }}>
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
