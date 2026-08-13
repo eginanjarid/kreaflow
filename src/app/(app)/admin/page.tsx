@@ -110,11 +110,17 @@ export default async function AdminPage() {
     return 399000 + (maxWs - 10) * 49000  // Agency + add-ons
   }
 
+  // email → user_id untuk cek apakah owner punya access terbatas (promo)
+  const emailToUserId = Object.fromEntries(Object.entries(userMap).map(([uid, u]) => [u.email, uid]))
+
   // Group by owner: find the max slot workspace per paying user
   const payingUsers = new Map<string, number>()
   for (const ws of workspaceList) {
     if (ws.plan !== 'lifetime') continue
     if (superAdminEmails.has(ws.owner_email)) continue
+    // Skip promo/free users — mereka punya access_expires_at (bukan true lifetime)
+    const ownerId = emailToUserId[ws.owner_email]
+    if (ownerId && accessMap[ownerId]) continue
     const rawWs = (workspaces || []).find(w => w.id === ws.id)
     const maxWs = (rawWs?.max_workspaces as number) || 1
     const current = payingUsers.get(ws.owner_email) || 0
