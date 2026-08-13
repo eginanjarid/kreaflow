@@ -49,7 +49,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/sprints', request.url))
   }
 
-  // Cek product_access — user harus punya akses KreaFlow (tidak cukup hanya punya akun Supabase)
+  // Cek product_access — atau fallback: member workspace (diundang owner)
   if (user && !isAuthRoute && !isPublicRoute && !isNoAccess && !isExpired) {
     const { data: access } = await supabase
       .from('product_access')
@@ -59,9 +59,18 @@ export async function proxy(request: NextRequest) {
       .maybeSingle()
 
     if (!access) {
-      return NextResponse.redirect(new URL('/no-access', request.url))
-    }
-    if (access.expires_at && new Date(access.expires_at) < new Date()) {
+      // Cek apakah user adalah member workspace (tim yang diundang owner)
+      const { data: membership } = await supabase
+        .from('kf_workspace_members')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+        .maybeSingle()
+
+      if (!membership) {
+        return NextResponse.redirect(new URL('/no-access', request.url))
+      }
+    } else if (access.expires_at && new Date(access.expires_at) < new Date()) {
       return NextResponse.redirect(new URL('/expired', request.url))
     }
   }
