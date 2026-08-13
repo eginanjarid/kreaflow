@@ -7,6 +7,15 @@ const track = (event: string, params?: Record<string, unknown>) => {
   if (typeof window !== 'undefined' && window.fbq) window.fbq('track', event, params)
 }
 
+// ── Ganti dengan URL checkout Scalev masing-masing plan ─────────────────────
+const SCALEV = {
+  bulanan: 'https://scalev.id/#', // TODO: isi link Scalev bulanan
+  basic:   'https://scalev.id/#', // TODO: isi link Scalev basic lifetime
+  pro:     'https://scalev.id/#', // TODO: isi link Scalev pro lifetime
+  agency:  'https://scalev.id/#', // TODO: isi link Scalev agency lifetime
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -148,7 +157,7 @@ export default function LpContent() {
           </div>
           <span className="lp-logo-name">KreaFlow</span>
         </a>
-        <a href="https://kreaflow.id/register" className="lp-nav-cta" onClick={handleCta}>Mulai Gratis →</a>
+        <a href="https://kreaflow.id/login" className="lp-nav-cta" onClick={handleCta}>Mulai Gratis →</a>
       </nav>
 
       {/* HERO */}
@@ -156,7 +165,7 @@ export default function LpContent() {
         <div className="lp-badge">🔥 LIFETIME DEAL · HARGA TERBATAS</div>
         <h1>Berhenti Pusing<br />Soal Konten.<br /><span>KreaFlow Urus Semua.</span></h1>
         <p>Satu platform end-to-end untuk kreator, UMKM, dan affiliator Indonesia — dari riset brand sampai jadwal posting, tanpa pindah-pindah tools.</p>
-        <a href="https://kreaflow.id/register" className="lp-cta-main" onClick={handleCta}>Coba Gratis Sekarang →</a>
+        <a href="https://kreaflow.id/login" className="lp-cta-main" onClick={handleCta}>Coba Gratis Sekarang →</a>
         <p className="lp-cta-sub">✓ Tanpa kartu kredit &nbsp;·&nbsp; ✓ Setup 5 menit &nbsp;·&nbsp; ✓ Lifetime sekali bayar</p>
       </section>
 
@@ -257,7 +266,7 @@ export default function LpContent() {
               <div key={i} className="lp-price-feature"><span>✓</span><span>{f}</span></div>
             ))}
           </div>
-          <a href="https://kreaflow.id/checkout?plan=bulanan" className="lp-price-cta outline" onClick={() => handlePricing('Bulanan')}>Coba Bulanan Dulu</a>
+          <a href={SCALEV.bulanan} className="lp-price-cta outline" onClick={() => handlePricing('Bulanan')}>Coba Bulanan Dulu</a>
         </div>
 
         {/* Basic Lifetime — PALING POPULER */}
@@ -271,7 +280,7 @@ export default function LpContent() {
               <div key={i} className="lp-price-feature"><span>✓</span><span style={i === 5 ? { color: '#1a73e8', fontWeight: 700 } : {}}>{f}</span></div>
             ))}
           </div>
-          <a href="https://kreaflow.id/checkout?plan=basic" className="lp-price-cta" onClick={() => handlePricing('Basic')}>Ambil Basic Sekarang →</a>
+          <a href={SCALEV.basic} className="lp-price-cta" onClick={() => handlePricing('Basic')}>Ambil Basic Sekarang →</a>
         </div>
 
         {/* Pro Lifetime */}
@@ -284,7 +293,7 @@ export default function LpContent() {
               <div key={i} className="lp-price-feature"><span>✓</span><span>{f}</span></div>
             ))}
           </div>
-          <a href="https://kreaflow.id/checkout?plan=pro" className="lp-price-cta outline" onClick={() => handlePricing('Pro')}>Mulai dengan Pro</a>
+          <a href={SCALEV.pro} className="lp-price-cta outline" onClick={() => handlePricing('Pro')}>Mulai dengan Pro</a>
         </div>
 
         {/* Agency Lifetime */}
@@ -297,7 +306,7 @@ export default function LpContent() {
               <div key={i} className="lp-price-feature"><span>✓</span><span>{f}</span></div>
             ))}
           </div>
-          <a href="https://kreaflow.id/checkout?plan=agency" className="lp-price-cta outline" onClick={() => handlePricing('Agency')}>Mulai dengan Agency</a>
+          <a href={SCALEV.agency} className="lp-price-cta outline" onClick={() => handlePricing('Agency')}>Mulai dengan Agency</a>
         </div>
         <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', marginTop: '8px' }}>+ Rp49.000 per workspace tambahan kapan saja</p>
       </section>
@@ -349,7 +358,7 @@ export default function LpContent() {
         <div className="lp-urgency">🔥 Harga lifetime ini tidak akan bertahan selamanya</div>
         <h2>Mulai Sekarang,<br />Sebelum Harga Naik</h2>
         <p>Bergabung dengan kreator, UMKM, dan affiliator Indonesia yang sudah pakai KreaFlow untuk konten yang lebih konsisten dan efisien.</p>
-        <a href="https://kreaflow.id/checkout?plan=basic" className="lp-cta-main" style={{ maxWidth: 320, margin: '0 auto 12px' }} onClick={handleCta}>Ambil Lifetime Deal Sekarang →</a>
+        <a href={SCALEV.basic} className="lp-cta-main" style={{ maxWidth: 320, margin: '0 auto 12px' }} onClick={handleCta}>Ambil Lifetime Deal Sekarang →</a>
         <p className="lp-cta-sub">✓ Setup 5 menit &nbsp;·&nbsp; ✓ Tanpa kartu kredit &nbsp;·&nbsp; ✓ Akses langsung</p>
       </section>
 
