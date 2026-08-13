@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { resolveWorkspaceId } from '@/lib/workspace'
 import SettingsModule from './SettingsModule'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -24,7 +26,7 @@ export default async function SettingsPage() {
     admin.from('kf_invites').select('id, email, role, token, created_at, expires_at').eq('workspace_id', wsId).is('accepted_at', null).gt('expires_at', new Date().toISOString()),
   ])
 
-  const { data: authUsers } = await admin.auth.admin.listUsers()
+  const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 })
   const userMap = Object.fromEntries((authUsers?.users || []).map(u => [u.id, { email: u.email, nama: u.user_metadata?.nama }]))
 
   const members = (membersRaw || []).map(m => ({

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
 
@@ -40,6 +41,8 @@ function fieldStyle(extra?: object) {
 }
 
 export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
+  const router = useRouter()
+  const [, startRefresh] = useTransition()
   const [tab, setTab] = useState('workspace')
   const [gdKey, setGdKey] = useState(initialGDKey)
   const [gdKeySaving, setGdKeySaving] = useState(false)
@@ -62,7 +65,8 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
   async function sendInvite(e: React.FormEvent) {
     e.preventDefault()
-    setInviting(true); setInviteError(''); setInviteLink('')
+    setInviting(true); setInviteError(''); setInviteLink(''); setTeamMsg('')
+    const sentEmail = inviteEmail
     const res = await fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,10 +75,12 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     const data = await res.json()
     setInviting(false)
     if (!res.ok) { setInviteError(data.error || 'Gagal'); return }
-    setInviteLink(data.url)
-    setPending(prev => [...prev, { id: data.token, email: inviteEmail, role: inviteRole, token: data.token, expires_at: new Date(Date.now() + 7 * 86400000).toISOString() }])
     setInviteEmail('')
     setInviteJabatan('')
+    setTeamMsg(`Email magic link berhasil dikirim ke ${sentEmail}!`)
+    setTimeout(() => setTeamMsg(''), 6000)
+    // Reload server data so new member appears in the list immediately
+    startRefresh(() => router.refresh())
   }
 
   async function resendInvite(inv: PendingInvite) {
@@ -383,23 +389,14 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               </form>
 
               {inviteLink && (
-                <div style={{ marginTop: 16 }}>
-                  <div style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.25)', borderRadius: 10, padding: '12px 16px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: '1rem' }}>✅</span>
-                    <div>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#065f46' }}>Email undangan terkirim!</div>
-                      <div style={{ fontSize: '0.72rem', color: '#059669', marginTop: 1 }}>Link juga bisa disalin manual di bawah sebagai backup.</div>
-                    </div>
-                  </div>
-                  <div style={{ background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px' }}>
-                    <div style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Link backup (valid 7 hari)</div>
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      <code style={{ flex: 1, fontSize: '0.72rem', color: '#6b7280', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
-                        style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
-                      >Salin</button>
-                    </div>
+                <div style={{ marginTop: 16, background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 10, padding: '12px 16px' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Link backup (valid 7 hari)</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <code style={{ flex: 1, fontSize: '0.72rem', color: '#6b7280', wordBreak: 'break-all', background: '#fff', borderRadius: 6, padding: '8px 10px', border: '1px solid #e5eaf2' }}>{inviteLink}</code>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(inviteLink).then(() => setTeamMsg('Link disalin!'))}
+                      style={{ background: '#fff', border: '1px solid #e5eaf2', borderRadius: 7, padding: '8px 12px', color: '#6b7280', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0 }}
+                    >Salin</button>
                   </div>
                 </div>
               )}
