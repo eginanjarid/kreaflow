@@ -39,9 +39,19 @@ export default async function AdminPage() {
         .filter(m => m.user_id === u.id)
         .map(m => {
           const ws = (workspaces || []).find(w => w.id === m.workspace_id)
-          return ws ? { id: ws.id, name: ws.name as string, plan: ws.plan as string, role: m.role as string } : null
+          return ws ? { id: ws.id, name: ws.name as string, plan: ws.plan as string, role: m.role as string, ws_created_at: ws.created_at as string } : null
         })
-        .filter(Boolean) as { id: string; name: string; plan: string; role: string }[]
+        .filter(Boolean) as { id: string; name: string; plan: string; role: string; ws_created_at: string }[]
+
+      // Sort: workspace milik sendiri (owner) duluan, lalu urut dari yang paling lama dibuat
+      userWorkspaces.sort((a, b) => {
+        if (a.role === 'owner' && b.role !== 'owner') return -1
+        if (a.role !== 'owner' && b.role === 'owner') return 1
+        return new Date(a.ws_created_at).getTime() - new Date(b.ws_created_at).getTime()
+      })
+
+      // Plan dari workspace yang dia own — bukan dari workspace orang lain
+      const ownedWs = userWorkspaces.find(w => w.role === 'owner')
 
       return {
         id: u.id,
@@ -50,7 +60,7 @@ export default async function AdminPage() {
         created_at: u.created_at,
         last_sign_in: u.last_sign_in_at || '',
         workspaces: userWorkspaces,
-        plan: userWorkspaces[0]?.plan || 'free',
+        plan: ownedWs?.plan || 'free',
       }
     }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
