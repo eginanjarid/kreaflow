@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState, useRef, useTransition } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { canAccess, type Module } from '@/lib/jabatan-access'
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -84,7 +84,6 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
   const [createError, setCreateError] = useState('')
   const [creating, setCreating] = useState(false)
   const [switching, setSwitching] = useState(false)
-  const [isRefreshing, startRefresh] = useTransition()
   const wsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -147,8 +146,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
       body: JSON.stringify({ workspace_id: wsId }),
     })
     setWsOpen(false)
-    setSwitching(false)
-    startRefresh(() => { router.refresh() })
+    window.location.href = pathname
   }
 
   async function createWorkspace(e: React.FormEvent) {
@@ -198,14 +196,6 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
 
   return (
     <>
-      {isRefreshing && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(2px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#fff', borderRadius: 14, padding: '16px 24px', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2.5" strokeLinecap="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151' }}>Memuat workspace...</span>
-          </div>
-        </div>
-      )}
       <aside className={className} style={{
         width: W,
         background: '#fff',
@@ -265,6 +255,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
                 position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
                 background: '#fff', border: '1px solid #e5eaf2', borderRadius: 10,
                 boxShadow: '0 6px 24px rgba(42,53,71,0.12)', zIndex: 300, overflow: 'hidden',
+                maxHeight: 'calc(100vh - 220px)', overflowY: 'auto',
               }}>
                 {switching && (
                   <div style={{ padding: '10px 12px', fontSize: '0.75rem', color: '#9fa9ba', textAlign: 'center' }}>Switching...</div>
