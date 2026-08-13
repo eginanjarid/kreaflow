@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 import { isSuperAdmin } from '@/lib/super-admins'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const admin = createAdmin(
+    process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { name, brand_type } = await req.json()
@@ -59,7 +64,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const { data: ws, error } = await supabase
+  const { data: ws, error } = await admin
     .from('kf_workspaces')
     .insert({ name, owner_id: user.id, plan: superAdmin ? 'lifetime' : 'free', brand_type })
     .select('id')
@@ -67,7 +72,7 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabase.from('kf_workspace_members').insert({
+  await admin.from('kf_workspace_members').insert({
     workspace_id: ws.id, user_id: user.id, role: 'owner',
   })
 
