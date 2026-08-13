@@ -794,6 +794,17 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                     style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.8rem', color: '#111827', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }}
                   />
                 </div>
+
+                {/* Checkout URL */}
+                <div style={{ marginTop: 12 }}>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 6 }}>Link Checkout</label>
+                  <input
+                    value={tier.checkout_url || ''}
+                    onChange={e => updateTierField(tier.id, 'checkout_url', e.target.value)}
+                    placeholder="https://..."
+                    style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box', fontFamily: 'monospace' }}
+                  />
+                </div>
               </div>
             ))}
           </div>

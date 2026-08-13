@@ -341,6 +341,7 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
     badge: t.badge,
     isMonthly: t.isMonthly,
     features: t.features,
+    checkout_url: t.checkout_url || '',
   }))
 
   const [phrase, setPhrase] = useState('')
@@ -409,7 +410,7 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
           </div>
           <div className="lp-nav-right">
             <Link href="/login" className="lp-nav-login">Masuk</Link>
-            <Link href="/register" className="lp-nav-cta">Mulai Sekarang</Link>
+            <Link href="/login" className="lp-nav-cta">Mulai Sekarang</Link>
           </div>
         </div>
       </nav>
@@ -741,9 +742,9 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
                 {tier.isMonthly && <span style={{ fontSize:'0.85rem', color:'#64748b', fontWeight:600 }}>/bln</span>}
               </div>
               <div className="lp-price-note">{tier.isMonthly ? 'Berlangganan bulanan · bisa batal kapan saja' : 'Bayar sekali · Lifetime'}</div>
-              <Link href={`/register?plan=${tier.id}`} className={`lp-price-cta ${tier.highlight?'lp-price-cta-solid':'lp-price-cta-ghost'}`}>
+              <a href={tier.checkout_url || '/login'} target={tier.checkout_url ? '_blank' : '_self'} rel="noopener noreferrer" className={`lp-price-cta ${tier.highlight?'lp-price-cta-solid':'lp-price-cta-ghost'}`}>
                 {tier.isMonthly ? 'Mulai Berlangganan →' : `Beli ${tier.name} →`}
-              </Link>
+              </a>
               <div className="lp-price-divider" />
               <div className="lp-price-feats">
                 {tier.features.map(f=>(
@@ -772,8 +773,8 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
               <div style={{ fontSize:'1.4rem', fontWeight:900, color:'#0f172a', lineHeight:1 }}>{fmtLpPrice(config.addonWs)}</div>
               <div style={{ fontSize:'0.72rem', color:'#94a3b8', marginTop:2 }}>lifetime</div>
             </div>
-            <Link href="/register" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0, whiteSpace:'nowrap' }}>
-              Mulai Berlangganan →
+            <Link href="/login" style={{ padding:'9px 18px', borderRadius:8, background:'#f8fafc', border:'1.5px solid #e5eaf2', color:'#374151', fontSize:'0.85rem', fontWeight:700, textDecoration:'none', flexShrink:0, whiteSpace:'nowrap' }}>
+              Mulai Sekarang →
             </Link>
           </div>
 
@@ -838,7 +839,7 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
             <p className="lp-cta-block-sub">Mulai berlangganan 99k/bln atau lifetime dari 149k — bayar sekali, pakai selamanya</p>
           </div>
           <div className="lp-cta-block-right">
-            <Link href="/register" className="lp-btn-white">Mulai Sekarang →</Link>
+            <Link href="/login" className="lp-btn-white">Mulai Sekarang →</Link>
           </div>
         </div>
       </div>
@@ -860,7 +861,7 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
           <div>
             <div className="lp-footer-col-title">Menu</div>
             <div className="lp-footer-links">
-              {[['Fitur','#fitur'],['Harga','#harga'],['Tentang','#'],['Daftar','/register'],['Masuk','/login']].map(([l,h])=>(
+              {[['Fitur','#fitur'],['Harga','#harga'],['Tentang','#'],['Masuk','/login']].map(([l,h])=>(
                 <a key={l} href={h} className="lp-footer-link">{l}</a>
               ))}
             </div>

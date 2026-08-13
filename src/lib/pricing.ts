@@ -7,6 +7,7 @@ export type PricingTier = {
   highlight: boolean
   badge: string | null
   features: string[]
+  checkout_url?: string
 }
 
 export type PricingConfig = {
