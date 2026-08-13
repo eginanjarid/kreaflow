@@ -213,9 +213,10 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   }
 
   async function deleteCoupon(id: string) {
-    if (!confirm('Hapus kupon ini?')) return
-    await fetch('/api/admin/coupons', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
-    setCouponList(prev => prev.filter(c => c.id !== id))
+    showConfirm('Hapus kupon ini?', async () => {
+      await fetch('/api/admin/coupons', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+      setCouponList(prev => prev.filter(c => c.id !== id))
+    })
   }
 
   // Dashboard computations
@@ -248,8 +249,18 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   const [confirmDeleteUser, setConfirmDeleteUser] = useState<UserRow | null>(null)
   const [deleteError, setDeleteError] = useState('')
   const [userList, setUserList] = useState<UserRow[]>(users)
+  const [toast, setToast] = useState('')
+  const [confirmDialog, setConfirmDialog] = useState<{ msg: string; onConfirm: () => void } | null>(null)
 
   // Akses tab state
+  function showToast(msg: string) {
+    setToast(msg)
+    setTimeout(() => setToast(''), 2500)
+  }
+  function showConfirm(msg: string, onConfirm: () => void) {
+    setConfirmDialog({ msg, onConfirm })
+  }
+
   type AccessUser = { user_id: string; email: string; name: string; expires_at: string | null; created_at: string; plan: string; max_members: number; max_workspaces: number; is_active: boolean }
   const [accessList, setAccessList] = useState<AccessUser[]>([])
   const [accessLoading, setAccessLoading] = useState(false)
@@ -290,9 +301,10 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   }
 
   async function revokeAccess(userId: string, email: string) {
-    if (!confirm(`Cabut akses KreaFlow dari ${email}?`)) return
-    await fetch('/api/admin/access', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId }) })
-    setAccessList(prev => prev.filter(u => u.user_id !== userId))
+    showConfirm(`Cabut akses KreaFlow dari ${email}?`, async () => {
+      await fetch('/api/admin/access', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: userId }) })
+      setAccessList(prev => prev.filter(u => u.user_id !== userId))
+    })
   }
 
   async function extendAccess(userId: string) {
@@ -344,9 +356,10 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   }
 
   async function deletePromo(id: string, token: string) {
-    if (!confirm(`Hapus promo link "${token}"?`)) return
-    await fetch('/api/admin/promo', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
-    setPromoList(prev => prev.filter(l => l.id !== id))
+    showConfirm(`Hapus promo link "${token}"?`, async () => {
+      await fetch('/api/admin/promo', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+      setPromoList(prev => prev.filter(l => l.id !== id))
+    })
   }
 
   const superAdminEmailSet = new Set([godAdminEmail, ...saList.map(s => s.email)])
@@ -447,14 +460,15 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   }
 
   async function removeSuperAdmin(email: string) {
-    if (!confirm(`Hapus ${email} dari super admin?`)) return
-    setSaLoading(true); setSaMsg('')
-    const res = await fetch('/api/admin/super-admins', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
-    const data = await res.json()
-    setSaLoading(false)
-    if (!res.ok) { setSaMsg('Error: ' + (data.error || 'Gagal')); return }
-    setSaList(prev => prev.filter(s => s.email !== email))
-    setSaMsg('Dihapus.'); setTimeout(() => setSaMsg(''), 3000)
+    showConfirm(`Hapus ${email} dari super admin?`, async () => {
+      setSaLoading(true); setSaMsg('')
+      const res = await fetch('/api/admin/super-admins', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+      const data = await res.json()
+      setSaLoading(false)
+      if (!res.ok) { setSaMsg('Error: ' + (data.error || 'Gagal')); return }
+      setSaList(prev => prev.filter(s => s.email !== email))
+      setSaMsg('Dihapus.'); setTimeout(() => setSaMsg(''), 3000)
+    })
   }
 
   return (
@@ -1337,7 +1351,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
-                    <button onClick={() => { navigator.clipboard.writeText(promoUrl); alert('Link disalin!') }} style={{ padding: '6px 10px', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: '#374151' }}>
+                    <button onClick={() => { navigator.clipboard.writeText(promoUrl); showToast('Link disalin!') }} style={{ padding: '6px 10px', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: '#374151' }}>
                       Salin Link
                     </button>
                     <button onClick={() => togglePromo(link.id, !link.active)} style={{ padding: '6px 10px', background: link.active ? '#fef3c7' : '#f0fdf4', border: '1px solid ' + (link.active ? '#fde68a' : '#bbf7d0'), borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: link.active ? '#92400e' : '#065f46' }}>
@@ -1411,6 +1425,26 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
               <button onClick={handleSave} disabled={saving} style={{ background: saving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 9, padding: '9px 20px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
                 {saving ? 'Menyimpan...' : 'Simpan'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)', background: '#111827', color: '#fff', padding: '10px 22px', borderRadius: 10, fontSize: '0.85rem', fontWeight: 600, zIndex: 500, boxShadow: '0 4px 20px rgba(0,0,0,0.25)', pointerEvents: 'none' }}>
+          {toast}
+        </div>
+      )}
+
+      {/* Generic confirm dialog */}
+      {confirmDialog && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 360, padding: '24px 22px', boxShadow: '0 8px 40px rgba(0,0,0,0.18)' }}>
+            <p style={{ fontSize: '0.9rem', color: '#111827', marginBottom: 20, lineHeight: 1.6 }}>{confirmDialog.msg}</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, background: 'transparent', border: '1px solid #e5eaf2', borderRadius: 10, padding: '9px', color: '#6b7280', fontSize: '0.85rem', cursor: 'pointer' }}>Batal</button>
+              <button onClick={() => { const fn = confirmDialog.onConfirm; setConfirmDialog(null); fn() }} style={{ flex: 1, background: '#dc2626', border: 'none', borderRadius: 10, padding: '9px', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>Ya, Lanjutkan</button>
             </div>
           </div>
         </div>
