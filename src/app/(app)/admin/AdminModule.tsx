@@ -125,7 +125,7 @@ function BarChart({ data, color = '#1a73e8', height = 56 }: { data: number[]; co
 
 export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail, savedPricing }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string; savedPricing: PricingConfig }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'dashboard' | 'users' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses' | 'promo'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'users' | 'owner' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses' | 'promo'>('dashboard')
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>(savedPricing)
   const [pricingSaving, setPricingSaving] = useState(false)
   const [pricingMsg, setPricingMsg] = useState('')
@@ -351,11 +351,15 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
 
   const superAdminEmailSet = new Set([godAdminEmail, ...saList.map(s => s.email)])
 
-  const filteredUsers = userList.filter(u => {
+  const ownerUsers = userList.filter(u => u.workspaces[0]?.role === 'owner' && !superAdminEmailSet.has(u.email))
+
+  const filteredUsers = (tab === 'owner' ? ownerUsers : userList).filter(u => {
     const matchSearch = !search || u.email.includes(search.toLowerCase()) || u.nama.toLowerCase().includes(search.toLowerCase())
     let matchFilter = true
-    if (filterPlan === 'owner') matchFilter = u.workspaces[0]?.role === 'owner'
-    else if (filterPlan) matchFilter = u.plan === filterPlan
+    if (tab !== 'owner') {
+      if (filterPlan === 'owner') matchFilter = u.workspaces[0]?.role === 'owner'
+      else if (filterPlan) matchFilter = u.plan === filterPlan
+    }
     return matchSearch && matchFilter
   })
 
@@ -507,6 +511,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
         {([
           ['dashboard', 'Dashboard', '#1a73e8'],
           ['users', 'Users', '#dc2626'],
+          ['owner', '👑 Owner', '#b45309'],
           ['workspaces', 'Workspaces', '#dc2626'],
           ['transaksi', 'Transaksi', '#059669'],
           ['kupon', 'Kupon', '#d97706'],
@@ -518,6 +523,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
             style={{ padding: '9px 14px', background: 'transparent', border: 'none', borderBottom: tab === id ? `2px solid ${color}` : '2px solid transparent', color: tab === id ? color : '#6b7280', fontSize: '0.82rem', fontWeight: tab === id ? 700 : 400, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0 }}>
             {label}
             {id === 'users' && <span style={{ fontSize: '0.68rem', color: '#9ca3af', marginLeft: 4 }}>{users.length}</span>}
+            {id === 'owner' && <span style={{ fontSize: '0.68rem', color: '#9ca3af', marginLeft: 4 }}>{users.filter(u => u.workspaces[0]?.role === 'owner' && !superAdminEmailSet.has(u.email)).length}</span>}
             {id === 'workspaces' && <span style={{ fontSize: '0.68rem', color: '#9ca3af', marginLeft: 4 }}>{workspaces.length}</span>}
           </button>
         ))}
@@ -530,20 +536,19 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
       </div>
 
       {/* Search + filter */}
-      {(tab === 'users' || tab === 'workspaces') && <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-        <input placeholder={tab === 'users' ? 'Cari email atau nama...' : 'Cari workspace atau owner...'}
+      {(tab === 'users' || tab === 'owner' || tab === 'workspaces') && <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+        <input placeholder={tab === 'workspaces' ? 'Cari workspace atau owner...' : 'Cari email atau nama...'}
           value={search} onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: 200, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
         {tab === 'users' && (
           <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 6 }}>
-            {(['', ...PLANS, 'owner'] as string[]).map(p => {
-              const color = p === 'owner' ? '#b45309' : (PLAN_COLORS[p] || '#dc2626')
-              const bg = p === 'owner' ? 'rgba(180,83,9,0.12)' : (color + '20')
+            {(['', ...PLANS] as string[]).map(p => {
+              const color = PLAN_COLORS[p] || '#dc2626'
               const active = filterPlan === p
               return (
                 <button key={p} onClick={() => setFilterPlan(p)}
-                  style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: active ? `1px solid ${color}` : '1px solid #e5e7eb', background: active ? bg : '#f1f5f9', color: active ? color : '#6b7280', cursor: 'pointer', textTransform: 'uppercase' }}>
-                  {p === 'owner' ? '👑 Owner' : (p || 'All')}
+                  style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: active ? `1px solid ${color}` : '1px solid #e5e7eb', background: active ? color + '20' : '#f1f5f9', color: active ? color : '#6b7280', cursor: 'pointer', textTransform: 'uppercase' }}>
+                  {p || 'All'}
                 </button>
               )
             })}
@@ -640,8 +645,8 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
         </div>
       )}
 
-      {/* Users Tab */}
-      {tab === 'users' && (
+      {/* Users / Owner Tab */}
+      {(tab === 'users' || tab === 'owner') && (
         <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, overflow: 'hidden' }}>
           {filteredUsers.length === 0 && <div style={{ padding: 28, textAlign: 'center', color: '#6b7280', fontSize: '0.85rem' }}>Tidak ada user</div>}
 
@@ -735,7 +740,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
             </>
           )}
 
-          <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.72rem', color: '#6b7280' }}>{filteredUsers.length} dari {userList.length} user</div>
+          <div style={{ padding: '8px 16px', borderTop: '1px solid #f3f4f6', fontSize: '0.72rem', color: '#6b7280' }}>{filteredUsers.length} dari {tab === 'owner' ? ownerUsers.length : userList.length} user</div>
         </div>
       )}
 
