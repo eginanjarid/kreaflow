@@ -330,11 +330,11 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   }
 
   // Promo Link tab state
-  type PromoLink = { id: string; token: string; label: string; plan: string; max_uses: number | null; claimed_emails: string[]; active: boolean; starts_at: string | null; expires_at: string | null; created_at: string }
+  type PromoLink = { id: string; token: string; label: string; plan: string; max_uses: number | null; claimed_emails: string[]; active: boolean; starts_at: string | null; expires_at: string | null; created_at: string; value: number | null }
   const [promoList, setPromoList] = useState<PromoLink[]>([])
   const [promoLoading, setPromoLoading] = useState(false)
   const [promoMsg, setPromoMsg] = useState('')
-  const [newPromo, setNewPromo] = useState({ token: '', label: '', plan: 'basic', max_uses: '', starts_at: '', expires_at: '' })
+  const [newPromo, setNewPromo] = useState({ token: '', label: '', plan: 'basic', max_uses: '', starts_at: '', expires_at: '', value: '' })
   const [promoSaving, setPromoSaving] = useState(false)
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
 
@@ -351,13 +351,13 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
     const res = await fetch('/api/admin/promo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: newPromo.token, label: newPromo.label, plan: newPromo.plan, max_uses: newPromo.max_uses || null, starts_at: newPromo.starts_at || null, expires_at: newPromo.expires_at || null }),
+      body: JSON.stringify({ token: newPromo.token, label: newPromo.label, plan: newPromo.plan, max_uses: newPromo.max_uses || null, starts_at: newPromo.starts_at || null, expires_at: newPromo.expires_at || null, value: newPromo.value ? parseInt(newPromo.value) : null }),
     })
     const data = await res.json()
     setPromoSaving(false)
     if (!res.ok) { setPromoMsg('Error: ' + (data.error || 'Gagal')); return }
     setPromoMsg('Link berhasil dibuat!')
-    setNewPromo({ token: '', label: '', plan: 'basic', max_uses: '', starts_at: '', expires_at: '' })
+    setNewPromo({ token: '', label: '', plan: 'basic', max_uses: '', starts_at: '', expires_at: '', value: '' })
     fetchPromo()
   }
 
@@ -1317,6 +1317,10 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                 <input type="number" value={newPromo.max_uses} onChange={e => setNewPromo(p => ({ ...p, max_uses: e.target.value }))} placeholder="misal: 50" min={1} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
               </div>
               <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Nilai Promo Rp (opsional)</label>
+                <input type="number" value={newPromo.value} onChange={e => setNewPromo(p => ({ ...p, value: e.target.value }))} placeholder="misal: 149000" min={0} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
                 <label style={{ display: 'block', fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, marginBottom: 5 }}>Mulai dari (opsional)</label>
                 <input type="datetime-local" value={newPromo.starts_at} onChange={e => setNewPromo(p => ({ ...p, starts_at: e.target.value }))} style={{ width: '100%', background: '#f3f4f6', border: '1px solid #e5eaf2', borderRadius: 9, padding: '8px 12px', fontSize: '0.85rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
               </div>
@@ -1357,6 +1361,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                     <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 2 }}>{link.label}</div>
                     <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                       Dipakai: {used}{link.max_uses !== null ? `/${link.max_uses}` : ''} kali
+                      {link.value && <span style={{ marginLeft: 8, color: '#059669', fontWeight: 600 }}>· Rp{link.value.toLocaleString('id-ID')}</span>}
                       {link.starts_at && <span style={{ marginLeft: 8 }}>· Mulai: {new Date(link.starts_at).toLocaleDateString('id-ID')}</span>}
                       {link.expires_at && <span style={{ marginLeft: 8 }}>· Berakhir: {new Date(link.expires_at).toLocaleDateString('id-ID')}</span>}
                     </div>

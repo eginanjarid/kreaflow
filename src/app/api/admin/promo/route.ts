@@ -13,6 +13,7 @@ export type PromoLink = {
   active: boolean
   starts_at: string | null
   expires_at: string | null
+  value: number | null
   created_at: string
 }
 
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
   const caller = await requireSuperAdmin()
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
 
-  const { token, label, plan = 'basic', max_uses, starts_at, expires_at } = await req.json()
+  const { token, label, plan = 'basic', max_uses, starts_at, expires_at, value } = await req.json()
 
   const admin = adminClient()
   const links = await loadLinks(admin)
@@ -83,6 +84,7 @@ export async function POST(req: NextRequest) {
     active: true,
     starts_at: starts_at || null,
     expires_at: expires_at || null,
+    value: value ? parseInt(value) : null,
     created_at: new Date().toISOString(),
   }
 
