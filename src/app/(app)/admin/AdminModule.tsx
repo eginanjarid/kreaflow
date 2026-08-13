@@ -353,8 +353,10 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
 
   const filteredUsers = userList.filter(u => {
     const matchSearch = !search || u.email.includes(search.toLowerCase()) || u.nama.toLowerCase().includes(search.toLowerCase())
-    const matchPlan = !filterPlan || u.plan === filterPlan
-    return matchSearch && matchPlan
+    let matchFilter = true
+    if (filterPlan === 'owner') matchFilter = u.workspaces[0]?.role === 'owner'
+    else if (filterPlan) matchFilter = u.plan === filterPlan
+    return matchSearch && matchFilter
   })
 
   const filteredWs = workspaces.filter(w =>
@@ -534,12 +536,17 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           style={{ flex: 1, minWidth: 200, background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#111827', fontSize: '0.85rem', outline: 'none' }} />
         {tab === 'users' && (
           <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 6 }}>
-            {['', ...PLANS].map(p => (
-              <button key={p} onClick={() => setFilterPlan(p)}
-                style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: filterPlan === p ? `1px solid ${PLAN_COLORS[p] || '#dc2626'}` : '1px solid #e5e7eb', background: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') + '20' : '#f1f5f9', color: filterPlan === p ? (PLAN_COLORS[p] || '#dc2626') : '#6b7280', cursor: 'pointer', textTransform: 'uppercase' }}>
-                {p || 'All'}
-              </button>
-            ))}
+            {(['', ...PLANS, 'owner'] as string[]).map(p => {
+              const color = p === 'owner' ? '#b45309' : (PLAN_COLORS[p] || '#dc2626')
+              const bg = p === 'owner' ? 'rgba(180,83,9,0.12)' : (color + '20')
+              const active = filterPlan === p
+              return (
+                <button key={p} onClick={() => setFilterPlan(p)}
+                  style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 7, fontSize: '0.72rem', fontWeight: 600, border: active ? `1px solid ${color}` : '1px solid #e5e7eb', background: active ? bg : '#f1f5f9', color: active ? color : '#6b7280', cursor: 'pointer', textTransform: 'uppercase' }}>
+                  {p === 'owner' ? '👑 Owner' : (p || 'All')}
+                </button>
+              )
+            })}
           </div>
         )}
       </div>}
