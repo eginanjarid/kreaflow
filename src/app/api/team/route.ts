@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { isSuperAdmin } from '@/lib/super-admins'
 import { sendInviteEmail } from '@/lib/mailer'
 import { sendMagicLinkEmail } from '@/lib/smtp-mailer'
 import { DEFAULT_MAGIC_LINK_SETTINGS, APP_CONFIG_KEY, type MagicLinkSettings } from '@/lib/email-config'
+
+const MAX_WORKSPACE_PER_MEMBER = 5
 
 function adminClient() {
   return createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -28,23 +31,27 @@ export async function POST(req: NextRequest) {
   if (!callerRole || callerRole === 'member') return NextResponse.json({ error: 'Tidak punya akses' }, { status: 403 })
 
   const admin = adminClient()
+  const callerIsSuper = await isSuperAdmin(user.email!)
 
-  // Check plan & member limit
-  const { data: ws } = await admin.from('kf_workspaces').select('plan, name').eq('id', workspaceId).single()
-  const plan = (ws as { plan: string; name: string } | null)?.plan || 'free'
-  const workspaceName = (ws as { plan: string; name: string } | null)?.name || 'KreaFlow'
-  const MAX_MEMBERS = plan === 'lifetime' ? 6 : 0
+  // Check plan & member limit (super admin bypass)
+  const { data: ws } = await admin.from('kf_workspaces').select('plan, name, max_members').eq('id', workspaceId).single()
+  const wsData = ws as { plan: string; name: string; max_members: number | null } | null
+  const plan = wsData?.plan || 'free'
+  const workspaceName = wsData?.name || 'KreaFlow'
+  const MAX_MEMBERS = wsData?.max_members ?? 4
 
-  const { count: currentCount } = await admin
-    .from('kf_workspace_members')
-    .select('*', { count: 'exact', head: true })
-    .eq('workspace_id', workspaceId)
+  if (!callerIsSuper) {
+    const { count: currentCount } = await admin
+      .from('kf_workspace_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('workspace_id', workspaceId)
 
-  if ((currentCount || 0) >= MAX_MEMBERS) {
-    const msg = plan === 'lifetime'
-      ? `Batas maksimal ${MAX_MEMBERS} anggota tim sudah tercapai.`
-      : 'Upgrade ke Lifetime Deal untuk mengundang anggota tim.'
-    return NextResponse.json({ error: msg, limit: true }, { status: 403 })
+    if ((currentCount || 0) >= MAX_MEMBERS) {
+      const msg = plan === 'free'
+        ? 'Upgrade ke paket berbayar untuk mengundang anggota tim.'
+        : `Slot anggota penuh (${MAX_MEMBERS} member). Tambah slot dengan add-on +1 anggota Rp29.000.`
+      return NextResponse.json({ error: msg, limit: true }, { status: 403 })
+    }
   }
 
   const cleanEmail = email.toLowerCase().trim()
@@ -52,13 +59,27 @@ export async function POST(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
 
   // Cari atau buat user di Supabase auth
-  const { data: authUsers } = await admin.auth.admin.listUsers()
+  const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 })
   let targetUser = authUsers?.users.find(u => u.email === cleanEmail) ?? null
 
   if (targetUser) {
     const { data: alreadyMember } = await admin.from('kf_workspace_members')
       .select('id').eq('workspace_id', workspaceId).eq('user_id', targetUser.id).single()
-    if (alreadyMember) return NextResponse.json({ error: 'User sudah jadi member' }, { status: 400 })
+    if (alreadyMember) return NextResponse.json({ error: 'User sudah jadi member di workspace ini' }, { status: 400 })
+
+    // Anti-fraud: max 5 workspace sebagai non-owner per akun (super admin bypass)
+    if (!callerIsSuper) {
+      const { count: nonOwnerCount } = await admin
+        .from('kf_workspace_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', targetUser.id)
+        .neq('role', 'owner')
+      if ((nonOwnerCount || 0) >= MAX_WORKSPACE_PER_MEMBER) {
+        return NextResponse.json({
+          error: `Akun ini sudah bergabung di ${MAX_WORKSPACE_PER_MEMBER} workspace berbeda (batas maksimal untuk mencegah penyalahgunaan akun).`
+        }, { status: 400 })
+      }
+    }
   } else {
     // Buat akun baru otomatis — email langsung terverifikasi
     const { data: created, error: createErr } = await admin.auth.admin.createUser({

@@ -15,7 +15,7 @@ export default async function SettingsPage() {
   if (!wsId) redirect('/login')
 
   const [{ data: ws }, { data: myMembership }] = await Promise.all([
-    supabase.from('kf_workspaces').select('id, name, plan, google_drive_api_key').eq('id', wsId).single(),
+    supabase.from('kf_workspaces').select('id, name, plan, google_drive_api_key, max_members').eq('id', wsId).single(),
     supabase.from('kf_workspace_members').select('role').eq('user_id', user.id).eq('workspace_id', wsId).single(),
   ])
 
@@ -49,6 +49,7 @@ export default async function SettingsPage() {
       googleDriveApiKey={(ws?.google_drive_api_key as string | null) || ''}
       myRole={(myMembership?.role as string) || 'member'}
       members={members}
+      maxMembers={(ws?.max_members as number) || 4}
       pendingInvites={(pendingInvites || []).map(i => ({ id: i.id, email: i.email, role: i.role as string, token: i.token as string, expires_at: i.expires_at as string }))}
       appUrl={process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'}
     />

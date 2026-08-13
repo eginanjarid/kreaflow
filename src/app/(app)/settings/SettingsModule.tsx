@@ -32,6 +32,7 @@ type Props = {
   googleDriveApiKey: string
   myRole: string
   members: Member[]
+  maxMembers: number
   pendingInvites: PendingInvite[]
   appUrl: string
 }
@@ -40,7 +41,7 @@ function fieldStyle(extra?: object) {
   return { width: '100%', background: '#f3f4f6', border: 'none', borderRadius: 10, padding: '10px 14px', color: '#111827', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' as const, ...extra }
 }
 
-export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, pendingInvites: initialPending, appUrl }: Props) {
+export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, maxMembers, pendingInvites: initialPending, appUrl }: Props) {
   const router = useRouter()
   const [, startRefresh] = useTransition()
   const [tab, setTab] = useState('workspace')
@@ -264,8 +265,8 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, marginBottom: 20, overflow: 'hidden' }}>
             <div style={{ padding: '14px 18px', borderBottom: '1px solid #e5eaf2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Member Aktif</div>
-              <div style={{ fontSize: '0.75rem', color: members.length >= 6 ? '#dc2626' : '#6b7280', fontWeight: 600 }}>
-                {members.length}/6 slot
+              <div style={{ fontSize: '0.75rem', color: members.length >= maxMembers ? '#dc2626' : '#6b7280', fontWeight: 600 }}>
+                {members.length}/{maxMembers} slot
               </div>
             </div>
             {members.map(m => (
@@ -341,17 +342,17 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
           )}
 
           {/* Invite form */}
-          {canManageTeam && members.length >= 6 && (
+          {canManageTeam && members.length >= maxMembers && (
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 14, padding: '14px 18px', marginBottom: 20 }}>
               <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#dc2626', marginBottom: 2 }}>Slot anggota tim penuh</div>
-              <div style={{ fontSize: '0.8rem', color: '#dc2626' }}>Maksimal 1 owner + 5 karyawan sudah tercapai. Hapus member untuk menambah yang baru.</div>
+              <div style={{ fontSize: '0.8rem', color: '#dc2626' }}>Maksimal {maxMembers} slot sudah tercapai. Hapus member atau tambah slot (+1 anggota Rp29.000).</div>
             </div>
           )}
-          {canManageTeam && members.length < 6 && (
+          {canManageTeam && members.length < maxMembers && (
             <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.875rem' }}>Undang Member Baru</div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{6 - members.length} slot tersisa</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{maxMembers - members.length} slot tersisa</div>
               </div>
               <form onSubmit={sendInvite} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10 }}>
