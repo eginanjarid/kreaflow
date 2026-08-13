@@ -709,9 +709,9 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                   <div style={{ display: 'flex', gap: 6, paddingLeft: 12 }}>
                     <button onClick={() => openUserAction(u, 'plan')} style={{ background: 'rgba(26,115,232,0.1)', border: '1px solid rgba(26,115,232,0.3)', borderRadius: 6, padding: '4px 8px', color: '#1a73e8', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>Plan</button>
                     <button onClick={() => openUserAction(u, 'password')} style={{ background: 'rgba(71,85,105,0.15)', border: '1px solid #e5eaf2', borderRadius: 6, padding: '4px 8px', color: '#6b7280', fontSize: '0.68rem', cursor: 'pointer' }}>PW</button>
-                    {isGodAdmin && !superAdminEmailSet.has(u.email) && (
+                    {!superAdminEmailSet.has(u.email) && (
                       <button onClick={() => deleteUser(u)} disabled={deletingUser === u.id} style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 6, padding: '4px 8px', color: '#dc2626', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}>
-                        {deletingUser === u.id ? '...' : '✕'}
+                        {deletingUser === u.id ? '...' : 'Hapus'}
                       </button>
                     )}
                   </div>
