@@ -445,6 +445,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
     3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern(),
   })
   const [savingSprint, setSavingSprint] = useState(false)
+  const [copyPopup, setCopyPopup] = useState<number | null>(null)
 
   // Content add modal
   const [addModal, setAddModal] = useState(false)
@@ -1893,7 +1894,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem' }}>Buat Sprint Baru</div>
               <button onClick={() => setSprintModal(false)} style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
             </div>
-            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto', flex: 1 }}>
+            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto', flex: 1 }} onClick={() => setCopyPopup(null)}>
               {/* Template selector */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 8, fontWeight: 600 }}>Jenis Konten</label>
@@ -2141,7 +2142,42 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dp.active ? '#111827' : '#9ca3af', flexShrink: 0 }}>{DAY_NAMES[idx]}</span>
                                 <span style={{ fontSize: '0.68rem', color: dp.active ? '#1a73e8' : '#d1d5db', fontWeight: 600 }}>{dateLabel}</span>
                                 {dp.active && dp.slots.filter(s => s.format).length > 0 && (
-                                  <span style={{ fontSize: '0.62rem', color: '#6b7280', marginLeft: 'auto' }}>{dp.slots.filter(s => s.format).length} konten</span>
+                                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, position: 'relative' }}>
+                                    <span style={{ fontSize: '0.62rem', color: '#6b7280' }}>{dp.slots.filter(s => s.format).length} konten</span>
+                                    <button type="button"
+                                      onClick={e => { e.stopPropagation(); setCopyPopup(copyPopup === idx ? null : idx) }}
+                                      style={{ fontSize: '0.62rem', padding: '2px 8px', borderRadius: 6, border: '1px solid #d1d5db', background: '#f9fafb', color: '#374151', cursor: 'pointer', fontWeight: 600 }}>
+                                      Salin →
+                                    </button>
+                                    {copyPopup === idx && (
+                                      <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', padding: '10px 14px', minWidth: 160, marginTop: 4 }}
+                                        onClick={e => e.stopPropagation()}>
+                                        <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#374151', marginBottom: 8 }}>Salin ke hari:</div>
+                                        {Object.entries(weeklyPattern).map(([dIdx, dPat]) => {
+                                          const di = parseInt(dIdx)
+                                          if (di === idx) return null
+                                          return (
+                                            <label key={di} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, cursor: 'pointer' }}>
+                                              <input type="checkbox" defaultChecked={dPat.active}
+                                                onChange={e => {
+                                                  const checked = e.target.checked
+                                                  setWeeklyPattern(p => ({
+                                                    ...p,
+                                                    [di]: { active: checked, slots: JSON.parse(JSON.stringify(p[idx].slots)) }
+                                                  }))
+                                                }}
+                                                style={{ accentColor: '#1a73e8' }} />
+                                              <span style={{ fontSize: '0.72rem', color: '#374151' }}>{DAY_NAMES[di]}</span>
+                                            </label>
+                                          )
+                                        })}
+                                        <button type="button" onClick={() => setCopyPopup(null)}
+                                          style={{ marginTop: 6, width: '100%', padding: '4px', borderRadius: 6, border: 'none', background: '#1a73e8', color: '#fff', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer' }}>
+                                          Selesai
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                               {/* Slots */}
