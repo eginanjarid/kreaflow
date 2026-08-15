@@ -262,7 +262,7 @@ export default function LpContent() {
           </div>
           <div className="lp-price-period">Berlangganan · Bisa cancel kapan saja</div>
           <div className="lp-price-features">
-            {['1 Workspace / Brand','1 owner + 3 anggota tim','Semua modul lengkap','Unlimited konten & jadwal','Bisa upgrade ke lifetime kapan saja'].map((f, i) => (
+            {['1 Workspace / Brand','1 owner + 4 anggota tim','Semua modul lengkap','Unlimited konten & jadwal','Bisa upgrade ke lifetime kapan saja'].map((f, i) => (
               <div key={i} className="lp-price-feature"><span>✓</span><span>{f}</span></div>
             ))}
           </div>
@@ -276,7 +276,7 @@ export default function LpContent() {
           <div className="lp-price-amount">Rp149.000</div>
           <div className="lp-price-period">Bayar sekali · Lifetime · 2 workspace</div>
           <div className="lp-price-features">
-            {['2 Workspace / Brand','1 owner + 3 anggota tim','Semua modul lengkap','Unlimited konten & jadwal','Update fitur selamanya','Lebih hemat dari 2 bulan berlangganan'].map((f, i) => (
+            {['2 Workspace / Brand','1 owner + 4 anggota tim','Semua modul lengkap','Unlimited konten & jadwal','Update fitur selamanya','Lebih hemat dari 2 bulan berlangganan'].map((f, i) => (
               <div key={i} className="lp-price-feature"><span>✓</span><span style={i === 5 ? { color: '#1a73e8', fontWeight: 700 } : {}}>{f}</span></div>
             ))}
           </div>
@@ -340,7 +340,7 @@ export default function LpContent() {
         <div style={{ marginTop: '24px' }}>
           {[
             { q: 'Lifetime deal artinya apa?', a: 'Bayar sekali, pakai selamanya. Tidak ada biaya bulanan atau tahunan. Kamu juga dapat semua update fitur baru secara gratis.' },
-            { q: 'Apakah bisa untuk tim?', a: 'Bisa. Starter support 3 anggota, Pro 5 anggota, Agency 10 anggota per workspace. Kamu bisa assign role berbeda ke setiap member.' },
+            { q: 'Apakah bisa untuk tim?', a: 'Bisa. Basic support 4 anggota, Pro 5 anggota, Agency 10 anggota per workspace. Kamu bisa assign role berbeda ke setiap member.' },
             { q: 'Apakah ada free trial?', a: 'Tidak ada free trial — KreaFlow langsung bisa dipakai setelah beli. Harga lifetime-nya sudah sangat terjangkau untuk akses selamanya.' },
             { q: 'Cocok untuk jenis bisnis apa?', a: 'KreaFlow cocok untuk kreator konten, pemilik UMKM, affiliator TikTok Shop, dan agensi digital yang butuh manage konten untuk beberapa klien sekaligus.' },
             { q: 'Bagaimana kalau butuh workspace lebih?', a: 'Bisa tambah workspace extra seharga Rp49.000 per workspace kapan saja, tanpa perlu ganti paket.' },

@@ -10,6 +10,12 @@ export function isPaidPlan(plan: string | null | undefined): boolean {
   return PAID_PLANS.includes((plan ?? '') as PlanId)
 }
 
+export function isPlanExpired(plan: string | null | undefined, expiresAt: string | null | undefined): boolean {
+  if (plan !== 'bulanan') return false
+  if (!expiresAt) return false
+  return new Date(expiresAt) < new Date()
+}
+
 // Label yang ditampilkan ke user berdasarkan plan id
 export const PLAN_LABELS: Record<string, string> = {
   lifetime: 'Lifetime',
@@ -60,11 +66,11 @@ export async function getWorkspaceWithPlanGuard() {
 
   const { data: ws } = await supabase
     .from('kf_workspaces')
-    .select('plan')
+    .select('plan, plan_expires_at')
     .eq('id', wsId)
     .maybeSingle()
 
-  if (!isPaidPlan(ws?.plan)) redirect('/upgrade')
+  if (!isPaidPlan(ws?.plan) || isPlanExpired(ws?.plan, ws?.plan_expires_at)) redirect('/upgrade')
 
   return { supabase, user, wsId }
 }

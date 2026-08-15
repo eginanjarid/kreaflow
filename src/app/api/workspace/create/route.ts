@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     .insert({
       name,
       owner_id: user.id,
-      plan: 'lifetime',
+      plan: firstWs?.plan ?? 'lifetime',
       brand_type,
       max_members: superAdmin ? 999 : inheritMaxMembers,
       max_workspaces: superAdmin ? 999 : inheritMaxWorkspaces,
