@@ -2150,15 +2150,18 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                       Salin →
                                     </button>
                                     {copyPopup === idx && (
-                                      <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', padding: '10px 14px', minWidth: 160, marginTop: 4 }}
+                                      <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', padding: '12px 14px', minWidth: 180, marginTop: 4 }}
                                         onClick={e => e.stopPropagation()}>
-                                        <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#374151', marginBottom: 8 }}>Salin ke hari:</div>
-                                        {Object.entries(weeklyPattern).map(([dIdx, dPat]) => {
-                                          const di = parseInt(dIdx)
+                                        <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#374151', marginBottom: 10 }}>Salin ke hari:</div>
+                                        {Array.from({ length: 7 }, (_, offset) => {
+                                          const dd = new Date(weeklyStart + 'T00:00:00')
+                                          dd.setDate(dd.getDate() + offset)
+                                          const di = dd.getDay()
                                           if (di === idx) return null
+                                          const dl = `${String(dd.getDate()).padStart(2, '0')}/${String(dd.getMonth() + 1).padStart(2, '0')}`
                                           return (
-                                            <label key={di} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, cursor: 'pointer' }}>
-                                              <input type="checkbox" defaultChecked={dPat.active}
+                                            <label key={offset} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
+                                              <input type="checkbox" defaultChecked={weeklyPattern[di]?.active}
                                                 onChange={e => {
                                                   const checked = e.target.checked
                                                   setWeeklyPattern(p => ({
@@ -2166,13 +2169,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
                                                     [di]: { active: checked, slots: JSON.parse(JSON.stringify(p[idx].slots)) }
                                                   }))
                                                 }}
-                                                style={{ accentColor: '#1a73e8' }} />
-                                              <span style={{ fontSize: '0.72rem', color: '#374151' }}>{DAY_NAMES[di]}</span>
+                                                style={{ accentColor: '#1a73e8', width: 14, height: 14, flexShrink: 0 }} />
+                                              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#111827', minWidth: 50 }}>{DAY_NAMES[di]}</span>
+                                              <span style={{ fontSize: '0.68rem', color: '#6b7280' }}>{dl}</span>
                                             </label>
                                           )
                                         })}
                                         <button type="button" onClick={() => setCopyPopup(null)}
-                                          style={{ marginTop: 6, width: '100%', padding: '4px', borderRadius: 6, border: 'none', background: '#1a73e8', color: '#fff', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer' }}>
+                                          style={{ marginTop: 4, width: '100%', padding: '5px', borderRadius: 6, border: 'none', background: '#1a73e8', color: '#fff', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}>
                                           Selesai
                                         </button>
                                       </div>
