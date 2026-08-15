@@ -254,6 +254,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
     if (!isAffiliate || item.status === 'Revisi') {
       setNaskahMode('creator')
       setNF('pillar', pillarName)
+      setNF('judul_custom', item.judul)
       if (item.format) setNF('tipe_konten', item.format)
       if (item.platform.length > 0) setNF('platform', item.platform[0])
       if (item.product_id) setNF('product_id', item.product_id)
@@ -619,7 +620,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     }
     if (activeQueueId) {
       const activeItem = localQueue.find(q => q.id === activeQueueId)
-      const judulAktif = activeItem?.judul || `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform}`
+      const judulAktif = naskahForm.judul_custom.trim() || activeItem?.judul || `[Affiliate] ${selectedProduct?.nama || 'Produk'} — ${affForm.platform}`
       const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
       await supabase.from('kf_content_ideas').update({ script: affNaskah, status: targetStatus, judul: judulAktif, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', activeQueueId)
       if (needsApproval) {
@@ -653,7 +654,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     // If user is working on a specific queue item, always update that item directly
     if (activeQueueId) {
       const activeItem = localQueue.find(q => q.id === activeQueueId)
-      const judulAktif = activeItem?.judul || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten}`
+      const judulAktif = naskahForm.judul_custom.trim() || activeItem?.judul || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten}`
       const targetStatus = needsApproval ? 'Menunggu Approval' : 'Naskah Siap'
       await supabase.from('kf_content_ideas').update({ script: generatedNaskah, status: targetStatus, judul: judulAktif, plan_completed_at: new Date().toISOString(), revisi_notes: null }).eq('id', activeQueueId)
       if (needsApproval) {
