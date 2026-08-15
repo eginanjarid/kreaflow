@@ -23,7 +23,7 @@ type Product = {
 
 type NaskahForm = {
   platform: string; tipe_konten: string; pillar: string; hook_angle: string
-  product_id: string; konteks: string; jumlah_varian: string
+  product_id: string; konteks: string; jumlah_varian: string; judul_custom: string
 }
 
 type AffNaskahForm = {
@@ -187,7 +187,7 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
   }
 
   // Naskah Generator state
-  const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '', jumlah_varian: '3' }
+  const emptyNaskah: NaskahForm = { platform: brandProfile?.platform_utama || 'TikTok', tipe_konten: 'Video Pendek', pillar: '', hook_angle: '', product_id: '', konteks: '', jumlah_varian: '3', judul_custom: '' }
   const [naskahMode, setNaskahMode] = useState<'creator' | 'affiliate'>(isAffiliate ? 'affiliate' : 'creator')
   const [naskahForm, setNaskahForm] = useState<NaskahForm>(emptyNaskah)
   const [aiModal, setAiModal] = useState<{ prompt: string; label?: string } | null>(null)
@@ -667,7 +667,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
       setTimeout(() => setSavedToLibrary(false), 3000)
       return
     }
-    const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
+    const judul = naskahForm.judul_custom.trim() || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
     const matchingDraft = naskahForm.product_id
       ? sprintDrafts.find(d => d.product_id === naskahForm.product_id)
       : naskahForm.pillar
@@ -712,7 +712,7 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
     const mode = saveWithoutQueueModal!
     setSaveWithoutQueueModal(null)
     if (mode === 'creator') {
-      const judul = `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
+      const judul = naskahForm.judul_custom.trim() || `[${naskahForm.platform}] ${naskahForm.pillar || naskahForm.tipe_konten} — ${new Date().toLocaleDateString('id-ID')}`
       await _doInsertNaskah(generatedNaskah, judul, naskahForm.product_id, naskahForm.platform, naskahForm.tipe_konten, 'creator', null, null)
     } else {
       const selectedProduct = products.find(p => p.id === affForm.product_id)
@@ -1063,6 +1063,11 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>Isi detail konten → Generate → paste hasil AI di kanan</div>
                   </div>
                 )}
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Judul Konten <span style={{ fontWeight: 400 }}>(opsional)</span></label>
+                  <input style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.judul_custom} onChange={e => setNF('judul_custom', e.target.value)} placeholder="cth: Cara Daftar KreaFlow untuk Tim..." />
+                </div>
 
                 {!sprintLockedItem && (
                   <div>
