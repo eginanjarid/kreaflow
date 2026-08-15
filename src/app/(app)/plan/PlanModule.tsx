@@ -1064,11 +1064,6 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                   </div>
                 )}
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Judul Konten <span style={{ fontWeight: 400 }}>(opsional)</span></label>
-                  <input style={fieldStyle({ fontSize: '0.82rem' })} value={naskahForm.judul_custom} onChange={e => setNF('judul_custom', e.target.value)} placeholder="cth: Cara Daftar KreaFlow untuk Tim..." />
-                </div>
-
                 {!sprintLockedItem && (
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', color: '#6b7280', marginBottom: 6, fontWeight: 600 }}>Platform</label>
@@ -1223,6 +1218,13 @@ Ingat: naskah harus terasa seperti teman yang excited share temuan bagus, bukan 
                     </button>
                   )}
                 </div>
+                {/* Judul Konten */}
+                <input
+                  style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', fontSize: '0.85rem', fontWeight: 600, color: '#111827', outline: 'none', background: '#fafafa' }}
+                  value={naskahForm.judul_custom}
+                  onChange={e => setNF('judul_custom', e.target.value)}
+                  placeholder="Judul konten (opsional)..."
+                />
                 {/* Formatting toolbar */}
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', padding: '6px 8px', background: '#f9fafb', borderRadius: 8, border: '1px solid #f0f0f0' }}>
                   {([
