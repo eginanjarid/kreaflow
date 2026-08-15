@@ -243,7 +243,6 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
   const [showRevisiInput, setShowRevisiInput] = useState(false)
   const product = products.find(p => p.id === item.product_id)
   const isVideo = VIDEO_FORMATS.includes(item.format)
-  const PRODUKSI_JABATAN = ['Videografer', 'Editor', 'Desainer', 'Art Director', 'Content Creator']
   const produksiMembers = workspaceMembers.filter(m => PRODUKSI_JABATAN.includes(m.jabatan))
   const otherMembers = workspaceMembers.filter(m => !PRODUKSI_JABATAN.includes(m.jabatan))
 
@@ -733,10 +732,13 @@ function NotifPanel({ notifications, onClose, onMarkRead }: { notifications: Not
   )
 }
 
-export default function StudioModule({ initialContents, products, initialNotifications, workspaceId, workspaceName = 'studio', workspaceMembers = [], role = '', jabatan = '' }: {
-  initialContents: ContentItem[]; products: Product[]; initialNotifications: Notification[]; workspaceId: string; workspaceName?: string; workspaceMembers?: WorkspaceMember[]; role?: string; jabatan?: string
+const PRODUKSI_JABATAN = ['Videografer', 'Editor', 'Desainer', 'Art Director', 'Content Creator']
+
+export default function StudioModule({ initialContents, products, initialNotifications, workspaceId, workspaceName = 'studio', workspaceMembers = [], role = '', jabatan = '', userId = '' }: {
+  initialContents: ContentItem[]; products: Product[]; initialNotifications: Notification[]; workspaceId: string; workspaceName?: string; workspaceMembers?: WorkspaceMember[]; role?: string; jabatan?: string; userId?: string
 }) {
   const isApprover = role === 'owner' || role === 'admin' || jabatan === 'Manager'
+  const isProduksiRole = PRODUKSI_JABATAN.includes(jabatan)
   const supabase = createClient()
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
@@ -755,6 +757,7 @@ export default function StudioModule({ initialContents, products, initialNotific
   const [searchQ, setSearchQ] = useState('')
   const [filterFormat, setFilterFormat] = useState('')
   const [filterPlatform, setFilterPlatform] = useState('')
+  const [myWorkOnly, setMyWorkOnly] = useState(isProduksiRole)
   // Bulk select
   const [bulkMode, setBulkMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -795,6 +798,7 @@ export default function StudioModule({ initialContents, products, initialNotific
   const allFormats = [...new Set(contents.map(c => c.format).filter(Boolean))]
   const allPlatforms = [...new Set(contents.flatMap(c => c.platform || []))]
   const displayItems = filtered.filter(c => {
+    if (myWorkOnly && userId && c.assigned_produksi && c.assigned_produksi !== userId) return false
     if (searchQ && !(c.judul || '').toLowerCase().includes(searchQ.toLowerCase())) return false
     if (filterFormat && c.format !== filterFormat) return false
     if (filterPlatform && !(c.platform || []).includes(filterPlatform)) return false
@@ -854,9 +858,10 @@ export default function StudioModule({ initialContents, products, initialNotific
     { key: 'selesai' as Tab, label: 'Selesai', color: '#059669' },
   ]
 
-  const antriCount = contents.filter(c => STATUS_STAGE[c.status] === 'antrian').length
-  const dikerjakanCount = contents.filter(c => STATUS_STAGE[c.status] === 'dikerjakan').length
-  const reviewCount = contents.filter(c => STATUS_STAGE[c.status] === 'review').length
+  const myWorkFilter = (c: ContentItem) => !myWorkOnly || !userId || !c.assigned_produksi || c.assigned_produksi === userId
+  const antriCount = contents.filter(c => STATUS_STAGE[c.status] === 'antrian' && myWorkFilter(c)).length
+  const dikerjakanCount = contents.filter(c => STATUS_STAGE[c.status] === 'dikerjakan' && myWorkFilter(c)).length
+  const reviewCount = contents.filter(c => STATUS_STAGE[c.status] === 'review' && myWorkFilter(c)).length
 
   const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
   const initial = workspaceName.charAt(0).toUpperCase()
@@ -928,6 +933,12 @@ export default function StudioModule({ initialContents, products, initialNotific
             <option value="">Semua Platform</option>
             {allPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
+          {isProduksiRole && (
+            <button onClick={() => setMyWorkOnly(v => !v)}
+              style={{ padding: '7px 12px', border: `1px solid ${myWorkOnly ? '#1a73e8' : '#e5e7eb'}`, borderRadius: 8, fontSize: '0.75rem', color: myWorkOnly ? '#1a73e8' : '#6b7280', background: myWorkOnly ? 'rgba(26,115,232,0.08)' : '#f3f4f6', cursor: 'pointer', flexShrink: 0, fontWeight: myWorkOnly ? 700 : 400 }}>
+              {myWorkOnly ? 'Tugasku' : 'Semua'}
+            </button>
+          )}
           {(searchQ || filterFormat || filterPlatform) && (
             <button onClick={() => { setSearchQ(''); setFilterFormat(''); setFilterPlatform('') }}
               style={{ padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.75rem', color: '#6b7280', background: '#f3f4f6', cursor: 'pointer', flexShrink: 0 }}>
@@ -943,6 +954,8 @@ export default function StudioModule({ initialContents, products, initialNotific
           <div style={{ marginBottom: 12, color: '#6b7280' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h5M17 12h5"/></svg></div>
           {(searchQ || filterFormat || filterPlatform) ? (
             <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>Tidak ada konten yang cocok</div>
+          ) : myWorkOnly ? (
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>Belum ada konten yang di-assign ke kamu</div>
           ) : (
             <div style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 6 }}>{tab === 'antrian' ? 'Belum ada naskah siap diproduksi' : tab === 'dikerjakan' ? 'Belum ada konten sedang dikerjakan' : tab === 'review' ? 'Tidak ada konten menunggu review' : 'Belum ada konten selesai'}</div>
           )}

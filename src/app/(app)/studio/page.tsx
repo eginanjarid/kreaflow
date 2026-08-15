@@ -5,7 +5,7 @@ import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
 import StudioModule from './StudioModule'
 
 export default async function StudioPage() {
-  const { supabase, wsId, role, jabatan } = await getServerContext()
+  const { supabase, user, wsId, role, jabatan } = await getServerContext()
   if (!canAccess(role, jabatan, 'studio')) redirect(firstAccessibleRoute(role, jabatan))
 
   const admin = createAdmin(process.env.SUPABASE_INTERNAL_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -54,6 +54,7 @@ export default async function StudioPage() {
       workspaceMembers={workspaceMembers}
       role={role}
       jabatan={jabatan}
+      userId={user.id}
     />
   )
 }
