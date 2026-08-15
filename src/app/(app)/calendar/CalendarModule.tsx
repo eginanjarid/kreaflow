@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -90,6 +90,26 @@ export default function CalendarModule({ initialEntries, workspaceId, ideas, tas
 
   function openDetail(e: Entry) { setDetailEntry(e) }
   function closeDetail() { setDetailEntry(null) }
+
+  // Horizontal scroll for "Siap Dijadwalkan" — mouse wheel + drag support
+  const readyScrollRef = useRef<HTMLDivElement>(null)
+  const isDragging = useRef(false)
+  const dragStartX = useRef(0)
+  const dragScrollLeft = useRef(0)
+
+  const handleReadyWheel = useCallback((e: WheelEvent) => {
+    const el = readyScrollRef.current
+    if (!el) return
+    e.preventDefault()
+    el.scrollLeft += e.deltaY + e.deltaX
+  }, [])
+
+  useEffect(() => {
+    const el = readyScrollRef.current
+    if (!el) return
+    el.addEventListener('wheel', handleReadyWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleReadyWheel)
+  }, [handleReadyWheel])
 
   // Calendar grid
   const calDays = useMemo(() => {
@@ -348,7 +368,23 @@ function prevMonth() {
             </div>
             <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik untuk jadwalkan</span>
           </div>
-          <div style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+          <div
+            ref={readyScrollRef}
+            style={{ display: 'flex', gap: 10, padding: '12px 16px', overflowX: 'auto', scrollbarWidth: 'none', cursor: isDragging.current ? 'grabbing' : 'grab', userSelect: 'none' }}
+            onMouseDown={(e) => {
+              isDragging.current = true
+              dragStartX.current = e.pageX - (readyScrollRef.current?.offsetLeft || 0)
+              dragScrollLeft.current = readyScrollRef.current?.scrollLeft || 0
+            }}
+            onMouseMove={(e) => {
+              if (!isDragging.current || !readyScrollRef.current) return
+              e.preventDefault()
+              const x = e.pageX - (readyScrollRef.current.offsetLeft || 0)
+              readyScrollRef.current.scrollLeft = dragScrollLeft.current - (x - dragStartX.current)
+            }}
+            onMouseUp={() => { isDragging.current = false }}
+            onMouseLeave={() => { isDragging.current = false }}
+          >
             {(() => {
               const sortedReady = [...readyItems].sort((a, b) => {
                 const da = a.tanggal_tayang || '9999', db = b.tanggal_tayang || '9999'
