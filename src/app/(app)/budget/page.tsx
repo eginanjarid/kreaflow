@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
@@ -8,7 +9,7 @@ export default async function BudgetPage() {
   if (!canAccess(role, jabatan, 'budget')) redirect(firstAccessibleRoute(role, jabatan))
 
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle()
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
 
   const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const isAffiliate = brandType === 'affiliate'

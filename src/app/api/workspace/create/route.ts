@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         .select('plan, max_workspaces')
         .in('id', wsIds)
 
-      const lifetimeWs = ownedWs?.find(w => w.plan === 'lifetime')
+      const lifetimeWs = ownedWs?.find(w => ['lifetime','basic','pro','agency'].includes(w.plan ?? ''))
 
       if (!lifetimeWs) {
         return NextResponse.json({ error: 'Akun belum diaktivasi. Silakan upgrade terlebih dahulu.', needUpgrade: true }, { status: 403 })

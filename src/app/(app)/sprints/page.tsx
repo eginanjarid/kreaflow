@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
@@ -25,7 +26,7 @@ export default async function SprintsPage() {
     supabase.from('kf_products').select('id', { count: 'exact', head: true }).eq('workspace_id', wsId).eq('is_active', true),
   ])
 
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
   const brandIncomplete = wsData?.brand_type === 'business' ? (!brand?.biz_nama_brand && !brand?.biz_kategori) : (!brand?.niche && !brand?.affiliate_micro_niche)
   if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
   if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')

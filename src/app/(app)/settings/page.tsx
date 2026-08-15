@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
-import { resolveWorkspaceId } from '@/lib/workspace'
+import { resolveWorkspaceId, PLAN_LABELS } from '@/lib/workspace'
 import SettingsModule from './SettingsModule'
 
 export const dynamic = 'force-dynamic'
@@ -45,7 +45,7 @@ export default async function SettingsPage() {
       workspaceName={ws?.name || ''}
       userEmail={user.email!}
       userName={user.user_metadata?.nama || user.email!}
-      plan={ws?.plan || 'Free'}
+      plan={PLAN_LABELS[ws?.plan ?? ''] || ws?.plan || 'Free'}
       googleDriveApiKey={(ws?.google_drive_api_key as string | null) || ''}
       myRole={(myMembership?.role as string) || 'member'}
       members={members}

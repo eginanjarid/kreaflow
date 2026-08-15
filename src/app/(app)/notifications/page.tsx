@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import NotificationsModule from './NotificationsModule'
@@ -15,7 +16,7 @@ const JABATAN_NOTIF_TYPES: Record<string, string[]> = {
 export default async function NotificationsPage() {
   const { supabase, wsId, role, jabatan } = await getServerContext()
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan').eq('id', wsId).maybeSingle()
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
 
   const allowedTypes = (role === 'owner' || role === 'admin') ? null : (JABATAN_NOTIF_TYPES[jabatan] ?? null)
 

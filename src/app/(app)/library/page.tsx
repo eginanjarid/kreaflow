@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import LibraryModule from './LibraryModule'
@@ -16,7 +17,7 @@ export default async function LibraryPage() {
     supabase.from('kf_sprints').select('id, nama, start_date, end_date').eq('workspace_id', wsId).gte('end_date', today).order('start_date', { ascending: true }),
   ])
 
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
 
   return (
     <LibraryModule

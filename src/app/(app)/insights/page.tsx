@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
@@ -88,7 +89,7 @@ export default async function DashboardPage() {
       .lte('due_date', weekEnd),
   ])
 
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
 
   const workspaceName = wsData?.name || 'KreaFlow'
 

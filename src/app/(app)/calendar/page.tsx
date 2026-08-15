@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
@@ -25,7 +26,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     admin.auth.admin.listUsers(),
   ])
 
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
   const brandIncomplete = wsData?.brand_type === 'business' ? (!brandCheck?.biz_nama_brand && !brandCheck?.biz_kategori) : (!brandCheck?.niche && !brandCheck?.affiliate_micro_niche)
   if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
   if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')

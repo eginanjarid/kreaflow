@@ -2,6 +2,23 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
+// Semua nilai plan yang sudah bayar dan punya akses penuh
+export const PAID_PLANS = ['lifetime', 'basic', 'pro', 'agency', 'bulanan'] as const
+export type PlanId = typeof PAID_PLANS[number]
+
+export function isPaidPlan(plan: string | null | undefined): boolean {
+  return PAID_PLANS.includes((plan ?? '') as PlanId)
+}
+
+// Label yang ditampilkan ke user berdasarkan plan id
+export const PLAN_LABELS: Record<string, string> = {
+  lifetime: 'Lifetime',
+  basic:    'Basic Lifetime',
+  pro:      'Pro Lifetime',
+  agency:   'Agency Lifetime',
+  bulanan:  'Bulanan',
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function resolveWorkspaceId(supabase: any, userId: string): Promise<string | null> {
   const { data: rows } = await supabase
@@ -20,8 +37,11 @@ export async function resolveWorkspaceId(supabase: any, userId: string): Promise
   if (rows.length === 1) return rows[0].workspace_id as string
   const wsIds = rows.map((r: { workspace_id: string }) => r.workspace_id)
   const { data: wsData } = await supabase.from('kf_workspaces').select('id, plan').in('id', wsIds)
-  const lifetimeId = wsData?.find((w: { id: string; plan: string }) => w.plan === 'lifetime')?.id
-  return lifetimeId || rows[0].workspace_id as string
+  // Pilih workspace lifetime terlebih dahulu (bukan bulanan)
+  const preferredId = wsData?.find((w: { id: string; plan: string }) =>
+    ['lifetime', 'basic', 'pro', 'agency'].includes(w.plan)
+  )?.id
+  return preferredId || rows[0].workspace_id as string
 }
 
 export async function getWorkspace() {
@@ -44,7 +64,7 @@ export async function getWorkspaceWithPlanGuard() {
     .eq('id', wsId)
     .maybeSingle()
 
-  if (ws?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(ws?.plan)) redirect('/upgrade')
 
   return { supabase, user, wsId }
 }

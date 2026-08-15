@@ -31,7 +31,7 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
       .select('plan, max_workspaces')
       .in('id', wsIds)
 
-    const lifetimeWs = ownedWs?.find(w => w.plan === 'lifetime')
+    const lifetimeWs = ownedWs?.find(w => ['lifetime','basic','pro','agency'].includes(w.plan ?? ''))
     isLifetime = !!lifetimeWs
     currentMaxWs = (lifetimeWs?.max_workspaces as number) || 1
 

@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
@@ -29,7 +30,7 @@ export default async function PlanPage() {
     supabase.from('kf_content_ideas').select('id,judul,script,assigned_naskah,tanggal_tayang,format,sprint_id,kf_sprints(nama)').eq('workspace_id', wsId).eq('status', 'Menunggu Approval').order('created_at', { ascending: true }),
   ])
 
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
   const brandIncomplete = wsData?.brand_type === 'business' ? (!brandProfile?.biz_nama_brand && !brandProfile?.biz_kategori) : (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche)
   if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
   if (wsData?.brand_type === 'affiliate' && !productCount && canAccess(role, jabatan, 'catalog')) redirect('/catalog?setup=1')

@@ -1,3 +1,4 @@
+import { isPaidPlan } from '@/lib/workspace'
 import { redirect } from 'next/navigation'
 import { getServerContext } from '@/lib/server-context'
 import { canAccess, firstAccessibleRoute } from '@/lib/jabatan-access'
@@ -13,7 +14,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
     supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus, affiliate_platforms').eq('workspace_id', wsId).maybeSingle(),
   ])
 
-  if (wsData?.plan !== 'lifetime') redirect('/upgrade')
+  if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
 
   const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
