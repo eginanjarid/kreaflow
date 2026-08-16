@@ -757,7 +757,7 @@ export default function StudioModule({ initialContents, products, initialNotific
   const [searchQ, setSearchQ] = useState('')
   const [filterFormat, setFilterFormat] = useState('')
   const [filterPlatform, setFilterPlatform] = useState('')
-  const [myWorkOnly, setMyWorkOnly] = useState(isProduksiRole)
+  const [myWorkOnly, setMyWorkOnly] = useState(false)
   // Bulk select
   const [bulkMode, setBulkMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
