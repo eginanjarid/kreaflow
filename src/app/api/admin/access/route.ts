@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       name: name || 'My Workspace',
       owner_id: userId,
       plan: 'lifetime',
-      brand_type: null,
+      brand_type: 'creator',
       max_workspaces: limits.maxWorkspaces,
       max_members: limits.maxMembers,
     }).select('id').single()

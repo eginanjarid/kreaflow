@@ -277,7 +277,7 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
                           {ws.name}
                         </div>
                         <div style={{ fontSize: '0.62rem', color: color, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                          {BRAND_TYPE_LABEL[ws.brand_type] || ws.brand_type}
+                          {BRAND_TYPE_LABEL[ws.brand_type] || BRAND_TYPE_LABEL['creator']}
                         </div>
                       </div>
                       {active && (
