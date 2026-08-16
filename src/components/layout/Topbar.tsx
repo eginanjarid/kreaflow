@@ -87,6 +87,7 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
   const pathname = usePathname()
   const router = useRouter()
 
+  const [avatarError, setAvatarError] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [bellOpen, setBellOpen] = useState(false)
   const [notifs, setNotifs] = useState<NotifItem[]>([])
@@ -387,9 +388,9 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
               borderRadius: 10, cursor: 'pointer',
             }}
           >
-            {user.avatar_url ? (
+            {user.avatar_url && !avatarError ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.avatar_url} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '1px solid #f1f5f9', flexShrink: 0 }} />
+              <img src={user.avatar_url} alt="avatar" onError={() => setAvatarError(true)} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '1px solid #f1f5f9', flexShrink: 0 }} />
             ) : (
               <div style={{
                 width: 36, height: 36, borderRadius: '50%',

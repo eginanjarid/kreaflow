@@ -486,7 +486,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
               >
                 {avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatarUrl} alt="avatar" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5eaf2' }} />
+                  <img src={avatarUrl} alt="avatar" onError={() => setAvatarUrl('')} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5eaf2' }} />
                 ) : (
                   <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>
                     {(userName || userEmail).charAt(0).toUpperCase()}
