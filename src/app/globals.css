@@ -196,6 +196,9 @@ body {
   /* Detail modal: shrink to fit above bottom nav */
   .kf-detail-modal-overlay { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px) !important; }
   .kf-detail-modal { max-height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px) - 32px) !important; }
+  /* Studio modal: same treatment */
+  .kf-studio-modal-overlay { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 16px) !important; }
+  .kf-studio-modal { max-height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px) - 32px) !important; }
   /* Sprint header: desktop hidden, mobile shown */
   .kf-sprint-header-desktop { display: none !important; }
   .kf-sprint-header-mobile { display: flex !important; }
