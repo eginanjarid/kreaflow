@@ -32,52 +32,84 @@ export async function sendMagicLinkEmail(
 }
 
 function buildMagicLinkHtml(magicLink: string, s: MagicLinkSettings, otp?: string): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
+  const logoUrl = `${appUrl}/logo-icon.png`
+
   const otpSection = otp ? `
-    <div style="margin:28px 0 0;padding-top:24px;border-top:1px solid #f0f0f0;">
-      <p style="margin:0 0 14px;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.6px;">Atau gunakan kode OTP</p>
-      <div style="display:flex;gap:8px;">
-        ${otp.split('').map(d => `<div style="width:44px;height:52px;background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;text-align:center;line-height:52px;font-size:24px;font-weight:900;color:#111827;font-family:'Courier New',monospace;">${d}</div>`).join('')}
-      </div>
-    </div>` : ''
+          <tr><td style="padding-top:24px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr><td style="border-top:1px solid #f0f0f0;padding-bottom:20px;"></td></tr>
+            </table>
+            <p style="margin:0 0 12px;font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;">Atau gunakan kode OTP</p>
+            <table cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;">
+              <tr><td style="padding:16px 24px;">
+                <span style="font-size:30px;font-weight:900;color:#111827;letter-spacing:10px;font-family:'Courier New',monospace;">${otp}</span>
+              </td></tr>
+            </table>
+          </td></tr>` : ''
 
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa;margin:0;padding:40px 20px;">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
 
-  <div style="text-align:center;margin-bottom:24px;">
-    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+  <!-- Logo -->
+  <tr><td align="center" style="padding-bottom:24px;">
+    <table cellpadding="0" cellspacing="0">
       <tr>
         <td style="vertical-align:middle;padding-right:10px;">
-          <div style="width:40px;height:40px;background:${s.primary_color};border-radius:10px;text-align:center;line-height:40px;font-size:20px;font-weight:900;color:#fff;">${s.app_name.charAt(0)}</div>
+          <img src="${logoUrl}" alt="${s.app_name}" width="40" height="40" style="display:block;border-radius:10px;" />
         </td>
         <td style="vertical-align:middle;">
-          <span style="font-size:22px;font-weight:900;color:#111827;">${s.app_name}</span>
+          <span style="font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px;">${s.app_name}</span>
         </td>
       </tr>
     </table>
-  </div>
+  </td></tr>
 
-  <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
-    <div style="padding:36px 36px 28px;">
-      <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:${s.primary_color};text-transform:uppercase;letter-spacing:0.6px;">Link Masuk</p>
-      <h2 style="margin:0 0 14px;font-size:22px;font-weight:800;color:#111827;">${s.button_text.replace(' →', '')}</h2>
-      <p style="margin:0 0 24px;color:#6b7280;font-size:15px;line-height:1.6;">${s.body_text}</p>
-      <a href="${magicLink}" style="display:inline-block;background:${s.primary_color};color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 24px;border-radius:10px;">
-        Masuk Sekarang →
-      </a>
+  <!-- Card -->
+  <tr><td style="background:#ffffff;border-radius:20px;padding:36px 36px 32px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 8px 32px rgba(0,0,0,0.08);">
+    <table width="100%" cellpadding="0" cellspacing="0">
+
+      <!-- Label + Heading + Body -->
+      <tr><td style="padding-bottom:24px;">
+        <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:${s.primary_color};letter-spacing:0.08em;text-transform:uppercase;">LINK MASUK</p>
+        <h1 style="margin:0 0 14px;font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.3px;">${s.button_text.replace(' →', '').replace(' →', '')}</h1>
+        <p style="margin:0;font-size:15px;color:#4b5563;line-height:1.65;">${s.body_text}</p>
+      </td></tr>
+
+      <!-- CTA Button -->
+      <tr><td style="padding-bottom:24px;">
+        <table cellpadding="0" cellspacing="0">
+          <tr><td style="background:${s.primary_color};border-radius:12px;">
+            <a href="${magicLink}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:-0.1px;">Masuk Sekarang &rarr;</a>
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- OTP Section -->
       ${otpSection}
-    </div>
-    <div style="padding:16px 36px;border-top:1px solid #f3f4f6;background:#fafafa;">
-      <p style="margin:0 0 4px;font-size:11px;color:#9ca3af;">Jika tombol tidak berfungsi, salin URL ini ke browser:</p>
-      <span style="font-size:11px;color:${s.primary_color};word-break:break-all;">${magicLink}</span>
-    </div>
-  </div>
 
-  <div style="text-align:center;margin-top:24px;">
+      <!-- Fallback URL -->
+      <tr><td style="padding-top:20px;border-top:1px solid #f3f4f6;">
+        <p style="margin:0 0 4px;font-size:11px;color:#9ca3af;">Jika tombol tidak berfungsi, salin URL ini ke browser:</p>
+        <span style="font-size:11px;color:${s.primary_color};word-break:break-all;">${magicLink}</span>
+      </td></tr>
+
+    </table>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td align="center" style="padding-top:24px;">
     <p style="margin:0;font-size:11px;color:#9ca3af;">${s.footer_text}</p>
-  </div>
+  </td></tr>
 
+</table>
+</td></tr>
+</table>
 </body>
 </html>`
 }
