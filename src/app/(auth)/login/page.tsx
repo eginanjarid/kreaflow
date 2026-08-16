@@ -112,7 +112,7 @@ export default function LoginPage() {
       <div style={{ textAlign: 'center', marginBottom: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-full.png" alt="KreaFlow" style={{ height: 45, maxWidth: 180, objectFit: 'contain' }} />
+          <img src="/logo-full.png" alt="KreaFlow" style={{ height: 68, maxWidth: 240, objectFit: 'contain' }} />
         </div>
         <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Masuk ke akun kamu</p>
       </div>
