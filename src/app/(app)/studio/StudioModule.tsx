@@ -498,44 +498,68 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
           {/* Teleprompter fullscreen overlay */}
           {naskahFullscreen && (
             <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: 500, display: 'flex', flexDirection: 'column' }}>
-              {/* Top bar — fixed, tidak ikut scroll */}
-              <div style={{ flexShrink: 0, padding: isMobile ? '10px 16px' : '16px 10vw', maxWidth: 900, margin: '0 auto', width: '100%', boxSizing: 'border-box', borderBottom: '1px solid #1f2937' }}>
+
+              {/* Camera — full background */}
+              {tpCamera && (
+                <>
+                  <video ref={cameraVideoRef} autoPlay playsInline muted style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: tpMirror ? 'scaleX(-1)' : 'none', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.62)', zIndex: 1 }} />
+                </>
+              )}
+
+              {/* Top bar — di atas camera */}
+              <div style={{ flexShrink: 0, position: 'relative', zIndex: 2, padding: isMobile ? '10px 16px' : '14px 10vw', maxWidth: 900, margin: '0 auto', width: '100%', boxSizing: 'border-box', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Naskah — {item.format || 'Konten'}</div>
-                    <div style={{ fontSize: '1rem', color: '#e5e7eb', fontWeight: 700 }}>{item.judul}</div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Naskah — {item.format || 'Konten'}</div>
+                    {!isMobile && <div style={{ fontSize: '0.9rem', color: '#e5e7eb', fontWeight: 700 }}>{item.judul}</div>}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 8, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 6, flexWrap: 'wrap' }}>
                     {/* Font size */}
-                    <button onClick={() => setTpFontSize(s => Math.max(14, s - 2))} style={{ width: isMobile ? 28 : 34, height: isMobile ? 28 : 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                    <span style={{ color: '#6b7280', fontSize: '0.72rem', minWidth: 28, textAlign: 'center' }}>{tpFontSize}px</span>
-                    <button onClick={() => setTpFontSize(s => Math.min(48, s + 2))} style={{ width: isMobile ? 28 : 34, height: isMobile ? 28 : 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                    <button onClick={() => setTpFontSize(s => Math.max(14, s - 2))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                    <span style={{ color: '#6b7280', fontSize: '0.7rem', minWidth: 26, textAlign: 'center' }}>{tpFontSize}px</span>
+                    <button onClick={() => setTpFontSize(s => Math.min(48, s + 2))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
                     {/* Speed */}
-                    {!isMobile && <div style={{ width: 1, height: 24, background: '#374151', margin: '0 4px' }} />}
-                    <button onClick={() => setTpSpeed(s => Math.max(1, s - 1))} style={{ width: isMobile ? 28 : 34, height: isMobile ? 28 : 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐢</button>
-                    <span style={{ color: '#6b7280', fontSize: '0.72rem', minWidth: 22, textAlign: 'center' }}>x{tpSpeed}</span>
-                    <button onClick={() => setTpSpeed(s => Math.min(10, s + 1))} style={{ width: isMobile ? 28 : 34, height: isMobile ? 28 : 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐇</button>
+                    <button onClick={() => setTpSpeed(s => Math.max(1, s - 1))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐢</button>
+                    <span style={{ color: '#6b7280', fontSize: '0.7rem', minWidth: 20, textAlign: 'center' }}>x{tpSpeed}</span>
+                    <button onClick={() => setTpSpeed(s => Math.min(10, s + 1))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐇</button>
                     {/* Play/Pause */}
-                    {!isMobile && <div style={{ width: 1, height: 24, background: '#374151', margin: '0 4px' }} />}
-                    <button onClick={() => setTpPlaying(p => !p)} style={{ width: isMobile ? 36 : 44, height: isMobile ? 28 : 34, borderRadius: 8, background: tpPlaying ? '#374151' : '#1a73e8', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                    <button onClick={() => setTpPlaying(p => !p)} style={{ width: isMobile ? 34 : 40, height: isMobile ? 28 : 32, borderRadius: 7, background: tpPlaying ? 'rgba(55,65,81,0.9)' : '#1a73e8', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {tpPlaying ? '⏸' : '▶'}
                     </button>
                     {/* Camera toggle */}
-                    {!isMobile && <div style={{ width: 1, height: 24, background: '#374151', margin: '0 4px' }} />}
-                    <button onClick={() => setTpCamera(p => !p)} title={tpCamera ? 'Matikan kamera' : 'Nyalakan kamera'} style={{ width: isMobile ? 28 : 44, height: isMobile ? 28 : 34, borderRadius: 8, background: tpCamera ? '#059669' : '#1f2937', border: tpCamera ? 'none' : '1px solid #374151', color: '#fff', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => setTpCamera(p => !p)} title={tpCamera ? 'Matikan kamera' : 'Nyalakan kamera'} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: tpCamera ? 'rgba(5,150,105,0.9)' : 'rgba(31,41,55,0.85)', border: tpCamera ? 'none' : '1px solid #374151', color: '#fff', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       📷
                     </button>
+                    {/* Mirror — hanya kalau kamera nyala */}
+                    {tpCamera && (
+                      <button onClick={() => setTpMirror(m => !m)} title="Mirror" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: tpMirror ? 'rgba(26,115,232,0.85)' : 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: tpMirror ? '#fff' : '#9ca3af', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↔</button>
+                    )}
+                    {/* REC — hanya kalau kamera nyala */}
+                    {tpCamera && (
+                      tpRecording ? (
+                        <button onClick={stopRecording} style={{ height: isMobile ? 28 : 32, padding: '0 10px', borderRadius: 7, fontSize: '0.7rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#dc2626', color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', animation: 'recblink 1s step-end infinite', display: 'inline-block' }} />
+                          {fmtSecs(tpRecSecs)} ■
+                        </button>
+                      ) : (
+                        <button onClick={startRecording} style={{ height: isMobile ? 28 : 32, padding: '0 10px', borderRadius: 7, fontSize: '0.7rem', fontWeight: 700, border: '1px solid #dc2626', cursor: 'pointer', background: 'rgba(127,29,29,0.8)', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                          REC
+                        </button>
+                      )
+                    )}
                     {/* Close */}
-                    <button onClick={() => setNaskahFullscreen(false)} style={{ marginLeft: isMobile ? 0 : 4, width: isMobile ? 28 : 34, height: isMobile ? 28 : 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#ef4444', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <button onClick={() => setNaskahFullscreen(false)} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#ef4444', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
               </div>
 
-              {/* Scrollable content area */}
-              <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '16px 16px 80px' : '0 10vw 80px', maxWidth: 900, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+              {/* Scrollable teks — di atas camera */}
+              <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', position: 'relative', zIndex: 2, padding: isMobile ? '24px 20px 80px' : '32px 10vw 80px', maxWidth: 900, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
                 {/* Camera error */}
                 {tpCamError && (
-                  <div style={{ background: '#7f1d1d', border: '1px solid #dc2626', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div style={{ background: 'rgba(127,29,29,0.9)', border: '1px solid #dc2626', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                     <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>📷</span>
                     <div>
                       <div style={{ color: '#fca5a5', fontSize: '0.85rem', fontWeight: 600, marginBottom: 4 }}>Kamera tidak bisa diakses</div>
@@ -547,65 +571,31 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
 
                 {/* Script content */}
                 {item.script ? (
-                  <div style={{ fontSize: tpFontSize, color: '#f9fafb', lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif', letterSpacing: '0.01em' }}>{item.script}</div>
+                  <div style={{ fontSize: tpFontSize, color: '#f9fafb', lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif', letterSpacing: '0.01em', textShadow: tpCamera ? '0 1px 8px rgba(0,0,0,0.8)' : 'none' }}>{item.script}</div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
                     {item.hook && (
                       <div>
                         <div style={{ fontSize: '0.65rem', color: '#4b5563', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Hook</div>
-                        <div style={{ fontSize: tpFontSize, color: '#60a5fa', lineHeight: 1.8, fontFamily: 'Georgia, serif' }}>{item.hook}</div>
+                        <div style={{ fontSize: tpFontSize, color: '#60a5fa', lineHeight: 1.8, fontFamily: 'Georgia, serif', textShadow: tpCamera ? '0 1px 8px rgba(0,0,0,0.8)' : 'none' }}>{item.hook}</div>
                       </div>
                     )}
                     {item.body && (
                       <div>
                         <div style={{ fontSize: '0.65rem', color: '#4b5563', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Body</div>
-                        <div style={{ fontSize: tpFontSize, color: '#f9fafb', lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif' }}>{item.body}</div>
+                        <div style={{ fontSize: tpFontSize, color: '#f9fafb', lineHeight: 1.9, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif', textShadow: tpCamera ? '0 1px 8px rgba(0,0,0,0.8)' : 'none' }}>{item.body}</div>
                       </div>
                     )}
                     {item.cta && (
                       <div>
                         <div style={{ fontSize: '0.65rem', color: '#4b5563', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>CTA</div>
-                        <div style={{ fontSize: tpFontSize, color: '#34d399', lineHeight: 1.8, fontFamily: 'Georgia, serif' }}>{item.cta}</div>
+                        <div style={{ fontSize: tpFontSize, color: '#34d399', lineHeight: 1.8, fontFamily: 'Georgia, serif', textShadow: tpCamera ? '0 1px 8px rgba(0,0,0,0.8)' : 'none' }}>{item.cta}</div>
                       </div>
                     )}
                   </div>
                 )}
               </div>
-
-              {/* Camera PiP */}
-              {tpCamera && (
-                <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 600, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                  {/* PiP controls */}
-                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                    {(['sm', 'md', 'lg'] as const).map(sz => (
-                      <button key={sz} onClick={() => setTpCamSize(sz)} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: tpCamSize === sz ? '#1a73e8' : '#1f2937', color: tpCamSize === sz ? '#fff' : '#6b7280' }}>
-                        {sz.toUpperCase()}
-                      </button>
-                    ))}
-                    <button onClick={() => setTpMirror(m => !m)} title="Mirror" style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: tpMirror ? '#1a73e8' : '#1f2937', color: tpMirror ? '#fff' : '#6b7280' }}>
-                      ↔
-                    </button>
-                    {/* Record button */}
-                    {tpRecording ? (
-                      <button onClick={stopRecording} style={{ padding: '2px 10px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#dc2626', color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', animation: 'recblink 1s step-end infinite', display: 'inline-block' }} />
-                        {fmtSecs(tpRecSecs)} ■
-                      </button>
-                    ) : (
-                      <button onClick={startRecording} title="Mulai rekam" style={{ padding: '2px 10px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#7f1d1d', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
-                        REC
-                      </button>
-                    )}
-                    <button onClick={() => { if (tpRecording) stopRecording(); setTpCamera(false) }} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', border: 'none', cursor: 'pointer', background: '#1f2937', color: '#6b7280' }}>✕</button>
-                  </div>
-                  <style>{`@keyframes recblink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
-                  {/* Video */}
-                  <div style={{ width: CAM_SIZES[tpCamSize].w, height: CAM_SIZES[tpCamSize].h, borderRadius: 12, overflow: 'hidden', border: '2px solid #374151', background: '#111', boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
-                    <video ref={cameraVideoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', transform: tpMirror ? 'scaleX(-1)' : 'none' }} />
-                  </div>
-                </div>
-              )}
+              <style>{`@keyframes recblink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
             </div>
           )}
           <div style={{ padding: '20px 24px' }}>
