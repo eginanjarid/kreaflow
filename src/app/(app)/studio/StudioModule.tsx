@@ -271,6 +271,50 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
     animId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(animId)
   }, [tpPlaying, tpSpeed])
+
+  const [tpCamera, setTpCamera] = useState(false)
+  const [tpMirror, setTpMirror] = useState(true)
+  const [tpCamError, setTpCamError] = useState('')
+  const [tpCamSize, setTpCamSize] = useState<'sm' | 'md' | 'lg'>('md')
+  const cameraVideoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+
+  useEffect(() => {
+    if (!tpCamera) {
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
+      if (cameraVideoRef.current) cameraVideoRef.current.srcObject = null
+      return
+    }
+    setTpCamError('')
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+      .then(stream => {
+        streamRef.current = stream
+        if (cameraVideoRef.current) {
+          cameraVideoRef.current.srcObject = stream
+          cameraVideoRef.current.play()
+        }
+      })
+      .catch(() => {
+        setTpCamError('Kamera tidak bisa diakses')
+        setTpCamera(false)
+      })
+    return () => {
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
+    }
+  }, [tpCamera])
+
+  useEffect(() => {
+    if (!naskahFullscreen) {
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      streamRef.current = null
+      setTpCamera(false)
+    }
+  }, [naskahFullscreen])
+
+  const CAM_SIZES = { sm: { w: 140, h: 105 }, md: { w: 200, h: 150 }, lg: { w: 280, h: 210 } }
+
   const [revisiInput, setRevisiInput] = useState('')
   const [showRevisiInput, setShowRevisiInput] = useState(false)
   const product = products.find(p => p.id === item.product_id)
@@ -423,10 +467,18 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                     <button onClick={() => setTpPlaying(p => !p)} style={{ width: 44, height: 34, borderRadius: 8, background: tpPlaying ? '#374151' : '#1a73e8', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                       {tpPlaying ? '⏸' : '▶'}
                     </button>
+                    {/* Camera toggle */}
+                    <div style={{ width: 1, height: 24, background: '#374151', margin: '0 4px' }} />
+                    <button onClick={() => setTpCamera(p => !p)} title={tpCamera ? 'Matikan kamera' : 'Nyalakan kamera'} style={{ width: 44, height: 34, borderRadius: 8, background: tpCamera ? '#059669' : '#1f2937', border: tpCamera ? 'none' : '1px solid #374151', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      📷
+                    </button>
                     {/* Close */}
                     <button onClick={() => setNaskahFullscreen(false)} style={{ marginLeft: 4, width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
+
+                {/* Camera error */}
+                {tpCamError && <div style={{ background: '#7f1d1d', border: '1px solid #dc2626', borderRadius: 8, padding: '8px 14px', color: '#fca5a5', fontSize: '0.8rem', marginBottom: 20 }}>{tpCamError}</div>}
 
                 {/* Script content */}
                 {item.script ? (
@@ -455,6 +507,28 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                 )}
                 <div style={{ height: 80 }} />
               </div>
+
+              {/* Camera PiP */}
+              {tpCamera && (
+                <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 600, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                  {/* PiP controls */}
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    {(['sm', 'md', 'lg'] as const).map(sz => (
+                      <button key={sz} onClick={() => setTpCamSize(sz)} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: tpCamSize === sz ? '#1a73e8' : '#1f2937', color: tpCamSize === sz ? '#fff' : '#6b7280' }}>
+                        {sz.toUpperCase()}
+                      </button>
+                    ))}
+                    <button onClick={() => setTpMirror(m => !m)} title="Mirror" style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: tpMirror ? '#1a73e8' : '#1f2937', color: tpMirror ? '#fff' : '#6b7280' }}>
+                      ↔
+                    </button>
+                    <button onClick={() => setTpCamera(false)} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', border: 'none', cursor: 'pointer', background: '#7f1d1d', color: '#fca5a5' }}>✕</button>
+                  </div>
+                  {/* Video */}
+                  <div style={{ width: CAM_SIZES[tpCamSize].w, height: CAM_SIZES[tpCamSize].h, borderRadius: 12, overflow: 'hidden', border: '2px solid #374151', background: '#111', boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+                    <video ref={cameraVideoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', transform: tpMirror ? 'scaleX(-1)' : 'none' }} />
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <div style={{ padding: '20px 24px' }}>
