@@ -516,41 +516,60 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 6, flexWrap: 'wrap' }}>
                     {/* Font size */}
-                    <button onClick={() => setTpFontSize(s => Math.max(14, s - 2))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                    <span style={{ color: '#6b7280', fontSize: '0.7rem', minWidth: 26, textAlign: 'center' }}>{tpFontSize}px</span>
-                    <button onClick={() => setTpFontSize(s => Math.min(48, s + 2))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                    {/* Speed */}
-                    <button onClick={() => setTpSpeed(s => Math.max(1, s - 1))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐢</button>
-                    <span style={{ color: '#6b7280', fontSize: '0.7rem', minWidth: 20, textAlign: 'center' }}>x{tpSpeed}</span>
-                    <button onClick={() => setTpSpeed(s => Math.min(10, s + 1))} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐇</button>
-                    {/* Play/Pause */}
-                    <button onClick={() => setTpPlaying(p => !p)} style={{ width: isMobile ? 34 : 40, height: isMobile ? 28 : 32, borderRadius: 7, background: tpPlaying ? 'rgba(55,65,81,0.9)' : '#1a73e8', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {tpPlaying ? '⏸' : '▶'}
+                    <button onClick={() => setTpFontSize(s => Math.max(14, s - 2))} title="Perkecil teks" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </button>
+                    <span style={{ color: '#6b7280', fontSize: '0.68rem', minWidth: 26, textAlign: 'center' }}>{tpFontSize}px</span>
+                    <button onClick={() => setTpFontSize(s => Math.min(48, s + 2))} title="Perbesar teks" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)' }} />
+                    {/* Speed */}
+                    <button onClick={() => setTpSpeed(s => Math.max(1, s - 1))} title="Perlambat" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="19 15 12 8 5 15"/></svg>
+                    </button>
+                    <span style={{ color: '#6b7280', fontSize: '0.68rem', minWidth: 22, textAlign: 'center' }}>×{tpSpeed}</span>
+                    <button onClick={() => setTpSpeed(s => Math.min(10, s + 1))} title="Percepat" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="5 9 12 16 19 9"/></svg>
+                    </button>
+                    <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)' }} />
+                    {/* Play/Pause */}
+                    <button onClick={() => setTpPlaying(p => !p)} title={tpPlaying ? 'Pause' : 'Play'} style={{ width: isMobile ? 34 : 40, height: isMobile ? 28 : 32, borderRadius: 7, background: tpPlaying ? 'rgba(55,65,81,0.9)' : '#1a73e8', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {tpPlaying
+                        ? <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                        : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      }
+                    </button>
+                    <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)' }} />
                     {/* Camera toggle */}
-                    <button onClick={() => setTpCamera(p => !p)} title={tpCamera ? 'Matikan kamera' : 'Nyalakan kamera'} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: tpCamera ? 'rgba(5,150,105,0.9)' : 'rgba(31,41,55,0.85)', border: tpCamera ? 'none' : '1px solid #374151', color: '#fff', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      📷
+                    <button onClick={() => setTpCamera(p => !p)} title={tpCamera ? 'Matikan kamera' : 'Nyalakan kamera'} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: tpCamera ? 'rgba(5,150,105,0.9)' : 'rgba(31,41,55,0.85)', border: tpCamera ? '1px solid #059669' : '1px solid #374151', color: tpCamera ? '#fff' : '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                     </button>
                     {/* Mirror — hanya kalau kamera nyala */}
                     {tpCamera && (
-                      <button onClick={() => setTpMirror(m => !m)} title="Mirror" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: tpMirror ? 'rgba(26,115,232,0.85)' : 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: tpMirror ? '#fff' : '#9ca3af', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↔</button>
+                      <button onClick={() => setTpMirror(m => !m)} title="Balik horizontal" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: tpMirror ? 'rgba(26,115,232,0.85)' : 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: tpMirror ? '#fff' : '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="16 7 20 12 16 17"/><polyline points="8 7 4 12 8 17"/></svg>
+                      </button>
                     )}
                     {/* REC — hanya kalau kamera nyala */}
                     {tpCamera && (
                       tpRecording ? (
-                        <button onClick={stopRecording} style={{ height: isMobile ? 28 : 32, padding: '0 10px', borderRadius: 7, fontSize: '0.7rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#dc2626', color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', animation: 'recblink 1s step-end infinite', display: 'inline-block' }} />
-                          {fmtSecs(tpRecSecs)} ■
+                        <button onClick={stopRecording} title="Stop rekam" style={{ height: isMobile ? 28 : 32, padding: '0 10px', borderRadius: 7, fontSize: '0.68rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#dc2626', color: '#fff', display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <svg width="8" height="8" viewBox="0 0 8 8" style={{ animation: 'recblink 1s step-end infinite', flexShrink: 0 }}><circle cx="4" cy="4" r="4" fill="#fff"/></svg>
+                          {fmtSecs(tpRecSecs)}
                         </button>
                       ) : (
-                        <button onClick={startRecording} style={{ height: isMobile ? 28 : 32, padding: '0 10px', borderRadius: 7, fontSize: '0.7rem', fontWeight: 700, border: '1px solid #dc2626', cursor: 'pointer', background: 'rgba(127,29,29,0.8)', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                        <button onClick={startRecording} title="Mulai rekam" style={{ height: isMobile ? 28 : 32, padding: '0 10px', borderRadius: 7, fontSize: '0.68rem', fontWeight: 600, border: '1px solid rgba(220,38,38,0.5)', cursor: 'pointer', background: 'rgba(127,29,29,0.7)', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#ef4444"/></svg>
                           REC
                         </button>
                       )
                     )}
+                    <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)' }} />
                     {/* Close */}
-                    <button onClick={() => setNaskahFullscreen(false)} style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#ef4444', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <button onClick={() => setNaskahFullscreen(false)} title="Tutup" style={{ width: isMobile ? 28 : 32, height: isMobile ? 28 : 32, borderRadius: 7, background: 'rgba(31,41,55,0.85)', border: '1px solid #374151', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -560,7 +579,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                 {/* Camera error */}
                 {tpCamError && (
                   <div style={{ background: 'rgba(127,29,29,0.9)', border: '1px solid #dc2626', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                    <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>📷</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                     <div>
                       <div style={{ color: '#fca5a5', fontSize: '0.85rem', fontWeight: 600, marginBottom: 4 }}>Kamera tidak bisa diakses</div>
                       <div style={{ color: '#f87171', fontSize: '0.78rem', lineHeight: 1.5 }}>Klik ikon 🔒 di address bar browser → ubah izin <strong>Kamera</strong> ke <strong>Allow</strong> → refresh halaman</div>
