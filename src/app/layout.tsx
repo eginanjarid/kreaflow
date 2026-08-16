@@ -11,6 +11,10 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: 'KreaFlow — Alur kreasi kontenmu',
   description: 'Platform manajemen konten sosial media berbasis AI untuk creator dan affiliator Indonesia.',
+  icons: {
+    icon: '/logo-icon.png',
+    apple: '/logo-icon.png',
+  },
 }
 
 export const viewport = {

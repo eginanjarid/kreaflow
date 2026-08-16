@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { DEFAULT_PRICING, type PricingConfig } from '@/lib/pricing'
 
 const CSS = `
@@ -398,12 +399,7 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
       <nav className="lp-nav">
         <div className="lp-nav-inner">
           <Link href="/" className="lp-logo">
-            <div className="lp-logo-mark">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-              </svg>
-            </div>
-            <span className="lp-logo-name">KreaFlow</span>
+            <Image src="/logo-full.png" alt="KreaFlow" width={120} height={34} style={{ objectFit: 'contain' }} />
           </Link>
           <div className="lp-nav-links">
             {['Fitur','Harga','Tentang'].map(l => <a key={l} href={`#${l.toLowerCase()}`} className="lp-nav-link">{l}</a>)}
@@ -477,8 +473,7 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
               <div className="lp-mockup-body">
                 <div className="lp-mockup-sb">
                   <div className="lp-mockup-sb-logo">
-                    <div className="lp-mockup-sb-logo-mark" />
-                    <span className="lp-mockup-sb-logo-name">KreaFlow</span>
+                    <Image src="/logo-icon.png" alt="KreaFlow" width={20} height={20} style={{ objectFit: 'contain' }} />
                   </div>
                   {[['Brand',false],['Catalog',false],['Sprint',false],['Plan',false],['Library',true],['Studio',false],['Calendar',false],['Tracker',false]].map(([n,on]) => (
                     <div key={String(n)} className={`lp-mockup-sb-item${on?' on':''}`}>

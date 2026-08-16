@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState, useRef } from 'react'
@@ -210,18 +211,13 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
 
         {/* Logo / Brand */}
         <div style={{ height: 64, display: 'flex', alignItems: 'center', borderBottom: '1px solid #f1f5f9', flexShrink: 0, padding: collapsed ? '0' : '0 14px', justifyContent: collapsed ? 'center' : 'flex-start', gap: 10, overflow: 'hidden', transition: 'padding 0.2s' }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          {!collapsed && (
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: '1rem', color: '#2a3547', letterSpacing: '-0.3px', whiteSpace: 'nowrap' }}>KreaFlow</div>
-              {workspace && (
-                <div style={{ fontSize: '0.6rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{workspace.plan}</div>
-              )}
-            </div>
+          {collapsed ? (
+            <Image src="/logo-icon.png" alt="KreaFlow" width={34} height={34} style={{ flexShrink: 0, objectFit: 'contain' }} />
+          ) : (
+            <Image src="/logo-full.png" alt="KreaFlow" width={120} height={34} style={{ objectFit: 'contain', objectPosition: 'left' }} />
+          )}
+          {!collapsed && workspace && (
+            <div style={{ fontSize: '0.6rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{workspace.plan}</div>
           )}
         </div>
 

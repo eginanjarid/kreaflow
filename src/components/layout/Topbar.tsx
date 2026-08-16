@@ -2,6 +2,7 @@
 
 import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -238,20 +239,15 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
         onClick={() => { setWsSheetOpen(true); setCreateOpen(false) }}
         style={{ alignItems: 'center', gap: 8, marginRight: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
       >
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-          </svg>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, textAlign: 'left' }}>
-          <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#2a3547', letterSpacing: '-0.3px', lineHeight: 1.1 }}>KreaFlow</span>
-          {workspace && (
+        <Image src="/logo-full.png" alt="KreaFlow" width={100} height={28} style={{ objectFit: 'contain', objectPosition: 'left', flexShrink: 0 }} />
+        {workspace && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, textAlign: 'left' }}>
             <span style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140, display: 'flex', alignItems: 'center', gap: 3 }}>
               {workspace.name}
               <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </button>
 
       {/* Desktop spacer */}
