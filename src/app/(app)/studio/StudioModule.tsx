@@ -2,7 +2,7 @@
 
 import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -246,6 +246,31 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
   const [assignedProduksi, setAssignedProduksi] = useState(item.assigned_produksi || '')
   const [naskahFullscreen, setNaskahFullscreen] = useState(false)
   const [tpFontSize, setTpFontSize] = useState(22)
+  const [tpPlaying, setTpPlaying] = useState(false)
+  const [tpSpeed, setTpSpeed] = useState(3)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!naskahFullscreen) { setTpPlaying(false); return }
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
+  }, [naskahFullscreen])
+
+  useEffect(() => {
+    if (!tpPlaying) return
+    let animId: number
+    const tick = () => {
+      if (!scrollRef.current) return
+      const el = scrollRef.current
+      el.scrollTop += tpSpeed * 0.6
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 2) {
+        setTpPlaying(false)
+        return
+      }
+      animId = requestAnimationFrame(tick)
+    }
+    animId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(animId)
+  }, [tpPlaying, tpSpeed])
   const [revisiInput, setRevisiInput] = useState('')
   const [showRevisiInput, setShowRevisiInput] = useState(false)
   const product = products.find(p => p.id === item.product_id)
@@ -375,8 +400,8 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
 
           {/* Teleprompter fullscreen overlay */}
           {naskahFullscreen && (
-            <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: 500, display: 'flex', flexDirection: 'column', overflowY: 'auto' }} onClick={() => setNaskahFullscreen(false)}>
-              <div onClick={e => e.stopPropagation()} style={{ flex: 1, padding: '32px 10vw', maxWidth: 900, margin: '0 auto', width: '100%' }}>
+            <div ref={scrollRef} style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: 500, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+              <div style={{ flex: 1, padding: '32px 10vw', maxWidth: 900, margin: '0 auto', width: '100%' }}>
                 {/* Top bar */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}>
                   <div>
@@ -384,10 +409,22 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                     <div style={{ fontSize: '1rem', color: '#e5e7eb', fontWeight: 700 }}>{item.judul}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {/* Font size */}
                     <button onClick={() => setTpFontSize(s => Math.max(14, s - 2))} style={{ width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
                     <span style={{ color: '#6b7280', fontSize: '0.78rem', minWidth: 36, textAlign: 'center' }}>{tpFontSize}px</span>
                     <button onClick={() => setTpFontSize(s => Math.min(48, s + 2))} style={{ width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                    <button onClick={() => setNaskahFullscreen(false)} style={{ marginLeft: 8, width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    {/* Speed */}
+                    <div style={{ width: 1, height: 24, background: '#374151', margin: '0 4px' }} />
+                    <button onClick={() => setTpSpeed(s => Math.max(1, s - 1))} style={{ width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐢</button>
+                    <span style={{ color: '#6b7280', fontSize: '0.78rem', minWidth: 28, textAlign: 'center' }}>x{tpSpeed}</span>
+                    <button onClick={() => setTpSpeed(s => Math.min(10, s + 1))} style={{ width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#9ca3af', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🐇</button>
+                    {/* Play/Pause */}
+                    <div style={{ width: 1, height: 24, background: '#374151', margin: '0 4px' }} />
+                    <button onClick={() => setTpPlaying(p => !p)} style={{ width: 44, height: 34, borderRadius: 8, background: tpPlaying ? '#374151' : '#1a73e8', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                      {tpPlaying ? '⏸' : '▶'}
+                    </button>
+                    {/* Close */}
+                    <button onClick={() => setNaskahFullscreen(false)} style={{ marginLeft: 4, width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
 
