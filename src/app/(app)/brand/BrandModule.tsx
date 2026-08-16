@@ -2902,22 +2902,28 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
             </div>
             <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                { label: 'ChatGPT', desc: 'OpenAI GPT-4o', abbr: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Claude', desc: 'Anthropic Claude', abbr: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'Gemini', desc: 'Google Gemini', abbr: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
-                { label: 'DeepSeek', desc: 'DeepSeek R1', abbr: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+                { label: 'ChatGPT', desc: 'Prompt langsung terisi otomatis', abbr: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}`, clipboard: false },
+                { label: 'Claude', desc: 'Prompt langsung terisi otomatis', abbr: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}`, clipboard: false },
+                { label: 'Gemini', desc: 'Prompt di-copy → tinggal Ctrl+V di Gemini', abbr: 'Gm', color: '#1a73e8', url: 'https://gemini.google.com/app', clipboard: true },
               ].map(ai => (
-                <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 12, background: '#f9fafb', textDecoration: 'none' }}>
+                <button key={ai.label}
+                  onClick={() => {
+                    if (ai.clipboard) navigator.clipboard.writeText(aiModal.prompt).then(() => showToast('Prompt disalin! Tinggal Ctrl+V (atau ⌘V) di Gemini', 'success'))
+                    window.open(ai.url, '_blank')
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 12, background: '#f9fafb', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}>
                   <div style={{ width: 38, height: 38, borderRadius: 10, background: ai.color + '14', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ fontSize: '0.62rem', fontWeight: 800, color: ai.color }}>{ai.abbr}</span>
                   </div>
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{ai.label}</div>
                     <div style={{ fontSize: '0.72rem', color: '#9ca3af' }}>{ai.desc}</div>
                   </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </a>
+                  {ai.clipboard
+                    ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  }
+                </button>
               ))}
             </div>
             <div style={{ height: 12 }} />
@@ -3212,22 +3218,28 @@ Tutup dengan 1 pertanyaan yang membantu saya memilih pillar mana yang paling rea
           </div>
           <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[
-              { label: 'ChatGPT', desc: 'OpenAI GPT-4o', abbr: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}` },
-              { label: 'Claude', desc: 'Anthropic Claude', abbr: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}` },
-              { label: 'Gemini', desc: 'Google Gemini', abbr: 'Gm', color: '#3b82f6', url: `https://gemini.google.com/app?q=${encodeURIComponent(aiModal.prompt)}` },
-              { label: 'DeepSeek', desc: 'DeepSeek R1', abbr: 'DS', color: '#8b5cf6', url: `https://chat.deepseek.com/?q=${encodeURIComponent(aiModal.prompt)}` },
+              { label: 'ChatGPT', desc: 'Prompt langsung terisi otomatis', abbr: 'GPT', color: '#10b981', url: `https://chatgpt.com/?q=${encodeURIComponent(aiModal.prompt)}`, clipboard: false },
+              { label: 'Claude', desc: 'Prompt langsung terisi otomatis', abbr: 'Cl', color: '#d97706', url: `https://claude.ai/new?q=${encodeURIComponent(aiModal.prompt)}`, clipboard: false },
+              { label: 'Gemini', desc: 'Prompt di-copy → tinggal Ctrl+V di Gemini', abbr: 'Gm', color: '#1a73e8', url: 'https://gemini.google.com/app', clipboard: true },
             ].map(ai => (
-              <a key={ai.label} href={ai.url} target="_blank" rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 12, background: '#f9fafb', textDecoration: 'none' }}>
+              <button key={ai.label}
+                onClick={() => {
+                  if (ai.clipboard) navigator.clipboard.writeText(aiModal.prompt).then(() => showToast('Prompt disalin! Tinggal Ctrl+V (atau ⌘V) di Gemini', 'success'))
+                  window.open(ai.url, '_blank')
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 12, background: '#f9fafb', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: ai.color + '14', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: '0.62rem', fontWeight: 800, color: ai.color }}>{ai.abbr}</span>
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{ai.label}</div>
                   <div style={{ fontSize: '0.72rem', color: '#9ca3af' }}>{ai.desc}</div>
                 </div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-              </a>
+                {ai.clipboard
+                  ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                }
+              </button>
             ))}
           </div>
           <div style={{ height: 12 }} />
