@@ -474,6 +474,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Akun Tab */}
       {tab === 'akun' && (
         <div style={{ maxWidth: 480 }}>
+          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px' }}>
             <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Info Akun</div>
             <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
