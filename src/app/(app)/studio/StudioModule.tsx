@@ -278,6 +278,41 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
   const [tpCamSize, setTpCamSize] = useState<'sm' | 'md' | 'lg'>('md')
   const cameraVideoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const [tpRecording, setTpRecording] = useState(false)
+  const [tpRecSecs, setTpRecSecs] = useState(0)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const recordedChunksRef = useRef<BlobPart[]>([])
+  const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function startRecording() {
+    if (!streamRef.current) return
+    recordedChunksRef.current = []
+    const mr = new MediaRecorder(streamRef.current, { mimeType: 'video/webm;codecs=vp8' })
+    mr.ondataavailable = e => { if (e.data.size > 0) recordedChunksRef.current.push(e.data) }
+    mr.onstop = () => {
+      const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `kreaflow-rec-${Date.now()}.webm`
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+    mr.start()
+    mediaRecorderRef.current = mr
+    setTpRecording(true)
+    setTpRecSecs(0)
+    recTimerRef.current = setInterval(() => setTpRecSecs(s => s + 1), 1000)
+  }
+
+  function stopRecording() {
+    mediaRecorderRef.current?.stop()
+    mediaRecorderRef.current = null
+    if (recTimerRef.current) { clearInterval(recTimerRef.current); recTimerRef.current = null }
+    setTpRecording(false)
+  }
+
+  function fmtSecs(s: number) { return `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}` }
 
   useEffect(() => {
     if (!tpCamera) {
@@ -307,6 +342,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
 
   useEffect(() => {
     if (!naskahFullscreen) {
+      if (mediaRecorderRef.current?.state === 'recording') stopRecording()
       streamRef.current?.getTracks().forEach(t => t.stop())
       streamRef.current = null
       setTpCamera(false)
@@ -521,7 +557,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
               {tpCamera && (
                 <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 600, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                   {/* PiP controls */}
-                  <div style={{ display: 'flex', gap: 4 }}>
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                     {(['sm', 'md', 'lg'] as const).map(sz => (
                       <button key={sz} onClick={() => setTpCamSize(sz)} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: tpCamSize === sz ? '#1a73e8' : '#1f2937', color: tpCamSize === sz ? '#fff' : '#6b7280' }}>
                         {sz.toUpperCase()}
@@ -530,8 +566,21 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                     <button onClick={() => setTpMirror(m => !m)} title="Mirror" style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: tpMirror ? '#1a73e8' : '#1f2937', color: tpMirror ? '#fff' : '#6b7280' }}>
                       ↔
                     </button>
-                    <button onClick={() => setTpCamera(false)} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', border: 'none', cursor: 'pointer', background: '#7f1d1d', color: '#fca5a5' }}>✕</button>
+                    {/* Record button */}
+                    {tpRecording ? (
+                      <button onClick={stopRecording} style={{ padding: '2px 10px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#dc2626', color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', animation: 'recblink 1s step-end infinite', display: 'inline-block' }} />
+                        {fmtSecs(tpRecSecs)} ■
+                      </button>
+                    ) : (
+                      <button onClick={startRecording} title="Mulai rekam" style={{ padding: '2px 10px', borderRadius: 5, fontSize: '0.65rem', fontWeight: 700, border: 'none', cursor: 'pointer', background: '#7f1d1d', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                        REC
+                      </button>
+                    )}
+                    <button onClick={() => { if (tpRecording) stopRecording(); setTpCamera(false) }} style={{ padding: '2px 8px', borderRadius: 5, fontSize: '0.65rem', border: 'none', cursor: 'pointer', background: '#1f2937', color: '#6b7280' }}>✕</button>
                   </div>
+                  <style>{`@keyframes recblink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
                   {/* Video */}
                   <div style={{ width: CAM_SIZES[tpCamSize].w, height: CAM_SIZES[tpCamSize].h, borderRadius: 12, overflow: 'hidden', border: '2px solid #374151', background: '#111', boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
                     <video ref={cameraVideoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', transform: tpMirror ? 'scaleX(-1)' : 'none' }} />
