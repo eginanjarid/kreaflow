@@ -454,6 +454,7 @@ export default function BrandModule({
   workspaceId,
   modes = ['creator'],
   initialBrandType = 'creator',
+  canSetBrandType = false,
   initialAkun = [],
   hasPillars = false,
 }: {
@@ -461,11 +462,12 @@ export default function BrandModule({
   workspaceId: string
   modes?: string[]
   initialBrandType?: string
+  canSetBrandType?: boolean
   initialAkun?: SosmedAkun[]
   hasPillars?: boolean
 }) {
   const [activeModes, setActiveModes] = useState<string[]>(modes)
-  const [showTypePicker, setShowTypePicker] = useState(initialProfile === null)
+  const [showTypePicker, setShowTypePicker] = useState(initialProfile === null && canSetBrandType)
   const [pickerType, setPickerType] = useState(initialBrandType || 'creator')
   const [typePickerLoading, setTypePickerLoading] = useState(false)
 
