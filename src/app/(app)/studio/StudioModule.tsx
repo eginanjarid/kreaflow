@@ -32,7 +32,14 @@ type PlatformTab = 'ig' | 'tiktok' | 'youtube'
 const STATUS_STAGE: Record<string, Tab> = { 'Naskah Siap': 'antrian', 'Produksi': 'dikerjakan', 'Menunggu Review': 'review', 'Siap Tayang': 'selesai', 'Terjadwal': 'selesai', 'Tayang': 'selesai' }
 const STATUS_COLOR: Record<string, string> = { Draft: '#6b7280', 'Naskah Siap': '#d97706', Produksi: '#1a73e8', 'Menunggu Review': '#8b5cf6', 'Siap Tayang': '#059669', Terjadwal: '#a855f7', Tayang: '#6b21a8' }
 const STATUS_BG: Record<string, string> = { Draft: '#f3f4f6', 'Naskah Siap': 'rgba(245,158,11,0.12)', Produksi: 'rgba(59,130,246,0.12)', 'Menunggu Review': 'rgba(139,92,246,0.12)', 'Siap Tayang': 'rgba(34,197,94,0.12)', Terjadwal: 'rgba(168,85,247,0.12)', Tayang: 'rgba(107,33,168,0.15)' }
-const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Live']
+const VIDEO_FORMATS = ['Reels', 'Video Pendek', 'Video Panjang', 'Live']
+
+// Format yang menjadi tanggung jawab masing-masing jabatan
+const JABATAN_FORMATS: Record<string, string[]> = {
+  'Desainer':   ['Single Post', 'Carousel'],
+  'Editor':     ['Video Pendek', 'Video Panjang', 'Reels'],
+  'Videografer':['Video Pendek', 'Video Panjang', 'Reels'],
+}
 
 function extractGdriveId(url: string): string | null {
   if (!url) return null
@@ -739,6 +746,7 @@ export default function StudioModule({ initialContents, products, initialNotific
 }) {
   const isApprover = role === 'owner' || role === 'admin' || jabatan === 'Manager'
   const isProduksiRole = PRODUKSI_JABATAN.includes(jabatan)
+  const jabatanFormats: string[] | null = JABATAN_FORMATS[jabatan] ?? null
   const supabase = createClient()
   const [contents, setContents] = useState<ContentItem[]>(initialContents)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
@@ -795,9 +803,10 @@ export default function StudioModule({ initialContents, products, initialNotific
   const unread = notifications.filter(n => !n.is_read).length
 
   // Search + filter derived
-  const allFormats = [...new Set(contents.map(c => c.format).filter(Boolean))]
+  const allFormats = [...new Set(contents.map(c => c.format).filter(Boolean))].filter(f => !jabatanFormats || jabatanFormats.includes(f))
   const allPlatforms = [...new Set(contents.flatMap(c => c.platform || []))]
   const displayItems = filtered.filter(c => {
+    if (jabatanFormats && !jabatanFormats.includes(c.format)) return false
     if (myWorkOnly && userId && c.assigned_produksi && c.assigned_produksi !== userId) return false
     if (searchQ && !(c.judul || '').toLowerCase().includes(searchQ.toLowerCase())) return false
     if (filterFormat && c.format !== filterFormat) return false
@@ -859,9 +868,10 @@ export default function StudioModule({ initialContents, products, initialNotific
   ]
 
   const myWorkFilter = (c: ContentItem) => !myWorkOnly || !userId || !c.assigned_produksi || c.assigned_produksi === userId
-  const antriCount = contents.filter(c => STATUS_STAGE[c.status] === 'antrian' && myWorkFilter(c)).length
-  const dikerjakanCount = contents.filter(c => STATUS_STAGE[c.status] === 'dikerjakan' && myWorkFilter(c)).length
-  const reviewCount = contents.filter(c => STATUS_STAGE[c.status] === 'review' && myWorkFilter(c)).length
+  const jabatanFilter = (c: ContentItem) => !jabatanFormats || jabatanFormats.includes(c.format)
+  const antriCount = contents.filter(c => STATUS_STAGE[c.status] === 'antrian' && myWorkFilter(c) && jabatanFilter(c)).length
+  const dikerjakanCount = contents.filter(c => STATUS_STAGE[c.status] === 'dikerjakan' && myWorkFilter(c) && jabatanFilter(c)).length
+  const reviewCount = contents.filter(c => STATUS_STAGE[c.status] === 'review' && myWorkFilter(c) && jabatanFilter(c)).length
 
   const handle = workspaceName.toLowerCase().replace(/\s+/g, '')
   const initial = workspaceName.charAt(0).toUpperCase()
