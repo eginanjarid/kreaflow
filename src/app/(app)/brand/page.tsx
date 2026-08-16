@@ -41,6 +41,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
         initialProfile={profile}
         workspaceId={wsId}
         modes={modes}
+        initialBrandType={brandType}
         initialAkun={(akun || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
         hasPillars={(pillarCount ?? 0) > 0}
       />

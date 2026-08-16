@@ -453,17 +453,24 @@ export default function BrandModule({
   initialProfile,
   workspaceId,
   modes = ['creator'],
+  initialBrandType = 'creator',
   initialAkun = [],
   hasPillars = false,
 }: {
   initialProfile: BrandProfile | null
   workspaceId: string
   modes?: string[]
+  initialBrandType?: string
   initialAkun?: SosmedAkun[]
   hasPillars?: boolean
 }) {
-  const isAffiliate = modes.includes('affiliate')
-  const isBusiness = modes.includes('business')
+  const [activeModes, setActiveModes] = useState<string[]>(modes)
+  const [showTypePicker, setShowTypePicker] = useState(initialProfile === null)
+  const [pickerType, setPickerType] = useState(initialBrandType || 'creator')
+  const [typePickerLoading, setTypePickerLoading] = useState(false)
+
+  const isAffiliate = activeModes.includes('affiliate')
+  const isBusiness = activeModes.includes('business')
   const TABS = isAffiliate ? AFFILIATE_TABS : isBusiness ? BUSINESS_TABS : CREATOR_TABS
   const [tab, setTab] = useState(isAffiliate ? 'aff-niche' : isBusiness ? 'biz-profil' : 'overview')
   const [akunList, setAkunList] = useState<SosmedAkun[]>(initialAkun)
@@ -1290,6 +1297,93 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
     const levelIdx = pct >= 90 ? 5 : pct >= 70 ? 4 : pct >= 50 ? 3 : pct >= 30 ? 2 : pct >= 10 ? 1 : 0
     return { freqChecked: checked, freqDone: done, freqTotal: total, freqPct: pct, freqLevelIdx: levelIdx, freqLevel: FREQ_LEVELS[levelIdx] }
   }, [savedProfile, hasPillars, isAffiliate, isBusiness, ACTIVE_FREQ_CHECKS])
+
+  async function handleConfirmType() {
+    setTypePickerLoading(true)
+    try {
+      await fetch('/api/settings/workspace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workspaceId, updates: { brand_type: pickerType, modes: [pickerType] } }),
+      })
+      setActiveModes([pickerType])
+      setTab(pickerType === 'affiliate' ? 'aff-niche' : pickerType === 'business' ? 'biz-profil' : 'overview')
+      setShowTypePicker(false)
+    } finally {
+      setTypePickerLoading(false)
+    }
+  }
+
+  if (showTypePicker) {
+    const TYPE_OPTS = [
+      {
+        id: 'creator', label: 'Creator', color: '#1a73e8',
+        desc: 'Personal brand & konten kreator. Cocok untuk YouTuber, TikToker, Instagrammer, atau podcast.',
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>,
+      },
+      {
+        id: 'affiliate', label: 'Affiliate', color: '#059669',
+        desc: 'Affiliator produk & komisi. Cocok untuk affiliate TikTok, Shopee, review produk, atau dropshipper.',
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>,
+      },
+      {
+        id: 'business', label: 'Business', color: '#7c3aed',
+        desc: 'Brand toko atau perusahaan. Cocok untuk UMKM, toko online, brand produk, atau jasa lokal.',
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+      },
+    ]
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px 0' }}>
+        <div style={{ maxWidth: 520, width: '100%' }}>
+          <div style={{ marginBottom: 32, textAlign: 'center' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.3px', marginBottom: 8 }}>Kamu mau fokus ke mana?</h1>
+            <p style={{ color: '#6b7280', fontSize: '0.9rem', lineHeight: 1.6 }}>Pilih tipe workspace — ini menentukan tools, form, dan AI yang akan kamu gunakan.</p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+            {TYPE_OPTS.map(opt => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setPickerType(opt.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 16,
+                  padding: '18px 20px', borderRadius: 16, cursor: 'pointer',
+                  border: `2px solid ${pickerType === opt.id ? opt.color : '#e5eaf2'}`,
+                  background: pickerType === opt.id ? `${opt.color}08` : '#fff',
+                  textAlign: 'left', transition: 'all 0.15s', width: '100%',
+                  boxShadow: pickerType === opt.id ? `0 0 0 4px ${opt.color}18` : '0 1px 3px rgba(0,0,0,0.04)',
+                }}
+              >
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: `${opt.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: opt.color }}>
+                  {opt.icon}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: pickerType === opt.id ? opt.color : '#111827', fontSize: '1rem', marginBottom: 3 }}>{opt.label}</div>
+                  <div style={{ fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.5 }}>{opt.desc}</div>
+                </div>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${pickerType === opt.id ? opt.color : '#d1d5db'}`, background: pickerType === opt.id ? opt.color : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {pickerType === opt.id && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                </div>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={handleConfirmType}
+            disabled={typePickerLoading}
+            style={{
+              width: '100%', padding: '14px', borderRadius: 12, border: 'none',
+              background: typePickerLoading ? '#93c5fd' : '#1a73e8', color: '#fff',
+              fontSize: '0.95rem', fontWeight: 700, cursor: typePickerLoading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            {typePickerLoading ? 'Menyimpan...' : 'Lanjutkan Setup Brand →'}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
