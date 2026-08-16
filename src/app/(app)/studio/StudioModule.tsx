@@ -287,14 +287,22 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
   function startRecording() {
     if (!streamRef.current) return
     recordedChunksRef.current = []
-    const mr = new MediaRecorder(streamRef.current, { mimeType: 'video/webm;codecs=vp8' })
+    const preferredTypes = [
+      'video/webm;codecs=vp8,opus',
+      'video/webm;codecs=vp9,opus',
+      'video/webm',
+      'video/mp4',
+    ]
+    const mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || ''
+    const ext = mimeType.includes('mp4') ? 'mp4' : 'webm'
+    const mr = new MediaRecorder(streamRef.current, mimeType ? { mimeType } : undefined)
     mr.ondataavailable = e => { if (e.data.size > 0) recordedChunksRef.current.push(e.data) }
     mr.onstop = () => {
-      const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
+      const blob = new Blob(recordedChunksRef.current, { type: mimeType || 'video/webm' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `kreaflow-rec-${Date.now()}.webm`
+      a.download = `kreaflow-rec-${Date.now()}.${ext}`
       a.click()
       URL.revokeObjectURL(url)
     }
@@ -322,7 +330,7 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
       return
     }
     setTpCamError('')
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true })
       .then(stream => {
         streamRef.current = stream
         if (cameraVideoRef.current) {
