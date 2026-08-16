@@ -488,10 +488,10 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
 
           {/* Teleprompter fullscreen overlay */}
           {naskahFullscreen && (
-            <div ref={scrollRef} style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: 500, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-              <div style={{ flex: 1, padding: '32px 10vw', maxWidth: 900, margin: '0 auto', width: '100%' }}>
-                {/* Top bar */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}>
+            <div style={{ position: 'fixed', inset: 0, background: '#0a0a0a', zIndex: 500, display: 'flex', flexDirection: 'column' }}>
+              {/* Top bar — fixed, tidak ikut scroll */}
+              <div style={{ flexShrink: 0, padding: '16px 10vw', maxWidth: 900, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Naskah — {item.format || 'Konten'}</div>
                     <div style={{ fontSize: '1rem', color: '#e5e7eb', fontWeight: 700 }}>{item.judul}</div>
@@ -520,7 +520,10 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                     <button onClick={() => setNaskahFullscreen(false)} style={{ marginLeft: 4, width: 34, height: 34, borderRadius: 8, background: '#1f2937', border: '1px solid #374151', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
+              </div>
 
+              {/* Scrollable content area */}
+              <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '0 10vw 80px', maxWidth: 900, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
                 {/* Camera error */}
                 {tpCamError && (
                   <div style={{ background: '#7f1d1d', border: '1px solid #dc2626', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -558,7 +561,6 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                     )}
                   </div>
                 )}
-                <div style={{ height: 80 }} />
               </div>
 
               {/* Camera PiP */}
