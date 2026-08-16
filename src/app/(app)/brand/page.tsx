@@ -43,6 +43,7 @@ export default async function BrandPage({ searchParams }: { searchParams: Promis
         modes={modes}
         initialBrandType={brandType}
         canSetBrandType={role === 'owner' || role === 'admin'}
+        canEdit={role === 'owner' || role === 'admin'}
         initialAkun={(akun || []).map(a => ({ id: a.id as string, platform: a.platform as string, handle: a.handle as string, nama: a.nama as string }))}
         hasPillars={(pillarCount ?? 0) > 0}
       />

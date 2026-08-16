@@ -455,6 +455,7 @@ export default function BrandModule({
   modes = ['creator'],
   initialBrandType = 'creator',
   canSetBrandType = false,
+  canEdit = false,
   initialAkun = [],
   hasPillars = false,
 }: {
@@ -463,6 +464,7 @@ export default function BrandModule({
   modes?: string[]
   initialBrandType?: string
   canSetBrandType?: boolean
+  canEdit?: boolean
   initialAkun?: SosmedAkun[]
   hasPillars?: boolean
 }) {
@@ -629,6 +631,7 @@ export default function BrandModule({
   }, [])
 
   async function addAkun() {
+    if (!canEdit) return
     if (!akunForm.handle.trim() || !akunForm.nama.trim()) return
     if (akunList.length >= MAX_AKUN) return
     setSavingAkun(true)
@@ -647,6 +650,7 @@ export default function BrandModule({
   }
 
   async function deleteAkun(id: string) {
+    if (!canEdit) return
     if (!confirm('Hapus akun ini?')) return
     setDeletingAkun(id)
     const supabase = createClient()
@@ -657,6 +661,7 @@ export default function BrandModule({
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    if (!canEdit) return
     const missing: string[] = []
     if (isAffiliate && tab === 'aff-niche') {
       if (!profile.affiliate_micro_niche?.trim()) missing.push('Micro Niche')
@@ -1395,6 +1400,14 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
         <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Bangun fondasi identitas brand dan konten kamu</p>
       </div>
 
+      {/* Read-only notice for non-editors */}
+      {!canEdit && (
+        <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0369a1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span style={{ fontSize: '0.875rem', color: '#0369a1', fontWeight: 500 }}>Kamu bisa melihat brand ini — hanya owner atau admin yang bisa mengedit.</span>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="kf-tabs-wrap">
         <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #f3f4f6', paddingBottom: 0 }}>
@@ -1422,6 +1435,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
         </div>
       )}
 
+      <div style={!canEdit ? { pointerEvents: 'none', opacity: 0.75, userSelect: 'none' } : undefined}>
       <form onSubmit={handleSave}>
         {/* Overview — Frekuensi Kreator */}
         {tab === 'overview' && (
@@ -3026,6 +3040,7 @@ Jangan tambahkan strategi konten, tips branding, atau penjelasan lain. Langsung 
           </div>
         </div>
       )}
+      </div>{/* end read-only wrapper */}
     </div>
   )
 }
