@@ -186,6 +186,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     setAvatarUrl(json.url)
     setAvatarUploading(false)
     showToast('Foto profil berhasil diperbarui!', 'success')
+    router.refresh()
   }
 
   async function saveWorkspace(e: React.FormEvent) {
