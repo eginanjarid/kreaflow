@@ -67,7 +67,8 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
 export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, maxMembers, pendingInvites: initialPending, appUrl }: Props) {
   const router = useRouter()
   const [, startRefresh] = useTransition()
-  const [tab, setTab] = useState('workspace')
+  const isOwnerOrAdminInit = myRole === 'owner' || myRole === 'admin'
+  const [tab, setTab] = useState(isOwnerOrAdminInit ? 'workspace' : 'akun')
   const [gdKey, setGdKey] = useState(initialGDKey)
   const [gdKeySaving, setGdKeySaving] = useState(false)
   const [gdKeyMsg, setGdKeyMsg] = useState('')
@@ -241,7 +242,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Tabs */}
       <div className="kf-tabs-wrap">
         <div className="kf-tabs-scroll" style={{ display: 'flex', gap: 4, marginBottom: 28, borderBottom: '1px solid #e5eaf2' }}>
-          {[{ id: 'workspace', label: 'Workspace' }, { id: 'tim', label: 'Tim' }, { id: 'integrasi', label: 'Integrasi' }, { id: 'akun', label: 'Akun' }].map(t => (
+          {[{ id: 'workspace', label: 'Workspace', ownerOnly: true }, { id: 'tim', label: 'Tim', ownerOnly: true }, { id: 'integrasi', label: 'Integrasi', ownerOnly: true }, { id: 'akun', label: 'Akun', ownerOnly: false }].filter(t => !t.ownerOnly || isOwnerOrAdminInit).map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               style={{ padding: '10px 18px', background: 'transparent', border: 'none', borderBottom: tab === t.id ? '2px solid #1a73e8' : '2px solid transparent', color: tab === t.id ? '#1a73e8' : '#6b7280', fontSize: '0.875rem', fontWeight: tab === t.id ? 600 : 400, cursor: 'pointer', marginBottom: -1, flexShrink: 0, whiteSpace: 'nowrap' }}>
               {t.label}
@@ -251,7 +252,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       </div>
 
       {/* Workspace Tab */}
-      {tab === 'workspace' && (
+      {tab === 'workspace' && isOwnerOrAdminInit && (
         <div style={{ maxWidth: 480 }}>
           {/* Plan info */}
           <div style={{ background: 'rgba(26,115,232,0.08)', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -292,7 +293,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       )}
 
       {/* Tim Tab */}
-      {tab === 'tim' && (
+      {tab === 'tim' && isOwnerOrAdminInit && (
         <div style={{ maxWidth: 560 }}>
           {teamMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem', marginBottom: 16 }}>{teamMsg}</div>}
 
@@ -430,7 +431,7 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       )}
 
       {/* Integrasi Tab */}
-      {tab === 'integrasi' && (
+      {tab === 'integrasi' && isOwnerOrAdminInit && (
         <div style={{ maxWidth: 480 }}>
           <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
