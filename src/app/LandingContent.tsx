@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { DEFAULT_PRICING, type PricingConfig } from '@/lib/pricing'
 
 const CSS = `
@@ -399,7 +398,8 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
       <nav className="lp-nav">
         <div className="lp-nav-inner">
           <Link href="/" className="lp-logo">
-            <Image src="/logo-full.png" alt="KreaFlow" width={120} height={34} style={{ objectFit: 'contain' }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-full.png" alt="KreaFlow" style={{ height: 34, maxWidth: 130, objectFit: 'contain' }} />
           </Link>
           <div className="lp-nav-links">
             {['Fitur','Harga','Tentang'].map(l => <a key={l} href={`#${l.toLowerCase()}`} className="lp-nav-link">{l}</a>)}
@@ -473,7 +473,8 @@ export default function LandingContent({ pricing }: { pricing?: PricingConfig })
               <div className="lp-mockup-body">
                 <div className="lp-mockup-sb">
                   <div className="lp-mockup-sb-logo">
-                    <Image src="/logo-icon.png" alt="KreaFlow" width={20} height={20} style={{ objectFit: 'contain' }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logo-icon.png" alt="KreaFlow" style={{ width: 20, height: 20, objectFit: 'contain' }} />
                   </div>
                   {[['Brand',false],['Catalog',false],['Sprint',false],['Plan',false],['Library',true],['Studio',false],['Calendar',false],['Tracker',false]].map(([n,on]) => (
                     <div key={String(n)} className={`lp-mockup-sb-item${on?' on':''}`}>

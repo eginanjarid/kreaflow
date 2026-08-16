@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 
 const inputStyle = {
   width: '100%', background: '#f3f4f6', border: '1.5px solid transparent', borderRadius: 10,
@@ -112,7 +111,8 @@ export default function LoginPage() {
       {/* Logo */}
       <div style={{ textAlign: 'center', marginBottom: 28 }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
-          <Image src="/logo-full.png" alt="KreaFlow" width={160} height={45} style={{ objectFit: 'contain' }} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-full.png" alt="KreaFlow" style={{ height: 45, maxWidth: 180, objectFit: 'contain' }} />
         </div>
         <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Masuk ke akun kamu</p>
       </div>

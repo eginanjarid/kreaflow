@@ -2,7 +2,6 @@
 
 import { NOTIF_ICON_MAP } from '@/components/ui/Icons'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -239,7 +238,8 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
         onClick={() => { setWsSheetOpen(true); setCreateOpen(false) }}
         style={{ alignItems: 'center', gap: 8, marginRight: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
       >
-        <Image src="/logo-full.png" alt="KreaFlow" width={100} height={28} style={{ objectFit: 'contain', objectPosition: 'left', flexShrink: 0 }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-full.png" alt="KreaFlow" style={{ height: 28, maxWidth: 110, objectFit: 'contain', objectPosition: 'left', flexShrink: 0 }} />
         {workspace && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0, textAlign: 'left' }}>
             <span style={{ fontSize: '0.68rem', color: '#1a73e8', fontWeight: 600, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140, display: 'flex', alignItems: 'center', gap: 3 }}>

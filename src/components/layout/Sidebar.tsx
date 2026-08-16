@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState, useRef } from 'react'
@@ -212,9 +211,11 @@ export default function Sidebar({ workspace, workspaces, isSuperAdmin, role, jab
         {/* Logo / Brand */}
         <div style={{ height: 64, display: 'flex', alignItems: 'center', borderBottom: '1px solid #f1f5f9', flexShrink: 0, padding: collapsed ? '0' : '0 14px', justifyContent: collapsed ? 'center' : 'flex-start', gap: 10, overflow: 'hidden', transition: 'padding 0.2s' }}>
           {collapsed ? (
-            <Image src="/logo-icon.png" alt="KreaFlow" width={34} height={34} style={{ flexShrink: 0, objectFit: 'contain' }} />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src="/logo-icon.png" alt="KreaFlow" style={{ width: 34, height: 34, flexShrink: 0, objectFit: 'contain' }} />
           ) : (
-            <Image src="/logo-full.png" alt="KreaFlow" width={120} height={34} style={{ objectFit: 'contain', objectPosition: 'left' }} />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src="/logo-full.png" alt="KreaFlow" style={{ height: 34, maxWidth: 130, objectFit: 'contain', objectPosition: 'left' }} />
           )}
           {!collapsed && workspace && (
             <div style={{ fontSize: '0.6rem', color: '#1a73e8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{workspace.plan}</div>
