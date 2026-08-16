@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { isSuperAdmin } from '@/lib/super-admins'
-import { sendMagicLinkEmail } from '@/lib/smtp-mailer'
+import { sendWelcomeAccessEmail } from '@/lib/smtp-mailer'
 import { DEFAULT_MAGIC_LINK_SETTINGS, APP_CONFIG_KEY, type MagicLinkSettings } from '@/lib/email-config'
 
 const KF_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://kreaflow.id'
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
           ...(config?.value ?? {}),
           subject: 'Akses KreaFlow kamu sudah aktif!',
         }
-        await sendMagicLinkEmail(cleanEmail, loginUrl, settings)
+        await sendWelcomeAccessEmail(cleanEmail, loginUrl, settings)
         emailSent = true
       }
     } catch (e) {

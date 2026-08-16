@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { isSuperAdmin } from '@/lib/super-admins'
 import { sendInviteEmail } from '@/lib/mailer'
-import { sendMagicLinkEmail } from '@/lib/smtp-mailer'
+import { sendInviteAccessEmail } from '@/lib/smtp-mailer'
 import { DEFAULT_MAGIC_LINK_SETTINGS, APP_CONFIG_KEY, type MagicLinkSettings } from '@/lib/email-config'
 
 const MAX_WORKSPACE_PER_MEMBER = 5
@@ -123,10 +123,10 @@ export async function POST(req: NextRequest) {
 
   // Ambil SMTP settings dari DB
   const { data: config } = await admin.from('app_config').select('value').eq('key', APP_CONFIG_KEY).maybeSingle()
-  const settings: MagicLinkSettings = { ...DEFAULT_MAGIC_LINK_SETTINGS, ...(config?.value ?? {}), subject: `Kamu diundang ke tim ${workspaceName} — KreaFlow` }
+  const settings: MagicLinkSettings = { ...DEFAULT_MAGIC_LINK_SETTINGS, ...(config?.value ?? {}) }
 
-  // Kirim via SMTP dengan magic link
-  sendMagicLinkEmail(cleanEmail, loginUrl, settings, undefined)
+  // Kirim via SMTP dengan template undangan yang include nama workspace & inviter
+  sendInviteAccessEmail(cleanEmail, loginUrl, workspaceName, inviterName, settings)
     .catch(err => console.error('[invite] SMTP error:', err))
 
   return NextResponse.json({ success: true, method: 'magic_link', existing: isExistingUser })
