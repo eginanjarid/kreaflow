@@ -478,7 +478,7 @@ export default function BrandModule({
     niche: '', kategori: '', micro_niche: '', nama_akun_rekomendasi: '',
     kelebihan: '', kelemahan: '', peluang_brand: '', tantangan: '', premis: '',
     bio_tiktok: '', bio_instagram: '', bio_youtube: '', bio_linkedin: '', bio_facebook: '',
-    logo_main_url: '', color_palette: ['#1a73e8', '#1a73e8', '#F9FAFB'], typography: '',
+    logo_main_url: '', color_palette: [], typography: '',
     niche_options: [],
     premis_options: [],
     bio_options: {},
