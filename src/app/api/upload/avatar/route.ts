@@ -25,5 +25,9 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   const { data } = supabase.storage.from('branding').getPublicUrl(path)
-  return NextResponse.json({ url: data.publicUrl })
+  const internalUrl = process.env.SUPABASE_INTERNAL_URL
+  const publicUrl = internalUrl
+    ? data.publicUrl.replace(internalUrl, process.env.NEXT_PUBLIC_SUPABASE_URL!)
+    : data.publicUrl
+  return NextResponse.json({ url: publicUrl })
 }
