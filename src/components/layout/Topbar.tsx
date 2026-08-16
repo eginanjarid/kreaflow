@@ -74,7 +74,7 @@ const BRAND_TYPES = [
 ]
 
 type Props = {
-  user: { email: string; nama: string }
+  user: { email: string; nama: string; avatar_url?: string }
   workspace?: Workspace | null
   workspaces?: Workspace[]
   role?: string
@@ -387,15 +387,20 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
               borderRadius: 10, cursor: 'pointer',
             }}
           >
-            <div style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1a73e8, #42a5f5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.75rem', fontWeight: 700, color: '#fff', flexShrink: 0,
-              border: '1px solid #f1f5f9',
-            }}>
-              {initials}
-            </div>
+            {user.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.avatar_url} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '1px solid #f1f5f9', flexShrink: 0 }} />
+            ) : (
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1a73e8, #42a5f5)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.75rem', fontWeight: 700, color: '#fff', flexShrink: 0,
+                border: '1px solid #f1f5f9',
+              }}>
+                {initials}
+              </div>
+            )}
             <span className="topbar-username" style={{ fontSize: '0.9375rem', fontWeight: 500, color: '#5a6a85', whiteSpace: 'nowrap' }}>
               Hi, <strong style={{ fontWeight: 700, color: '#2a3547' }}>{user.nama.split(' ')[0]}</strong>
             </span>

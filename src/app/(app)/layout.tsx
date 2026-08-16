@@ -27,7 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       workspace={ws}
       workspaces={(allWorkspaces as Workspace[] | null) || []}
       isSuperAdmin={superAdmin}
-      user={{ email: user.email!, nama: user.user_metadata?.nama || user.email! }}
+      user={{ email: user.email!, nama: user.user_metadata?.nama || user.email!, avatar_url: user.user_metadata?.avatar_url || '' }}
       role={role}
       jabatan={jabatan}
       workspaceId={wsId}

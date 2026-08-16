@@ -12,7 +12,7 @@ type Props = {
   workspace: Workspace | null
   workspaces: Workspace[]
   isSuperAdmin: boolean
-  user: { email: string; nama: string }
+  user: { email: string; nama: string; avatar_url?: string }
   role: string
   jabatan: string
   workspaceId?: string

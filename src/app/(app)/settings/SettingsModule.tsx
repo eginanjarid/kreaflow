@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
@@ -28,6 +28,7 @@ type Props = {
   workspaceName: string
   userEmail: string
   userName: string
+  userAvatarUrl?: string
   plan: string
   googleDriveApiKey: string
   myRole: string
@@ -64,7 +65,7 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
   )
 }
 
-export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, maxMembers, pendingInvites: initialPending, appUrl }: Props) {
+export default function SettingsModule({ workspaceId, workspaceName, userEmail, userName, userAvatarUrl, plan, googleDriveApiKey: initialGDKey, myRole, members: initialMembers, maxMembers, pendingInvites: initialPending, appUrl }: Props) {
   const router = useRouter()
   const [, startRefresh] = useTransition()
   const isOwnerOrAdminInit = myRole === 'owner' || myRole === 'admin'
@@ -167,12 +168,25 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
 
   const canManageTeam = myRole === 'owner' || myRole === 'admin'
 
-  const [curPwd, setCurPwd] = useState('')
-  const [newPwd, setNewPwd] = useState('')
-  const [confirmPwd, setConfirmPwd] = useState('')
-  const [pwdSaving, setPwdSaving] = useState(false)
-  const [pwdMsg, setPwdMsg] = useState('')
-  const [pwdError, setPwdError] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState(userAvatarUrl || '')
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarUploading(true)
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await fetch('/api/upload/avatar', { method: 'POST', body: fd })
+    const json = await res.json()
+    if (!res.ok) { showToast(json.error || 'Gagal upload foto.'); setAvatarUploading(false); return }
+    const supabase = createClient()
+    await supabase.auth.updateUser({ data: { avatar_url: json.url } })
+    setAvatarUrl(json.url)
+    setAvatarUploading(false)
+    showToast('Foto profil berhasil diperbarui!', 'success')
+  }
 
   async function saveWorkspace(e: React.FormEvent) {
     e.preventDefault()
@@ -200,24 +214,6 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
     showToast('Pengaturan berhasil disimpan! Refresh halaman untuk melihat perubahan.', 'success')
     setWsMsg('Tersimpan! Refresh halaman untuk melihat perubahan.')
     setTimeout(() => setWsMsg(''), 4000)
-  }
-
-  async function changePassword(e: React.FormEvent) {
-    e.preventDefault()
-    setPwdError('')
-    setPwdMsg('')
-    if (!newPwd) { showToast('Password baru wajib diisi.'); return }
-    if (newPwd.length < 6) { showToast('Password minimal 6 karakter.'); return }
-    if (newPwd !== confirmPwd) { showToast('Konfirmasi password tidak cocok.'); return }
-    setPwdSaving(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password: newPwd })
-    setPwdSaving(false)
-    if (error) { setPwdError(error.message); return }
-    showToast('Password berhasil diubah!', 'success')
-    setPwdMsg('Password berhasil diubah!')
-    setCurPwd(''); setNewPwd(''); setConfirmPwd('')
-    setTimeout(() => setPwdMsg(''), 4000)
   }
 
   async function saveGdKey() {
@@ -478,37 +474,44 @@ export default function SettingsModule({ workspaceId, workspaceName, userEmail, 
       {/* Akun Tab */}
       {tab === 'akun' && (
         <div style={{ maxWidth: 480 }}>
-          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px', marginBottom: 20 }}>
-            <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Info Akun</div>
-            <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#1a73e8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
-                {(userName || userEmail).charAt(0).toUpperCase()}
+          <div style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px' }}>
+            <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Info Akun</div>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+              {/* Clickable avatar with camera overlay */}
+              <div
+                style={{ position: 'relative', width: 56, height: 56, flexShrink: 0, cursor: 'pointer' }}
+                onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+                title="Klik untuk ganti foto profil"
+              >
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl} alt="avatar" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5eaf2' }} />
+                ) : (
+                  <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #1a73e8, #42a5f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>
+                    {(userName || userEmail).charAt(0).toUpperCase()}
+                  </div>
+                )}
+                {/* Camera icon overlay */}
+                <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20, borderRadius: '50%', background: '#1a73e8', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {avatarUploading ? (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
+                      <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity="0.3"/><path d="M21 12a9 9 0 00-9-9"/>
+                    </svg>
+                  ) : (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  )}
+                </div>
+                <input ref={avatarInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} />
               </div>
               <div>
                 <div style={{ fontWeight: 600, color: '#111827', fontSize: '0.9rem' }}>{userName || userEmail}</div>
-                <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>{userEmail}</div>
+                <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 4 }}>{userEmail}</div>
+                <div style={{ fontSize: '0.72rem', color: '#9ca3af' }}>Klik foto untuk mengganti • Maks 2MB</div>
               </div>
             </div>
           </div>
-
-          <form onSubmit={changePassword} style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.05)', borderRadius: 20, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Ganti Password</div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Password Baru *</label>
-              <input type="password" style={fieldStyle()} value={newPwd} onChange={e => setNewPwd(e.target.value)} placeholder="Minimal 6 karakter" required minLength={6} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>Konfirmasi Password *</label>
-              <input type="password" style={fieldStyle()} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="Ulangi password baru" required />
-            </div>
-            {pwdError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: '0.85rem' }}>{pwdError}</div>}
-            {pwdMsg && <div style={{ background: 'rgba(134,239,172,0.08)', border: '1px solid rgba(134,239,172,0.2)', borderRadius: 8, padding: '10px 14px', color: '#059669', fontSize: '0.85rem' }}>{pwdMsg}</div>}
-            <div>
-              <button type="submit" disabled={pwdSaving} style={{ background: pwdSaving ? '#1565c0' : '#1a73e8', border: 'none', borderRadius: 10, padding: '11px 24px', color: '#fff', fontSize: '0.875rem', fontWeight: 600, cursor: pwdSaving ? 'not-allowed' : 'pointer' }}>
-                {pwdSaving ? 'Mengubah...' : 'Ubah Password'}
-              </button>
-            </div>
-          </form>
         </div>
       )}
 

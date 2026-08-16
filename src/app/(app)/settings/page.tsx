@@ -45,6 +45,7 @@ export default async function SettingsPage() {
       workspaceName={ws?.name || ''}
       userEmail={user.email!}
       userName={user.user_metadata?.nama || user.email!}
+      userAvatarUrl={user.user_metadata?.avatar_url || ''}
       plan={PLAN_LABELS[ws?.plan ?? ''] || ws?.plan || 'Free'}
       googleDriveApiKey={(ws?.google_drive_api_key as string | null) || ''}
       myRole={(myMembership?.role as string) || 'member'}
