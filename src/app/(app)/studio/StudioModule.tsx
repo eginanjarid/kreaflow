@@ -478,7 +478,16 @@ function NaskahModal({ item, products, workspaceMembers, onClose, onUpdate, isAp
                 </div>
 
                 {/* Camera error */}
-                {tpCamError && <div style={{ background: '#7f1d1d', border: '1px solid #dc2626', borderRadius: 8, padding: '8px 14px', color: '#fca5a5', fontSize: '0.8rem', marginBottom: 20 }}>{tpCamError}</div>}
+                {tpCamError && (
+                  <div style={{ background: '#7f1d1d', border: '1px solid #dc2626', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>📷</span>
+                    <div>
+                      <div style={{ color: '#fca5a5', fontSize: '0.85rem', fontWeight: 600, marginBottom: 4 }}>Kamera tidak bisa diakses</div>
+                      <div style={{ color: '#f87171', fontSize: '0.78rem', lineHeight: 1.5 }}>Klik ikon 🔒 di address bar browser → ubah izin <strong>Kamera</strong> ke <strong>Allow</strong> → refresh halaman</div>
+                    </div>
+                    <button onClick={() => setTpCamError('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '0.9rem', flexShrink: 0 }}>✕</button>
+                  </div>
+                )}
 
                 {/* Script content */}
                 {item.script ? (
