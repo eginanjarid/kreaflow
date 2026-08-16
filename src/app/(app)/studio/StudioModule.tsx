@@ -943,7 +943,7 @@ export default function StudioModule({ initialContents, products, initialNotific
             <option value="">Semua Platform</option>
             {allPlatforms.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
-          {isProduksiRole && (
+          {isProduksiRole && !jabatanFormats && (
             <button onClick={() => setMyWorkOnly(v => !v)}
               style={{ padding: '7px 12px', border: `1px solid ${myWorkOnly ? '#1a73e8' : '#e5e7eb'}`, borderRadius: 8, fontSize: '0.75rem', color: myWorkOnly ? '#1a73e8' : '#6b7280', background: myWorkOnly ? 'rgba(26,115,232,0.08)' : '#f3f4f6', cursor: 'pointer', flexShrink: 0, fontWeight: myWorkOnly ? 700 : 400 }}>
               {myWorkOnly ? 'Tugasku' : 'Semua'}
