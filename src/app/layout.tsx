@@ -11,9 +11,18 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: 'KreaFlow — Alur kreasi kontenmu',
   description: 'Platform manajemen konten sosial media berbasis AI untuk creator dan affiliator Indonesia.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'KreaFlow',
+  },
   icons: {
     icon: '/logo-icon.png',
-    apple: '/logo-icon.png',
+    apple: '/icon-192.png',
+    other: [
+      { rel: 'icon', url: '/icon-512.png', sizes: '512x512' },
+    ],
   },
 }
 
@@ -21,6 +30,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  themeColor: '#1a73e8',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
