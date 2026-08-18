@@ -283,49 +283,62 @@ export default function PlanModule({ workspaceId, brandProfile, products, modes,
 
   function buildNaskahPrompt(): string {
     const brand = brandProfile
-    const niche = brand?.niche || '[belum diisi di Brand]'
-    const premis = brand?.premis || '-'
+    const niche = brand?.niche || ''
+    const premis = brand?.premis || ''
     const tone = brand?.tone_of_voice || 'Friendly'
-    const audiens = brand?.target_audiens || '-'
+    const audiens = brand?.target_audiens || ''
     const platform = naskahForm.platform
     const tipe = naskahForm.tipe_konten
-    const pillar = naskahForm.pillar || '-'
-    const hookAngle = naskahForm.hook_angle || '-'
-    const konteks = naskahForm.konteks || '-'
+    const pillar = naskahForm.pillar || ''
+    const hookAngle = naskahForm.hook_angle || ''
+    const konteks = naskahForm.konteks || ''
     const selectedProduct = products.find(p => p.id === naskahForm.product_id)
 
     let productSection = ''
     if (selectedProduct) {
-      productSection = `
-PRODUK YANG DIPROMOSIKAN
-Nama: ${selectedProduct.nama}
-Kategori: ${selectedProduct.kategori || '-'}
-Harga: Rp ${selectedProduct.harga_normal?.toLocaleString('id-ID') || '-'}
-Platform affiliate: ${selectedProduct.platform_affiliate || '-'}
-Komisi: ${selectedProduct.komisi_nilai}${selectedProduct.komisi_tipe === 'persen' ? '%' : ' (flat)'}
-Deskripsi: ${selectedProduct.deskripsi || '-'}
-`
+      const prodLines = [
+        `Nama: ${selectedProduct.nama}`,
+        selectedProduct.kategori ? `Kategori: ${selectedProduct.kategori}` : null,
+        selectedProduct.harga_normal ? `Harga: Rp ${selectedProduct.harga_normal.toLocaleString('id-ID')}` : null,
+        selectedProduct.platform_affiliate ? `Platform affiliate: ${selectedProduct.platform_affiliate}` : null,
+        selectedProduct.komisi_nilai ? `Komisi: ${selectedProduct.komisi_nilai}${selectedProduct.komisi_tipe === 'persen' ? '%' : ' (flat)'}` : null,
+        selectedProduct.deskripsi ? `Deskripsi: ${selectedProduct.deskripsi}` : null,
+      ].filter(Boolean).join('\n')
+      productSection = `\nPRODUK YANG DIPROMOSIKAN\n${prodLines}\n`
     }
 
     const affiliateContext = isAffiliate && brand?.affiliate_tipe
-      ? `\nTipe akun: ${brand.affiliate_tipe === 'store' ? 'Niche Store' : 'Personal Brand Affiliator'}\nPositioning: ${brand.affiliate_positioning || '-'}\nStyle promosi: ${brand.affiliate_promo_style || '-'}`
+      ? [
+          `\nTipe akun: ${brand.affiliate_tipe === 'store' ? 'Niche Store' : 'Personal Brand Affiliator'}`,
+          brand.affiliate_positioning ? `Positioning: ${brand.affiliate_positioning}` : null,
+          brand.affiliate_promo_style ? `Style promosi: ${brand.affiliate_promo_style}` : null,
+        ].filter(Boolean).join('\n')
       : ''
 
     const varian = parseInt(naskahForm.jumlah_varian) || 3
     const isCarousel = tipe === 'Carousel'
 
+    const brandDataLines = [
+      niche ? `Niche: ${niche}` : null,
+      premis ? `Premis: ${premis}` : null,
+      `Tone of voice: ${tone}`,
+      audiens ? `Target audiens: ${audiens}` : null,
+      affiliateContext || null,
+    ].filter(Boolean).join('\n')
+
+    const specsLines = [
+      `Platform: ${platform}`,
+      `Format: ${tipe}`,
+      pillar ? `Pillar konten: ${pillar}` : null,
+      hookAngle ? `Hook angle yang diinginkan: ${hookAngle}` : null,
+      konteks ? `Konteks tambahan: ${konteks}` : null,
+    ].filter(Boolean).join('\n')
+
     const brandBlock = `DATA BRAND
-Niche: ${niche}
-Premis: ${premis}
-Tone of voice: ${tone}
-Target audiens: ${audiens}${affiliateContext}
+${brandDataLines}
 
 SPESIFIKASI KONTEN
-Platform: ${platform}
-Format: ${tipe}
-Pillar konten: ${pillar}
-Hook angle yang diinginkan: ${hookAngle}
-Konteks tambahan: ${konteks}
+${specsLines}
 ${productSection}`
 
     if (isCarousel) {
@@ -445,13 +458,13 @@ Format: poin bernomor, singkat, langsung ke manfaat. Bahasa Indonesia yang natur
   function buildAffNaskahPrompt(): string {
     const selectedProduct = products.find(p => p.id === affForm.product_id)
     const nama = selectedProduct?.nama || '[nama produk]'
-    const harga = selectedProduct?.harga_normal ? `Rp ${selectedProduct.harga_normal.toLocaleString('id-ID')}` : '-'
-    const platformAffiliate = selectedProduct?.platform_affiliate || '-'
+    const harga = selectedProduct?.harga_normal ? `Rp ${selectedProduct.harga_normal.toLocaleString('id-ID')}` : ''
+    const platformAffiliate = selectedProduct?.platform_affiliate || ''
     const brand = brandProfile
-    const niche = brand?.niche || affForm.niche_produk || '-'
+    const niche = brand?.niche || affForm.niche_produk || ''
     const tone = brand?.tone_of_voice || 'Friendly, relate'
-    const positioning = brand?.affiliate_positioning || '-'
-    const promoStyle = brand?.affiliate_promo_style || '-'
+    const positioning = brand?.affiliate_positioning || ''
+    const promoStyle = brand?.affiliate_promo_style || ''
     const varian = parseInt(affForm.jumlah_varian) || 3
 
     const formulaGuide: Record<string, string> = {
@@ -470,17 +483,21 @@ Format: poin bernomor, singkat, langsung ke manfaat. Bahasa Indonesia yang natur
 ---
 
 PROFIL AFFILIATOR
-Niche: ${niche}
-Tone of voice: ${tone}
-Positioning: ${positioning}
-Style promosi: ${promoStyle}
+${[
+  niche ? `Niche: ${niche}` : null,
+  `Tone of voice: ${tone}`,
+  positioning ? `Positioning: ${positioning}` : null,
+  promoStyle ? `Style promosi: ${promoStyle}` : null,
+].filter(Boolean).join('\n')}
 
 ---
 
 PRODUK YANG DIPROMOSIKAN
-Nama: ${nama}
-Harga: ${harga}
-Platform affiliate: ${platformAffiliate}
+${[
+  `Nama: ${nama}`,
+  harga !== '-' ? `Harga: ${harga}` : null,
+  platformAffiliate !== '-' ? `Platform affiliate: ${platformAffiliate}` : null,
+].filter(Boolean).join('\n')}
 
 HASIL ANALISIS USP (dari langkah sebelumnya):
 ${affForm.usp || '[Isi USP hasil analisis terlebih dahulu]'}
