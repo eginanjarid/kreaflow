@@ -180,8 +180,32 @@ function SprintTimeline({ tasks, productName }: { tasks: TaskSnap[]; productName
 
 // ── Bank Ide ─────────────────────────────────────────────────────────────────
 
+function IdePreviewModal({ idea, onEdit, onClose }: { idea: ContentIdea; onEdit: () => void; onClose: () => void }) {
+  const content = [idea.hook, idea.body, idea.cta, idea.script, idea.prompt_script].filter(Boolean).join('\n\n') || idea.judul
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400, padding: 20 }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 520, maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+          <div>
+            <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.95rem' }}>{idea.judul}</div>
+            <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 20, color: STATUS_COLOR[idea.status], background: STATUS_BG[idea.status], fontWeight: 600 }}>{idea.status}</span>
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1 }}>×</button>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+          <div style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{content}</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, padding: '14px 20px', borderTop: '1px solid #f3f4f6' }}>
+          <button onClick={onEdit} style={{ flex: 1, background: '#1a73e8', border: 'none', borderRadius: 8, padding: '9px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}>Edit</button>
+          <button onClick={onClose} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '9px 16px', color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer' }}>Tutup</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function BankIdeTab({
-  ideas, workspaceId, sprints, products, pillars, onIdeaUpdate, onIdeaDelete,
+  ideas, workspaceId, sprints, products, pillars, onIdeaUpdate, onIdeaDelete, onEdit,
 }: {
   ideas: ContentIdea[]
   workspaceId: string
@@ -190,8 +214,10 @@ function BankIdeTab({
   pillars: Pillar[]
   onIdeaUpdate: (updated: ContentIdea) => void
   onIdeaDelete: (id: string) => void
+  onEdit: (idea: ContentIdea) => void
 }) {
   const [bankFilter, setBankFilter] = useState<'Semua' | 'Ide' | 'Kandidat'>('Semua')
+  const [previewIdea, setPreviewIdea] = useState<ContentIdea | null>(null)
   const [sprintModal, setSprintModal] = useState<{ open: boolean; idea: ContentIdea | null; format: string; tanggal: string; jam: string; pillar_id: string; product_id: string }>({ open: false, idea: null, format: '', tanggal: '', jam: '18:00', pillar_id: '', product_id: '' })
   const [selectedSprint, setSelectedSprint] = useState('')
   const [promoting, setPromoting] = useState<string | null>(null)
@@ -318,6 +344,16 @@ function BankIdeTab({
 
                 {/* Actions */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
+                  <button
+                    onClick={() => setPreviewIdea(idea)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', color: '#374151', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => onEdit(idea)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #1a73e8', background: 'rgba(26,115,232,0.08)', color: '#1a73e8', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Edit
+                  </button>
                   {idea.status === 'Ide' && (
                     <button
                       onClick={() => upgradeStatus(idea, 'Kandidat')}
@@ -348,6 +384,15 @@ function BankIdeTab({
           )
         })}
       </div>
+
+      {/* Idea Preview Modal */}
+      {previewIdea && (
+        <IdePreviewModal
+          idea={previewIdea}
+          onEdit={() => { onEdit(previewIdea); setPreviewIdea(null) }}
+          onClose={() => setPreviewIdea(null)}
+        />
+      )}
 
       {/* Sprint Modal */}
       {sprintModal.open && sprintModal.idea && (
@@ -617,6 +662,7 @@ export default function LibraryModule({ initialIdeas, workspaceId, workspaceName
           pillars={pillars}
           onIdeaUpdate={updated => setIdeas(prev => prev.map(i => i.id === updated.id ? updated : i))}
           onIdeaDelete={id => setIdeas(prev => prev.filter(i => i.id !== id))}
+          onEdit={openEdit}
         />
       )}
 
