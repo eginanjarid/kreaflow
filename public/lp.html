@@ -205,6 +205,30 @@ footer{background:#0f172a;color:rgba(255,255,255,0.45);padding:44px 0 28px}
 .footer-col ul a:hover{color:#fff!important}
 .footer-bottom{border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.72rem;color:rgba(255,255,255,0.35)}
 
+/* MODULE SHOWCASE */
+.module-showcase{padding:80px 0}
+.module-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:56px 0;border-bottom:1px solid #e2e8f0}
+.module-row:first-of-type{padding-top:52px}
+.module-row:last-of-type{border-bottom:none;padding-bottom:0}
+.module-row.rev .module-vid{order:-1}
+.module-tag{display:inline-flex;align-items:center;gap:6px;background:#eef3ff;border:1px solid #dbeafe;color:#1a73e8;font-size:0.7rem;font-weight:800;padding:5px 12px;border-radius:100px;margin-bottom:14px;letter-spacing:0.05em;text-transform:uppercase}
+.module-num{font-size:2.2rem;font-weight:900;color:#e2e8f0;letter-spacing:-2px;line-height:1;margin-bottom:4px}
+.module-title{font-size:1.3rem;font-weight:900;color:#0f172a;margin-bottom:10px;letter-spacing:-0.4px}
+.module-desc{font-size:0.88rem;color:#64748b;line-height:1.75;margin-bottom:18px}
+.module-bullets{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:0}
+.module-bullets li{font-size:0.82rem;color:#334155;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.module-bullets li::before{content:'✓';color:#059669;font-weight:900;flex-shrink:0;margin-top:1px}
+.module-vid-wrap{border-radius:14px;overflow:hidden;border:1px solid #c7d8f8;box-shadow:0 12px 40px rgba(26,115,232,0.12),0 2px 8px rgba(0,0,0,0.06);background:#0d1829}
+.module-vid-bar{background:rgba(255,255,255,0.06);padding:9px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.mvd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.module-vid-url{font-size:0.6rem;color:rgba(255,255,255,0.3);margin-left:8px}
+.module-vid-soon{height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#0d1829}
+.module-vid-soon span{font-size:0.75rem;color:rgba(255,255,255,0.25);font-weight:600}
+@media(max-width:768px){
+  .module-row{grid-template-columns:1fr;gap:24px;padding:40px 0}
+  .module-row.rev .module-vid{order:0}
+}
+
 /* FOR WHO */
 .forwho-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:44px}
 .forwho-item{display:flex;align-items:flex-start;gap:14px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px;transition:border-color 0.2s}
@@ -496,34 +520,99 @@ footer{background:#0f172a;color:rgba(255,255,255,0.45);padding:44px 0 28px}
   </div>
 </section>
 
-<!-- DEMO VIDEO -->
-<section class="section" style="background:#f8fafc">
+<!-- MODULE SHOWCASE -->
+<section class="section module-showcase" style="background:#fff" id="fitur-demo">
   <div class="container">
     <div class="text-center">
-      <span class="label">Lihat Platformnya Langsung</span>
-      <h2 class="section-title">Bukan cuma klaim —<br>ini tampilannya asli</h2>
-      <p class="section-sub mx-auto" style="max-width:500px;margin-bottom:40px">Semua modul terhubung dalam satu platform. Cukup klik, semua tim tahu ngapain.</p>
+      <span class="label">Demo per Modul</span>
+      <h2 class="section-title">Lihat sendiri cara<br>tiap modul bekerja</h2>
+      <p class="section-sub mx-auto" style="max-width:500px">Bukan mockup. Ini tampilan platform asli — semua modul terhubung otomatis.</p>
     </div>
-    <div style="max-width:760px;margin:0 auto">
-      <div style="border-radius:16px;overflow:hidden;border:1px solid #c7d8f8;box-shadow:0 16px 48px rgba(26,115,232,0.12),0 4px 12px rgba(0,0,0,0.06);background:#0d1829">
-        <div style="background:rgba(255,255,255,0.06);padding:10px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="width:10px;height:10px;border-radius:50%;background:#ff5f57;display:inline-block"></span>
-          <span style="width:10px;height:10px;border-radius:50%;background:#febc2e;display:inline-block"></span>
-          <span style="width:10px;height:10px;border-radius:50%;background:#28c840;display:inline-block"></span>
-          <span style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-left:8px">kreaflow.id/brand</span>
-        </div>
-        <video
-          class="demo-video"
-          src="https://kreaflow.id/videos/brand.mp4"
-          muted
-          loop
-          playsinline
-          preload="none"
-          style="width:100%;display:block;max-height:460px;object-fit:cover"
-        ></video>
+
+    <!-- BRAND -->
+    <div class="module-row">
+      <div class="module-info">
+        <div class="module-num">01</div>
+        <div class="module-tag">🏷️ Brand</div>
+        <h3 class="module-title">Setup Identitas Brand Sekali,<br>Semua Modul Pakai Otomatis</h3>
+        <p class="module-desc">Isi niche, tone of voice, target audiens, platform, dan strategi konten satu kali di sini. Plan, Studio, Calendar — semuanya langsung pakai data ini. Gak perlu isi ulang di mana-mana.</p>
+        <ul class="module-bullets">
+          <li>Profil brand, niche, dan premis konten</li>
+          <li>Tone of voice & pillar konten per platform</li>
+          <li>Link produk dan target audiens tersimpan otomatis</li>
+        </ul>
       </div>
-      <p style="text-align:center;font-size:0.78rem;color:#94a3b8;margin-top:14px">📌 Modul Brand — setup identitas, niche, tone of voice, dan strategi konten sekali, semua modul lain pakai data ini otomatis</p>
+      <div class="module-vid">
+        <div class="module-vid-wrap">
+          <div class="module-vid-bar">
+            <span class="mvd" style="background:#ff5f57"></span>
+            <span class="mvd" style="background:#febc2e"></span>
+            <span class="mvd" style="background:#28c840"></span>
+            <span class="module-vid-url">kreaflow.id/brand</span>
+          </div>
+          <video class="demo-video" src="https://kreaflow.id/videos/brand.mp4" muted loop playsinline preload="none" style="width:100%;display:block"></video>
+        </div>
+      </div>
     </div>
+
+    <!-- SPRINT -->
+    <div class="module-row rev">
+      <div class="module-info">
+        <div class="module-num">02</div>
+        <div class="module-tag">⚡ Sprint</div>
+        <h3 class="module-title">Kanban Board Tim —<br>Semua Tahu Ngapain</h3>
+        <p class="module-desc">Buat sprint mingguan, assign tugas ke anggota tim sesuai jabatan, dan pantau progress real-time. Tidak ada lagi tanya "ini udah dikerjain belum?" lewat WhatsApp.</p>
+        <ul class="module-bullets">
+          <li>Board Draft → Produksi → Review → Selesai</li>
+          <li>Assign per jabatan: copywriter, desainer, videografer</li>
+          <li>Deadline otomatis terhubung ke Calendar</li>
+        </ul>
+      </div>
+      <div class="module-vid">
+        <div class="module-vid-wrap">
+          <div class="module-vid-bar">
+            <span class="mvd" style="background:#ff5f57"></span>
+            <span class="mvd" style="background:#febc2e"></span>
+            <span class="mvd" style="background:#28c840"></span>
+            <span class="module-vid-url">kreaflow.id/sprints</span>
+          </div>
+          <div class="module-vid-soon">
+            <span style="font-size:1.8rem">⚡</span>
+            <span>Demo video segera hadir</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAN -->
+    <div class="module-row">
+      <div class="module-info">
+        <div class="module-num">03</div>
+        <div class="module-tag">✍️ Plan</div>
+        <h3 class="module-title">Naskah AI dalam 5 Menit —<br>Tinggal Rekam</h3>
+        <p class="module-desc">Pilih pillar, format, dan hook angle — sistem generate naskah lengkap. Klik, langsung buka di ChatGPT atau Gemini. Submit ke sprint aktif tanpa copas manual.</p>
+        <ul class="module-bullets">
+          <li>Generator naskah video, carousel, caption, affiliate</li>
+          <li>Hook angle + brief otomatis dari data brand</li>
+          <li>Submit ke sprint langsung dari halaman Plan</li>
+        </ul>
+      </div>
+      <div class="module-vid">
+        <div class="module-vid-wrap">
+          <div class="module-vid-bar">
+            <span class="mvd" style="background:#ff5f57"></span>
+            <span class="mvd" style="background:#febc2e"></span>
+            <span class="mvd" style="background:#28c840"></span>
+            <span class="module-vid-url">kreaflow.id/plan</span>
+          </div>
+          <div class="module-vid-soon">
+            <span style="font-size:1.8rem">✍️</span>
+            <span>Demo video segera hadir</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
