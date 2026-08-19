@@ -550,7 +550,7 @@ footer{background:#0f172a;color:rgba(255,255,255,0.45);padding:44px 0 28px}
             <span class="mvd" style="background:#28c840"></span>
             <span class="module-vid-url">kreaflow.id/brand</span>
           </div>
-          <video class="demo-video" src="https://kreaflow.id/videos/brand.mp4" muted loop playsinline preload="none" style="width:100%;display:block"></video>
+          <video class="demo-video" src="https://kreaflow.id/videos/brand.mp4" autoplay muted loop playsinline preload="metadata" style="width:100%;display:block"></video>
         </div>
       </div>
     </div>
@@ -1125,7 +1125,7 @@ footer{background:#0f172a;color:rgba(255,255,255,0.45);padding:44px 0 28px}
         entry.target.currentTime = 0;
       }
     });
-  }, { threshold: 0.4 });
+  }, { threshold: 0.15 });
   videos.forEach(function(v) { observer.observe(v); });
 })();
 </script>
