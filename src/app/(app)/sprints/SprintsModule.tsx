@@ -584,6 +584,14 @@ export default function SprintsModule({ initialSprints, initialContents, product
       return { id: step.id, daysBefore, memberId: memberId || undefined, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
     })
 
+    // Verify session is still valid before insert — avoid silent RLS failures
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      showToast('Sesi habis. Refresh halaman dan coba lagi.', 'error')
+      setSavingSprint(false)
+      return
+    }
+
     const { data: sprint, error } = await supabase.from('kf_sprints').insert({
       workspace_id: workspaceId,
       nama: autoNama,
@@ -600,7 +608,11 @@ export default function SprintsModule({ initialSprints, initialContents, product
     }).select('*').single()
 
     if (error || !sprint) {
-      showToast('Gagal membuat sprint. Coba lagi atau hubungi admin.', 'error')
+      console.error('[createSprint] error:', error?.code, error?.message, error?.details)
+      const msg = error?.message?.includes('row-level security')
+        ? 'Gagal: sesi tidak sinkron dengan workspace. Refresh halaman dan coba lagi.'
+        : 'Gagal membuat sprint. Coba lagi atau hubungi admin.'
+      showToast(msg, 'error')
       setSavingSprint(false)
       return
     }
