@@ -599,74 +599,78 @@ export default function SprintsModule({ initialSprints, initialContents, product
       status: 'active',
     }).select('*').single()
 
-    if (!error && sprint) {
-      const assignByCol: Record<string, string> = {}
-      sprintSteps.forEach(({ step, memberId }) => {
-        const col = STEP_ASSIGN_COL[step.id]
-        if (col && memberId) {
-          const m = workspaceMembers.find(x => x.id === memberId)
-          if (m) assignByCol[col] = m.nama || m.email
-        }
-      })
-
-      let items: object[] = []
-
-      if (weeklyStart) {
-        const cur = new Date(weeklyStart + 'T00:00:00')
-        const endD = new Date((weeklyEnd || weeklyStart) + 'T00:00:00')
-        const counterPerDate: Record<string, number> = {}
-        while (cur <= endD) {
-          const dayIdx = cur.getDay()
-          const dp = weeklyPattern[dayIdx]
-          if (dp.active) {
-            const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
-            const dayLabel = `${cur.getDate()}/${cur.getMonth() + 1}`
-            const activeSlots = dp.slots.filter(s => s.format)
-            activeSlots.forEach(slot => {
-              counterPerDate[dateStr] = (counterPerDate[dateStr] || 0) + 1
-              const slotIdx = counterPerDate[dateStr]
-              const pillar = pillars.find(p => p.id === slot.pillar_id)
-              const produk = products.find(p => p.id === slot.product_id)
-              const judulPrefix = isAffiliate
-                ? (produk ? produk.nama : null)
-                : (pillar ? pillar.nama : null)
-              const multiSuffix = activeSlots.length > 1 ? ` Konten ${slotIdx}` : ''
-              items.push({
-                workspace_id: workspaceId,
-                sprint_id: sprint.id,
-                judul: judulPrefix
-                  ? `${judulPrefix} — ${slot.format} [${dayLabel}]${multiSuffix}`
-                  : `${slot.format} — ${dayLabel}${multiSuffix}`,
-                status: 'Draft',
-                format: slot.format,
-                platform: slot.platforms.length > 0 ? slot.platforms : (activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : [])),
-                tanggal_tayang: dateStr,
-                jam_tayang: slot.jam || null,
-                product_id: isAffiliate ? (slot.product_id || null) : null,
-                ...assignByCol,
-              })
-            })
-          }
-          cur.setDate(cur.getDate() + 1)
-        }
-      }
-
-      if (items.length > 0) {
-        const { data: inserted } = await supabase.from('kf_content_ideas').insert(items).select('*')
-        if (inserted) setContents(prev => [...inserted, ...prev])
-        await supabase.from('kf_notifications').insert({
-          workspace_id: workspaceId,
-          type: 'naskah',
-          title: `Sprint Dimulai — ${autoNama}`,
-          message: `${items.length} konten siap dikerjakan. Buka Plan untuk mulai buat naskah.`,
-        })
-        showToast(`Sprint dibuat! ${items.length} konten masuk ke antrian Plan.`)
-      } else if (weeklyStart) {
-        showToast('Sprint dibuat. Pilih format di setiap slot hari aktif agar konten terbuat otomatis di Plan.')
-      }
-      setSprints(prev => [sprint, ...prev])
-      setSelectedSprintId(sprint.id)
+    if (error || !sprint) {
+      showToast('Gagal membuat sprint. Coba lagi atau hubungi admin.', 'error')
+      setSavingSprint(false)
+      return
     }
+
+    const assignByCol: Record<string, string> = {}
+    sprintSteps.forEach(({ step, memberId }) => {
+      const col = STEP_ASSIGN_COL[step.id]
+      if (col && memberId) {
+        const m = workspaceMembers.find(x => x.id === memberId)
+        if (m) assignByCol[col] = m.nama || m.email
+      }
+    })
+
+    let items: object[] = []
+
+    if (weeklyStart) {
+      const cur = new Date(weeklyStart + 'T00:00:00')
+      const endD = new Date((weeklyEnd || weeklyStart) + 'T00:00:00')
+      const counterPerDate: Record<string, number> = {}
+      while (cur <= endD) {
+        const dayIdx = cur.getDay()
+        const dp = weeklyPattern[dayIdx]
+        if (dp.active) {
+          const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
+          const dayLabel = `${cur.getDate()}/${cur.getMonth() + 1}`
+          const activeSlots = dp.slots.filter(s => s.format)
+          activeSlots.forEach(slot => {
+            counterPerDate[dateStr] = (counterPerDate[dateStr] || 0) + 1
+            const slotIdx = counterPerDate[dateStr]
+            const pillar = pillars.find(p => p.id === slot.pillar_id)
+            const produk = products.find(p => p.id === slot.product_id)
+            const judulPrefix = isAffiliate
+              ? (produk ? produk.nama : null)
+              : (pillar ? pillar.nama : null)
+            const multiSuffix = activeSlots.length > 1 ? ` Konten ${slotIdx}` : ''
+            items.push({
+              workspace_id: workspaceId,
+              sprint_id: sprint.id,
+              judul: judulPrefix
+                ? `${judulPrefix} — ${slot.format} [${dayLabel}]${multiSuffix}`
+                : `${slot.format} — ${dayLabel}${multiSuffix}`,
+              status: 'Draft',
+              format: slot.format,
+              platform: slot.platforms.length > 0 ? slot.platforms : (activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : (sprintForm.platform ? [sprintForm.platform] : [])),
+              tanggal_tayang: dateStr,
+              jam_tayang: slot.jam || null,
+              product_id: isAffiliate ? (slot.product_id || null) : null,
+              ...assignByCol,
+            })
+          })
+        }
+        cur.setDate(cur.getDate() + 1)
+      }
+    }
+
+    if (items.length > 0) {
+      const { data: inserted } = await supabase.from('kf_content_ideas').insert(items).select('*')
+      if (inserted) setContents(prev => [...inserted, ...prev])
+      await supabase.from('kf_notifications').insert({
+        workspace_id: workspaceId,
+        type: 'naskah',
+        title: `Sprint Dimulai — ${autoNama}`,
+        message: `${items.length} konten siap dikerjakan. Buka Plan untuk mulai buat naskah.`,
+      })
+      showToast(`Sprint dibuat! ${items.length} konten masuk ke antrian Plan.`)
+    } else if (weeklyStart) {
+      showToast('Sprint dibuat. Pilih format di setiap slot hari aktif agar konten terbuat otomatis di Plan.')
+    }
+    setSprints(prev => [sprint, ...prev])
+    setSelectedSprintId(sprint.id)
     setSavingSprint(false)
     setSprintModal(false)
   }
