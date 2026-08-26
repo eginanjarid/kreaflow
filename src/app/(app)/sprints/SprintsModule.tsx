@@ -681,7 +681,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
     } else if (weeklyStart) {
       showToast('Sprint dibuat. Pilih format di setiap slot hari aktif agar konten terbuat otomatis di Plan.')
     }
-    setSprints(prev => [sprint, ...prev])
+    setSprints(prev => prev.some(s => s.id === sprint.id) ? prev : [sprint, ...prev])
     setSelectedSprintId(sprint.id)
     setSavingSprint(false)
     setSprintModal(false)
