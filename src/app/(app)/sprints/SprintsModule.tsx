@@ -671,6 +671,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
               tanggal_tayang: dateStr,
               jam_tayang: slot.jam || null,
               product_id: isAffiliate ? (slot.product_id || null) : null,
+              pillar_id: !isAffiliate ? (slot.pillar_id || null) : null,
               ...assignByCol,
             })
           })
@@ -952,13 +953,22 @@ export default function SprintsModule({ initialSprints, initialContents, product
       const dayIdx = d.getDay()
       newPattern[dayIdx] = {
         active: true,
-        slots: items.map(c => ({
-          format: c.format || '',
-          pillar_id: c.pillar_id || '',
-          product_id: c.product_id || '',
-          jam: c.jam_tayang || '18:00',
-          platforms: Array.isArray(c.platform) ? c.platform : (c.platform ? [c.platform] : []),
-        })),
+        slots: items.map(c => {
+          // Fallback: parse pillar from judul for old content that didn't store pillar_id
+          let pillarId = c.pillar_id || ''
+          if (!pillarId && !isAffiliate) {
+            const firstPart = c.judul.split(' — ')[0]
+            const matched = pillars.find(p => p.nama === firstPart)
+            if (matched) pillarId = matched.id
+          }
+          return {
+            format: c.format || '',
+            pillar_id: pillarId,
+            product_id: c.product_id || '',
+            jam: c.jam_tayang || '18:00',
+            platforms: Array.isArray(c.platform) ? c.platform : (c.platform ? [c.platform] : []),
+          }
+        }),
       }
     })
     if (sprintItems.length === 0) {
