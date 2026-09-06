@@ -484,6 +484,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [editSprintModal, setEditSprintModal] = useState(false)
   const [editSprintForm, setEditSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35 })
   const [savingEditSprint, setSavingEditSprint] = useState(false)
+  const [duplicatingSprintId, setDuplicatingSprintId] = useState<string | null>(null)
 
   const selectedSprint = sprints.find(s => s.id === selectedSprintId)
   const sprintContents = contents.filter(c => c.sprint_id === selectedSprintId)
@@ -930,6 +931,61 @@ export default function SprintsModule({ initialSprints, initialContents, product
       setEditSprintModal(false)
     }
     setSavingEditSprint(false)
+  }
+
+  async function duplicateSprint(sprintId: string) {
+    const sprint = sprints.find(s => s.id === sprintId)
+    if (!sprint) return
+    setDuplicatingSprintId(sprintId)
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { showToast('Sesi habis. Refresh halaman.', 'error'); setDuplicatingSprintId(null); return }
+
+    const { data: newSprint, error } = await supabase.from('kf_sprints').insert({
+      workspace_id: workspaceId,
+      nama: `${sprint.nama} (Duplikat)`,
+      start_date: sprint.start_date,
+      end_date: sprint.end_date,
+      target_konten: sprint.target_konten,
+      platform: sprint.platform,
+      akun: sprint.akun,
+      template_type: sprint.template_type,
+      step_config: sprint.step_config,
+      status: 'active',
+    }).select('*').single()
+
+    if (error || !newSprint) {
+      showToast('Gagal menduplikat sprint. Coba lagi.', 'error')
+      setDuplicatingSprintId(null)
+      return
+    }
+
+    const sprintItems = contents.filter(c => c.sprint_id === sprintId)
+    if (sprintItems.length > 0) {
+      const newItems = sprintItems.map(c => ({
+        workspace_id: workspaceId,
+        sprint_id: newSprint.id,
+        judul: c.judul,
+        format: c.format,
+        platform: c.platform,
+        status: 'Draft',
+        product_id: c.product_id,
+        pillar_id: c.pillar_id,
+        tanggal_tayang: c.tanggal_tayang,
+        jam_tayang: c.jam_tayang,
+        assigned_riset: c.assigned_riset,
+        assigned_naskah: c.assigned_naskah,
+        assigned_produksi: c.assigned_produksi,
+        assigned_schedule: c.assigned_schedule,
+      }))
+      const { data: inserted } = await supabase.from('kf_content_ideas').insert(newItems).select('*')
+      if (inserted) setContents(prev => [...inserted, ...prev])
+    }
+
+    setSprints(prev => prev.some(s => s.id === newSprint.id) ? prev : [newSprint, ...prev])
+    setSelectedSprintId(newSprint.id)
+    setDuplicatingSprintId(null)
+    showToast(`Sprint diduplikat! ${sprintItems.length} konten disalin, semua kembali ke Draft.`, 'success')
   }
 
   async function requestRevisi(item: ContentItem) {
@@ -1665,8 +1721,19 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                     {isCurrent && <span style={{ fontSize: '0.6rem', background: '#059669', color: '#fff', fontWeight: 700, padding: '2px 6px', borderRadius: 20 }}>AKTIF</span>}
                     <span style={{ fontSize: '0.65rem', fontWeight: 500, padding: '2px 6px', borderRadius: 20, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
+                    {canEdit && (
+                      <button onClick={e => { e.stopPropagation(); duplicateSprint(s.id) }} title="Duplikat sprint"
+                        disabled={duplicatingSprintId === s.id}
+                        style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: duplicatingSprintId === s.id ? '#d1d5db' : '#9ca3af', cursor: duplicatingSprintId === s.id ? 'default' : 'pointer', padding: '0 3px', lineHeight: 1, display: 'flex', alignItems: 'center' }}>
+                        {duplicatingSprintId === s.id ? (
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        ) : (
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        )}
+                      </button>
+                    )}
                     <button onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }} title="Hapus sprint"
-                      style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.8rem', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>✕</button>
+                      style={{ background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.8rem', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>✕</button>
                   </div>
                   <div style={{ fontSize: '0.82rem', fontWeight: active ? 700 : 500, color: active ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{s.nama}</div>
                   <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginBottom: 7 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
