@@ -18,7 +18,7 @@ type Sprint = {
   start_date: string
   end_date: string
   target_konten: number
-  platform: string
+  platform: string | null
   akun: string | null
   status: string
   template_type: string
@@ -485,6 +485,7 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [editSprintForm, setEditSprintForm] = useState({ nama: '', start_date: '', end_date: '', target_konten: 35 })
   const [editSprintSteps, setEditSprintSteps] = useState<{ step: StepDef; memberId: string; daysBefore: number }[]>([])
   const [editAddStepOpen, setEditAddStepOpen] = useState(false)
+  const [editSelectedAkunIds, setEditSelectedAkunIds] = useState<string[]>([])
   const [savingEditSprint, setSavingEditSprint] = useState(false)
   const [duplicatingSprintId, setDuplicatingSprintId] = useState<string | null>(null)
 
@@ -924,6 +925,10 @@ export default function SprintsModule({ initialSprints, initialContents, product
         daysBefore: cfg?.daysBefore ?? DEFAULT_DAYS_BEFORE[s.id] ?? 1,
       }
     }))
+    // Pre-select akun from stored akun string
+    const akunStr = selectedSprint.akun || ''
+    const preselected = accounts.filter(a => akunStr.includes(`${a.platform} @${a.handle}`)).map(a => a.id)
+    setEditSelectedAkunIds(preselected.length > 0 ? preselected : (accounts.length === 1 ? [accounts[0].id] : []))
     setEditAddStepOpen(false)
     setEditSprintModal(true)
   }
@@ -939,11 +944,17 @@ export default function SprintsModule({ initialSprints, initialContents, product
       const m = workspaceMembers.find(x => x.id === memberId)
       return { id: step.id, daysBefore, memberId: memberId || undefined, memberName: m ? (m.nama || m.email) + (m.jabatan ? ` (${m.jabatan})` : '') : '' }
     })
+    const editAkunStr = accounts.length > 1
+      ? (editSelectedAkunIds.length > 0 ? editSelectedAkunIds.map(id => { const a = accounts.find(x => x.id === id); return a ? `${a.platform} @${a.handle}` : '' }).filter(Boolean).join(', ') : null)
+      : (accounts.length === 1 ? `${accounts[0].platform} @${accounts[0].handle}` : null)
+    const editPlatformStr = accounts.length === 1 ? accounts[0].platform : (editSelectedAkunIds.length > 0 ? (accounts.find(a => a.id === editSelectedAkunIds[0])?.platform || null) : null)
     const patch = {
       nama: editSprintForm.nama.trim(),
       start_date: editSprintForm.start_date,
       end_date: editSprintForm.end_date,
       target_konten: editSprintForm.target_konten,
+      platform: editPlatformStr,
+      akun: editAkunStr,
       template_type: tplType,
       step_config: stepConfigData,
     }
@@ -2002,6 +2013,53 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
                   <input type="date" style={fieldStyle()} value={editSprintForm.end_date} onChange={e => setEditSprintForm(f => ({ ...f, end_date: e.target.value }))} />
                 </div>
+              </div>
+
+              {/* Target Konten */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Target Konten</label>
+                <input type="number" className="no-spinner" min={1} max={999} style={fieldStyle()} value={editSprintForm.target_konten}
+                  onChange={e => setEditSprintForm(f => ({ ...f, target_konten: Math.max(1, parseInt(e.target.value) || 1) }))} />
+              </div>
+
+              {/* Akun Posting */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Akun Posting</label>
+                {accounts.length === 0 ? (
+                  <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '10px 12px', fontSize: '0.78rem', color: '#92400e' }}>
+                    Belum ada akun. <a href="/brand" style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: 600 }}>Daftarkan di Brand → Akun Sosial</a>
+                  </div>
+                ) : accounts.length === 1 ? (
+                  <div style={{ background: '#f0f9ff', border: '1px solid rgba(26,115,232,0.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111827' }}>{accounts[0].platform} · @{accounts[0].handle}</div>
+                      <div style={{ fontSize: '0.68rem', color: '#6b7280', marginTop: 1 }}>{accounts[0].nama}</div>
+                    </div>
+                    <span style={{ fontSize: '0.62rem', color: '#059669', fontWeight: 700, background: '#d1fae5', padding: '2px 7px', borderRadius: 6 }}>Auto</span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    {accounts.map(a => {
+                      const checked = editSelectedAkunIds.includes(a.id)
+                      return (
+                        <button key={a.id} type="button"
+                          onClick={() => setEditSelectedAkunIds(prev => checked ? prev.filter(id => id !== a.id) : [...prev, a.id])}
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, background: checked ? '#f0f9ff' : '#f8fafc', border: `1px solid ${checked ? 'rgba(26,115,232,0.25)' : '#e5e7eb'}`, borderRadius: 8, padding: '9px 12px', cursor: 'pointer', textAlign: 'left' }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? '#1a73e8' : '#d1d5db'}`, background: checked ? '#1a73e8' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {checked && <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                          </div>
+                          <div style={{ flex: 1, textAlign: 'left' }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: checked ? '#111827' : '#6b7280' }}>{a.platform} · @{a.handle}</div>
+                            <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 1 }}>{a.nama}</div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                    {editSelectedAkunIds.length === 0 && (
+                      <div style={{ fontSize: '0.72rem', color: '#ef4444', marginTop: 2 }}>Pilih minimal 1 akun posting.</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Steps Pekerjaan */}
