@@ -1705,45 +1705,66 @@ export default function SprintsModule({ initialSprints, initialContents, product
           )}
           <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
             {sprints.length === 0 && <div style={{ fontSize: '0.78rem', color: '#9ca3af', padding: '24px 8px', textAlign: 'center' }}>Belum ada sprint</div>}
-            {sprints.map(s => {
-              const sc = contents.filter(c => c.sprint_id === s.id)
-              const done = sc.filter(c => c.status === 'Tayang' || c.status === 'Terjadwal').length
-              const active = s.id === selectedSprintId
+            {(() => {
               const today = localToday()
-              const isCurrent = s.start_date <= today && s.end_date >= today
-              const tplLabel = getTemplateLabel(s.template_type)
-              const tplColor = getTemplateColor(s.template_type)
-              const pct = sc.length > 0 ? Math.round(done / sc.length * 100) : 0
-              return (
-                <div key={s.id} onClick={() => { setSelectedSprintId(s.id); setFilterPillar(''); setFilterProduct('') }}
-                  className="kf-sprint-item"
-                  style={{ position: 'relative', padding: '10px 12px', borderRadius: 10, marginBottom: 2, cursor: 'pointer', background: active ? 'rgba(26,115,232,0.07)' : 'transparent', borderLeft: `3px solid ${active ? '#1a73e8' : 'transparent'}`, transition: 'background 0.15s' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                    {isCurrent && <span style={{ fontSize: '0.6rem', background: '#059669', color: '#fff', fontWeight: 700, padding: '2px 6px', borderRadius: 20 }}>AKTIF</span>}
-                    <span style={{ fontSize: '0.65rem', fontWeight: 500, padding: '2px 6px', borderRadius: 20, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
-                    {canEdit && (
-                      <button onClick={e => { e.stopPropagation(); duplicateSprint(s.id) }} title="Duplikat sprint"
-                        disabled={duplicatingSprintId === s.id}
-                        style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: duplicatingSprintId === s.id ? '#d1d5db' : '#9ca3af', cursor: duplicatingSprintId === s.id ? 'default' : 'pointer', padding: '0 3px', lineHeight: 1, display: 'flex', alignItems: 'center' }}>
-                        {duplicatingSprintId === s.id ? (
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                        ) : (
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                        )}
-                      </button>
-                    )}
-                    <button onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }} title="Hapus sprint"
-                      style={{ background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.8rem', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>✕</button>
-                  </div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: active ? 700 : 500, color: active ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{s.nama}</div>
-                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginBottom: 7 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
-                  <div style={{ height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${pct}%`, background: active ? '#1a73e8' : '#d1d5db', borderRadius: 4, transition: 'width 0.4s ease' }} />
-                  </div>
-                  <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 4 }}>{done}/{sc.length} selesai</div>
+              const active = sprints.filter(s => s.start_date <= today && s.end_date >= today)
+              const upcoming = sprints.filter(s => s.start_date > today).sort((a, b) => a.start_date.localeCompare(b.start_date))
+              const past = sprints.filter(s => s.end_date < today).sort((a, b) => b.start_date.localeCompare(a.start_date))
+              const sorted = [...active, ...upcoming, ...past]
+
+              const sectionLabel = (text: string, color: string, bg: string) => (
+                <div style={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color, padding: '6px 4px 2px', marginTop: 4 }}>
+                  <span style={{ background: bg, padding: '2px 6px', borderRadius: 4 }}>{text}</span>
                 </div>
               )
-            })}
+
+              const sprintCard = (s: Sprint) => {
+                const sc = contents.filter(c => c.sprint_id === s.id)
+                const done = sc.filter(c => c.status === 'Tayang' || c.status === 'Terjadwal').length
+                const isSelected = s.id === selectedSprintId
+                const isCurrent = s.start_date <= today && s.end_date >= today
+                const tplLabel = getTemplateLabel(s.template_type)
+                const tplColor = getTemplateColor(s.template_type)
+                const pct = sc.length > 0 ? Math.round(done / sc.length * 100) : 0
+                return (
+                  <div key={s.id} onClick={() => { setSelectedSprintId(s.id); setFilterPillar(''); setFilterProduct('') }}
+                    className="kf-sprint-item"
+                    style={{ position: 'relative', padding: '10px 12px', borderRadius: 10, marginBottom: 2, cursor: 'pointer', background: isSelected ? 'rgba(26,115,232,0.07)' : 'transparent', borderLeft: `3px solid ${isSelected ? '#1a73e8' : 'transparent'}`, transition: 'background 0.15s' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                      {isCurrent && <span style={{ fontSize: '0.6rem', background: '#059669', color: '#fff', fontWeight: 700, padding: '2px 6px', borderRadius: 20 }}>AKTIF</span>}
+                      <span style={{ fontSize: '0.65rem', fontWeight: 500, padding: '2px 6px', borderRadius: 20, background: tplColor + '18', color: tplColor }}>{tplLabel}</span>
+                      {canEdit && (
+                        <button onClick={e => { e.stopPropagation(); duplicateSprint(s.id) }} title="Duplikat sprint"
+                          disabled={duplicatingSprintId === s.id}
+                          style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: duplicatingSprintId === s.id ? '#d1d5db' : '#9ca3af', cursor: duplicatingSprintId === s.id ? 'default' : 'pointer', padding: '0 3px', lineHeight: 1, display: 'flex', alignItems: 'center' }}>
+                          {duplicatingSprintId === s.id ? (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                          ) : (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                          )}
+                        </button>
+                      )}
+                      <button onClick={e => { e.stopPropagation(); deleteSprint(s.id, s.nama) }} title="Hapus sprint"
+                        style={{ background: 'transparent', border: 'none', color: '#d1d5db', fontSize: '0.8rem', cursor: 'pointer', padding: '0 2px', lineHeight: 1 }}>✕</button>
+                    </div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: isSelected ? 700 : 500, color: isSelected ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{s.nama}</div>
+                    <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginBottom: 7 }}>{fmtDate(s.start_date)} – {fmtDate(s.end_date)}</div>
+                    <div style={{ height: 4, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${pct}%`, background: isSelected ? '#1a73e8' : '#d1d5db', borderRadius: 4, transition: 'width 0.4s ease' }} />
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#9ca3af', marginTop: 4 }}>{done}/{sc.length} selesai</div>
+                  </div>
+                )
+              }
+
+              return (
+                <>
+                  {active.length > 0 && <>{sectionLabel('Minggu Ini', '#059669', '#dcfce7')}{active.map(sprintCard)}</>}
+                  {upcoming.length > 0 && <>{sectionLabel('Akan Datang', '#1a73e8', '#dbeafe')}{upcoming.map(sprintCard)}</>}
+                  {past.length > 0 && <>{sectionLabel('Selesai', '#9ca3af', '#f3f4f6')}{past.map(sprintCard)}</>}
+                </>
+              )
+            })()}
           </div>
         </div>
 
