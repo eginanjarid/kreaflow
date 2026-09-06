@@ -1,0 +1,105 @@
+name: Deploy KreaFlow ke VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Deploy ke VPS via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          script: |
+            export PATH=/www/server/nvm/versions/node/v24.15.0/bin:$PATH
+            export HOME=/root
+            export NODE_EXTRA_CA_CERTS=/etc/ssl/tuasdigital-cert.pem
+            PM2=/www/server/nvm/versions/node/v24.15.0/lib/node_modules/pm2/bin/pm2
+            NPM=/www/server/nvm/versions/node/v24.15.0/bin/npm
+            NODE=/www/server/nvm/versions/node/v24.15.0/bin/node
+            WORKTREE=/www/wwwroot/kreaflow
+            NEXT_BACKUP=$WORKTREE/.next_backup
+
+            echo "==> Pull dari GitHub..."
+            cd $WORKTREE
+            git pull origin main
+
+            echo "==> Install dependencies..."
+            $NPM install --prefer-offline 2>/dev/null || $NPM install
+
+            echo "==> Run pending migrations..."
+            if ls migrations/pending/*.sql 2>/dev/null | head -1 | grep -q .; then
+              for f in migrations/pending/*.sql; do
+                echo "  Applying $f..."
+                docker exec supabase-db psql -U postgres -d postgres < "$f" && \
+                  mkdir -p migrations/applied && \
+                  mv "$f" migrations/applied/$(date +%Y%m%d_%H%M%S)_$(basename "$f") && \
+                  echo "  ✓ $f applied"
+              done
+            else
+              echo "  Tidak ada pending migration"
+            fi
+
+            echo "==> Build..."
+            rm -rf $NEXT_BACKUP
+            [ -d $WORKTREE/.next ] && cp -a $WORKTREE/.next $NEXT_BACKUP && echo "  .next backed up"
+
+            $NPM run build
+            BUILD_EXIT=$?
+
+            if [ $BUILD_EXIT -ne 0 ]; then
+              echo "✗ Build gagal! Restore .next lama..."
+              [ -d $NEXT_BACKUP ] && rm -rf $WORKTREE/.next && mv $NEXT_BACKUP $WORKTREE/.next
+              exit 1
+            fi
+            rm -rf $NEXT_BACKUP
+
+            echo "==> Restart PM2..."
+            if $PM2 describe kreaflow > /dev/null 2>&1; then
+              $PM2 restart kreaflow
+            else
+              $PM2 start node_modules/next/dist/bin/next --name kreaflow --cwd $WORKTREE --interpreter $NODE -- start -p 3003
+            fi
+            $PM2 save
+            echo "✓ Deploy selesai"
+
+      - name: Notifikasi sukses ke Telegram
+        if: success()
+        uses: appleboy/telegram-action@v1.0.0
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✅ *KreaFlow Deploy Sukses*
+
+            👤 Push by: `${{ github.actor }}`
+            🌿 Branch: `${{ github.ref_name }}`
+            💬 Commit: ${{ github.event.head_commit.message }}
+            🔗 [Lihat commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+
+            🌐 Live di: https://kreaflow.id
+
+      - name: Notifikasi gagal ke Telegram
+        if: failure()
+        uses: appleboy/telegram-action@v1.0.0
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ❌ *KreaFlow Deploy GAGAL*
+
+            👤 Push by: `${{ github.actor }}`
+            💬 Commit: ${{ github.event.head_commit.message }}
+            🔗 [Lihat log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            Cek log di GitHub Actions untuk detail error.

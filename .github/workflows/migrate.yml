@@ -1,0 +1,68 @@
+name: Run DB Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      sql:
+        description: "SQL yang mau dijalankan (satu baris, untuk migration kecil)"
+        required: false
+        type: string
+      filename:
+        description: "Nama file SQL dari folder migrations/pending/ (kosongkan jika pakai input sql)"
+        required: false
+        type: string
+
+jobs:
+  migrate:
+    name: Run Migration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run migration di VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          script: |
+            WORKTREE=/www/wwwroot/kreaflow
+
+            if [ -n "${{ github.event.inputs.filename }}" ]; then
+              FILE=$WORKTREE/migrations/pending/${{ github.event.inputs.filename }}
+              if [ ! -f "$FILE" ]; then
+                echo "ERROR: File tidak ditemukan: $FILE"
+                exit 1
+              fi
+              echo "==> Menjalankan $FILE..."
+              docker exec -i supabase-db psql -U postgres -d postgres < "$FILE"
+              mkdir -p $WORKTREE/migrations/applied
+              mv "$FILE" $WORKTREE/migrations/applied/$(date +%Y%m%d_%H%M%S)_$(basename "$FILE")
+              echo "✓ Migration selesai dan dipindah ke applied/"
+            elif [ -n "${{ github.event.inputs.sql }}" ]; then
+              echo "==> Menjalankan inline SQL..."
+              echo "${{ github.event.inputs.sql }}" | docker exec -i supabase-db psql -U postgres -d postgres
+              echo "✓ SQL berhasil dijalankan"
+            else
+              echo "ERROR: Tidak ada SQL atau filename yang diberikan."
+              exit 1
+            fi
+
+      - name: Notifikasi ke Telegram
+        if: always()
+        uses: appleboy/telegram-action@v1.0.0
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ${{ job.status == 'success' && '✅' || '❌' }} *KreaFlow DB Migration*
+
+            Status: `${{ job.status }}`
+            👤 Dijalankan oleh: `${{ github.actor }}`
+            📄 File: `${{ github.event.inputs.filename || 'inline SQL' }}`
+            🔗 [Lihat log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
