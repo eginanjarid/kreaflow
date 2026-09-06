@@ -53,6 +53,8 @@ const MORE_ITEMS = [
 
 const ADMIN_ITEM = { href: '/admin', label: 'Admin', icon: (c: string) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> }
 
+const HELP_ITEM = { href: '/help', label: 'Bantuan', icon: (c: string) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> }
+
 export default function BottomNav({ isSuperAdmin, workspaceId, role = 'owner', jabatan = '' }: { isSuperAdmin: boolean; workspaceId?: string; role?: string; jabatan?: string }) {
   const pathname = usePathname()
   const [moreOpen, setMoreOpen] = useState(false)
@@ -90,10 +92,13 @@ export default function BottomNav({ isSuperAdmin, workspaceId, role = 'owner', j
     const mod = HREF_TO_MODULE[item.href]
     return !mod || canAccess(role, jabatan, mod)
   })
-  const allMore = (isSuperAdmin ? [...MORE_ITEMS, ADMIN_ITEM] : MORE_ITEMS).filter(item => {
-    const mod = HREF_TO_MODULE[item.href]
-    return !mod || canAccess(role, jabatan, mod)
-  })
+  const allMore = [
+    ...(isSuperAdmin ? [...MORE_ITEMS, ADMIN_ITEM] : MORE_ITEMS).filter(item => {
+      const mod = HREF_TO_MODULE[item.href]
+      return !mod || canAccess(role, jabatan, mod)
+    }),
+    HELP_ITEM, // selalu tampil untuk semua role/jabatan
+  ]
   const moreActive = allMore.some(item => pathname.startsWith(item.href))
 
   return (
