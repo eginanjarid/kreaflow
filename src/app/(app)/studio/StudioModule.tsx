@@ -1009,6 +1009,11 @@ export default function StudioModule({ initialContents, products, initialNotific
     if (filterFormat && c.format !== filterFormat) return false
     if (filterPlatform && !(c.platform || []).includes(filterPlatform)) return false
     return true
+  }).sort((a, b) => {
+    const da = a.tanggal_tayang || '9999-12-31'
+    const db = b.tanggal_tayang || '9999-12-31'
+    if (da !== db) return da.localeCompare(db)
+    return (a.jam_tayang || '00:00').localeCompare(b.jam_tayang || '00:00')
   })
 
   async function handleBulkSelesai() {
