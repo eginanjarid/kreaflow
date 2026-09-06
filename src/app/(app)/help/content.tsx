@@ -78,14 +78,21 @@ export const HELP_TOPICS: HelpTopic[] = [
           <Li>Klik kotak nama workspace di bagian atas sidebar, lalu pilih <strong>&quot;Buat Workspace Baru&quot;</strong>.</Li>
           <Li>Isi nama brand/workspace-nya.</Li>
           <Li>Pilih tipe brand: <strong>Creator</strong> (konten kreator/personal brand), <strong>Affiliate</strong> (affiliator produk & komisi), atau <strong>Business</strong> (brand toko/perusahaan). Pilihan ini memengaruhi jenis konten & ide yang direkomendasikan nanti.</Li>
+          <Li>Setelah workspace dibuat, kamu <strong>otomatis diarahkan ke halaman Brand</strong> untuk mengisi identitas brand — ini wajib diisi dulu sebelum menu lain (Dashboard, Sprint, Plan, Studio, Calendar, Catalog, Library, Tracker, Budget, Notifikasi) bisa dibuka.</Li>
         </Ol>
         <Note tone="warn">
           Jumlah workspace yang bisa kamu buat dibatasi sesuai paket kamu. Kalau kena limit, kamu akan diarahkan ke halaman upgrade — lihat topik <strong>Paket & Upgrade</strong>.
         </Note>
         <H>Pindah workspace</H>
         <P>Klik kotak nama workspace di sidebar, lalu pilih workspace lain dari daftarnya. Halaman akan reload dan menampilkan data workspace yang baru dipilih.</P>
-        <H>Isi profil brand</H>
-        <P>Sebelum modul lain (Sprint, Plan, dst.) bisa dipakai penuh, lengkapi dulu profil brand di menu <strong>Brand</strong> — niche/kategori usaha kamu. Ini dipakai sistem untuk kasih rekomendasi ide konten yang relevan.</P>
+        <H>Isi identitas brand (wajib di awal)</H>
+        <P>Begitu workspace baru dibuat, sistem akan terus mengarahkanmu ke halaman <strong>Brand</strong> setiap kali membuka menu lain sampai identitas brand-nya lengkap. Yang perlu diisi beda-beda tergantung tipe brand yang kamu pilih:</P>
+        <Ul>
+          <Li><strong>Creator</strong> — isi lewat <strong>Niche Hunt</strong>: jawab apa yang kamu suka, apa yang kamu bisa, dan apa yang dibutuhkan orang. Sistem (dibantu AI) akan menyarankan niche & micro-niche yang cocok buat kamu pilih.</Li>
+          <Li><strong>Affiliate</strong> — isi tab <strong>Profil & Target</strong>: tipe akun, kategori fokus, platform affiliate yang dipakai, micro-niche, dan target pembeli.</Li>
+          <Li><strong>Business</strong> — isi <strong>Profil Bisnis</strong>: nama brand dan kategori bisnisnya.</Li>
+        </Ul>
+        <P>Data ini dipakai sistem untuk kasih rekomendasi ide konten yang relevan di modul lain — jadi worth diisi serius, bukan asal-asalan biar cepat lewat.</P>
         <H>Mengundang anggota tim</H>
         <P>Owner atau admin workspace bisa mengundang anggota lewat menu <strong>Pengaturan</strong>. Setiap anggota bisa dikasih <em>jabatan</em> (Manager, Copywriter, Videografer, dll.) yang menentukan modul apa saja yang bisa mereka akses — lihat topik <strong>Peran & Akses Tim</strong> untuk detailnya.</P>
       </>
