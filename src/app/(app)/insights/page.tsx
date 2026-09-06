@@ -43,7 +43,7 @@ export default async function DashboardPage() {
     { data: calendarWork },
     { data: weeklyTasksRaw },
   ] = await Promise.all([
-    supabase.from('kf_workspaces').select('plan, name').eq('id', wsId).maybeSingle(),
+    supabase.from('kf_workspaces').select('plan, name, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_content_ideas').select('id, status, platform, sprint_id').eq('workspace_id', wsId),
     supabase.from('kf_products').select('is_active').eq('workspace_id', wsId),
     supabase.from('kf_transactions').select('tipe, jumlah').eq('workspace_id', wsId),
@@ -90,6 +90,14 @@ export default async function DashboardPage() {
   ])
 
   if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
+
+  const { data: brand } = await supabase
+    .from('kf_brand_profiles')
+    .select('niche, affiliate_micro_niche, biz_nama_brand, biz_kategori')
+    .eq('workspace_id', wsId)
+    .maybeSingle()
+  const brandIncomplete = wsData?.brand_type === 'business' ? (!brand?.biz_nama_brand && !brand?.biz_kategori) : (!brand?.niche && !brand?.affiliate_micro_niche)
+  if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
 
   const workspaceName = wsData?.name || 'KreaFlow'
 

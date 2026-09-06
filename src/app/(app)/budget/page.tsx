@@ -11,6 +11,10 @@ export default async function BudgetPage() {
   const { data: wsData } = await supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle()
   if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
 
+  const { data: brand } = await supabase.from('kf_brand_profiles').select('niche, affiliate_micro_niche, biz_nama_brand, biz_kategori').eq('workspace_id', wsId).maybeSingle()
+  const brandIncomplete = wsData?.brand_type === 'business' ? (!brand?.biz_nama_brand && !brand?.biz_kategori) : (!brand?.niche && !brand?.affiliate_micro_niche)
+  if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
+
   const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const isAffiliate = brandType === 'affiliate'
 

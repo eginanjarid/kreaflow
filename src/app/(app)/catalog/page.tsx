@@ -11,10 +11,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
   const [{ data: wsData }, { data: products }, { data: brandProfile }] = await Promise.all([
     supabase.from('kf_workspaces').select('plan, brand_type').eq('id', wsId).maybeSingle(),
     supabase.from('kf_products').select('*').eq('workspace_id', wsId).order('created_at', { ascending: false }),
-    supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus, affiliate_platforms').eq('workspace_id', wsId).maybeSingle(),
+    supabase.from('kf_brand_profiles').select('affiliate_kategori_fokus, affiliate_platforms, niche, affiliate_micro_niche, biz_nama_brand, biz_kategori').eq('workspace_id', wsId).maybeSingle(),
   ])
 
   if (!isPaidPlan(wsData?.plan)) redirect('/upgrade')
+
+  const brandIncomplete = wsData?.brand_type === 'business' ? (!brandProfile?.biz_nama_brand && !brandProfile?.biz_kategori) : (!brandProfile?.niche && !brandProfile?.affiliate_micro_niche)
+  if (brandIncomplete && canAccess(role, jabatan, 'brand')) redirect('/brand?setup=1')
 
   const brandType = (wsData?.brand_type as string | null) ?? 'creator'
   const modes = brandType === 'affiliate' ? ['affiliate'] : ['creator']
