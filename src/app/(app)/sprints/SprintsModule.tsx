@@ -2105,23 +2105,75 @@ export default function SprintsModule({ initialSprints, initialContents, product
                 <input style={fieldStyle()} value={editSprintForm.nama} onChange={e => setEditSprintForm(f => ({ ...f, nama: e.target.value }))} placeholder="cth: Sprint W3 20–26 Sep" />
               </div>
 
-              {/* Tanggal */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Mulai</label>
-                  <input type="date" style={fieldStyle()} value={editSprintForm.start_date} onChange={e => setEditSprintForm(f => ({ ...f, start_date: e.target.value }))} />
+              {/* Steps Pekerjaan */}
+              <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 10, padding: '12px 14px' }} onClick={e => e.stopPropagation()}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Steps Pekerjaan</div>
+                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#7c3aed', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Deadline Internal Tim</span>
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set <strong>D-N</strong> = berapa hari sebelum tanggal tayang step harus selesai</div>
+                  </div>
+                  <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{editSprintSteps.length} step</span>
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Selesai</label>
-                  <input type="date" style={fieldStyle()} value={editSprintForm.end_date} onChange={e => setEditSprintForm(f => ({ ...f, end_date: e.target.value }))} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {editSprintSteps.map(({ step, memberId, daysBefore }, idx) => (
+                    <div key={`${step.id}-${idx}`} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 700, background: '#f8fafc', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
+                        <span style={{ color: '#6b7280', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
+                        <span style={{ fontSize: '0.82rem', color: '#111827', fontWeight: 600, flex: 1 }}>{step.nama}</span>
+                        <button type="button" onClick={() => setEditSprintSteps(prev => prev.filter((_, i) => i !== idx))}
+                          style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 22, height: 22, color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✕</button>
+                      </div>
+                      {workspaceMembers.length > 0 && (
+                        <select value={memberId}
+                          onChange={e => setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
+                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#374151', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const, marginBottom: 6 }}>
+                          <option value="">— Assign ke —</option>
+                          {workspaceMembers.map(m => (
+                            <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
+                          ))}
+                        </select>
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '5px 10px' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>Selesai</span>
+                        <button type="button" onClick={() => setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
+                          style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+                        <input type="text" inputMode="numeric" pattern="[0-9]*" value={daysBefore}
+                          onChange={e => { const v = parseInt(e.target.value.replace(/\D/g, '')) || 0; setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, Math.min(30, v)) } : x)) }}
+                          style={{ width: 44, textAlign: 'center', color: '#111827', fontWeight: 700, fontSize: '0.9rem', border: '1px solid #fcd34d', borderRadius: 5, background: '#fff', outline: 'none', padding: '2px 4px' }} />
+                        <button type="button" onClick={() => setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
+                          style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+                        <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>hari sebelum tayang</span>
+                      </div>
+                    </div>
+                  ))}
+                  {editSprintSteps.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '12px', color: '#6b7280', fontSize: '0.72rem', border: '1px dashed #e5eaf2', borderRadius: 8 }}>Belum ada step</div>
+                  )}
                 </div>
-              </div>
-
-              {/* Target Konten */}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: '#6b7280', marginBottom: 5, fontWeight: 600 }}>Target Konten</label>
-                <input type="number" className="no-spinner" min={1} max={999} style={fieldStyle()} value={editSprintForm.target_konten}
-                  onChange={e => setEditSprintForm(f => ({ ...f, target_konten: Math.max(1, parseInt(e.target.value) || 1) }))} />
+                <div style={{ marginTop: 8, position: 'relative' }}>
+                  <button type="button" onClick={e => { e.stopPropagation(); setEditAddStepOpen(v => !v) }}
+                    style={{ width: '100%', background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                    <span>+</span> Tambah Step
+                  </button>
+                  {editAddStepOpen && (
+                    <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {MASTER_STEPS.filter(ms => !editSprintSteps.some(ss => ss.step.id === ms.id)).map(ms => (
+                        <button key={ms.id} type="button"
+                          onClick={() => { setEditSprintSteps(prev => [...prev, { step: ms, memberId: '', daysBefore: DEFAULT_DAYS_BEFORE[ms.id] ?? 1 }]); setEditAddStepOpen(false) }}
+                          style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#111827', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
+                          <span style={{ color: '#6b7280', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[ms.id] || null}</span> {ms.nama}
+                        </button>
+                      ))}
+                      {MASTER_STEPS.filter(ms => !editSprintSteps.some(ss => ss.step.id === ms.id)).length === 0 && (
+                        <div style={{ padding: '6px 10px', color: '#6b7280', fontSize: '0.72rem' }}>Semua step sudah ditambah</div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Akun Posting */}
@@ -2184,13 +2236,12 @@ export default function SprintsModule({ initialSprints, initialContents, product
                           const val = e.target.value
                           setEditWeeklyStart(val)
                           setEditSprintForm(f => ({ ...f, start_date: val }))
-                          if (!editWeeklyEnd) {
-                            const end = new Date(val + 'T00:00:00')
-                            end.setDate(end.getDate() + 6)
-                            const endStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`
-                            setEditWeeklyEnd(endStr)
-                            setEditSprintForm(f => ({ ...f, end_date: endStr }))
-                          }
+                          // Always recalculate end = start + 6 days to keep 1-week window
+                          const end = new Date(val + 'T00:00:00')
+                          end.setDate(end.getDate() + 6)
+                          const endStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`
+                          setEditWeeklyEnd(endStr)
+                          setEditSprintForm(f => ({ ...f, end_date: endStr }))
                         }}
                         style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
                     </div>
@@ -2352,77 +2403,6 @@ export default function SprintsModule({ initialSprints, initialContents, product
                   {!editWeeklyStart && (
                     <div style={{ textAlign: 'center', padding: '16px 0', color: '#9ca3af', fontSize: '0.75rem' }}>
                       Pilih tanggal mulai posting untuk set pola mingguan
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Steps Pekerjaan */}
-              <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 10, padding: '12px 14px' }} onClick={e => e.stopPropagation()}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Steps Pekerjaan</div>
-                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#7c3aed', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Deadline Internal Tim</span>
-                    </div>
-                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Set <strong>D-N</strong> = berapa hari sebelum tanggal tayang step harus selesai</div>
-                  </div>
-                  <span style={{ fontSize: '0.65rem', color: '#6b7280' }}>{editSprintSteps.length} step</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {editSprintSteps.map(({ step, memberId, daysBefore }, idx) => (
-                    <div key={`${step.id}-${idx}`} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                        <span style={{ fontSize: '0.65rem', color: '#6b7280', fontWeight: 700, background: '#f8fafc', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>{idx + 1}</span>
-                        <span style={{ color: '#6b7280', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[step.id] || null}</span>
-                        <span style={{ fontSize: '0.82rem', color: '#111827', fontWeight: 600, flex: 1 }}>{step.nama}</span>
-                        <button type="button" onClick={() => setEditSprintSteps(prev => prev.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: '1px solid #f3f4f6', borderRadius: 5, width: 22, height: 22, color: '#6b7280', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✕</button>
-                      </div>
-                      {workspaceMembers.length > 0 && (
-                        <select value={memberId}
-                          onChange={e => setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, memberId: e.target.value } : x))}
-                          style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', color: memberId ? '#1a73e8' : '#374151', fontSize: '0.72rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' as const, marginBottom: 6 }}>
-                          <option value="">— Assign ke —</option>
-                          {workspaceMembers.map(m => (
-                            <option key={m.id} value={m.id}>{m.nama || m.email}{m.jabatan ? ` (${m.jabatan})` : ''}</option>
-                          ))}
-                        </select>
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '5px 10px' }}>
-                        <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>Selesai</span>
-                        <button type="button" onClick={() => setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, x.daysBefore - 1) } : x))}
-                          style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
-                        <input type="text" inputMode="numeric" pattern="[0-9]*" value={daysBefore}
-                          onChange={e => { const v = parseInt(e.target.value.replace(/\D/g, '')) || 0; setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.max(0, Math.min(30, v)) } : x)) }}
-                          style={{ width: 44, textAlign: 'center', color: '#111827', fontWeight: 700, fontSize: '0.9rem', border: '1px solid #fcd34d', borderRadius: 5, background: '#fff', outline: 'none', padding: '2px 4px' }} />
-                        <button type="button" onClick={() => setEditSprintSteps(prev => prev.map((x, i) => i === idx ? { ...x, daysBefore: Math.min(30, x.daysBefore + 1) } : x))}
-                          style={{ background: '#fff', border: '1px solid #fcd34d', borderRadius: 4, color: '#d97706', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
-                        <span style={{ fontSize: '0.68rem', color: '#92400e', flexShrink: 0 }}>hari sebelum tayang</span>
-                      </div>
-                    </div>
-                  ))}
-                  {editSprintSteps.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '12px', color: '#6b7280', fontSize: '0.72rem', border: '1px dashed #e5eaf2', borderRadius: 8 }}>Belum ada step</div>
-                  )}
-                </div>
-                <div style={{ marginTop: 8, position: 'relative' }}>
-                  <button type="button" onClick={e => { e.stopPropagation(); setEditAddStepOpen(v => !v) }}
-                    style={{ width: '100%', background: 'transparent', border: '1px dashed #c8d1e0', borderRadius: 7, padding: '6px', color: '#9fa9ba', fontSize: '0.72rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                    <span>+</span> Tambah Step
-                  </button>
-                  {editAddStepOpen && (
-                    <div style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px', zIndex: 10, marginBottom: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {MASTER_STEPS.filter(ms => !editSprintSteps.some(ss => ss.step.id === ms.id)).map(ms => (
-                        <button key={ms.id} type="button"
-                          onClick={() => { setEditSprintSteps(prev => [...prev, { step: ms, memberId: '', daysBefore: DEFAULT_DAYS_BEFORE[ms.id] ?? 1 }]); setEditAddStepOpen(false) }}
-                          style={{ background: 'transparent', border: 'none', borderRadius: 6, padding: '6px 10px', color: '#111827', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, textAlign: 'left' }}>
-                          <span style={{ color: '#6b7280', display: 'flex', flexShrink: 0 }}>{STEP_ICON_MAP[ms.id] || null}</span> {ms.nama}
-                        </button>
-                      ))}
-                      {MASTER_STEPS.filter(ms => !editSprintSteps.some(ss => ss.step.id === ms.id)).length === 0 && (
-                        <div style={{ padding: '6px 10px', color: '#6b7280', fontSize: '0.72rem' }}>Semua step sudah ditambah</div>
-                      )}
                     </div>
                   )}
                 </div>
