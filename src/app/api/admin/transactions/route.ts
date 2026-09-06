@@ -34,5 +34,11 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ transactions: data || [] })
+  const transactions = (data || []).map(t => ({
+    ...t,
+    amount_original: t.amount_original ?? 0,
+    amount_paid: t.amount_paid ?? 0,
+    discount_amount: t.discount_amount ?? 0,
+  }))
+  return NextResponse.json({ transactions })
 }

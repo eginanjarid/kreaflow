@@ -113,8 +113,8 @@ function fmtDate(s: string) {
   return new Date(s).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
-function fmtPrice(n: number) {
-  return 'Rp' + n.toLocaleString('id-ID')
+function fmtPrice(n: number | null | undefined) {
+  return 'Rp' + (n ?? 0).toLocaleString('id-ID')
 }
 
 const TX_STATUS_COLORS: Record<string, string> = { paid: '#059669', pending: '#d97706', failed: '#dc2626' }
@@ -966,7 +966,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           {!txLoading && (
             <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
               {[
-                { label: 'Total Paid', value: fmtPrice(txList.filter(t => t.status === 'paid').reduce((s, t) => s + t.amount_paid, 0)), color: '#059669' },
+                { label: 'Total Paid', value: fmtPrice(txList.filter(t => t.status === 'paid').reduce((s, t) => s + (t.amount_paid ?? 0), 0)), color: '#059669' },
                 { label: 'Paid', value: txList.filter(t => t.status === 'paid').length, color: '#059669' },
                 { label: 'Pending', value: txList.filter(t => t.status === 'pending').length, color: '#d97706' },
                 { label: 'Failed', value: txList.filter(t => t.status === 'failed').length, color: '#dc2626' },
