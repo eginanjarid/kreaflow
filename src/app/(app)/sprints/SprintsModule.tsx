@@ -486,6 +486,13 @@ export default function SprintsModule({ initialSprints, initialContents, product
   const [editSprintSteps, setEditSprintSteps] = useState<{ step: StepDef; memberId: string; daysBefore: number }[]>([])
   const [editAddStepOpen, setEditAddStepOpen] = useState(false)
   const [editSelectedAkunIds, setEditSelectedAkunIds] = useState<string[]>([])
+  const [editWeeklyStart, setEditWeeklyStart] = useState('')
+  const [editWeeklyEnd, setEditWeeklyEnd] = useState('')
+  const [editWeeklyPattern, setEditWeeklyPattern] = useState<Record<number, DayPattern>>({
+    0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(),
+    3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern(),
+  })
+  const [editCopyPopup, setEditCopyPopup] = useState<number | null>(null)
   const [savingEditSprint, setSavingEditSprint] = useState(false)
   const [duplicatingSprintId, setDuplicatingSprintId] = useState<string | null>(null)
 
@@ -929,6 +936,37 @@ export default function SprintsModule({ initialSprints, initialContents, product
     const akunStr = selectedSprint.akun || ''
     const preselected = accounts.filter(a => akunStr.includes(`${a.platform} @${a.handle}`)).map(a => a.id)
     setEditSelectedAkunIds(preselected.length > 0 ? preselected : (accounts.length === 1 ? [accounts[0].id] : []))
+    // Pre-fill Jadwal Konten from existing content items
+    setEditWeeklyStart(selectedSprint.start_date)
+    setEditWeeklyEnd(selectedSprint.end_date)
+    const newPattern: Record<number, DayPattern> = {
+      0: defaultDayPattern(), 1: defaultDayPattern(), 2: defaultDayPattern(),
+      3: defaultDayPattern(), 4: defaultDayPattern(), 5: defaultDayPattern(), 6: defaultDayPattern(),
+    }
+    const sprintItems = contents.filter(c => c.sprint_id === selectedSprint.id && c.tanggal_tayang)
+    // Group by date
+    const byDate: Record<string, typeof sprintItems> = {}
+    sprintItems.forEach(c => { if (c.tanggal_tayang) { (byDate[c.tanggal_tayang] = byDate[c.tanggal_tayang] || []).push(c) } })
+    Object.entries(byDate).forEach(([dateStr, items]) => {
+      const d = new Date(dateStr + 'T00:00:00')
+      const dayIdx = d.getDay()
+      newPattern[dayIdx] = {
+        active: true,
+        slots: items.map(c => ({
+          format: c.format || '',
+          pillar_id: c.pillar_id || '',
+          product_id: c.product_id || '',
+          jam: c.jam_tayang || '18:00',
+          platforms: Array.isArray(c.platform) ? c.platform : (c.platform ? [c.platform] : []),
+        })),
+      }
+    })
+    if (sprintItems.length === 0) {
+      // No content yet — start with empty pattern
+      newPattern[0] = defaultDayPattern()
+    }
+    setEditWeeklyPattern(newPattern)
+    setEditCopyPopup(null)
     setEditAddStepOpen(false)
     setEditSprintModal(true)
   }
@@ -959,12 +997,76 @@ export default function SprintsModule({ initialSprints, initialContents, product
       step_config: stepConfigData,
     }
     const { error } = await supabase.from('kf_sprints').update(patch).eq('id', selectedSprint.id)
-    if (!error) {
-      setSprints(prev => prev.map(s => s.id === selectedSprint.id ? { ...s, ...patch } : s))
+    if (error) { showToast('Gagal menyimpan sprint.', 'error'); setSavingEditSprint(false); return }
+
+    setSprints(prev => prev.map(s => s.id === selectedSprint.id ? { ...s, ...patch } : s))
+
+    // Delete existing content items and regenerate from editWeeklyPattern
+    await supabase.from('kf_content_ideas').delete().eq('sprint_id', selectedSprint.id)
+    setContents(prev => prev.filter(c => c.sprint_id !== selectedSprint.id))
+
+    const assignByCol: Record<string, string> = {}
+    editSprintSteps.forEach(({ step, memberId }) => {
+      const col = STEP_ASSIGN_COL[step.id]
+      if (col && memberId) {
+        const m = workspaceMembers.find(x => x.id === memberId)
+        if (m) assignByCol[col] = m.nama || m.email
+      }
+    })
+
+    const editAkunPlatforms = accounts.length > 1
+      ? accounts.filter(a => editSelectedAkunIds.includes(a.id)).map(a => a.platform)
+      : accounts.map(a => a.platform)
+
+    if (editWeeklyStart) {
+      const cur = new Date(editWeeklyStart + 'T00:00:00')
+      const endD = new Date((editWeeklyEnd || editWeeklyStart) + 'T00:00:00')
+      const newItems: object[] = []
+      const counterPerDate: Record<string, number> = {}
+      while (cur <= endD) {
+        const dayIdx = cur.getDay()
+        const dp = editWeeklyPattern[dayIdx]
+        if (dp.active) {
+          const dateStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`
+          const dayLabel = `${cur.getDate()}/${cur.getMonth() + 1}`
+          const activeSlots = dp.slots.filter(s => s.format)
+          activeSlots.forEach(slot => {
+            counterPerDate[dateStr] = (counterPerDate[dateStr] || 0) + 1
+            const slotIdx = counterPerDate[dateStr]
+            const pillar = pillars.find(p => p.id === slot.pillar_id)
+            const produk = products.find(p => p.id === slot.product_id)
+            const judulPrefix = isAffiliate ? (produk ? produk.nama : null) : (pillar ? pillar.nama : null)
+            const multiSuffix = activeSlots.length > 1 ? ` Konten ${slotIdx}` : ''
+            const platforms = slot.platforms.length > 0 ? slot.platforms
+              : (activePlatformsFor(slot.format, true).length > 0 ? activePlatformsFor(slot.format, true) : editAkunPlatforms)
+            newItems.push({
+              workspace_id: workspaceId,
+              sprint_id: selectedSprint.id,
+              judul: judulPrefix ? `${judulPrefix} — ${slot.format} [${dayLabel}]${multiSuffix}` : `${slot.format} — ${dayLabel}${multiSuffix}`,
+              status: 'Draft',
+              format: slot.format,
+              platform: platforms,
+              tanggal_tayang: dateStr,
+              jam_tayang: slot.jam || null,
+              product_id: isAffiliate ? (slot.product_id || null) : null,
+              pillar_id: !isAffiliate ? (slot.pillar_id || null) : null,
+              ...assignByCol,
+            })
+          })
+        }
+        cur.setDate(cur.getDate() + 1)
+      }
+      if (newItems.length > 0) {
+        const { data: inserted } = await supabase.from('kf_content_ideas').insert(newItems).select('*')
+        if (inserted) setContents(prev => [...inserted, ...prev])
+      }
+      showToast(`Sprint diperbarui! ${newItems.length} konten dibuat ulang.`, 'success')
+    } else {
       showToast('Sprint diperbarui!', 'success')
-      setEditSprintModal(false)
     }
+
     setSavingEditSprint(false)
+    setEditSprintModal(false)
   }
 
   async function duplicateSprint(sprintId: string) {
@@ -2060,6 +2162,199 @@ export default function SprintsModule({ initialSprints, initialContents, product
                     )}
                   </div>
                 )}
+              </div>
+
+              {/* Jadwal Konten */}
+              <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 10, padding: '12px 14px' }} onClick={() => setEditCopyPopup(null)}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>Jadwal Konten</div>
+                      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>Regenerate</span>
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: '#6b7280', marginTop: 2 }}>Simpan akan hapus konten lama &amp; buat ulang dari jadwal ini</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Mulai Posting</div>
+                      <input type="date" value={editWeeklyStart}
+                        onChange={e => {
+                          const val = e.target.value
+                          setEditWeeklyStart(val)
+                          setEditSprintForm(f => ({ ...f, start_date: val }))
+                          if (!editWeeklyEnd) {
+                            const end = new Date(val + 'T00:00:00')
+                            end.setDate(end.getDate() + 6)
+                            const endStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`
+                            setEditWeeklyEnd(endStr)
+                            setEditSprintForm(f => ({ ...f, end_date: endStr }))
+                          }
+                        }}
+                        style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: 3 }}>Sampai Tanggal</div>
+                      <input type="date" value={editWeeklyEnd}
+                        onChange={e => { setEditWeeklyEnd(e.target.value); setEditSprintForm(f => ({ ...f, end_date: e.target.value })) }}
+                        style={{ width: '100%', background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 8px', fontSize: '0.78rem', outline: 'none', boxSizing: 'border-box' as const }} />
+                    </div>
+                  </div>
+                  {editWeeklyStart && (() => {
+                    const activeDays = Object.values(editWeeklyPattern).filter(dp => dp.active && dp.slots.some(s => s.format))
+                    const totalSlots = activeDays.reduce((sum, dp) => sum + dp.slots.filter(s => s.format).length, 0)
+                    if (!activeDays.length || !totalSlots) return null
+                    const days = editWeeklyEnd ? Math.round((new Date(editWeeklyEnd + 'T00:00:00').getTime() - new Date(editWeeklyStart + 'T00:00:00').getTime()) / 86400000) + 1 : 7
+                    const weeks = Math.max(1, Math.ceil(days / 7))
+                    return (
+                      <div style={{ fontSize: '0.65rem', color: '#059669', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 6, padding: '5px 8px' }}>
+                        {activeDays.length} hari aktif/minggu · {weeks} minggu · ≈{weeks * totalSlots} konten
+                      </div>
+                    )
+                  })()}
+                  {editWeeklyStart && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {Array.from({ length: 7 }, (_, i) => {
+                        const d = new Date(editWeeklyStart + 'T00:00:00')
+                        d.setDate(d.getDate() + i)
+                        const idx = d.getDay()
+                        const dateLabel = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
+                        const dp = editWeeklyPattern[idx]
+                        return (
+                          <div key={i} style={{ background: dp.active ? '#f0f9ff' : '#f8fafc', border: `1px solid ${dp.active ? 'rgba(26,115,232,0.2)' : '#e5e7eb'}`, borderRadius: 8, padding: '8px 10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <button type="button"
+                                onClick={() => setEditWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], active: !p[idx].active } }))}
+                                style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${dp.active ? '#1a73e8' : '#d1d5db'}`, background: dp.active ? '#1a73e8' : 'transparent', flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {dp.active && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                              </button>
+                              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: dp.active ? '#111827' : '#9ca3af', flexShrink: 0 }}>{DAY_NAMES[idx]}</span>
+                              <span style={{ fontSize: '0.68rem', color: dp.active ? '#1a73e8' : '#d1d5db', fontWeight: 600 }}>{dateLabel}</span>
+                              {dp.active && dp.slots.filter(s => s.format).length > 0 && (
+                                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, position: 'relative' }}>
+                                  <span style={{ fontSize: '0.62rem', color: '#6b7280' }}>{dp.slots.filter(s => s.format).length} konten</span>
+                                  <button type="button"
+                                    onClick={e => { e.stopPropagation(); setEditCopyPopup(editCopyPopup === idx ? null : idx) }}
+                                    style={{ fontSize: '0.62rem', padding: '2px 8px', borderRadius: 6, border: '1px solid #d1d5db', background: '#f9fafb', color: '#374151', cursor: 'pointer', fontWeight: 600 }}>
+                                    Salin →
+                                  </button>
+                                  {editCopyPopup === idx && (
+                                    <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', padding: '12px 14px', minWidth: 180, marginTop: 4 }}
+                                      onClick={e => e.stopPropagation()}>
+                                      <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#374151', marginBottom: 10 }}>Salin ke hari:</div>
+                                      {Array.from({ length: 7 }, (_, offset) => {
+                                        const dd = new Date(editWeeklyStart + 'T00:00:00')
+                                        dd.setDate(dd.getDate() + offset)
+                                        const di = dd.getDay()
+                                        if (di === idx) return null
+                                        const dl = `${String(dd.getDate()).padStart(2, '0')}/${String(dd.getMonth() + 1).padStart(2, '0')}`
+                                        return (
+                                          <label key={offset} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
+                                            <input type="checkbox" defaultChecked={editWeeklyPattern[di]?.active}
+                                              onChange={e => {
+                                                const checked = e.target.checked
+                                                setEditWeeklyPattern(p => ({ ...p, [di]: { active: checked, slots: JSON.parse(JSON.stringify(p[idx].slots)) } }))
+                                              }}
+                                              style={{ accentColor: '#1a73e8', width: 14, height: 14, flexShrink: 0 }} />
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#111827', minWidth: 50 }}>{DAY_NAMES[di]}</span>
+                                            <span style={{ fontSize: '0.68rem', color: '#6b7280' }}>{dl}</span>
+                                          </label>
+                                        )
+                                      })}
+                                      <button type="button" onClick={() => setEditCopyPopup(null)}
+                                        style={{ marginTop: 4, width: '100%', padding: '5px', borderRadius: 6, border: 'none', background: '#1a73e8', color: '#fff', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}>
+                                        Selesai
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            {dp.active && (
+                              <div style={{ marginLeft: 26, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                                {dp.slots.map((slot, si) => (
+                                  <div key={si}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                      <span style={{ fontSize: '0.62rem', color: '#9ca3af', width: 14, flexShrink: 0 }}>{si + 1}.</span>
+                                      <select value={slot.format} onChange={e => setEditWeeklyPattern(p => {
+                                        const fmt = e.target.value
+                                        const autoPlatforms = activePlatformsFor(fmt, true)
+                                        const slots = p[idx].slots.map((s, j) => j === si ? { ...s, format: fmt, platforms: autoPlatforms } : s)
+                                        return { ...p, [idx]: { ...p[idx], slots } }
+                                      })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                        <option value="">— Format —</option>
+                                        {(isAffiliate ? FORMATS_AFFILIATE : FORMATS_CREATOR).map(f => <option key={f} value={f}>{f}</option>)}
+                                      </select>
+                                      {isAffiliate && (
+                                        <select value={slot.product_id} onChange={e => setEditWeeklyPattern(p => {
+                                          const slots = p[idx].slots.map((s, j) => j === si ? { ...s, product_id: e.target.value } : s)
+                                          return { ...p, [idx]: { ...p[idx], slots } }
+                                        })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                          <option value="">— Produk —</option>
+                                          {products.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                                        </select>
+                                      )}
+                                      {!isAffiliate && pillars.length > 0 && (
+                                        <select value={slot.pillar_id} onChange={e => setEditWeeklyPattern(p => {
+                                          const slots = p[idx].slots.map((s, j) => j === si ? { ...s, pillar_id: e.target.value } : s)
+                                          return { ...p, [idx]: { ...p[idx], slots } }
+                                        })} style={{ flex: 1, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none', cursor: 'pointer' }}>
+                                          <option value="">— Pilar —</option>
+                                          {pillars.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+                                        </select>
+                                      )}
+                                      <input type="time" value={slot.jam} onChange={e => setEditWeeklyPattern(p => {
+                                        const slots = p[idx].slots.map((s, j) => j === si ? { ...s, jam: e.target.value } : s)
+                                        return { ...p, [idx]: { ...p[idx], slots } }
+                                      })} style={{ width: 72, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 6px', fontSize: '0.72rem', outline: 'none' }} />
+                                      {dp.slots.length > 1 && (
+                                        <button type="button" onClick={() => setEditWeeklyPattern(p => {
+                                          const slots = p[idx].slots.filter((_, j) => j !== si)
+                                          return { ...p, [idx]: { ...p[idx], slots } }
+                                        })} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '0.75rem', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                                      )}
+                                    </div>
+                                    {slot.format && CONTENT_TYPE_PLATFORMS[slot.format] && (
+                                      <div style={{ display: 'flex', gap: 3, marginTop: 4, marginLeft: 19, flexWrap: 'wrap', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.58rem', color: '#9ca3af', marginRight: 2 }}>Post ke:</span>
+                                        {CONTENT_TYPE_PLATFORMS[slot.format].map(plt => {
+                                          const selPlt = editSelectedAkunIds.length > 0 ? accounts.filter(a => editSelectedAkunIds.includes(a.id)).map(a => a.platform) : registeredPlatforms
+                                          const hasAkun = selPlt.length === 0 || selPlt.includes(plt)
+                                          const isSelected = slot.platforms.includes(plt)
+                                          return (
+                                            <button key={plt} type="button"
+                                              onClick={() => setEditWeeklyPattern(p => {
+                                                const newPlatforms = isSelected ? slot.platforms.filter(x => x !== plt) : [...slot.platforms, plt]
+                                                const slots = p[idx].slots.map((s, j) => j === si ? { ...s, platforms: newPlatforms } : s)
+                                                return { ...p, [idx]: { ...p[idx], slots } }
+                                              })}
+                                              style={{ fontSize: '0.6rem', padding: '2px 7px', borderRadius: 8, border: `1.5px solid ${isSelected ? '#1a73e8' : hasAkun ? '#d1d5db' : '#e5e7eb'}`, background: isSelected ? 'rgba(26,115,232,0.1)' : '#f9fafb', color: isSelected ? '#1a73e8' : hasAkun ? '#374151' : '#c4c9d4', fontWeight: isSelected ? 700 : 400, cursor: 'pointer', transition: 'all 0.1s' }}>
+                                              {FORMAT_PLATFORM_LABEL[slot.format]?.[plt] || plt}
+                                            </button>
+                                          )
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                                <button type="button" onClick={() => setEditWeeklyPattern(p => ({ ...p, [idx]: { ...p[idx], slots: [...p[idx].slots, defaultSlot()] } }))}
+                                  style={{ alignSelf: 'flex-start', background: 'transparent', border: '1px dashed #d1d5db', borderRadius: 6, padding: '3px 8px', fontSize: '0.68rem', color: '#6b7280', cursor: 'pointer', marginTop: 2 }}>
+                                  + Tambah Slot
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {!editWeeklyStart && (
+                    <div style={{ textAlign: 'center', padding: '16px 0', color: '#9ca3af', fontSize: '0.75rem' }}>
+                      Pilih tanggal mulai posting untuk set pola mingguan
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Steps Pekerjaan */}
