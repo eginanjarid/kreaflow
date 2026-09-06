@@ -261,17 +261,14 @@ export const HELP_TOPICS: HelpTopic[] = [
     slug: 'upgrade',
     group: 'Akun & Tim',
     label: 'Paket & Upgrade',
-    summary: 'Pilihan paket KreaFlow dan kapan perlu upgrade.',
+    summary: 'Harga KreaFlow dan kapan perlu upgrade/tambah workspace.',
     body: (
       <>
-        <P>KreaFlow punya beberapa pilihan paket. Kamu akan diarahkan ke halaman <strong>Upgrade</strong> secara otomatis kalau kena limit workspace atau anggota tim.</P>
+        <P>KreaFlow sekarang cuma punya <strong>1 paket: Lifetime Rp199.000</strong>, bayar sekali untuk selamanya. Kamu akan diarahkan ke halaman <strong>Upgrade</strong> secara otomatis kalau kena limit workspace atau anggota tim.</P>
         <Ul>
-          <Li><strong>Bulanan</strong> — 1 workspace, 1 owner + 4 anggota, perpanjang tiap bulan.</Li>
-          <Li><strong>Basic Lifetime</strong> — 2 workspace, 1 owner + 4 anggota, bayar sekali.</Li>
-          <Li><strong>Pro Lifetime</strong> — 4 workspace, 1 owner + 5 anggota, bayar sekali.</Li>
-          <Li><strong>Agency Lifetime</strong> — 10 workspace, 1 owner + 10 anggota, bayar sekali.</Li>
+          <Li><strong>Rp199.000 (sekali bayar)</strong> — 3 workspace/brand, 1 owner + 5 anggota tim, semua modul lengkap, konten & jadwal unlimited, update fitur selamanya.</Li>
         </Ul>
-        <P>Semua paket dapat modul lengkap yang sama — bedanya cuma jumlah workspace dan anggota tim yang bisa ditampung. Ada juga tambahan slot workspace/jadwal terpisah kalau butuh lebih tanpa naik paket penuh.</P>
+        <P>Butuh lebih dari 3 workspace? Ada add-on <strong>+1 Workspace seharga Rp49.000</strong> (sekali bayar, berlaku selamanya) — nggak perlu ganti paket.</P>
       </>
     ),
   },

@@ -318,9 +318,9 @@ const PLATFORM_TABS = [
 
 const FAQS = [
   { q: 'Apa itu KreaFlow?', a: 'KreaFlow adalah platform manajemen konten end-to-end untuk content creator dan affiliator Indonesia. Mulai dari membangun brand, menyusun konten, menjadwalkan, hingga memantau performa, semua dalam satu platform.' },
-  { q: 'Apa perbedaan Bulanan, Basic, Pro, dan Agency?', a: 'Bulanan (99k/bln) cocok untuk yang ingin coba dulu. Basic Lifetime (149k) dan Pro Lifetime (199k) untuk yang sudah komit — bayar sekali, pakai selamanya. Agency (399k) untuk agensi dengan banyak klien. Semua paket dapat akses semua 10 modul.' },
+  { q: 'Berapa harga KreaFlow?', a: 'KreaFlow Lifetime cuma Rp199.000, bayar sekali untuk selamanya. Dapat 3 workspace/brand, 1 owner + 5 anggota tim, dan akses semua 10 modul lengkap tanpa batasan fitur.' },
   { q: 'Apakah lifetime deal benar-benar seumur hidup?', a: 'Ya. Bayar sekali, pakai selamanya. Termasuk semua update fitur ke depan tanpa biaya tambahan. Harga lifetime jauh lebih hemat dibanding berlangganan jangka panjang.' },
-  { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa, khusus untuk paket lifetime (Basic/Pro/Agency). Tersedia add-on +1 workspace seharga Rp49.000 sekali bayar. User Bulanan tidak bisa beli add-on workspace — upgrade ke lifetime untuk akses fitur ini.' },
+  { q: 'Bisa tambah workspace setelah beli?', a: 'Bisa. Tersedia add-on +1 workspace seharga Rp49.000 sekali bayar, bisa ditambah kapan saja setelah beli paket Lifetime.' },
   { q: 'Apakah ada fitur auto-posting ke sosial media?', a: 'Fitur Auto Schedule Post sedang dalam pengembangan dan akan segera hadir sebagai add-on Rp49.000/bulan. Untuk saat ini, Calendar bisa digunakan untuk merencanakan jadwal posting secara manual.' },
 ]
 
