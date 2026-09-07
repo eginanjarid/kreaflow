@@ -59,7 +59,7 @@ const JABATAN_NOTIF_TYPES: Record<string, string[]> = {
   'Art Director': ['naskah', 'produksi', 'deadline'],
 }
 
-type Workspace = { id: string; name: string; plan: string; brand_type: string }
+type Workspace = { id: string; name: string; plan: string; brand_type: string; myRole?: string }
 
 const BRAND_TYPE_COLOR: Record<string, string> = {
   creator: '#1a73e8', affiliate: '#059669', business: '#7c3aed',
@@ -101,6 +101,9 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
   const [createForm, setCreateForm] = useState({ name: '', brand_type: 'creator' })
   const [createError, setCreateError] = useState('')
   const [creating, setCreating] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Workspace | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   const bellRef = useRef<HTMLDivElement>(null)
   const userRef = useRef<HTMLDivElement>(null)
@@ -209,6 +212,26 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
       setCreateError(`Batas workspace tercapai (${data.maxWorkspaces}). Upgrade paket untuk tambah lebih banyak.`)
     } else {
       setCreateError(data.error || 'Gagal membuat workspace')
+    }
+  }
+
+  async function deleteWorkspace() {
+    if (!deleteTarget) return
+    setDeleting(true)
+    setDeleteError('')
+    const res = await fetch('/api/workspace/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspace_id: deleteTarget.id }),
+    })
+    const data = await res.json()
+    setDeleting(false)
+    if (res.ok) {
+      setDeleteTarget(null)
+      setWsSheetOpen(false)
+      router.refresh()
+    } else {
+      setDeleteError(data.error || 'Gagal menghapus workspace')
     }
   }
 
@@ -477,20 +500,32 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
                 const active = ws.id === workspace?.id
                 const color = BRAND_TYPE_COLOR[ws.brand_type] || '#1a73e8'
                 const btLabel = BRAND_TYPE_LABEL[ws.brand_type] || ws.brand_type
+                const canDelete = (ws.myRole === 'owner' || ws.myRole === 'admin') && workspaces.length > 1
                 return (
-                  <button key={ws.id} type="button" onClick={() => switchWorkspace(ws.id)}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 10px', borderRadius: 12, background: active ? `${color}10` : 'transparent', border: `1.5px solid ${active ? color + '40' : 'transparent'}`, marginBottom: 6, cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color }}>{ws.name.slice(0, 2).toUpperCase()}</span>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.875rem', fontWeight: active ? 700 : 500, color: active ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ws.name}</div>
-                      <div style={{ fontSize: '0.68rem', color, fontWeight: 600, marginTop: 1 }}>{btLabel}</div>
-                    </div>
-                    {active && (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  <div key={ws.id}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 6, borderRadius: 12, background: active ? `${color}10` : 'transparent', border: `1.5px solid ${active ? color + '40' : 'transparent'}`, marginBottom: 6 }}>
+                    <button type="button" onClick={() => switchWorkspace(ws.id)}
+                      style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 12, padding: '12px 10px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 800, color }}>{ws.name.slice(0, 2).toUpperCase()}</span>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '0.875rem', fontWeight: active ? 700 : 500, color: active ? '#111827' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ws.name}</div>
+                        <div style={{ fontSize: '0.68rem', color, fontWeight: 600, marginTop: 1 }}>{btLabel}</div>
+                      </div>
+                      {active && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      )}
+                    </button>
+                    {canDelete && (
+                      <button type="button" onClick={() => { setDeleteError(''); setDeleteTarget(ws) }} title="Hapus workspace"
+                        style={{ flexShrink: 0, width: 32, height: 32, marginRight: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c1c9d6' }}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                      </button>
                     )}
-                  </button>
+                  </div>
                 )
               })
             )}
@@ -535,6 +570,32 @@ export default function Topbar({ user, workspace, workspaces = [], role = 'owner
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Delete Workspace Confirm Modal */}
+    {deleteTarget && (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        onClick={e => { if (e.target === e.currentTarget && !deleting) setDeleteTarget(null) }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: '24px', width: '100%', maxWidth: 380, margin: '0 16px', boxShadow: '0 16px 48px rgba(0,0,0,0.16)' }}>
+          <div style={{ fontWeight: 700, fontSize: '1rem', color: '#2a3547', marginBottom: 4 }}>Hapus Workspace?</div>
+          <div style={{ fontSize: '0.82rem', color: '#5a6a85', marginBottom: 16, lineHeight: 1.5 }}>
+            Yakin mau hapus <strong style={{ color: '#2a3547' }}>&quot;{deleteTarget.name}&quot;</strong>? Semua brand, sprint, naskah, jadwal, dan data lain di dalamnya akan terhapus permanen dan <strong>tidak bisa dikembalikan</strong>.
+          </div>
+          {deleteError && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '10px 14px', color: '#dc2626', fontSize: '0.8rem', fontWeight: 500, marginBottom: 16 }}>
+              {deleteError}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button type="button" onClick={() => setDeleteTarget(null)} disabled={deleting} style={{ flex: 1, padding: '10px', border: '1.5px solid #e5eaf2', borderRadius: 9, background: '#fff', color: '#5a6a85', fontSize: '0.85rem', cursor: deleting ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
+              Batal
+            </button>
+            <button type="button" onClick={deleteWorkspace} disabled={deleting} style={{ flex: 1, padding: '10px', border: 'none', borderRadius: 9, background: deleting ? '#fca5a5' : '#dc2626', color: '#fff', fontSize: '0.85rem', cursor: deleting ? 'not-allowed' : 'pointer', fontWeight: 700 }}>
+              {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+            </button>
           </div>
         </div>
       </div>

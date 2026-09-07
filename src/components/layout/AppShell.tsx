@@ -6,7 +6,7 @@ import BottomNav from './BottomNav'
 import Toast from '@/components/ui/Toast'
 import QuickCapture from '@/components/QuickCapture'
 
-type Workspace = { id: string; name: string; plan: string; brand_type: string }
+type Workspace = { id: string; name: string; plan: string; brand_type: string; myRole?: string }
 
 type Props = {
   workspace: Workspace | null
