@@ -124,6 +124,34 @@ export const HELP_TOPICS: HelpTopic[] = [
         <Note tone="warn">Menu Sprint, Plan, Studio, dan Calendar baru bisa dipakai setelah field <strong>wajib paling awal</strong> di tiap tipe terisi — Niche Hunt untuk Creator, Profil & Target untuk Affiliate, atau Profil Bisnis untuk Business. Tab-tab lainnya boleh dilengkapi belakangan, tapi makin lengkap diisi, makin relevan rekomendasi ide konten yang dikasih sistem — jadi worth diisi serius, bukan asal-asalan biar cepat lewat.</Note>
         <H>Mengundang anggota tim</H>
         <P>Owner atau admin workspace bisa mengundang anggota lewat menu <strong>Pengaturan</strong>. Setiap anggota bisa dikasih <em>jabatan</em> (Manager, Copywriter, Videografer, dll.) yang menentukan modul apa saja yang bisa mereka akses — lihat topik <strong>Peran & Akses Tim</strong> untuk detailnya.</P>
+        <H>Menghapus workspace</H>
+        <P>Kalau kamu <strong>owner atau admin</strong> dan punya lebih dari satu workspace, kamu bisa hapus workspace yang sudah tidak dipakai lewat ikon tempat sampah di sebelah nama workspace pada dropdown switcher (klik kotak nama workspace di sidebar/topbar untuk membukanya).</P>
+        <Note tone="warn">
+          Menghapus workspace itu <strong>permanen dan tidak bisa dibatalkan</strong> — semua brand, sprint, naskah, jadwal, produk di Catalog, dan data lain di dalamnya ikut terhapus. Sistem akan minta konfirmasi dulu sebelum benar-benar menghapus. Kamu juga tidak bisa menghapus satu-satunya workspace yang kamu punya — harus ada minimal satu yang tersisa.
+        </Note>
+      </>
+    ),
+  },
+  {
+    slug: 'dashboard',
+    group: 'Mulai Cepat',
+    label: 'Dashboard',
+    summary: 'Halaman pertama yang kamu lihat — ringkasan progres, jadwal, dan keuangan.',
+    body: (
+      <>
+        <P>Dashboard adalah halaman utama yang muncul begitu kamu masuk ke sebuah workspace (menu <strong>Dashboard</strong> di sidebar) — ringkasan cepat semua hal penting tanpa harus buka satu-satu modul.</P>
+        <Note tone="warn">Dashboard cuma bisa dibuka kalau workspace kamu sudah pakai <strong>paket berbayar</strong>. Kalau masih Free, kamu akan diarahkan ke halaman <strong>Upgrade</strong> — lihat topik <strong>Paket & Upgrade</strong>.</Note>
+        <H>Yang ditampilkan</H>
+        <Ul>
+          <Li><strong>4 kartu KPI</strong> — Total Konten, Produk Aktif, Jadwal Hari Ini, dan Saldo Bersih.</Li>
+          <Li><strong>Sprint Aktif</strong> — progres sprint yang sedang berjalan minggu ini (Todo/In Progress/Tayang), atau ajakan bikin sprint baru kalau belum ada yang aktif.</Li>
+          <Li><strong>Pipeline Konten</strong> — breakdown semua ide konten berdasarkan status: Draft, In Progress, Tayang.</Li>
+          <Li><strong>Keterlambatan Tim</strong> — muncul otomatis kalau ada task lewat deadline, dikelompokkan per anggota tim biar gampang ditindaklanjuti.</Li>
+          <Li><strong>Aktivitas Tim</strong> — grafik batang aktivitas harian (7/30 hari) per modul (Naskah/Studio/Tasks/Tayang), plus leaderboard per anggota lengkap dengan badge 🔥⭐🎯 buat yang paling produktif.</Li>
+          <Li><strong>Konten Terbaru</strong> — daftar ide konten yang paling baru dibuat.</Li>
+          <Li><strong>Jadwal Hari Ini</strong>, <strong>Menu Cepat</strong> (shortcut ke Plan/Studio/Calendar/Catalog/Tracker), dan ringkasan <strong>Keuangan</strong> (pemasukan/pengeluaran/saldo) di kolom kanan.</Li>
+        </Ul>
+        <P>Semua angka di Dashboard ngambil data real-time dari modul lain — jadi gak perlu diisi manual, cukup pakai Sprint/Plan/Studio/Calendar/Budget seperti biasa dan Dashboard otomatis kebaruan.</P>
       </>
     ),
   },
@@ -235,9 +263,44 @@ export const HELP_TOPICS: HelpTopic[] = [
     slug: 'catalog',
     group: 'Alur Konten',
     label: 'Catalog',
-    summary: 'Template konten siap pakai supaya tim tidak mulai dari nol tiap kali.',
+    summary: 'Daftar produk/layanan yang kamu promosikan lewat konten — harga, link, dan komisi.',
     body: (
-      <P>Catalog berisi template struktur konten (format naskah, jenis hook, dll.) yang bisa langsung dipakai sebagai titik awal saat membuat ide baru di Plan — mempercepat proses brainstorming tim.</P>
+      <>
+        <P>Catalog adalah daftar produk atau layanan yang jadi bahan promosi konten kamu — bukan template naskah. Setiap produk yang kamu tambahkan di sini bisa dikaitkan ke ide konten di menu Plan, jadi jelas konten mana yang mempromosikan produk yang mana.</P>
+        <H>Tipe produk</H>
+        <Ul>
+          <Li><strong>Fisik</strong> — barang yang kamu jual sendiri, lengkap dengan harga normal & diskon.</Li>
+          <Li><strong>Digital</strong> — produk digital seperti ebook, kelas online, atau software.</Li>
+          <Li><strong>Affiliate</strong> — produk orang lain yang kamu promosikan untuk komisi; isi link affiliate, platform (Shopee, Tokopedia, dll.), dan besaran komisinya.</Li>
+        </Ul>
+        <P>Tiap produk juga punya kode/SKU, kategori, thumbnail, dan status aktif/nonaktif — produk yang dinonaktifkan tidak akan muncul sebagai pilihan saat membuat ide konten baru.</P>
+      </>
+    ),
+  },
+  {
+    slug: 'notifikasi',
+    group: 'Alur Konten',
+    label: 'Notifikasi',
+    summary: 'Pemberitahuan otomatis saat ada aktivitas konten yang perlu perhatian.',
+    body: (
+      <>
+        <P>Buka lewat ikon lonceng di pojok kanan atas, atau menu <strong>Notifikasi</strong> di bawah (mobile). Notifikasi muncul otomatis saat ada aktivitas di sprint yang perlu kamu tahu atau tindak lanjuti.</P>
+        <H>Jenis notifikasi</H>
+        <Ul>
+          <Li><strong>Riset</strong> — terkait tahap riset di Sprints.</Li>
+          <Li><strong>Naskah</strong> — ada naskah baru, butuh approval, atau kena revisi di Plan.</Li>
+          <Li><strong>Produksi</strong> — update dari antrian Studio.</Li>
+          <Li><strong>Schedule</strong> — terkait penjadwalan di Calendar.</Li>
+          <Li><strong>Deadline</strong> — pengingat tenggat waktu sprint/task.</Li>
+        </Ul>
+        <H>Kelola notifikasi</H>
+        <Ul>
+          <Li>Klik <strong>&quot;Buka [Modul] →&quot;</strong> di tiap notifikasi untuk langsung lompat ke halaman terkait (otomatis ditandai dibaca).</Li>
+          <Li>Filter berdasarkan jenis, atau lihat yang belum dibaca saja.</Li>
+          <Li><strong>&quot;Tandai Semua Dibaca&quot;</strong> untuk bersihkan badge merah di sidebar sekaligus.</Li>
+          <Li>Notifikasi yang sudah tidak relevan bisa dihapus satu-satu lewat ikon ✕.</Li>
+        </Ul>
+      </>
     ),
   },
   {
