@@ -86,13 +86,42 @@ export const HELP_TOPICS: HelpTopic[] = [
         <H>Pindah workspace</H>
         <P>Klik kotak nama workspace di sidebar, lalu pilih workspace lain dari daftarnya. Halaman akan reload dan menampilkan data workspace yang baru dipilih.</P>
         <H>Isi identitas brand (wajib di awal)</H>
-        <P>Begitu workspace baru dibuat, sistem akan terus mengarahkanmu ke halaman <strong>Brand</strong> setiap kali membuka menu lain sampai identitas brand-nya lengkap. Yang perlu diisi beda-beda tergantung tipe brand yang kamu pilih:</P>
+        <P>Begitu workspace baru dibuat, sistem akan terus mengarahkanmu ke halaman <strong>Brand</strong> setiap kali membuka menu lain sampai identitas brand-nya lengkap. Halaman pertama yang muncul adalah pemilihan tipe brand — <strong>ini menentukan tools, form, dan AI yang akan kamu pakai selanjutnya</strong>, jadi pilih yang paling cocok dengan fokus kamu:</P>
+        <H>Creator — personal brand & konten kreator</H>
+        <P>Cocok buat YouTuber, TikToker, Instagrammer, atau podcaster. Setelah dipilih, kamu akan melewati tab-tab berikut secara bertahap:</P>
         <Ul>
-          <Li><strong>Creator</strong> — isi lewat <strong>Niche Hunt</strong>: jawab apa yang kamu suka, apa yang kamu bisa, dan apa yang dibutuhkan orang. Sistem (dibantu AI) akan menyarankan niche & micro-niche yang cocok buat kamu pilih.</Li>
-          <Li><strong>Affiliate</strong> — isi tab <strong>Profil & Target</strong>: tipe akun, kategori fokus, platform affiliate yang dipakai, micro-niche, dan target pembeli.</Li>
-          <Li><strong>Business</strong> — isi <strong>Profil Bisnis</strong>: nama brand dan kategori bisnisnya.</Li>
+          <Li><strong>Frekuensi</strong> — dashboard progres brand kamu, dikemas dengan level bertema sinyal radio (Signal → Broadcast → Icon Frequency) yang naik seiring makin lengkapnya identitas brand kamu diisi.</Li>
+          <Li><strong>Account Identity</strong> — data dasar akun kamu.</Li>
+          <Li><strong>Niche Hunt</strong> (wajib diisi paling awal) — jawab &quot;apa yang kamu suka&quot;, &quot;apa yang kamu bisa&quot;, &quot;apa yang dibutuhkan orang&quot;, dan &quot;peluang penghasilan&quot;; AI akan menyarankan niche, kategori, dan micro-niche yang paling cocok buat kamu pilih.</Li>
+          <Li><strong>Origin Story</strong> — cerita/latar belakang brand kamu, dipakai sebagai bahan konten storytelling.</Li>
+          <Li><strong>Content Pillars</strong> — pilar-pilar tema konten yang akan jadi acuan ide di modul Plan.</Li>
+          <Li><strong>Bio Studio</strong> — bio siap pakai untuk tiap platform (TikTok, Instagram, YouTube, dll.).</Li>
+          <Li><strong>Brand Identity</strong> — logo, warna, dan tipografi brand.</Li>
+          <Li><strong>Akun Sosial</strong> — hubungkan akun sosial media kamu per platform.</Li>
         </Ul>
-        <P>Data ini dipakai sistem untuk kasih rekomendasi ide konten yang relevan di modul lain — jadi worth diisi serius, bukan asal-asalan biar cepat lewat.</P>
+        <H>Affiliate — affiliator produk & komisi</H>
+        <P>Cocok buat affiliate TikTok/Shopee, review produk, atau dropshipper. Tab-nya lebih ringkas dan fokus ke target jualan:</P>
+        <Ul>
+          <Li><strong>Brand Score</strong> — dashboard progres kelengkapan brand kamu.</Li>
+          <Li><strong>Profil & Target</strong> (wajib diisi paling awal) — tipe akun, kategori fokus, platform affiliate yang dipakai, micro-niche, dan target pembeli.</Li>
+          <Li><strong>Identitas Akun</strong> — data dasar akun kamu.</Li>
+          <Li><strong>Bio & Trust</strong> — bio dan elemen kepercayaan (trust builder) buat meyakinkan calon pembeli.</Li>
+          <Li><strong>Akun Sosial</strong> — hubungkan akun sosial media kamu per platform.</Li>
+          <Li><strong>Brand Visual</strong> — logo, warna, dan tipografi brand.</Li>
+        </Ul>
+        <H>Business — brand toko atau perusahaan</H>
+        <P>Cocok buat UMKM, toko online, brand produk, atau jasa lokal. Setelah memilih Business, kamu juga akan memilih kategori bisnis yang lebih spesifik (Kuliner, Pendidikan, Fashion, Kecantikan, Properti, Jasa Profesional, Teknologi, Retail, Otomotif, dll.) — pilihan ini otomatis menyesuaikan rekomendasi platform, tipe konten, dan content pillar yang muncul di tab-tab berikut:</P>
+        <Ul>
+          <Li><strong>Brand Score</strong> — dashboard progres kelengkapan brand kamu.</Li>
+          <Li><strong>Profil Bisnis</strong> (wajib diisi paling awal) — nama brand dan kategori bisnisnya.</Li>
+          <Li><strong>Market & Produk</strong> — produk/layanan unggulan dan target pasar/klien.</Li>
+          <Li><strong>Strategi Konten</strong> — tipe konten dan platform yang direkomendasikan sesuai kategori bisnis kamu.</Li>
+          <Li><strong>Bio & Copy</strong> — bio dan copy siap pakai per platform.</Li>
+          <Li><strong>Content Pillars</strong> — pilar-pilar tema konten yang jadi acuan ide di modul Plan.</Li>
+          <Li><strong>Brand Visual</strong> — logo, warna, dan tipografi brand.</Li>
+          <Li><strong>Akun Sosial</strong> — hubungkan akun sosial media kamu per platform.</Li>
+        </Ul>
+        <Note tone="warn">Menu Sprint, Plan, Studio, dan Calendar baru bisa dipakai setelah field <strong>wajib paling awal</strong> di tiap tipe terisi — Niche Hunt untuk Creator, Profil & Target untuk Affiliate, atau Profil Bisnis untuk Business. Tab-tab lainnya boleh dilengkapi belakangan, tapi makin lengkap diisi, makin relevan rekomendasi ide konten yang dikasih sistem — jadi worth diisi serius, bukan asal-asalan biar cepat lewat.</Note>
         <H>Mengundang anggota tim</H>
         <P>Owner atau admin workspace bisa mengundang anggota lewat menu <strong>Pengaturan</strong>. Setiap anggota bisa dikasih <em>jabatan</em> (Manager, Copywriter, Videografer, dll.) yang menentukan modul apa saja yang bisa mereka akses — lihat topik <strong>Peran & Akses Tim</strong> untuk detailnya.</P>
       </>
