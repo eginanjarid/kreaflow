@@ -38,7 +38,8 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/invite') ||
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/promo') ||
-    pathname.startsWith('/lp')
+    pathname.startsWith('/lp') ||
+    pathname.startsWith('/trial')
 
   const isNoAccess = pathname.startsWith('/no-access')
   const isExpired  = pathname.startsWith('/expired')
