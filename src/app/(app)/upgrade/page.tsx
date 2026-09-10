@@ -24,16 +24,18 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
 
   let isLifetime = false
   let currentMaxWs = 1
+  let trialUsed = false
 
   if (wsIds.length > 0) {
     const { data: ownedWs } = await supabase
       .from('kf_workspaces')
-      .select('plan, max_workspaces')
+      .select('plan, max_workspaces, trial_used_at')
       .in('id', wsIds)
 
     const lifetimeWs = ownedWs?.find(w => ['lifetime','basic','pro','agency'].includes(w.plan ?? ''))
     isLifetime = !!lifetimeWs
     currentMaxWs = (lifetimeWs?.max_workspaces as number) || 1
+    trialUsed = !!ownedWs?.some(w => !!w.trial_used_at)
 
     // If lifetime and still have room for workspaces, redirect back
     if (isLifetime && wsCount < currentMaxWs) {
@@ -49,5 +51,5 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
   )
   const pricing = await fetchPricingConfig(adminClient)
 
-  return <UpgradeModule failed={failed === '1'} isLifetime={isLifetime} currentMaxWs={currentMaxWs} wsCount={wsCount} pricing={pricing} />
+  return <UpgradeModule failed={failed === '1'} isLifetime={isLifetime} currentMaxWs={currentMaxWs} wsCount={wsCount} pricing={pricing} trialUsed={trialUsed} />
 }

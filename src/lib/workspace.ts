@@ -3,8 +3,13 @@ import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
 // Semua nilai plan yang sudah bayar dan punya akses penuh
-export const PAID_PLANS = ['lifetime', 'basic', 'pro', 'agency', 'bulanan'] as const
+// 'trial' ikut disini karena selama masih aktif dia dapat akses penuh juga —
+// expiry-nya di-enforce lewat downgrade proaktif (lihat getServerContext), bukan cek tanggal di sini
+export const PAID_PLANS = ['lifetime', 'basic', 'pro', 'agency', 'bulanan', 'trial'] as const
 export type PlanId = typeof PAID_PLANS[number]
+
+// Lama trial gratis dalam hari
+export const TRIAL_DAYS = 7
 
 export function isPaidPlan(plan: string | null | undefined): boolean {
   return PAID_PLANS.includes((plan ?? '') as PlanId)
@@ -23,6 +28,7 @@ export const PLAN_LABELS: Record<string, string> = {
   pro:      'Pro Lifetime',
   agency:   'Agency Lifetime',
   bulanan:  'Bulanan',
+  trial:    'Trial',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

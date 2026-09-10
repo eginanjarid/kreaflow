@@ -136,7 +136,7 @@ function BarChart({ data, color = '#1a73e8', height = 56 }: { data: number[]; co
 
 export default function AdminModule({ users, workspaces, stats, isGodAdmin, superAdmins, godAdminEmail, savedPricing }: { users: UserRow[]; workspaces: WorkspaceRow[]; stats: Stats; isGodAdmin: boolean; superAdmins: SuperAdminRow[]; godAdminEmail: string; savedPricing: PricingConfig }) {
   const isMobile = useIsMobile()
-  const [tab, setTab] = useState<'dashboard' | 'users' | 'owner' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses' | 'promo'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'users' | 'owner' | 'workspaces' | 'transaksi' | 'kupon' | 'pricing' | 'superadmins' | 'akses' | 'promo' | 'trial'>('dashboard')
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>(savedPricing)
   const [pricingSaving, setPricingSaving] = useState(false)
   const [pricingMsg, setPricingMsg] = useState('')
@@ -198,6 +198,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
   useEffect(() => {
     if (tab === 'akses') fetchAccess(accessSearch)
     if (tab === 'promo') fetchPromo()
+    if (tab === 'trial') fetchTrialEnabled()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
 
@@ -373,6 +374,26 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
     })
   }
 
+  // Trial tab state
+  const [trialEnabled, setTrialEnabled] = useState(false)
+  const [trialLoading, setTrialLoading] = useState(false)
+  const [trialSaving, setTrialSaving] = useState(false)
+
+  async function fetchTrialEnabled() {
+    setTrialLoading(true)
+    const res = await fetch('/api/admin/trial')
+    const data = await res.json()
+    setTrialLoading(false)
+    if (res.ok) setTrialEnabled(data.enabled === true)
+  }
+
+  async function toggleTrial(enabled: boolean) {
+    setTrialSaving(true)
+    const res = await fetch('/api/admin/trial', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled }) })
+    setTrialSaving(false)
+    if (res.ok) { setTrialEnabled(enabled); showToast(enabled ? 'Trial diaktifkan' : 'Trial dinonaktifkan') }
+  }
+
   const superAdminEmailSet = new Set([godAdminEmail, ...saList.map(s => s.email)])
 
   const ownerUsers = userList.filter(u => u.workspaces[0]?.role === 'owner' && !superAdminEmailSet.has(u.email))
@@ -543,6 +564,7 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
           ['pricing', 'Pricing', '#d97706'],
           ['akses', 'Grant Akses', '#059669'],
           ['promo', 'Promo Link', '#7c3aed'],
+          ['trial', 'Trial', '#0891b2'],
         ] as [string, string, string][]).map(([id, label, color]) => (
           <button key={id} onClick={() => setTab(id as typeof tab)}
             style={{ padding: '9px 14px', background: 'transparent', border: 'none', borderBottom: tab === id ? `2px solid ${color}` : '2px solid transparent', color: tab === id ? color : '#6b7280', fontSize: '0.82rem', fontWeight: tab === id ? 700 : 400, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -1380,6 +1402,37 @@ export default function AdminModule({ users, workspaces, stats, isGodAdmin, supe
                 </div>
               )
             })}
+          </div>
+        </div>
+      )}
+
+      {/* TRIAL TAB */}
+      {tab === 'trial' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)' }}>
+            <div style={{ fontWeight: 700, color: '#111827', fontSize: '0.9rem', marginBottom: 4 }}>Uji Coba Gratis 7 Hari</div>
+            <p style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 16, lineHeight: 1.6 }}>
+              Kontrol apakah halaman <code style={{ background: '#f3f4f6', padding: '1px 6px', borderRadius: 5 }}>{APP_URL}/trial</code> lagi bisa dipakai orang buat mulai trial 7 hari. Link ini sengaja tidak dipasang di landing page — cuma dibagikan manual.
+            </p>
+            {trialLoading ? (
+              <div style={{ padding: 16, textAlign: 'center', color: '#9ca3af', fontSize: '0.85rem' }}>Loading...</div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: trialEnabled ? '#f0fdf4' : '#f8fafc', border: '1px solid ' + (trialEnabled ? '#bbf7d0' : '#e5eaf2'), borderRadius: 10 }}>
+                <span style={{ fontSize: '0.65rem', padding: '3px 9px', borderRadius: 20, background: trialEnabled ? '#059669' : '#9ca3af', color: '#fff', fontWeight: 700 }}>
+                  {trialEnabled ? 'AKTIF' : 'NONAKTIF'}
+                </span>
+                <span style={{ fontSize: '0.82rem', color: '#374151', flex: 1 }}>
+                  {trialEnabled ? 'Trial sedang terbuka — orang bisa daftar dari /trial.' : 'Trial sedang tertutup — /trial menampilkan pesan "tidak dibuka".'}
+                </span>
+                <button onClick={() => toggleTrial(!trialEnabled)} disabled={trialSaving}
+                  style={{ padding: '7px 16px', background: trialEnabled ? '#fef2f2' : '#059669', border: trialEnabled ? '1px solid #fecaca' : 'none', borderRadius: 8, fontSize: '0.78rem', fontWeight: 700, cursor: trialSaving ? 'not-allowed' : 'pointer', color: trialEnabled ? '#dc2626' : '#fff' }}>
+                  {trialSaving ? 'Menyimpan...' : trialEnabled ? 'Matikan' : 'Nyalakan'}
+                </button>
+              </div>
+            )}
+            <button onClick={() => { navigator.clipboard.writeText(`${APP_URL}/trial`); showToast('Link disalin!') }} style={{ marginTop: 12, padding: '6px 10px', background: '#f8fafc', border: '1px solid #e5eaf2', borderRadius: 7, fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', color: '#374151' }}>
+              Salin Link /trial
+            </button>
           </div>
         </div>
       )}

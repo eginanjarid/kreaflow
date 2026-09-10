@@ -15,12 +15,14 @@ export default function UpgradeModule({
   currentMaxWs = 0,
   wsCount = 0,
   pricing,
+  trialUsed = false,
 }: {
   failed: boolean
   isLifetime?: boolean
   currentMaxWs?: number
   wsCount?: number
   pricing?: PricingConfig
+  trialUsed?: boolean
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
@@ -75,6 +77,17 @@ export default function UpgradeModule({
       {failed && (
         <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: '#dc2626', fontWeight: 500 }}>
           Pembayaran gagal atau dibatalkan. Silakan coba lagi.
+        </div>
+      )}
+
+      {!failed && trialUsed && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: '#92400e', fontWeight: 500 }}>
+          Trial 7 hari kamu sudah selesai. Makasih udah coba KreaFlow — yuk lanjut berlangganan biar tim kamu nggak putus alur kerja.
+        </div>
+      )}
+      {!failed && !trialUsed && (
+        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: '#1a73e8', fontWeight: 500 }}>
+          Pilih paket buat lanjut pakai KreaFlow.
         </div>
       )}
 
